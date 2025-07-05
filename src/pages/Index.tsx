@@ -70,45 +70,45 @@ const Index = () => {
   const [operation, setOperation] = useState("");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-orange-600 via-red-600 to-amber-600 text-white">
-        <div className="absolute inset-0 bg-black opacity-15"></div>
+      <section className="relative bg-gradient-to-br from-amber-700 via-yellow-700 to-amber-800 text-white">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative container mx-auto px-6 py-28 text-center">
           <h1 className="text-6xl md:text-7xl font-bold mb-8 leading-tight drop-shadow-lg">
             Encuentra tu
             <span className="block text-yellow-200 animate-pulse">Hogar Perfecto</span>
           </h1>
-          <p className="text-2xl md:text-3xl mb-14 text-orange-100 max-w-4xl mx-auto drop-shadow-md">
+          <p className="text-2xl md:text-3xl mb-14 text-amber-100 max-w-4xl mx-auto drop-shadow-md">
             Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.
           </p>
           
           {/* España-UE Logo más grande */}
           <div className="mb-12 flex justify-center animate-bounce">
             <img 
-              src="/lovable-uploads/40868b12-4e35-4795-9055-e41aed888525.png" 
+              src="/lovable-uploads/14d0d64d-7033-4aba-8b62-45478fd05ee4.png" 
               alt="España - Europa" 
-              className="h-24 w-auto drop-shadow-2xl"
+              className="h-32 w-auto drop-shadow-2xl"
             />
           </div>
           
           {/* Search Bar */}
-          <div className="bg-white rounded-3xl p-8 max-w-5xl mx-auto shadow-2xl border-4 border-orange-200">
+          <div className="bg-white rounded-3xl p-8 max-w-5xl mx-auto shadow-2xl border-4 border-amber-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 h-6 w-6 text-orange-500" />
+                <MapPin className="absolute left-4 top-4 h-6 w-6 text-amber-600" />
                 <Input
                   placeholder="¿Dónde buscas?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 border-2 border-orange-200 text-orange-800 font-medium text-lg focus:border-orange-400"
+                  className="pl-12 h-14 border-2 border-amber-200 text-amber-900 font-medium text-lg focus:border-amber-400"
                 />
               </div>
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-14 border-2 border-orange-200 text-orange-800 font-medium text-lg focus:border-orange-400">
+                <SelectTrigger className="h-14 border-2 border-amber-200 text-amber-900 font-medium text-lg focus:border-amber-400">
                   <SelectValue placeholder="Tipo de propiedad" />
                 </SelectTrigger>
                 <SelectContent>
@@ -120,7 +120,7 @@ const Index = () => {
               </Select>
               
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-14 border-2 border-orange-200 text-orange-800 font-medium text-lg focus:border-orange-400">
+                <SelectTrigger className="h-14 border-2 border-amber-200 text-amber-900 font-medium text-lg focus:border-amber-400">
                   <SelectValue placeholder="Alquiler o Venta" />
                 </SelectTrigger>
                 <SelectContent>
@@ -129,7 +129,7 @@ const Index = () => {
                 </SelectContent>
               </Select>
               
-              <Button size="lg" className="h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <Button size="lg" className="h-14 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
                 <Search className="mr-3 h-6 w-6" />
                 Buscar
               </Button>
@@ -139,47 +139,47 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-white to-orange-50">
+      <section className="py-20 bg-gradient-to-r from-white to-amber-50">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-orange-100">
-              <div className="bg-gradient-to-br from-orange-400 to-red-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-amber-100">
+              <div className="bg-gradient-to-br from-amber-500 to-yellow-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Home className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-4xl font-bold text-orange-700 mb-3">15,000+</h3>
-              <p className="text-orange-600 text-lg font-medium">Propiedades Disponibles</p>
+              <h3 className="text-4xl font-bold text-amber-800 mb-3">15,000+</h3>
+              <p className="text-amber-700 text-lg font-medium">Propiedades Disponibles</p>
             </div>
-            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-orange-100">
-              <div className="bg-gradient-to-br from-red-400 to-amber-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-amber-100">
+              <div className="bg-gradient-to-br from-yellow-500 to-amber-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Key className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-4xl font-bold text-red-700 mb-3">5,000+</h3>
-              <p className="text-red-600 text-lg font-medium">Clientes Satisfechos</p>
+              <h3 className="text-4xl font-bold text-yellow-700 mb-3">5,000+</h3>
+              <p className="text-yellow-700 text-lg font-medium">Clientes Satisfechos</p>
             </div>
-            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-orange-100">
-              <div className="bg-gradient-to-br from-amber-400 to-orange-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-amber-100">
+              <div className="bg-gradient-to-br from-amber-600 to-yellow-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Zap className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-4xl font-bold text-amber-700 mb-3">98%</h3>
-              <p className="text-amber-600 text-lg font-medium">Tasa de Éxito</p>
+              <h3 className="text-4xl font-bold text-amber-800 mb-3">98%</h3>
+              <p className="text-amber-700 text-lg font-medium">Tasa de Éxito</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Properties */}
-      <section className="py-24 bg-gradient-to-b from-orange-50 to-red-50">
+      <section className="py-24 bg-gradient-to-b from-amber-50 to-yellow-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold text-orange-800 mb-6 drop-shadow-sm">Propiedades Destacadas</h2>
-            <p className="text-2xl text-orange-700 max-w-3xl mx-auto font-medium">
+            <h2 className="text-5xl font-bold text-amber-900 mb-6 drop-shadow-sm">Propiedades Destacadas</h2>
+            <p className="text-2xl text-amber-800 max-w-3xl mx-auto font-medium">
               Descubre nuestra selección de las mejores propiedades disponibles
             </p>
             <div className="mt-8 flex justify-center">
               <img 
-                src="/lovable-uploads/40868b12-4e35-4795-9055-e41aed888525.png" 
+                src="/lovable-uploads/14d0d64d-7033-4aba-8b62-45478fd05ee4.png" 
                 alt="España - Europa" 
-                className="h-20 w-auto animate-pulse drop-shadow-lg"
+                className="h-24 w-auto animate-pulse drop-shadow-lg"
               />
             </div>
           </div>
@@ -192,7 +192,7 @@ const Index = () => {
           
           <div className="text-center mt-16">
             <Link to="/properties">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold text-lg px-10 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <Button size="lg" className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold text-lg px-10 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
                 Ver Todas las Propiedades
               </Button>
             </Link>

@@ -40,7 +40,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-2 border-orange-200 shadow-xl hover:scale-[1.03] hover:-translate-y-2 bg-gradient-to-b from-white to-orange-50">
+    <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-2 border-amber-200 shadow-xl hover:scale-[1.03] hover:-translate-y-2 bg-gradient-to-b from-white to-amber-50">
       <div className="relative overflow-hidden">
         <img
           src={property.image}
@@ -54,13 +54,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             variant={property.operation === 'rent' ? 'default' : 'secondary'}
             className={`${
               property.operation === 'rent' 
-                ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600' 
-                : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
+                ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700' 
+                : 'bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700'
             } text-white transition-all duration-300 hover:scale-105 animate-pulse font-semibold shadow-lg`}
           >
             {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
           </Badge>
-          <Badge variant="outline" className="bg-white/95 text-orange-700 border-orange-300 transition-all duration-300 hover:scale-105 font-medium shadow-md">
+          <Badge variant="outline" className="bg-white/95 text-amber-800 border-amber-300 transition-all duration-300 hover:scale-105 font-medium shadow-md">
             {getTypeLabel(property.type)}
           </Badge>
         </div>
@@ -70,36 +70,36 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           variant="ghost"
           className="absolute top-3 right-3 bg-white/95 hover:bg-white p-2 h-auto transition-all duration-300 hover:scale-110 hover:text-red-500 shadow-lg"
         >
-          <Heart className="h-4 w-4 text-orange-600 transition-colors duration-300" />
+          <Heart className="h-4 w-4 text-amber-700 transition-colors duration-300" />
         </Button>
 
         <div className="absolute top-3 right-14 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <Star className="h-5 w-5 text-yellow-400 animate-pulse drop-shadow-lg" />
+          <Star className="h-5 w-5 text-yellow-500 animate-pulse drop-shadow-lg" />
         </div>
       </div>
 
-      <CardContent className="p-6 bg-gradient-to-b from-white to-orange-50">
+      <CardContent className="p-6 bg-gradient-to-b from-white to-amber-50">
         <div className="mb-4">
-          <h3 className="font-bold text-xl text-orange-800 mb-2 line-clamp-1 group-hover:text-orange-600 transition-colors duration-300">
+          <h3 className="font-bold text-xl text-amber-900 mb-2 line-clamp-1 group-hover:text-amber-700 transition-colors duration-300">
             {property.title}
           </h3>
-          <div className="flex items-center text-orange-600 text-base group-hover:text-orange-700 transition-colors duration-300 font-medium">
+          <div className="flex items-center text-amber-700 text-base group-hover:text-amber-800 transition-colors duration-300 font-medium">
             <MapPin className="h-5 w-5 mr-2 animate-pulse" />
             {property.location}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-5 text-base text-orange-700">
+        <div className="flex items-center justify-between mb-5 text-base text-amber-800">
           <div className="flex items-center space-x-5">
-            <div className="flex items-center transition-all duration-300 hover:text-orange-900 hover:scale-110 font-medium">
+            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
               <Bed className="h-5 w-5 mr-1" />
               <span>{property.bedrooms}</span>
             </div>
-            <div className="flex items-center transition-all duration-300 hover:text-orange-900 hover:scale-110 font-medium">
+            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
               <Bath className="h-5 w-5 mr-1" />
               <span>{property.bathrooms}</span>
             </div>
-            <div className="flex items-center transition-all duration-300 hover:text-orange-900 hover:scale-110 font-medium">
+            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
               <Square className="h-5 w-5 mr-1" />
               <span>{property.area}m²</span>
             </div>
@@ -107,11 +107,11 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-orange-700 animate-pulse drop-shadow-sm">
+          <div className="text-2xl font-bold text-amber-800 animate-pulse drop-shadow-sm">
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.id}`}>
-            <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl font-semibold shadow-lg">
+            <Button size="sm" className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl font-semibold shadow-lg">
               <Eye className="h-4 w-4 mr-2" />
               Ver Más
             </Button>
