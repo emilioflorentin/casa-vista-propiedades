@@ -12,91 +12,97 @@ const Header = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-4 group">
             <img 
               src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
               alt="Nazarí Homes" 
-              className="h-12 w-auto"
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="hidden md:block w-px h-8 bg-stone-300"></div>
+            <img 
+              src="/lovable-uploads/40868b12-4e35-4795-9055-e41aed888525.png" 
+              alt="España - Europa" 
+              className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-stone-700 hover:text-stone-900 font-medium transition-colors">
+            <Link to="/" className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-stone-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
               Inicio
             </Link>
-            <Link to="/properties" className="text-stone-700 hover:text-stone-900 font-medium transition-colors">
+            <Link to="/properties" className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-stone-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
               Propiedades
             </Link>
-            <Link to="/contact" className="text-stone-700 hover:text-stone-900 font-medium transition-colors">
+            <Link to="/contact" className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-stone-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
               Contacto
             </Link>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-stone-700 hover:text-stone-900 hover:bg-stone-100">
-              <Heart className="h-4 w-4 mr-2" />
+            <Button variant="ghost" size="sm" className="text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all duration-300 hover:scale-105">
+              <Heart className="h-4 w-4 mr-2 transition-transform duration-300" />
               Favoritos
             </Button>
-            <Button variant="ghost" size="sm" className="text-stone-700 hover:text-stone-900 hover:bg-stone-100">
-              <User className="h-4 w-4 mr-2" />
+            <Button variant="ghost" size="sm" className="text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all duration-300 hover:scale-105">
+              <User className="h-4 w-4 mr-2 transition-transform duration-300" />
               Mi Cuenta
             </Button>
-            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
-              <Phone className="h-4 w-4 mr-2" />
+            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <Phone className="h-4 w-4 mr-2 transition-transform duration-300" />
               Contactar
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 transition-transform duration-300 hover:scale-110"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-stone-700" />
+              <X className="h-6 w-6 text-stone-700 transition-transform duration-300" />
             ) : (
-              <Menu className="h-6 w-6 text-stone-700" />
+              <Menu className="h-6 w-6 text-stone-700 transition-transform duration-300" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-stone-200">
+          <div className="md:hidden py-4 border-t border-stone-200 animate-fade-in">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className="text-stone-700 hover:text-stone-900 font-medium transition-colors"
+                className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:translate-x-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Inicio
               </Link>
               <Link 
                 to="/properties" 
-                className="text-stone-700 hover:text-stone-900 font-medium transition-colors"
+                className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:translate-x-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Propiedades
               </Link>
               <Link 
                 to="/contact" 
-                className="text-stone-700 hover:text-stone-900 font-medium transition-colors"
+                className="text-stone-700 hover:text-stone-900 font-medium transition-all duration-300 hover:translate-x-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-stone-200">
-                <Button variant="ghost" size="sm" className="justify-start text-stone-700 hover:text-stone-900 hover:bg-stone-100">
+                <Button variant="ghost" size="sm" className="justify-start text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all duration-300 hover:translate-x-2">
                   <Heart className="h-4 w-4 mr-2" />
                   Favoritos
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-stone-700 hover:text-stone-900 hover:bg-stone-100">
+                <Button variant="ghost" size="sm" className="justify-start text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all duration-300 hover:translate-x-2">
                   <User className="h-4 w-4 mr-2" />
                   Mi Cuenta
                 </Button>
-                <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
+                <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start transition-all duration-300 hover:translate-x-2">
                   <Phone className="h-4 w-4 mr-2" />
                   Contactar
                 </Button>
