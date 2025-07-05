@@ -2,7 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MapPin, Bed, Bath, Square, Eye, Star } from "lucide-react";
+import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Property {
@@ -40,79 +40,66 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-2 border-amber-200 shadow-xl hover:scale-[1.03] hover:-translate-y-2 bg-gradient-to-b from-white to-amber-50">
+    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
       <div className="relative overflow-hidden">
         <img
           src={property.image}
           alt={property.title}
-          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
         <div className="absolute top-3 left-3 flex gap-2">
           <Badge 
             variant={property.operation === 'rent' ? 'default' : 'secondary'}
             className={`${
               property.operation === 'rent' 
-                ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700' 
-                : 'bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700'
-            } text-white transition-all duration-300 hover:scale-105 animate-pulse font-semibold shadow-lg`}
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-blue-500 hover:bg-blue-600'
+            } text-white`}
           >
             {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
           </Badge>
-          <Badge variant="outline" className="bg-white/95 text-amber-800 border-amber-300 transition-all duration-300 hover:scale-105 font-medium shadow-md">
+          <Badge variant="outline" className="bg-white/90 text-gray-700">
             {getTypeLabel(property.type)}
           </Badge>
         </div>
-        
         <Button
           size="sm"
           variant="ghost"
-          className="absolute top-3 right-3 bg-white/95 hover:bg-white p-2 h-auto transition-all duration-300 hover:scale-110 hover:text-red-500 shadow-lg"
+          className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 h-auto"
         >
-          <Heart className="h-4 w-4 text-amber-700 transition-colors duration-300" />
+          <Heart className="h-4 w-4 text-gray-600" />
         </Button>
-
-        <div className="absolute top-3 right-14 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <Star className="h-5 w-5 text-yellow-500 animate-pulse drop-shadow-lg" />
-        </div>
       </div>
 
-      <CardContent className="p-6 bg-gradient-to-b from-white to-amber-50">
-        <div className="mb-4">
-          <h3 className="font-bold text-xl text-amber-900 mb-2 line-clamp-1 group-hover:text-amber-700 transition-colors duration-300">
+      <CardContent className="p-5">
+        <div className="mb-3">
+          <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
             {property.title}
           </h3>
-          <div className="flex items-center text-amber-700 text-base group-hover:text-amber-800 transition-colors duration-300 font-medium">
-            <MapPin className="h-5 w-5 mr-2 animate-pulse" />
+          <div className="flex items-center text-gray-500 text-sm">
+            <MapPin className="h-4 w-4 mr-1" />
             {property.location}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-5 text-base text-amber-800">
-          <div className="flex items-center space-x-5">
-            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
-              <Bed className="h-5 w-5 mr-1" />
-              <span>{property.bedrooms}</span>
-            </div>
-            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
-              <Bath className="h-5 w-5 mr-1" />
-              <span>{property.bathrooms}</span>
-            </div>
-            <div className="flex items-center transition-all duration-300 hover:text-amber-900 hover:scale-110 font-medium">
-              <Square className="h-5 w-5 mr-1" />
-              <span>{property.area}m²</span>
-            </div>
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+          <div className="flex items-center">
+            <Bed className="h-4 w-4 mr-1" />
+            <span className="mr-3">{property.bedrooms}</span>
+            <Bath className="h-4 w-4 mr-1" />
+            <span className="mr-3">{property.bathrooms}</span>
+            <Square className="h-4 w-4 mr-1" />
+            <span>{property.area}m²</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-amber-800 animate-pulse drop-shadow-sm">
+          <div className="text-xl font-bold text-blue-600">
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.id}`}>
-            <Button size="sm" className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl font-semibold shadow-lg">
-              <Eye className="h-4 w-4 mr-2" />
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Eye className="h-4 w-4 mr-1" />
               Ver Más
             </Button>
           </Link>

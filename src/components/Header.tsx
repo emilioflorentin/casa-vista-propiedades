@@ -1,109 +1,102 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone } from "lucide-react";
+import { Menu, X, Home, Heart, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 shadow-xl sticky top-0 z-50 border-b-2 border-amber-200">
+    <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-6 group">
-            <img 
-              src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
-              alt="Nazarí Homes" 
-              className="h-16 w-auto transition-transform duration-300 group-hover:scale-110 drop-shadow-lg"
-            />
-            <div className="hidden md:block w-px h-12 bg-gradient-to-b from-amber-400 to-yellow-500"></div>
-            <img 
-              src="/lovable-uploads/14d0d64d-7033-4aba-8b62-45478fd05ee4.png" 
-              alt="España - Europa" 
-              className="h-20 w-auto transition-transform duration-300 group-hover:scale-110 drop-shadow-lg"
-            />
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Home className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-gray-800">InmobiliariaApp</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-1 after:bottom-0 after:left-0 after:bg-gradient-to-r after:from-amber-600 after:to-yellow-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
+            <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Inicio
             </Link>
-            <Link to="/properties" className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-1 after:bottom-0 after:left-0 after:bg-gradient-to-r after:from-amber-600 after:to-yellow-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
+            <Link to="/properties" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Propiedades
             </Link>
-            <Link to="/contact" className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:scale-105 relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-1 after:bottom-0 after:left-0 after:bg-gradient-to-r after:from-amber-600 after:to-yellow-600 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">
+            <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contacto
             </Link>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-amber-800 hover:text-amber-900 hover:bg-amber-100 transition-all duration-300 hover:scale-105 font-medium">
-              <Heart className="h-5 w-5 mr-2 transition-transform duration-300" />
+            <Button variant="ghost" size="sm">
+              <Heart className="h-4 w-4 mr-2" />
               Favoritos
             </Button>
-            <Button variant="ghost" size="sm" className="text-amber-800 hover:text-amber-900 hover:bg-amber-100 transition-all duration-300 hover:scale-105 font-medium">
-              <User className="h-5 w-5 mr-2 transition-transform duration-300" />
+            <Button variant="ghost" size="sm">
+              <User className="h-4 w-4 mr-2" />
               Mi Cuenta
             </Button>
-            <Button size="sm" className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg">
-              <Phone className="h-5 w-5 mr-2 transition-transform duration-300" />
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Phone className="h-4 w-4 mr-2" />
               Contactar
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 transition-transform duration-300 hover:scale-110"
+            className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <X className="h-7 w-7 text-amber-800 transition-transform duration-300" />
+              <X className="h-6 w-6 text-gray-700" />
             ) : (
-              <Menu className="h-7 w-7 text-amber-800 transition-transform duration-300" />
+              <Menu className="h-6 w-6 text-gray-700" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t-2 border-amber-200 animate-fade-in bg-gradient-to-b from-amber-50 to-yellow-50">
+          <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:translate-x-2"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Inicio
               </Link>
               <Link 
                 to="/properties" 
-                className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:translate-x-2"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Propiedades
               </Link>
               <Link 
                 to="/contact" 
-                className="text-amber-800 hover:text-amber-900 font-semibold text-lg transition-all duration-300 hover:translate-x-2"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
-              <div className="flex flex-col space-y-3 pt-4 border-t-2 border-amber-200">
-                <Button variant="ghost" size="sm" className="justify-start text-amber-800 hover:text-amber-900 hover:bg-amber-100 transition-all duration-300 hover:translate-x-2 font-medium">
-                  <Heart className="h-5 w-5 mr-2" />
+              <div className="flex flex-col space-y-2 pt-4 border-t">
+                <Button variant="ghost" size="sm" className="justify-start">
+                  <Heart className="h-4 w-4 mr-2" />
                   Favoritos
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-amber-800 hover:text-amber-900 hover:bg-amber-100 transition-all duration-300 hover:translate-x-2 font-medium">
-                  <User className="h-5 w-5 mr-2" />
+                <Button variant="ghost" size="sm" className="justify-start">
+                  <User className="h-4 w-4 mr-2" />
                   Mi Cuenta
                 </Button>
-                <Button size="sm" className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white justify-start transition-all duration-300 hover:translate-x-2 font-semibold shadow-lg">
-                  <Phone className="h-5 w-5 mr-2" />
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 justify-start">
+                  <Phone className="h-4 w-4 mr-2" />
                   Contactar
                 </Button>
               </div>
