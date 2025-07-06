@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,15 +37,17 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       console.log('Executing text search for:', searchQuery);
       setIsSearching(true);
       
-      // Use text search as fallback when geolocation or maps don't work
+      // Use the searchLocationByName function for better geocoding
+      const result = searchLocationByName(searchQuery);
+      
       const location = {
-        address: searchQuery,
-        lat: 40.4168, // Default to Madrid center as fallback
-        lng: -3.7038,
+        address: result.address,
+        lat: result.lat,
+        lng: result.lng,
         radius: parseInt(radius)
       };
       
-      setSelectedLocation({ address: searchQuery, lat: 40.4168, lng: -3.7038 });
+      setSelectedLocation({ address: result.address, lat: result.lat, lng: result.lng });
       onLocationSelect(location);
       console.log('Text search applied:', location);
       
@@ -119,6 +120,23 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     circleRef.current = circle;
   };
 
+  // Update radius circle when radius changes
+  useEffect(() => {
+    if (selectedLocation && mapInstanceRef.current && circleRef.current) {
+      // Remove existing circle
+      mapInstanceRef.current.removeLayer(circleRef.current);
+      
+      // Add new circle with updated radius
+      const circle = L.circle([selectedLocation.lat, selectedLocation.lng], {
+        color: '#8B7355',
+        fillColor: '#8B7355',
+        fillOpacity: 0.15,
+        radius: parseInt(radius)
+      }).addTo(mapInstanceRef.current);
+      circleRef.current = circle;
+    }
+  }, [radius, selectedLocation]);
+
   const handleShowMap = () => {
     setShowMap(true);
     setIsSearching(false);
@@ -137,7 +155,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   };
 
   const searchLocationByName = (locationName: string) => {
-    // Simple geocoding for common Madrid locations
+    // Enhanced geocoding for Spanish locations including Granada
     const locationMap: { [key: string]: [number, number] } = {
       'madrid': [40.4168, -3.7038],
       'madrid centro': [40.4168, -3.7038],
@@ -148,15 +166,44 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       'pozuelo': [40.4364, -3.8123],
       'chueca': [40.4255, -3.6959],
       'retiro': [40.4153, -3.6844],
-      'chamberí': [40.4378, -3.7044]
+      'chamberí': [40.4378, -3.7044],
+      'granada': [37.1773, -3.5986], // Granada, Spain coordinates
+      'sevilla': [37.3886, -5.9823],
+      'barcelona': [41.3851, 2.1734],
+      'valencia': [39.4699, -0.3763],
+      'bilbao': [43.2627, -2.9253],
+      'málaga': [36.7213, -4.4214],
+      'córdoba': [37.8882, -4.7794],
+      'toledo': [39.8628, -4.0273]
     };
 
     const searchTerm = locationName.toLowerCase().trim();
-    const coords = locationMap[searchTerm] || [40.4168, -3.7038];
     
+    // Try exact match first
+    if (locationMap[searchTerm]) {
+      const coords = locationMap[searchTerm];
+      return {
+        lat: coords[0],
+        lng: coords[1],
+        address: locationName
+      };
+    }
+    
+    // Try partial match for cities
+    for (const [key, coords] of Object.entries(locationMap)) {
+      if (key.includes(searchTerm) || searchTerm.includes(key)) {
+        return {
+          lat: coords[0],
+          lng: coords[1],
+          address: locationName
+        };
+      }
+    }
+    
+    // Default to Madrid if no match found
     return {
-      lat: coords[0],
-      lng: coords[1],
+      lat: 40.4168,
+      lng: -3.7038,
       address: locationName
     };
   };
@@ -288,7 +335,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 <div className="flex gap-2">
                   <Input
                     id="modal-location-input"
-                    placeholder="Escribe una dirección (ej: Madrid Centro, Malasaña, Sol...)"
+                    placeholder="Escribe una dirección (ej: Granada, Madrid Centro, Sevilla...)"
                     className="flex-1 bg-white border border-gray-300"
                     onKeyPress={handleModalInputKeyPress}
                   />
