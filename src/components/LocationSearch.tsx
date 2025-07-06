@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
   const handleTextSearch = () => {
     if (searchQuery.trim()) {
+      console.log('Executing text search for:', searchQuery);
       // Use text search as fallback when geolocation or maps don't work
       const location = {
         address: searchQuery,
@@ -65,6 +67,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
   const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleTextSearch();
     }
   };
@@ -232,15 +235,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     <div className="relative">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-3 h-5 w-5 text-amber-400" />
+          <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-600" />
           <Input
             id="location-input"
             placeholder={placeholder}
             value={searchQuery}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
-            className="pl-10 h-12 border-0 text-amber-700"
-            onClick={handleShowMap}
+            className="pl-10 h-12 border-0 text-stone-700"
           />
         </div>
         <Button
@@ -249,7 +251,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           size="sm"
           onClick={handleTextSearch}
           disabled={!searchQuery.trim()}
-          className="h-12 px-3 border-0 bg-amber-100 hover:bg-amber-200"
+          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
+          title="Buscar por texto"
         >
           <Search className="h-4 w-4" />
         </Button>
@@ -257,25 +260,26 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           type="button"
           variant="outline"
           size="sm"
-          onClick={handleCurrentLocation}
-          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200"
+          onClick={handleShowMap}
+          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
+          title="Buscar por ubicación"
         >
           <Target className="h-4 w-4" />
         </Button>
       </div>
 
       {showMap && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-lg">
+        <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-xl bg-white">
           <CardContent className="p-4">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-amber-700 mb-2">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
                 Radio de búsqueda
               </label>
               <Select value={radius} onValueChange={setRadius}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                   <SelectItem value="500">500 metros</SelectItem>
                   <SelectItem value="1000">1 kilómetro</SelectItem>
                   <SelectItem value="2000">2 kilómetros</SelectItem>
@@ -287,13 +291,13 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             
             <div 
               ref={mapRef} 
-              className="w-full h-64 rounded-lg mb-4 bg-amber-50"
+              className="w-full h-64 rounded-lg mb-4 bg-stone-50"
               style={{ minHeight: '250px' }}
             />
             
             {!mapsLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-amber-50 rounded-lg">
-                <p className="text-amber-600">Cargando mapa...</p>
+              <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
+                <p className="text-stone-600">Cargando mapa...</p>
               </div>
             )}
             
@@ -302,14 +306,22 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 variant="outline"
                 onClick={() => setShowMap(false)}
                 size="sm"
+                className="bg-white hover:bg-stone-50 border-stone-300"
               >
                 Cancelar
+              </Button>
+              <Button
+                onClick={handleCurrentLocation}
+                size="sm"
+                className="bg-stone-600 hover:bg-stone-700 text-white mr-2"
+              >
+                Mi Ubicación
               </Button>
               <Button
                 onClick={handleApplyLocation}
                 disabled={!selectedLocation}
                 size="sm"
-                className="bg-amber-600 hover:bg-amber-700"
+                className="bg-stone-600 hover:bg-stone-700 text-white"
               >
                 Aplicar Ubicación
               </Button>
