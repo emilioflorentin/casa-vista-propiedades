@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -7,12 +8,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
-import { featuredProperties } from "@/data/properties";
+import { featuredProperties, allProperties } from "@/data/properties";
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
+  const [filteredProperties, setFilteredProperties] = useState(featuredProperties);
+  const [showingSearchResults, setShowingSearchResults] = useState(false);
 
   const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
     setSelectedLocation(location);
@@ -25,7 +28,41 @@ const Index = () => {
       propertyType,
       operation
     });
-    // Here you would implement the actual search logic
+
+    // Filter properties based on search criteria
+    let results = [...allProperties];
+
+    // Filter by property type if selected
+    if (propertyType && propertyType !== "any") {
+      results = results.filter(property => property.type === propertyType);
+    }
+
+    // Filter by operation if selected
+    if (operation && operation !== "any") {
+      results = results.filter(property => property.operation === operation);
+    }
+
+    // Filter by location if provided
+    if (selectedLocation) {
+      // Simple text-based location filtering for now
+      const searchTerm = selectedLocation.address.toLowerCase();
+      results = results.filter(property => 
+        property.location.toLowerCase().includes(searchTerm) ||
+        property.location.toLowerCase().includes('madrid') // Include Madrid properties for general searches
+      );
+    }
+
+    setFilteredProperties(results);
+    setShowingSearchResults(true);
+    console.log('Filtered results:', results);
+  };
+
+  const resetSearch = () => {
+    setFilteredProperties(featuredProperties);
+    setShowingSearchResults(false);
+    setSelectedLocation(null);
+    setPropertyType("");
+    setOperation("");
   };
 
   return (
@@ -57,6 +94,7 @@ const Index = () => {
                   <SelectValue placeholder="Tipo de propiedad" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="any">Cualquiera</SelectItem>
                   <SelectItem value="apartment">Apartamento</SelectItem>
                   <SelectItem value="house">Casa</SelectItem>
                   <SelectItem value="loft">Loft</SelectItem>
@@ -69,6 +107,7 @@ const Index = () => {
                   <SelectValue placeholder="Alquiler o Venta" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="any">Cualquiera</SelectItem>
                   <SelectItem value="rent">Alquiler</SelectItem>
                   <SelectItem value="sale">Venta</SelectItem>
                 </SelectContent>
@@ -116,29 +155,59 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Properties */}
+      {/* Properties Section */}
       <section className="py-20 bg-stone-25">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Propiedades Destacadas</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              {showingSearchResults ? 'Resultados de Búsqueda' : 'Propiedades Destacadas'}
+            </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Descubre nuestra selección de las mejores propiedades disponibles
+              {showingSearchResults 
+                ? `Encontradas ${filteredProperties.length} propiedades que coinciden con tu búsqueda`
+                : 'Descubre nuestra selección de las mejores propiedades disponibles'
+              }
             </p>
+            {showingSearchResults && (
+              <Button 
+                onClick={resetSearch}
+                variant="outline" 
+                className="mt-4 hover:bg-stone-50 border-stone-300 text-stone-700"
+              >
+                Ver Propiedades Destacadas
+              </Button>
+            )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/properties">
-              <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
+          {filteredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {filteredProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-xl text-gray-600 mb-4">
+                No se encontraron propiedades que coincidan con tu búsqueda
+              </p>
+              <Button 
+                onClick={resetSearch}
+                className="bg-stone-600 hover:bg-stone-700 text-white"
+              >
                 Ver Todas las Propiedades
               </Button>
-            </Link>
-          </div>
+            </div>
+          )}
+          
+          {!showingSearchResults && (
+            <div className="text-center mt-12">
+              <Link to="/properties">
+                <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
+                  Ver Todas las Propiedades
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
