@@ -71,46 +71,19 @@ const Index = () => {
           
           console.log(`Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${selectedLocation.radius}m`);
           
-          // Check if property is within the specified radius
-          if (distance <= selectedLocation.radius) {
-            return true;
-          }
+          // ONLY include properties within the specified radius
+          return distance <= selectedLocation.radius;
         }
         
-        // Fallback to text-based matching if coordinates are not available
-        if (propertyLocation.includes(searchTerm)) {
-          return true;
-        }
-        
-        // Check for specific city matches
-        if (searchTerm.includes('granada') && propertyLocation.includes('granada')) {
-          return true;
-        }
-        
-        if (searchTerm.includes('madrid') && propertyLocation.includes('madrid')) {
-          return true;
-        }
-        
-        if (searchTerm.includes('sevilla') && propertyLocation.includes('sevilla')) {
-          return true;
-        }
-        
-        if (searchTerm.includes('barcelona') && propertyLocation.includes('barcelona')) {
-          return true;
-        }
-        
-        // For coordinate-based searches (like "Lat: X, Lng: Y"), include all properties within radius
-        if (searchTerm.includes('lat:') && searchTerm.includes('lng:')) {
-          return true;
-        }
-        
+        // If coordinates are not available, exclude the property from radius search
+        console.log(`No coordinates found for ${property.location}, excluding from radius search`);
         return false;
       });
     }
 
     setFilteredProperties(results);
     setShowingSearchResults(true);
-    console.log('Filtered results:', results);
+    console.log('Filtered results:', results.length, 'properties found');
   };
 
   const resetSearch = () => {
