@@ -52,13 +52,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             variant={property.operation === 'rent' ? 'default' : 'secondary'}
             className={`${
               property.operation === 'rent' 
-                ? 'bg-stone-600 hover:bg-stone-700' 
-                : 'bg-stone-500 hover:bg-stone-600'
+                ? 'bg-blue-600 hover:bg-blue-700' 
+                : 'bg-green-600 hover:bg-green-700'
             } text-white`}
           >
             {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
           </Badge>
-          <Badge variant="outline" className="bg-white/90 text-stone-700 border-stone-300">
+          <Badge variant="outline" className="bg-white/90 text-gray-700 border-gray-300">
             {getTypeLabel(property.type)}
           </Badge>
         </div>
@@ -67,22 +67,22 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           variant="ghost"
           className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 h-auto"
         >
-          <Heart className="h-4 w-4 text-stone-600" />
+          <Heart className="h-4 w-4 text-gray-600" />
         </Button>
       </div>
 
       <CardContent className="p-5">
         <div className="mb-3">
-          <h3 className="font-semibold text-lg text-stone-800 mb-1 line-clamp-1">
+          <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
             {property.title}
           </h3>
-          <div className="flex items-center text-stone-500 text-sm">
+          <div className="flex items-center text-gray-500 text-sm">
             <MapPin className="h-4 w-4 mr-1" />
             {property.location}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4 text-sm text-stone-600">
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
           <div className="flex items-center">
             <Bed className="h-4 w-4 mr-1" />
             <span className="mr-3">{property.bedrooms}</span>
@@ -94,11 +94,11 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold text-stone-700">
+          <div className="text-xl font-bold text-gray-700">
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.id}`}>
-            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
               <Eye className="h-4 w-4 mr-1" />
               Ver Más
             </Button>

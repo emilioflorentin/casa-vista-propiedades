@@ -70,36 +70,36 @@ const Index = () => {
   const [operation, setOperation] = useState("");
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-800 via-stone-700 to-stone-600 text-white">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
             Encuentra tu
-            <span className="block text-stone-200">Hogar Perfecto</span>
+            <span className="block text-blue-100">Hogar Perfecto</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-stone-100 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-blue-50 max-w-3xl mx-auto">
             Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.
           </p>
           
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl p-6 max-w-4xl mx-auto shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 max-w-4xl mx-auto shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <Input
                   placeholder="¿Dónde buscas?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 border-0 text-stone-700"
+                  className="pl-10 h-12 border-0 text-gray-700"
                 />
               </div>
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 border-0 text-stone-700">
+                <SelectTrigger className="h-12 border-0 text-gray-700">
                   <SelectValue placeholder="Tipo de propiedad" />
                 </SelectTrigger>
                 <SelectContent>
@@ -111,7 +111,7 @@ const Index = () => {
               </Select>
               
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 border-0 text-stone-700">
+                <SelectTrigger className="h-12 border-0 text-gray-700">
                   <SelectValue placeholder="Alquiler o Venta" />
                 </SelectTrigger>
                 <SelectContent>
@@ -120,7 +120,7 @@ const Index = () => {
                 </SelectContent>
               </Select>
               
-              <Button size="lg" className="h-12 bg-stone-600 hover:bg-stone-700 text-white font-semibold">
+              <Button size="lg" className="h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                 <Search className="mr-2 h-5 w-5" />
                 Buscar
               </Button>
@@ -134,36 +134,36 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="p-6">
-              <div className="bg-stone-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="h-8 w-8 text-stone-600" />
+              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Home className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-3xl font-bold text-stone-800 mb-2">15,000+</h3>
-              <p className="text-stone-600">Propiedades Disponibles</p>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">15,000+</h3>
+              <p className="text-gray-600">Propiedades Disponibles</p>
             </div>
             <div className="p-6">
-              <div className="bg-stone-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Key className="h-8 w-8 text-stone-600" />
+              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Key className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-3xl font-bold text-stone-800 mb-2">5,000+</h3>
-              <p className="text-stone-600">Clientes Satisfechos</p>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">5,000+</h3>
+              <p className="text-gray-600">Clientes Satisfechos</p>
             </div>
             <div className="p-6">
-              <div className="bg-stone-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-stone-600" />
+              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-3xl font-bold text-stone-800 mb-2">98%</h3>
-              <p className="text-stone-600">Tasa de Éxito</p>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
+              <p className="text-gray-600">Tasa de Éxito</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Properties */}
-      <section className="py-20 bg-stone-50">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-stone-800 mb-4">Propiedades Destacadas</h2>
-            <p className="text-xl text-stone-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Propiedades Destacadas</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Descubre nuestra selección de las mejores propiedades disponibles
             </p>
           </div>
@@ -176,7 +176,7 @@ const Index = () => {
           
           <div className="text-center mt-12">
             <Link to="/properties">
-              <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
+              <Button size="lg" variant="outline" className="hover:bg-blue-50 border-blue-300 text-blue-700">
                 Ver Todas las Propiedades
               </Button>
             </Link>
