@@ -47,7 +47,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleTextSearch = () => {
     if (searchQuery.trim()) {
       console.log('Executing text search for:', searchQuery);
-      // Close map modal if it's open
+      // Ensure modal is closed when using text search
       setShowMap(false);
       
       // Use text search as fallback when geolocation or maps don't work
@@ -66,6 +66,10 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    // If user starts typing and modal is open, close it
+    if (showMap) {
+      setShowMap(false);
+    }
   };
 
   const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -236,7 +240,16 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
   const handleCancelMap = () => {
     setShowMap(false);
-    // Reset any temporary selections if needed
+    // Clear any temporary state that might interfere
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current = null;
+    }
+    if (markerRef.current) {
+      markerRef.current = null;
+    }
+    if (circleRef.current) {
+      circleRef.current = null;
+    }
   };
 
   return (
@@ -251,6 +264,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
             className="pl-10 h-12 border-0 text-stone-700"
+            disabled={showMap} // Disable input when map modal is open
           />
         </div>
         <Button
@@ -258,7 +272,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           variant="outline"
           size="sm"
           onClick={handleTextSearch}
-          disabled={!searchQuery.trim()}
+          disabled={!searchQuery.trim() || showMap}
           className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
           title="Buscar por texto"
         >
@@ -269,6 +283,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           variant="outline"
           size="sm"
           onClick={handleShowMap}
+          disabled={showMap}
           className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
           title="Buscar por ubicación"
         >
@@ -277,9 +292,21 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       </div>
 
       {showMap && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2">
-          <Card className="shadow-xl bg-white border border-gray-200">
-            <CardContent className="p-4 space-y-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold text-stone-800">Buscar por ubicación</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCancelMap}
+                  className="text-stone-600 hover:text-stone-800"
+                >
+                  ✕
+                </Button>
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Radio de búsqueda
@@ -312,7 +339,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 )}
               </div>
               
-              <div className="flex flex-wrap gap-2 justify-end pt-2">
+              <div className="flex justify-end gap-2 pt-4">
                 <Button
                   variant="outline"
                   onClick={handleCancelMap}
@@ -337,8 +364,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                   Aplicar Ubicación
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>
