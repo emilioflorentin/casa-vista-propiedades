@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,7 @@ interface Property {
   bathrooms: number;
   area: number;
   image: string;
+  features?: string[];
 }
 
 interface PropertyCardProps {
@@ -91,6 +93,23 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             <span>{property.area}m²</span>
           </div>
         </div>
+
+        {property.features && property.features.length > 0 && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-1">
+              {property.features.slice(0, 3).map((feature, index) => (
+                <Badge key={index} variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
+                  {feature}
+                </Badge>
+              ))}
+              {property.features.length > 3 && (
+                <Badge variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
+                  +{property.features.length - 3} más
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div className="text-xl font-bold text-gray-700">

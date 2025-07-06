@@ -1,7 +1,6 @@
 
-
 import { useState } from "react";
-import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye, Heater } from "lucide-react";
+import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye, Heater, Waves, Car, Zap, Home, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -25,8 +24,15 @@ const Properties = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [minBedrooms, setMinBedrooms] = useState("all");
   const [minBathrooms, setMinBathrooms] = useState("all");
+  
+  // Filtros de características
   const [hasHeating, setHasHeating] = useState(false);
   const [hasPool, setHasPool] = useState(false);
+  const [hasGarage, setHasGarage] = useState(false);
+  const [hasAirConditioning, setHasAirConditioning] = useState(false);
+  const [hasElevator, setHasElevator] = useState(false);
+  const [hasTerrace, setHasTerrace] = useState(false);
+  const [hasGarden, setHasGarden] = useState(false);
 
   const filteredProperties = allProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,11 +42,34 @@ const Properties = () => {
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
     const matchesBedrooms = minBedrooms === "all" || property.bedrooms >= parseInt(minBedrooms);
     const matchesBathrooms = minBathrooms === "all" || property.bathrooms >= parseInt(minBathrooms);
-    const matchesHeating = !hasHeating || property.features?.includes("Calefacción");
-    const matchesPool = !hasPool || property.features?.includes("Piscina");
+    
+    // Filtros de características
+    const matchesHeating = !hasHeating || property.features?.some(feature => 
+      feature.toLowerCase().includes('calefacción')
+    );
+    const matchesPool = !hasPool || property.features?.some(feature => 
+      feature.toLowerCase().includes('piscina')
+    );
+    const matchesGarage = !hasGarage || property.features?.some(feature => 
+      feature.toLowerCase().includes('garaje')
+    );
+    const matchesAirConditioning = !hasAirConditioning || property.features?.some(feature => 
+      feature.toLowerCase().includes('aire acondicionado')
+    );
+    const matchesElevator = !hasElevator || property.features?.some(feature => 
+      feature.toLowerCase().includes('ascensor')
+    );
+    const matchesTerrace = !hasTerrace || property.features?.some(feature => 
+      feature.toLowerCase().includes('terraza') || feature.toLowerCase().includes('balcón')
+    );
+    const matchesGarden = !hasGarden || property.features?.some(feature => 
+      feature.toLowerCase().includes('jardín')
+    );
     
     return matchesSearch && matchesType && matchesOperation && matchesPrice && 
-           matchesBedrooms && matchesBathrooms && matchesHeating && matchesPool;
+           matchesBedrooms && matchesBathrooms && matchesHeating && matchesPool &&
+           matchesGarage && matchesAirConditioning && matchesElevator && 
+           matchesTerrace && matchesGarden;
   });
 
   return (
@@ -155,31 +184,94 @@ const Properties = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
-                <div className="flex flex-col space-y-4">
-                  <label className="text-sm font-medium text-stone-700">
-                    Características
-                  </label>
+              </div>
+              
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-stone-700 mb-4">
+                  Características
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="heating" 
                       checked={hasHeating}
-                      onCheckedChange={setHasHeating}
+                      onCheckedChange={(checked) => setHasHeating(checked === true)}
                     />
                     <Label htmlFor="heating" className="flex items-center text-sm text-stone-600">
                       <Heater className="h-4 w-4 mr-1" />
                       Calefacción
                     </Label>
                   </div>
+                  
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="pool" 
                       checked={hasPool}
-                      onCheckedChange={setHasPool}
+                      onCheckedChange={(checked) => setHasPool(checked === true)}
                     />
                     <Label htmlFor="pool" className="flex items-center text-sm text-stone-600">
-                      <Square className="h-4 w-4 mr-1" />
+                      <Waves className="h-4 w-4 mr-1" />
                       Piscina
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="garage" 
+                      checked={hasGarage}
+                      onCheckedChange={(checked) => setHasGarage(checked === true)}
+                    />
+                    <Label htmlFor="garage" className="flex items-center text-sm text-stone-600">
+                      <Car className="h-4 w-4 mr-1" />
+                      Garaje
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="airConditioning" 
+                      checked={hasAirConditioning}
+                      onCheckedChange={(checked) => setHasAirConditioning(checked === true)}
+                    />
+                    <Label htmlFor="airConditioning" className="flex items-center text-sm text-stone-600">
+                      <Zap className="h-4 w-4 mr-1" />
+                      Aire Acondicionado
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="elevator" 
+                      checked={hasElevator}
+                      onCheckedChange={(checked) => setHasElevator(checked === true)}
+                    />
+                    <Label htmlFor="elevator" className="flex items-center text-sm text-stone-600">
+                      <Square className="h-4 w-4 mr-1" />
+                      Ascensor
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="terrace" 
+                      checked={hasTerrace}
+                      onCheckedChange={(checked) => setHasTerrace(checked === true)}
+                    />
+                    <Label htmlFor="terrace" className="flex items-center text-sm text-stone-600">
+                      <Home className="h-4 w-4 mr-1" />
+                      Terraza/Balcón
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="garden" 
+                      checked={hasGarden}
+                      onCheckedChange={(checked) => setHasGarden(checked === true)}
+                    />
+                    <Label htmlFor="garden" className="flex items-center text-sm text-stone-600">
+                      <Square className="h-4 w-4 mr-1" />
+                      Jardín
                     </Label>
                   </div>
                 </div>
@@ -325,4 +417,3 @@ const Properties = () => {
 };
 
 export default Properties;
-

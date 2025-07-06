@@ -12,6 +12,7 @@ export const allProperties = [
     bathrooms: 2,
     area: 85,
     image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=300&fit=crop",
+    features: ["Calefacción Central", "Aire Acondicionado", "Ascensor", "Balcón"]
   },
   {
     id: 2,
@@ -25,6 +26,7 @@ export const allProperties = [
     bathrooms: 3,
     area: 180,
     image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&h=300&fit=crop",
+    features: ["Calefacción de Gas", "Jardín Privado", "Garaje", "Piscina", "Barbacoa"]
   },
   {
     id: 3,
@@ -38,6 +40,7 @@ export const allProperties = [
     bathrooms: 1,
     area: 75,
     image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500&h=300&fit=crop",
+    features: ["Calefacción Eléctrica", "Techos Altos", "Suelo Radiante", "Terraza"]
   },
   {
     id: 4,
@@ -51,6 +54,7 @@ export const allProperties = [
     bathrooms: 2,
     area: 120,
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=300&fit=crop",
+    features: ["Calefacción Central", "Aire Acondicionado", "Terraza", "Ascensor", "Portero"]
   },
   {
     id: 5,
@@ -64,6 +68,7 @@ export const allProperties = [
     bathrooms: 1,
     area: 45,
     image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=500&h=300&fit=crop",
+    features: ["Calefacción Eléctrica", "Amueblado", "Internet Incluido"]
   },
   {
     id: 6,
@@ -77,6 +82,7 @@ export const allProperties = [
     bathrooms: 4,
     area: 250,
     image: "https://images.unsplash.com/photo-1448630360428-65456885c650?w=500&h=300&fit=crop",
+    features: ["Calefacción de Gas", "Piscina", "Jardín Privado", "Garaje Doble", "Barbacoa", "Alarma"]
   },
   {
     id: 7,
@@ -90,6 +96,7 @@ export const allProperties = [
     bathrooms: 2,
     area: 110,
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500&h=300&fit=crop",
+    features: ["Calefacción Central", "Piscina Comunitaria", "Gimnasio", "Portero", "Ascensor"]
   },
   {
     id: 8,
@@ -103,6 +110,7 @@ export const allProperties = [
     bathrooms: 2,
     area: 140,
     image: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=500&h=300&fit=crop",
+    features: ["Calefacción Individual", "Patio", "Garaje", "Trastero"]
   },
   {
     id: 9,
@@ -116,6 +124,7 @@ export const allProperties = [
     bathrooms: 1,
     area: 90,
     image: "https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=500&h=300&fit=crop",
+    features: ["Calefacción Eléctrica", "Techos Altos", "Terraza", "Amueblado"]
   },
   {
     id: 10,
@@ -129,6 +138,7 @@ export const allProperties = [
     bathrooms: 1,
     area: 70,
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&h=300&fit=crop",
+    features: ["Calefacción Central", "Balcón", "Ascensor", "Orientación Sur"]
   }
 ];
 
