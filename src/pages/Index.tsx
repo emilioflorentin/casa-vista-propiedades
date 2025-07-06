@@ -1,13 +1,12 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, MapPin, Home, Key, Zap } from "lucide-react";
+import { Search, Home, Key, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
+import LocationSearch from "@/components/LocationSearch";
 
 const featuredProperties = [
   {
@@ -65,16 +64,30 @@ const featuredProperties = [
 ];
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
 
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
+    setSelectedLocation(location);
+    console.log('Selected location:', location);
+  };
+
+  const handleSearch = () => {
+    console.log('Search params:', {
+      location: selectedLocation,
+      propertyType,
+      operation
+    });
+    // Here you would implement the actual search logic
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-400 via-amber-400 to-orange-400 text-white">
+      <section className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
@@ -88,18 +101,13 @@ const Index = () => {
           {/* Search Bar */}
           <div className="bg-white rounded-2xl p-6 max-w-4xl mx-auto shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  placeholder="¿Dónde buscas?"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 border-0 text-gray-700"
-                />
-              </div>
+              <LocationSearch
+                onLocationSelect={handleLocationSelect}
+                placeholder="¿Dónde buscas?"
+              />
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 border-0 text-gray-700">
+                <SelectTrigger className="h-12 border-0 text-stone-700">
                   <SelectValue placeholder="Tipo de propiedad" />
                 </SelectTrigger>
                 <SelectContent>
@@ -111,7 +119,7 @@ const Index = () => {
               </Select>
               
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 border-0 text-gray-700">
+                <SelectTrigger className="h-12 border-0 text-stone-700">
                   <SelectValue placeholder="Alquiler o Venta" />
                 </SelectTrigger>
                 <SelectContent>
@@ -120,7 +128,11 @@ const Index = () => {
                 </SelectContent>
               </Select>
               
-              <Button size="lg" className="h-12 bg-stone-600 hover:bg-stone-700 text-white font-semibold">
+              <Button 
+                size="lg" 
+                className="h-12 bg-stone-600 hover:bg-stone-700 text-white font-semibold"
+                onClick={handleSearch}
+              >
                 <Search className="mr-2 h-5 w-5" />
                 Buscar
               </Button>
