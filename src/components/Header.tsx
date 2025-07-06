@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Heart, User, Phone } from "lucide-react";
@@ -8,7 +7,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-amber-200">
+    <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -22,28 +21,28 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-amber-800 font-medium transition-colors">
+            <Link to="/" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               Inicio
             </Link>
-            <Link to="/properties" className="text-gray-700 hover:text-amber-800 font-medium transition-colors">
+            <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               Propiedades
             </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-amber-800 font-medium transition-colors">
+            <Link to="/contact" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               Contacto
             </Link>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-amber-800 hover:bg-amber-50">
+            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
               <Heart className="h-4 w-4 mr-2" />
               Favoritos
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-amber-800 hover:bg-amber-50">
+            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
               <User className="h-4 w-4 mr-2" />
               Mi Cuenta
             </Button>
-            <Button size="sm" className="bg-amber-700 hover:bg-amber-800 text-white">
+            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
               <Phone className="h-4 w-4 mr-2" />
               Contactar
             </Button>
@@ -64,39 +63,39 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-amber-200">
+          <div className="md:hidden py-4 border-t border-stone-200">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className="text-gray-700 hover:text-amber-800 font-medium transition-colors"
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Inicio
               </Link>
               <Link 
                 to="/properties" 
-                className="text-gray-700 hover:text-amber-800 font-medium transition-colors"
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Propiedades
               </Link>
               <Link 
                 to="/contact" 
-                className="text-gray-700 hover:text-amber-800 font-medium transition-colors"
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
-              <div className="flex flex-col space-y-2 pt-4 border-t border-amber-200">
-                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-amber-800 hover:bg-amber-50">
+              <div className="flex flex-col space-y-2 pt-4 border-t border-stone-200">
+                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
                   <Heart className="h-4 w-4 mr-2" />
                   Favoritos
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-amber-800 hover:bg-amber-50">
+                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
                   <User className="h-4 w-4 mr-2" />
                   Mi Cuenta
                 </Button>
-                <Button size="sm" className="bg-amber-700 hover:bg-amber-800 text-white justify-start">
+                <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
                   <Phone className="h-4 w-4 mr-2" />
                   Contactar
                 </Button>

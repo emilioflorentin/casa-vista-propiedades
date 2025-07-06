@@ -1,10 +1,9 @@
-
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-stone-800 text-white">
+    <footer className="bg-stone-700 text-white">
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -21,10 +20,10 @@ const Footer = () => {
               Más de 10 años de experiencia en el sector inmobiliario.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="h-5 w-5 text-gray-300 hover:text-amber-400 cursor-pointer transition-colors" />
-              <Twitter className="h-5 w-5 text-gray-300 hover:text-amber-400 cursor-pointer transition-colors" />
-              <Instagram className="h-5 w-5 text-gray-300 hover:text-amber-400 cursor-pointer transition-colors" />
-              <Linkedin className="h-5 w-5 text-gray-300 hover:text-amber-400 cursor-pointer transition-colors" />
+              <Facebook className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
+              <Twitter className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
+              <Instagram className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
+              <Linkedin className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
             </div>
           </div>
 
@@ -108,7 +107,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-12 pt-8 text-center">
+        <div className="border-t border-gray-600 mt-12 pt-8 text-center">
           <p className="text-gray-300">
             © 2024 Nazarí Homes. Todos los derechos reservados.
           </p>
