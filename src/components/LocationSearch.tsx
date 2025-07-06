@@ -47,6 +47,9 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleTextSearch = () => {
     if (searchQuery.trim()) {
       console.log('Executing text search for:', searchQuery);
+      // Close map modal if it's open
+      setShowMap(false);
+      
       // Use text search as fallback when geolocation or maps don't work
       const location = {
         address: searchQuery,
@@ -231,6 +234,11 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
+  const handleCancelMap = () => {
+    setShowMap(false);
+    // Reset any temporary selections if needed
+  };
+
   return (
     <div className="relative">
       <div className="flex gap-2">
@@ -270,7 +278,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
       {showMap && (
         <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-xl bg-white">
-          <CardContent className="p-4">
+          <CardContent className="p-6">
             <div className="mb-4">
               <label className="block text-sm font-medium text-stone-700 mb-2">
                 Radio de búsqueda
@@ -289,31 +297,33 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               </Select>
             </div>
             
-            <div 
-              ref={mapRef} 
-              className="w-full h-64 rounded-lg mb-4 bg-stone-50"
-              style={{ minHeight: '250px' }}
-            />
+            <div className="relative mb-4">
+              <div 
+                ref={mapRef} 
+                className="w-full h-64 rounded-lg bg-stone-50"
+                style={{ minHeight: '250px' }}
+              />
+              
+              {!mapsLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
+                  <p className="text-stone-600">Cargando mapa...</p>
+                </div>
+              )}
+            </div>
             
-            {!mapsLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
-                <p className="text-stone-600">Cargando mapa...</p>
-              </div>
-            )}
-            
-            <div className="flex gap-2 justify-end">
+            <div className="flex flex-col sm:flex-row gap-2 justify-end">
               <Button
                 variant="outline"
-                onClick={() => setShowMap(false)}
+                onClick={handleCancelMap}
                 size="sm"
-                className="bg-white hover:bg-stone-50 border-stone-300"
+                className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleCurrentLocation}
                 size="sm"
-                className="bg-stone-600 hover:bg-stone-700 text-white mr-2"
+                className="bg-stone-600 hover:bg-stone-700 text-white"
               >
                 Mi Ubicación
               </Button>
