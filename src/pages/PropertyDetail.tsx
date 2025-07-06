@@ -9,255 +9,47 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { allProperties } from "@/data/properties";
 
-const propertyData = {
-  1: {
-    id: 1,
-    title: "Apartamento Moderno en el Centro",
-    type: "apartment",
-    price: 1200,
-    currency: "€",
-    operation: "rent" as const,
-    location: "Madrid Centro",
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 85,
-    images: [
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
-    ],
-    description: "Hermoso apartamento moderno ubicado en el corazón de Madrid. Completamente renovado con acabados de alta calidad, cocina equipada y amplia terraza con vistas a la ciudad. Perfecto para parejas o profesionales que buscan comodidad y ubicación privilegiada.",
-    features: [
-      "Totalmente amueblado",
-      "Cocina equipada",
-      "Aire acondicionado",
-      "Calefacción central",
-      "Terraza privada",
-      "Ascensor",
-      "Portero automático",
-      "Internet fibra óptica"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "María García",
-      phone: "+34 91 123 45 67",
-      email: "maria@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face"
-    }
+// Agent data for different properties
+const agentData = [
+  {
+    name: "María García",
+    phone: "+34 91 123 45 67",
+    email: "maria@inmobiliariaapp.com",
+    image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face"
   },
-  2: {
-    id: 2,
-    title: "Casa Familiar con Jardín",
-    type: "house",
-    price: 450000,
-    currency: "€",
-    operation: "sale" as const,
-    location: "Las Rozas, Madrid",
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 180,
-    images: [
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1448630360428-65456885c650?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&h=600&fit=crop",
-    ],
-    description: "Magnífica casa familiar de dos plantas con amplio jardín privado. Ubicada en una zona residencial tranquila, perfecta para familias. Cuenta con espacios amplios, cocina independiente y múltiples opciones de entretenimiento al aire libre.",
-    features: [
-      "Jardín privado",
-      "Piscina",
-      "Barbacoa",
-      "Garaje para 2 coches",
-      "Trastero",
-      "Cocina independiente",
-      "Chimenea",
-      "Sistema de alarma"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "Carlos Rodríguez",
-      phone: "+34 91 234 56 78",
-      email: "carlos@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-    }
+  {
+    name: "Carlos Rodríguez", 
+    phone: "+34 91 234 56 78",
+    email: "carlos@inmobiliariaapp.com",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
   },
-  3: {
-    id: 3,
-    title: "Loft Industrial Reformado",
-    type: "loft",
-    price: 1800,
-    currency: "€",
-    operation: "rent" as const,
-    location: "Malasaña, Madrid",
-    bedrooms: 1,
-    bathrooms: 1,
-    area: 75,
-    images: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1615873968403-89e068629265?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&h=600&fit=crop",
-    ],
-    description: "Impresionante loft de estilo industrial completamente reformado en el corazón de Malasaña. Techos altos, espacios diáfanos y una decoración moderna que combina perfectamente con el carácter histórico del edificio.",
-    features: [
-      "Techos altos",
-      "Espacios diáfanos",
-      "Totalmente reformado",
-      "Suelos de hormigón pulido",
-      "Grandes ventanales",
-      "Cocina americana",
-      "Aire acondicionado",
-      "Totalmente amueblado"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "Ana Martínez",
-      phone: "+34 91 345 67 89",
-      email: "ana@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
-    }
+  {
+    name: "Ana Martínez",
+    phone: "+34 91 345 67 89", 
+    email: "ana@inmobiliariaapp.com",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
   },
-  4: {
-    id: 4,
-    title: "Ático con Terraza Panorámica",
-    type: "apartment",
-    price: 650000,
-    currency: "€",
-    operation: "sale" as const,
-    location: "Salamanca, Madrid",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 120,
-    images: [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571624436279-b272aff752b5?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop",
-    ],
-    description: "Exclusivo ático en el prestigioso barrio de Salamanca con espectacular terraza panorámica. Vistas impresionantes de la ciudad, acabados de lujo y una ubicación inmejorable en una de las zonas más cotizadas de Madrid.",
-    features: [
-      "Terraza panorámica",
-      "Vistas a la ciudad",
-      "Acabados de lujo",
-      "Ascensor directo",
-      "Aire acondicionado",
-      "Suelos de parquet",
-      "Cocina equipada",
-      "Trastero incluido"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "Luis González",
-      phone: "+34 91 456 78 90",
-      email: "luis@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
-    }
+  {
+    name: "Luis González",
+    phone: "+34 91 456 78 90",
+    email: "luis@inmobiliariaapp.com", 
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
   },
-  5: {
-    id: 5,
-    title: "Estudio Luminoso Céntrico",
-    type: "studio",
-    price: 800,
-    currency: "€",
-    operation: "rent" as const,
-    location: "Chueca, Madrid",
-    bedrooms: 1,
-    bathrooms: 1,
-    area: 45,
-    images: [
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800&h=600&fit=crop",
-    ],
-    description: "Acogedor estudio en el vibrante barrio de Chueca, completamente reformado y con mucha luz natural. Perfecto para jóvenes profesionales o estudiantes que buscan vivir en el centro de Madrid con todas las comodidades.",
-    features: [
-      "Completamente reformado",
-      "Mucha luz natural",
-      "Totalmente amueblado",
-      "Cocina americana equipada",
-      "Aire acondicionado",
-      "Internet de alta velocidad",
-      "Cerca del metro",
-      "Zona comercial"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "Isabel Fernández",
-      phone: "+34 91 567 89 01",
-      email: "isabel@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
-    }
+  {
+    name: "Isabel Fernández",
+    phone: "+34 91 567 89 01",
+    email: "isabel@inmobiliariaapp.com",
+    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
   },
-  6: {
-    id: 6,
-    title: "Chalet Independiente",
-    type: "house",
-    price: 850000,
-    currency: "€",
-    operation: "sale" as const,
-    location: "Pozuelo de Alarcón",
-    bedrooms: 5,
-    bathrooms: 4,
-    area: 250,
-    images: [
-      "https://images.unsplash.com/photo-1448630360428-65456885c650?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
-    ],
-    description: "Impresionante chalet independiente en una de las mejores zonas de Pozuelo de Alarcón. Parcela privada con jardín maduro, piscina y múltiples espacios de entretenimiento. Ideal para familias numerosas que buscan tranquilidad y espacio.",
-    features: [
-      "Parcela privada 500m²",
-      "Piscina privada",
-      "Jardín maduro",
-      "Garaje para 3 coches",
-      "Bodega",
-      "Despacho",
-      "Sala de juegos",
-      "Sistema domótica"
-    ],
-    amenities: [
-      { icon: Wifi, label: "WiFi" },
-      { icon: Wind, label: "Aire Acondicionado" },
-      { icon: Tv, label: "TV" },
-      { icon: Car, label: "Parking" }
-    ],
-    agent: {
-      name: "Roberto Silva",
-      phone: "+34 91 678 90 12",
-      email: "roberto@inmobiliariaapp.com",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-    }
+  {
+    name: "Roberto Silva",
+    phone: "+34 91 678 90 12", 
+    email: "roberto@inmobiliariaapp.com",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
   }
-};
+];
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -270,7 +62,7 @@ const PropertyDetail = () => {
     message: ""
   });
 
-  const property = propertyData[Number(id) as keyof typeof propertyData];
+  const property = allProperties.find(p => p.id === Number(id));
 
   if (!property) {
     return (
@@ -284,6 +76,35 @@ const PropertyDetail = () => {
       </div>
     );
   }
+
+  // Generate multiple images for the property
+  const images = [
+    property.image,
+    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+  ];
+
+  // Get agent data (cycle through available agents)
+  const agent = agentData[property.id % agentData.length];
+
+  // Generate description based on property type
+  const getDescription = (property: any) => {
+    const typeDescriptions = {
+      apartment: "Hermoso apartamento ubicado en una zona privilegiada. Completamente renovado con acabados de alta calidad y todas las comodidades modernas.",
+      house: "Magnífica casa familiar perfecta para disfrutar en familia. Espacios amplios y bien distribuidos con múltiples opciones de entretenimiento.",
+      loft: "Impresionante loft de estilo moderno con espacios diáfanos y una decoración contemporánea que combina funcionalidad y estilo.",
+      studio: "Acogedor estudio completamente reformado y con mucha luz natural. Perfecto para jóvenes profesionales o estudiantes."
+    };
+    return typeDescriptions[property.type as keyof typeof typeDescriptions] || "Excelente propiedad en ubicación privilegiada.";
+  };
+
+  const amenities = [
+    { icon: Wifi, label: "WiFi" },
+    { icon: Wind, label: "Aire Acondicionado" }, 
+    { icon: Tv, label: "TV" },
+    { icon: Car, label: "Parking" }
+  ];
 
   const formatPrice = (price: number, operation: string) => {
     const formattedPrice = new Intl.NumberFormat('es-ES').format(price);
@@ -303,7 +124,7 @@ const PropertyDetail = () => {
     // Here you would typically send the form data to your backend
   };
 
-    const handleGoBack = () => {
+  const handleGoBack = () => {
     navigate(-1); // Goes back to the previous page in history
   };
 
@@ -328,13 +149,13 @@ const PropertyDetail = () => {
             <div className="relative mb-6">
               <div className="aspect-video rounded-lg overflow-hidden">
                 <img
-                  src={property.images[currentImageIndex]}
+                  src={images[currentImageIndex]}
                   alt={property.title}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="grid grid-cols-4 gap-2 mt-4">
-                {property.images.map((image, index) => (
+                {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -417,28 +238,30 @@ const PropertyDetail = () => {
               <div className="py-6">
                 <h2 className="text-xl font-semibold mb-4 text-stone-800">Descripción</h2>
                 <p className="text-stone-700 leading-relaxed">
-                  {property.description}
+                  {getDescription(property)}
                 </p>
               </div>
 
               {/* Features */}
-              <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800">Características</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {property.features.map((feature, index) => (
-                    <div key={index} className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{feature}</span>
-                    </div>
-                  ))}
+              {property.features && property.features.length > 0 && (
+                <div className="py-6 border-t border-stone-200">
+                  <h2 className="text-xl font-semibold mb-4 text-stone-800">Características</h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    {property.features.map((feature, index) => (
+                      <div key={index} className="flex items-center">
+                        <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
+                        <span className="text-stone-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Amenities */}
               <div className="py-6 border-t border-stone-200">
                 <h2 className="text-xl font-semibold mb-4 text-stone-800">Servicios</h2>
                 <div className="grid grid-cols-4 gap-4">
-                  {property.amenities.map((amenity, index) => (
+                  {amenities.map((amenity, index) => (
                     <div key={index} className="text-center p-3 bg-stone-50 rounded-lg">
                       <amenity.icon className="h-6 w-6 mx-auto text-stone-600 mb-2" />
                       <span className="text-sm text-stone-700">{amenity.label}</span>
@@ -459,23 +282,23 @@ const PropertyDetail = () => {
               <CardContent>
                 <div className="flex items-center mb-4">
                   <img
-                    src={property.agent.image}
-                    alt={property.agent.name}
+                    src={agent.image}
+                    alt={agent.name}
                     className="w-16 h-16 rounded-full mr-4"
                   />
                   <div>
-                    <h3 className="font-semibold text-lg text-stone-800">{property.agent.name}</h3>
+                    <h3 className="font-semibold text-lg text-stone-800">{agent.name}</h3>
                     <p className="text-stone-600">Agente Senior</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center">
                     <Phone className="h-4 w-4 mr-3 text-stone-400" />
-                    <span className="text-stone-700">{property.agent.phone}</span>
+                    <span className="text-stone-700">{agent.phone}</span>
                   </div>
                   <div className="flex items-center">
                     <Mail className="h-4 w-4 mr-3 text-stone-400" />
-                    <span className="text-stone-700">{property.agent.email}</span>
+                    <span className="text-stone-700">{agent.email}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
