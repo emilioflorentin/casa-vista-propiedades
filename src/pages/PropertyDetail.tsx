@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, MessageCircle, Send, Upload, FileText, CreditCard } from "lucide-react";
@@ -186,18 +185,18 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = () => {
-    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (ID: ${property.id}) ubicada en ${property.location}. ${formatPrice(property.price, property.operation)}. Me gustaría agendar una cita para visitarla.`;
+    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (Ref: ${property.reference}) ubicada en ${property.location}. ${formatPrice(property.price, property.operation)}. Me gustaría agendar una cita para visitarla.`;
     const encodedMessage = encodeURIComponent(defaultMessage);
     const whatsappUrl = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  // Updated quick messages with property-specific information
+  // Updated quick messages with property-specific information including reference number
   const quickMessages = [
-    `Quiero agendar una visita para la propiedad "${property.title}" (ID: ${property.id}) en ${property.location}`,
-    `¿Está disponible la propiedad "${property.title}" por ${formatPrice(property.price, property.operation)}?`,
-    `¿Cuáles son los horarios de visita para la propiedad en ${property.location}?`,
-    `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para "${property.title}"`
+    `Quiero agendar una visita para la propiedad "${property.title}" (Ref: ${property.reference}) en ${property.location}`,
+    `¿Está disponible la propiedad con referencia ${property.reference} por ${formatPrice(property.price, property.operation)}?`,
+    `¿Cuáles son los horarios de visita para la propiedad Ref: ${property.reference} en ${property.location}?`,
+    `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para la propiedad Ref: ${property.reference}`
   ];
 
   return (
@@ -259,6 +258,9 @@ const PropertyDetail = () => {
                       } text-white`}
                     >
                       {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+                    </Badge>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-mono">
+                      Ref: {property.reference}
                     </Badge>
                   </div>
                   <h1 className="text-3xl font-bold text-stone-800 mb-2">

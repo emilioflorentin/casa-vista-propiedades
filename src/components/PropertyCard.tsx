@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 
 interface Property {
   id: number;
+  reference: string;
   title: string;
   type: string;
   price: number;
@@ -48,19 +49,24 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           alt={property.title}
           className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
         />
-        <div className="absolute top-3 left-3 flex gap-2">
-          <Badge 
-            variant={property.operation === 'rent' ? 'default' : 'secondary'}
-            className={`${
-              property.operation === 'rent' 
-                ? 'bg-stone-500 hover:bg-stone-600' 
-                : 'bg-amber-500 hover:bg-amber-600'
-            } text-white`}
-          >
-            {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
-          </Badge>
-          <Badge variant="outline" className="bg-white/90 text-gray-700 border-gray-300">
-            {getTypeLabel(property.type)}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="flex gap-2">
+            <Badge 
+              variant={property.operation === 'rent' ? 'default' : 'secondary'}
+              className={`${
+                property.operation === 'rent' 
+                  ? 'bg-stone-500 hover:bg-stone-600' 
+                  : 'bg-amber-500 hover:bg-amber-600'
+              } text-white`}
+            >
+              {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+            </Badge>
+            <Badge variant="outline" className="bg-white/90 text-gray-700 border-gray-300">
+              {getTypeLabel(property.type)}
+            </Badge>
+          </div>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-mono">
+            Ref: {property.reference}
           </Badge>
         </div>
         <Button
