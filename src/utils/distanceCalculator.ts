@@ -40,12 +40,14 @@ export const getCoordinatesFromLocation = (location: string): { lat: number; lng
     'málaga': [36.7213, -4.4214],
     'córdoba': [37.8882, -4.7794],
     'toledo': [39.8628, -4.0273],
-    // Pueblos de Granada
+    // Pueblos de Granada y alrededores
     'almuñécar, granada': [36.7344, -3.6881],
     'motril, granada': [36.7505, -3.5156],
     'guadix, granada': [37.2986, -3.1375],
     'baza, granada': [37.4906, -2.7729],
-    'loja, granada': [37.1619, -4.1436]
+    'loja, granada': [37.1619, -4.1436],
+    'órgiva, granada': [36.8944, -3.4203],
+    'monachil, granada': [37.1308, -3.5264]
   };
 
   const searchKey = location.toLowerCase().trim();
