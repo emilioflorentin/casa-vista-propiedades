@@ -109,7 +109,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-600 mt-12 pt-8 text-center">
           <p className="text-gray-300">
-            © 2024 Nazarí Homes. Todos los derechos reservados.
+            © 2025 Nazarí Homes. Todos los derechos reservados.
           </p>
         </div>
       </div>
