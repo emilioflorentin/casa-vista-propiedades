@@ -191,10 +191,10 @@ const PropertyDetail = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Updated quick messages with property-specific information including reference number
+  // Updated quick messages with consistent "Ref:" format
   const quickMessages = [
-    `Quiero agendar una visita para la propiedad "${property.title}" (Ref: ${property.reference}) en ${property.location}`,
-    `¿Está disponible la propiedad con referencia ${property.reference} por ${formatPrice(property.price, property.operation)}?`,
+    `Quiero agendar una visita para la propiedad "${property.title}" Ref: ${property.reference} en ${property.location}`,
+    `¿Está disponible la propiedad Ref: ${property.reference} por ${formatPrice(property.price, property.operation)}?`,
     `¿Cuáles son los horarios de visita para la propiedad Ref: ${property.reference} en ${property.location}?`,
     `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para la propiedad Ref: ${property.reference}`
   ];
