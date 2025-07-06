@@ -277,67 +277,69 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       </div>
 
       {showMap && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-xl bg-white">
-          <CardContent className="p-6">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-stone-700 mb-2">
-                Radio de búsqueda
-              </label>
-              <Select value={radius} onValueChange={setRadius}>
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                  <SelectItem value="500">500 metros</SelectItem>
-                  <SelectItem value="1000">1 kilómetro</SelectItem>
-                  <SelectItem value="2000">2 kilómetros</SelectItem>
-                  <SelectItem value="5000">5 kilómetros</SelectItem>
-                  <SelectItem value="10000">10 kilómetros</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="relative mb-4">
-              <div 
-                ref={mapRef} 
-                className="w-full h-64 rounded-lg bg-stone-50"
-                style={{ minHeight: '250px' }}
-              />
+        <div className="absolute top-full left-0 right-0 z-50 mt-2">
+          <Card className="shadow-xl bg-white border border-gray-200">
+            <CardContent className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-2">
+                  Radio de búsqueda
+                </label>
+                <Select value={radius} onValueChange={setRadius}>
+                  <SelectTrigger className="w-full bg-white border border-gray-300">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-lg z-[60]">
+                    <SelectItem value="500">500 metros</SelectItem>
+                    <SelectItem value="1000">1 kilómetro</SelectItem>
+                    <SelectItem value="2000">2 kilómetros</SelectItem>
+                    <SelectItem value="5000">5 kilómetros</SelectItem>
+                    <SelectItem value="10000">10 kilómetros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               
-              {!mapsLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
-                  <p className="text-stone-600">Cargando mapa...</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={handleCancelMap}
-                size="sm"
-                className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleCurrentLocation}
-                size="sm"
-                className="bg-stone-600 hover:bg-stone-700 text-white"
-              >
-                Mi Ubicación
-              </Button>
-              <Button
-                onClick={handleApplyLocation}
-                disabled={!selectedLocation}
-                size="sm"
-                className="bg-stone-600 hover:bg-stone-700 text-white"
-              >
-                Aplicar Ubicación
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="relative">
+                <div 
+                  ref={mapRef} 
+                  className="w-full h-64 rounded-lg bg-stone-50 border border-gray-200"
+                  style={{ minHeight: '250px' }}
+                />
+                
+                {!mapsLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
+                    <p className="text-stone-600">Cargando mapa...</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex flex-wrap gap-2 justify-end pt-2">
+                <Button
+                  variant="outline"
+                  onClick={handleCancelMap}
+                  size="sm"
+                  className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleCurrentLocation}
+                  size="sm"
+                  className="bg-stone-600 hover:bg-stone-700 text-white"
+                >
+                  Mi Ubicación
+                </Button>
+                <Button
+                  onClick={handleApplyLocation}
+                  disabled={!selectedLocation}
+                  size="sm"
+                  className="bg-stone-600 hover:bg-stone-700 text-white disabled:opacity-50"
+                >
+                  Aplicar Ubicación
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
