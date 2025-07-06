@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +61,7 @@ const PropertyDetail = () => {
     phone: "",
     message: ""
   });
+  const [whatsappMessage, setWhatsappMessage] = useState("");
 
   const property = allProperties.find(p => p.id === Number(id));
 
@@ -127,6 +128,21 @@ const PropertyDetail = () => {
   const handleGoBack = () => {
     navigate(-1); // Goes back to the previous page in history
   };
+
+  const handleWhatsAppChat = () => {
+    const phoneNumber = "+34912345678"; // Número de WhatsApp del negocio
+    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (ID: ${property.id}). Me gustaría agendar una cita para visitarla.`;
+    const encodedMessage = encodeURIComponent(defaultMessage);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const quickMessages = [
+    "Quiero agendar una visita",
+    "¿Está disponible esta propiedad?",
+    "¿Cuáles son los horarios de visita?",
+    "Necesito más información sobre el precio"
+  ];
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -310,6 +326,59 @@ const PropertyDetail = () => {
                     <Calendar className="h-4 w-4 mr-1" />
                     Cita
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* WhatsApp Chat Card */}
+            <Card className="border-stone-200">
+              <CardHeader>
+                <CardTitle className="text-stone-800 flex items-center">
+                  <MessageCircle className="h-5 w-5 mr-2 text-green-500" />
+                  Chat WhatsApp
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-stone-600 mb-4">
+                  Chatea directamente con nosotros para agendar una cita o resolver tus dudas al instante.
+                </p>
+                
+                {/* Quick message buttons */}
+                <div className="space-y-2 mb-4">
+                  <p className="text-sm font-medium text-stone-700">Mensajes rápidos:</p>
+                  {quickMessages.map((message, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setWhatsappMessage(message)}
+                      className="w-full text-left p-2 text-sm bg-stone-50 hover:bg-stone-100 rounded-lg transition-colors"
+                    >
+                      {message}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom message input */}
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="Escribe tu mensaje personalizado..."
+                    value={whatsappMessage}
+                    onChange={(e) => setWhatsappMessage(e.target.value)}
+                    rows={3}
+                    className="border-stone-300 focus:border-stone-500 text-sm resize-none"
+                  />
+                  <Button 
+                    onClick={handleWhatsAppChat}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Abrir WhatsApp
+                  </Button>
+                </div>
+
+                <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                  <p className="text-xs text-green-700 text-center">
+                    📱 Te responderemos en menos de 5 minutos
+                  </p>
                 </div>
               </CardContent>
             </Card>
