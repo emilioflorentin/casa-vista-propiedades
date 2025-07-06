@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, Send, Upload, FileText, CreditCard } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, Send, Upload, FileText, CreditCard, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -222,6 +222,12 @@ const PropertyDetail = () => {
     `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para la propiedad Ref: ${property.reference}`
   ];
 
+  // Function to generate Google Maps embed URL
+  const getGoogleMapsEmbedUrl = (location: string) => {
+    const encodedLocation = encodeURIComponent(location);
+    return `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodedLocation}&zoom=15&maptype=roadmap`;
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
@@ -339,6 +345,44 @@ const PropertyDetail = () => {
                 </p>
               </div>
 
+              {/* Google Maps Location Section */}
+              <div className="py-6 border-t border-stone-200">
+                <h2 className="text-xl font-semibold mb-4 text-stone-800 flex items-center">
+                  <Map className="h-5 w-5 mr-2 text-stone-600" />
+                  Ubicación
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-center text-stone-600 mb-4">
+                    <MapPin className="h-5 w-5 mr-2" />
+                    <span className="text-lg">{property.location}</span>
+                  </div>
+                  
+                  {/* Google Maps Embed */}
+                  <div className="relative w-full h-80 rounded-lg overflow-hidden border border-stone-200">
+                    <iframe
+                      src={getGoogleMapsEmbedUrl(property.location)}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Ubicación de ${property.title}`}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  
+                  {/* Location info */}
+                  <div className="bg-stone-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-stone-800 mb-2">Información de la zona</h3>
+                    <p className="text-stone-600 text-sm">
+                      Excelente ubicación en una zona residencial tranquila, cerca de transporte público, 
+                      centros comerciales y servicios básicos. Fácil acceso a las principales vías de comunicación.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Features */}
               {property.features && property.features.length > 0 && (
                 <div className="py-6 border-t border-stone-200">
@@ -392,17 +436,10 @@ const PropertyDetail = () => {
                 </div>
               </div>
 
-              {/* Additional Information Section to extend height */}
+              {/* Additional Information Section */}
               <div className="py-6 border-t border-stone-200">
                 <h2 className="text-xl font-semibold mb-4 text-stone-800">Información Adicional</h2>
                 <div className="space-y-4">
-                  <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">Ubicación</h3>
-                    <p className="text-stone-600 text-sm">
-                      Excelente ubicación en una zona residencial tranquila, cerca de transporte público, 
-                      centros comerciales y servicios básicos.
-                    </p>
-                  </div>
                   <div className="bg-stone-50 p-4 rounded-lg">
                     <h3 className="font-medium text-stone-800 mb-2">Transporte</h3>
                     <p className="text-stone-600 text-sm">
@@ -415,6 +452,13 @@ const PropertyDetail = () => {
                     <p className="text-stone-600 text-sm">
                       Barrio familiar con colegios, parques, centros de salud y comercios en los alrededores.
                       Ambiente seguro y tranquilo ideal para familias.
+                    </p>
+                  </div>
+                  <div className="bg-stone-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-stone-800 mb-2">Servicios cercanos</h3>
+                    <p className="text-stone-600 text-sm">
+                      Supermercados, farmacias, restaurantes y cafeterías en un radio de 300 metros.
+                      Centro médico y biblioteca municipal a 10 minutos a pie.
                     </p>
                   </div>
                 </div>
