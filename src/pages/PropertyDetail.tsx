@@ -63,7 +63,7 @@ const PropertyDetail = () => {
   const [whatsappMessage, setWhatsappMessage] = useState("");
 
   // Fixed WhatsApp number for the business
-  const WHATSAPP_BUSINESS_NUMBER = "+34912345678";
+  const WHATSAPP_BUSINESS_NUMBER = "+34671030927";
 
   const property = allProperties.find(p => p.id === Number(id));
 
