@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, MessageCircle, Send, Upload, FileText, CreditCard } from "lucide-react";
@@ -185,17 +186,18 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = () => {
-    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (ID: ${property.id}). Me gustaría agendar una cita para visitarla.`;
+    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (ID: ${property.id}) ubicada en ${property.location}. ${formatPrice(property.price, property.operation)}. Me gustaría agendar una cita para visitarla.`;
     const encodedMessage = encodeURIComponent(defaultMessage);
     const whatsappUrl = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   };
 
+  // Updated quick messages with property-specific information
   const quickMessages = [
-    "Quiero agendar una visita",
-    "¿Está disponible esta propiedad?",
-    "¿Cuáles son los horarios de visita?",
-    "Necesito más información sobre el precio"
+    `Quiero agendar una visita para la propiedad "${property.title}" (ID: ${property.id}) en ${property.location}`,
+    `¿Está disponible la propiedad "${property.title}" por ${formatPrice(property.price, property.operation)}?`,
+    `¿Cuáles son los horarios de visita para la propiedad en ${property.location}?`,
+    `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para "${property.title}"`
   ];
 
   return (
