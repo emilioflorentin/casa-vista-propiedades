@@ -48,14 +48,43 @@ const Index = () => {
       results = results.filter(property => property.managedBy === managedBy);
     }
 
-    // Filter by location if provided
+    // Filter by location if provided - improved logic
     if (selectedLocation) {
-      // Simple text-based location filtering for now
       const searchTerm = selectedLocation.address.toLowerCase();
-      results = results.filter(property => 
-        property.location.toLowerCase().includes(searchTerm) ||
-        property.location.toLowerCase().includes('madrid') // Include Madrid properties for general searches
-      );
+      console.log('Filtering by location:', searchTerm);
+      
+      results = results.filter(property => {
+        const propertyLocation = property.location.toLowerCase();
+        
+        // Direct location match
+        if (propertyLocation.includes(searchTerm)) {
+          return true;
+        }
+        
+        // Check for specific city matches
+        if (searchTerm.includes('granada') && propertyLocation.includes('granada')) {
+          return true;
+        }
+        
+        if (searchTerm.includes('madrid') && propertyLocation.includes('madrid')) {
+          return true;
+        }
+        
+        if (searchTerm.includes('sevilla') && propertyLocation.includes('sevilla')) {
+          return true;
+        }
+        
+        if (searchTerm.includes('barcelona') && propertyLocation.includes('barcelona')) {
+          return true;
+        }
+        
+        // For coordinate-based searches (like "Lat: X, Lng: Y"), don't filter by text
+        if (searchTerm.includes('lat:') && searchTerm.includes('lng:')) {
+          return true;
+        }
+        
+        return false;
+      });
     }
 
     setFilteredProperties(results);
