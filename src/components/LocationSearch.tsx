@@ -28,6 +28,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
   const circleRef = useRef<google.maps.Circle | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Load Google Maps API
@@ -45,10 +47,21 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   }, []);
 
+  const cleanupAutocomplete = () => {
+    if (autocompleteRef.current) {
+      // Clear all listeners from autocomplete
+      window.google?.maps?.event?.clearInstanceListeners(autocompleteRef.current);
+      autocompleteRef.current = null;
+    }
+  };
+
   const handleTextSearch = () => {
     if (searchQuery.trim() && !isSearching) {
       console.log('Executing text search for:', searchQuery);
       setIsSearching(true);
+      
+      // Clean up any existing autocomplete to prevent interference
+      cleanupAutocomplete();
       
       // Use text search as fallback when geolocation or maps don't work
       const location = {
@@ -80,6 +93,11 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
+  const handleInputFocus = () => {
+    // Clean up autocomplete when focusing on main input for text search
+    cleanupAutocomplete();
+  };
+
   const initializeMap = () => {
     if (!mapRef.current || !window.google || !mapsLoaded) return;
 
@@ -109,13 +127,15 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       }
     });
 
-    // Initialize autocomplete
-    const inputElement = document.getElementById('location-input') as HTMLInputElement;
-    if (inputElement) {
+    // Initialize autocomplete only for the modal input
+    const modalInputElement = document.getElementById('modal-location-input') as HTMLInputElement;
+    if (modalInputElement && !autocompleteRef.current) {
       const autocomplete = new window.google.maps.places.Autocomplete(
-        inputElement,
+        modalInputElement,
         { types: ['geocode'] }
       );
+      
+      autocompleteRef.current = autocomplete;
 
       autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();
@@ -178,13 +198,19 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }, 100);
   };
 
+  const handleCloseMap = () => {
+    setShowMap(false);
+    // Clean up autocomplete when closing modal
+    cleanupAutocomplete();
+  };
+
   const handleApplyLocation = () => {
     if (selectedLocation) {
       onLocationSelect({
         ...selectedLocation,
         radius: parseInt(radius)
       });
-      setShowMap(false);
+      handleCloseMap();
       setIsSearching(false);
     }
   };
@@ -241,17 +267,25 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      cleanupAutocomplete();
+    };
+  }, []);
+
   return (
     <div className="relative">
       <div className="flex gap-2">
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-600" />
           <Input
-            id="location-input"
+            ref={inputRef}
             placeholder={placeholder}
             value={searchQuery}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
+            onFocus={handleInputFocus}
             className="pl-10 h-12 border-0 text-stone-700"
           />
         </div>
@@ -267,7 +301,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           <Search className="h-4 w-4" />
         </Button>
         
-        <Dialog open={showMap} onOpenChange={setShowMap}>
+        <Dialog open={showMap} onOpenChange={handleCloseMap}>
           <DialogTrigger asChild>
             <Button
               type="button"
@@ -288,6 +322,17 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             </DialogHeader>
             
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-2">
+                  Buscar dirección
+                </label>
+                <Input
+                  id="modal-location-input"
+                  placeholder="Escribe una dirección..."
+                  className="w-full bg-white border border-gray-300"
+                />
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Radio de búsqueda
@@ -323,7 +368,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <div className="flex justify-end gap-2 pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => setShowMap(false)}
+                  onClick={handleCloseMap}
                   size="sm"
                   className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
                 >
