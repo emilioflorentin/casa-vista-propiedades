@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye, Heater, Waves, Car, Zap, Home, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [operation, setOperation] = useState("all");
+  const [managedBy, setManagedBy] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -39,6 +39,7 @@ const Properties = () => {
                          property.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = propertyType === "all" || property.type === propertyType;
     const matchesOperation = operation === "all" || property.operation === operation;
+    const matchesManagement = managedBy === "all" || property.managedBy === managedBy;
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
     const matchesBedrooms = minBedrooms === "all" || property.bedrooms >= parseInt(minBedrooms);
     const matchesBathrooms = minBathrooms === "all" || property.bathrooms >= parseInt(minBathrooms);
@@ -66,9 +67,9 @@ const Properties = () => {
       feature.toLowerCase().includes('jardín')
     );
     
-    return matchesSearch && matchesType && matchesOperation && matchesPrice && 
-           matchesBedrooms && matchesBathrooms && matchesHeating && matchesPool &&
-           matchesGarage && matchesAirConditioning && matchesElevator && 
+    return matchesSearch && matchesType && matchesOperation && matchesManagement && 
+           matchesPrice && matchesBedrooms && matchesBathrooms && matchesHeating && 
+           matchesPool && matchesGarage && matchesAirConditioning && matchesElevator && 
            matchesTerrace && matchesGarden;
   });
 
@@ -112,6 +113,17 @@ const Properties = () => {
                   <SelectItem value="house">Casa</SelectItem>
                   <SelectItem value="loft">Loft</SelectItem>
                   <SelectItem value="studio">Estudio</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={managedBy} onValueChange={setManagedBy}>
+                <SelectTrigger className="h-12 w-40 border-stone-300">
+                  <SelectValue placeholder="Gestionada por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="nazari">Nazarí Homes</SelectItem>
+                  <SelectItem value="other">Otras Inmobiliarias</SelectItem>
                 </SelectContent>
               </Select>
               

@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +18,7 @@ interface Property {
   area: number;
   image: string;
   features?: string[];
+  managedBy: "nazari" | "other";
 }
 
 interface PropertyCardProps {
@@ -39,6 +39,10 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
       studio: 'Estudio'
     };
     return types[type] || type;
+  };
+
+  const getManagementLabel = (managedBy: string) => {
+    return managedBy === 'nazari' ? 'Nazarí Homes' : 'Otra Inmobiliaria';
   };
 
   return (
@@ -67,6 +71,16 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           </div>
           <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-mono">
             Ref: {property.reference}
+          </Badge>
+          <Badge 
+            variant="outline" 
+            className={`text-xs ${
+              property.managedBy === 'nazari' 
+                ? 'bg-green-50 text-green-700 border-green-200' 
+                : 'bg-gray-50 text-gray-700 border-gray-200'
+            }`}
+          >
+            {getManagementLabel(property.managedBy)}
           </Badge>
         </div>
         <Button

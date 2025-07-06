@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -14,6 +13,7 @@ const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
+  const [managedBy, setManagedBy] = useState("");
   const [filteredProperties, setFilteredProperties] = useState(featuredProperties);
   const [showingSearchResults, setShowingSearchResults] = useState(false);
 
@@ -26,7 +26,8 @@ const Index = () => {
     console.log('Search params:', {
       location: selectedLocation,
       propertyType,
-      operation
+      operation,
+      managedBy
     });
 
     // Filter properties based on search criteria
@@ -40,6 +41,11 @@ const Index = () => {
     // Filter by operation if selected
     if (operation && operation !== "any") {
       results = results.filter(property => property.operation === operation);
+    }
+
+    // Filter by management if selected
+    if (managedBy && managedBy !== "any") {
+      results = results.filter(property => property.managedBy === managedBy);
     }
 
     // Filter by location if provided
@@ -63,6 +69,7 @@ const Index = () => {
     setSelectedLocation(null);
     setPropertyType("");
     setOperation("");
+    setManagedBy("");
   };
 
   return (
@@ -82,8 +89,8 @@ const Index = () => {
           </p>
           
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl p-6 max-w-4xl mx-auto shadow-xl">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <LocationSearch
                 onLocationSelect={handleLocationSelect}
                 placeholder="¿Dónde buscas?"
@@ -110,6 +117,17 @@ const Index = () => {
                   <SelectItem value="any">Cualquiera</SelectItem>
                   <SelectItem value="rent">Alquiler</SelectItem>
                   <SelectItem value="sale">Venta</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={managedBy} onValueChange={setManagedBy}>
+                <SelectTrigger className="h-12 border-0 text-stone-700">
+                  <SelectValue placeholder="Gestionada por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Cualquiera</SelectItem>
+                  <SelectItem value="nazari">Nazarí Homes</SelectItem>
+                  <SelectItem value="other">Otras Inmobiliarias</SelectItem>
                 </SelectContent>
               </Select>
               
