@@ -5,16 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default markers in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface LocationSearchProps {
   onLocationSelect: (location: { address: string; lat: number; lng: number; radius: number }) => void;
   placeholder?: string;
-}
-
-declare global {
-  interface Window {
-    google: typeof google;
-  }
 }
 
 const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: LocationSearchProps) => {
@@ -22,46 +26,17 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const [radius, setRadius] = useState("1000");
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number } | null>(null);
   const [showMap, setShowMap] = useState(false);
-  const [mapsLoaded, setMapsLoaded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
-  const circleRef = useRef<google.maps.Circle | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const circleRef = useRef<L.Circle | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    // Load Google Maps API
-    if (!window.google && !document.querySelector('script[src*="maps.googleapis.com"]')) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        setMapsLoaded(true);
-      };
-      document.head.appendChild(script);
-    } else if (window.google) {
-      setMapsLoaded(true);
-    }
-  }, []);
-
-  const cleanupAutocomplete = () => {
-    if (autocompleteRef.current) {
-      // Clear all listeners from autocomplete
-      window.google?.maps?.event?.clearInstanceListeners(autocompleteRef.current);
-      autocompleteRef.current = null;
-    }
-  };
 
   const handleTextSearch = () => {
     if (searchQuery.trim() && !isSearching) {
       console.log('Executing text search for:', searchQuery);
       setIsSearching(true);
-      
-      // Clean up any existing autocomplete to prevent interference
-      cleanupAutocomplete();
       
       // Use text search as fallback when geolocation or maps don't work
       const location = {
@@ -93,98 +68,54 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
-  const handleInputFocus = () => {
-    // Clean up autocomplete when focusing on main input for text search
-    cleanupAutocomplete();
-  };
-
   const initializeMap = () => {
-    if (!mapRef.current || !window.google || !mapsLoaded) return;
+    if (!mapRef.current) return;
 
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: { lat: 40.4168, lng: -3.7038 }, // Madrid center
-      zoom: 10,
-    });
+    const map = L.map(mapRef.current).setView([40.4168, -3.7038], 10);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
     mapInstanceRef.current = map;
 
     // Add click listener to map
-    map.addListener('click', (event: google.maps.MapMouseEvent) => {
-      if (event.latLng) {
-        const lat = event.latLng.lat();
-        const lng = event.latLng.lng();
-        
-        // Reverse geocoding to get address
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === 'OK' && results && results[0]) {
-            const address = results[0].formatted_address;
-            setSelectedLocation({ address, lat, lng });
-            setSearchQuery(address);
-            updateMapMarker(lat, lng, address);
-          }
-        });
-      }
-    });
-
-    // Initialize autocomplete only for the modal input
-    const modalInputElement = document.getElementById('modal-location-input') as HTMLInputElement;
-    if (modalInputElement && !autocompleteRef.current) {
-      const autocomplete = new window.google.maps.places.Autocomplete(
-        modalInputElement,
-        { types: ['geocode'] }
-      );
+    map.on('click', (event: L.LeafletMouseEvent) => {
+      const lat = event.latlng.lat;
+      const lng = event.latlng.lng;
       
-      autocompleteRef.current = autocomplete;
-
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (place.geometry && place.geometry.location) {
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-          const address = place.formatted_address || place.name || '';
-          
-          setSelectedLocation({ address, lat, lng });
-          setSearchQuery(address);
-          updateMapMarker(lat, lng, address);
-          
-          map.setCenter({ lat, lng });
-          map.setZoom(14);
-        }
-      });
-    }
+      // Use a simple location name based on coordinates
+      const address = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+      setSelectedLocation({ address, lat, lng });
+      setSearchQuery(address);
+      updateMapMarker(lat, lng, address);
+    });
   };
 
   const updateMapMarker = (lat: number, lng: number, address: string) => {
-    if (!mapInstanceRef.current || !window.google) return;
+    if (!mapInstanceRef.current) return;
 
     // Remove existing marker and circle
     if (markerRef.current) {
-      markerRef.current.setMap(null);
+      mapInstanceRef.current.removeLayer(markerRef.current);
     }
     if (circleRef.current) {
-      circleRef.current.setMap(null);
+      mapInstanceRef.current.removeLayer(circleRef.current);
     }
 
     // Add new marker
-    const marker = new window.google.maps.Marker({
-      position: { lat, lng },
-      map: mapInstanceRef.current,
-      title: address,
-    });
+    const marker = L.marker([lat, lng]).addTo(mapInstanceRef.current);
+    marker.bindPopup(address).openPopup();
     markerRef.current = marker;
 
     // Add radius circle
-    const circle = new window.google.maps.Circle({
-      strokeColor: '#8B7355',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
+    const circle = L.circle([lat, lng], {
+      color: '#8B7355',
       fillColor: '#8B7355',
       fillOpacity: 0.15,
-      map: mapInstanceRef.current,
-      center: { lat, lng },
-      radius: parseInt(radius),
-    });
+      radius: parseInt(radius)
+    }).addTo(mapInstanceRef.current);
     circleRef.current = circle;
   };
 
@@ -192,16 +123,63 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     setShowMap(true);
     setIsSearching(false);
     setTimeout(() => {
-      if (mapsLoaded) {
-        initializeMap();
-      }
+      initializeMap();
     }, 100);
   };
 
   const handleCloseMap = () => {
     setShowMap(false);
-    // Clean up autocomplete when closing modal
-    cleanupAutocomplete();
+    // Clean up map
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+  };
+
+  const searchLocationByName = (locationName: string) => {
+    // Simple geocoding for common Madrid locations
+    const locationMap: { [key: string]: [number, number] } = {
+      'madrid': [40.4168, -3.7038],
+      'madrid centro': [40.4168, -3.7038],
+      'las rozas': [40.4926, -3.8739],
+      'malasaña': [40.4264, -3.7037],
+      'sol': [40.4173, -3.7053],
+      'salamanca': [40.4310, -3.6827],
+      'pozuelo': [40.4364, -3.8123],
+      'chueca': [40.4255, -3.6959],
+      'retiro': [40.4153, -3.6844],
+      'chamberí': [40.4378, -3.7044]
+    };
+
+    const searchTerm = locationName.toLowerCase().trim();
+    const coords = locationMap[searchTerm] || [40.4168, -3.7038];
+    
+    return {
+      lat: coords[0],
+      lng: coords[1],
+      address: locationName
+    };
+  };
+
+  const handleModalLocationSearch = () => {
+    const modalInput = document.getElementById('modal-location-input') as HTMLInputElement;
+    if (modalInput && modalInput.value.trim()) {
+      const result = searchLocationByName(modalInput.value);
+      setSelectedLocation(result);
+      setSearchQuery(result.address);
+      
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setView([result.lat, result.lng], 14);
+        updateMapMarker(result.lat, result.lng, result.address);
+      }
+    }
+  };
+
+  const handleModalInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleModalLocationSearch();
+    }
   };
 
   const handleApplyLocation = () => {
@@ -221,34 +199,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          const address = `Mi ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
           
-          // Reverse geocoding to get address
-          if (window.google && mapsLoaded) {
-            const geocoder = new window.google.maps.Geocoder();
-            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-              if (status === 'OK' && results && results[0]) {
-                const address = results[0].formatted_address;
-                setSelectedLocation({ address, lat, lng });
-                setSearchQuery(address);
-                
-                if (mapInstanceRef.current) {
-                  mapInstanceRef.current.setCenter({ lat, lng });
-                  mapInstanceRef.current.setZoom(14);
-                  updateMapMarker(lat, lng, address);
-                }
-              }
-            });
-          } else {
-            // Fallback when Google Maps is not available
-            const address = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-            setSelectedLocation({ address, lat, lng });
-            setSearchQuery(address);
-            onLocationSelect({
-              address,
-              lat,
-              lng,
-              radius: parseInt(radius)
-            });
+          setSelectedLocation({ address, lat, lng });
+          setSearchQuery(address);
+          
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.setView([lat, lng], 14);
+            updateMapMarker(lat, lng, address);
           }
         },
         (error) => {
@@ -270,7 +228,9 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      cleanupAutocomplete();
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+      }
     };
   }, []);
 
@@ -285,7 +245,6 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             value={searchQuery}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
-            onFocus={handleInputFocus}
             className="pl-10 h-12 border-0 text-stone-700"
           />
         </div>
@@ -326,11 +285,21 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Buscar dirección
                 </label>
-                <Input
-                  id="modal-location-input"
-                  placeholder="Escribe una dirección..."
-                  className="w-full bg-white border border-gray-300"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="modal-location-input"
+                    placeholder="Escribe una dirección (ej: Madrid Centro, Malasaña, Sol...)"
+                    className="flex-1 bg-white border border-gray-300"
+                    onKeyPress={handleModalInputKeyPress}
+                  />
+                  <Button
+                    onClick={handleModalLocationSearch}
+                    size="sm"
+                    className="bg-stone-600 hover:bg-stone-700 text-white"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               
               <div>
@@ -357,12 +326,6 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                   className="w-full h-80 rounded-lg bg-stone-50 border border-gray-200"
                   style={{ minHeight: '320px' }}
                 />
-                
-                {!mapsLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg">
-                    <p className="text-stone-600">Cargando mapa...</p>
-                  </div>
-                )}
               </div>
               
               <div className="flex justify-end gap-2 pt-4">
