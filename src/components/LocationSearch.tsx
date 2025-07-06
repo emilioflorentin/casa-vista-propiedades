@@ -301,7 +301,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           <Search className="h-4 w-4" />
         </Button>
         
-        <Dialog open={showMap} onOpenChange={handleCloseMap}>
+        <Dialog open={showMap} onOpenChange={setShowMap}>
           <DialogTrigger asChild>
             <Button
               type="button"
