@@ -112,7 +112,7 @@ const Properties = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Header />
       
       {/* Search Header */}
@@ -120,18 +120,18 @@ const Properties = () => {
         <div className="container mx-auto px-6 py-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
               <Input
                 placeholder="Buscar por ubicación, tipo de propiedad..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-10 h-12 border-stone-300 focus:border-stone-500"
               />
             </div>
             
             <div className="flex gap-3">
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 w-40">
+                <SelectTrigger className="h-12 w-40 border-stone-300">
                   <SelectValue placeholder="Operación" />
                 </SelectTrigger>
                 <SelectContent>
@@ -142,7 +142,7 @@ const Properties = () => {
               </Select>
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 w-40">
+                <SelectTrigger className="h-12 w-40 border-stone-300">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,7 +157,7 @@ const Properties = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="h-12"
+                className="h-12 border-stone-300 text-stone-600 hover:bg-stone-50"
               >
                 <Filter className="h-4 w-4 mr-2" />
                 Filtros
@@ -167,10 +167,10 @@ const Properties = () => {
           
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="mt-6 p-6 bg-gray-50 rounded-lg">
+            <div className="mt-6 p-6 bg-stone-50 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-stone-700 mb-2">
                     Rango de Precio (€)
                   </label>
                   <Slider
@@ -181,7 +181,7 @@ const Properties = () => {
                     step={10000}
                     className="mt-2"
                   />
-                  <div className="flex justify-between text-sm text-gray-500 mt-1">
+                  <div className="flex justify-between text-sm text-stone-500 mt-1">
                     <span>{priceRange[0].toLocaleString()}€</span>
                     <span>{priceRange[1].toLocaleString()}€</span>
                   </div>
@@ -196,10 +196,10 @@ const Properties = () => {
       <div className="container mx-auto px-6 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-2xl font-bold text-stone-800">
               {filteredProperties.length} Propiedades Encontradas
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-stone-600 mt-1">
               Resultados de tu búsqueda
             </p>
           </div>
@@ -209,6 +209,7 @@ const Properties = () => {
               variant={viewMode === "grid" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("grid")}
+              className={viewMode === "grid" ? "bg-stone-600 hover:bg-stone-700" : "border-stone-300 text-stone-600 hover:bg-stone-50"}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
@@ -216,6 +217,7 @@ const Properties = () => {
               variant={viewMode === "list" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("list")}
+              className={viewMode === "list" ? "bg-stone-600 hover:bg-stone-700" : "border-stone-300 text-stone-600 hover:bg-stone-50"}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -232,7 +234,7 @@ const Properties = () => {
         ) : (
           <div className="space-y-4">
             {filteredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow border-stone-200">
                 <CardContent className="p-0">
                   <div className="flex">
                     <div className="w-64 h-48 flex-shrink-0">
@@ -250,27 +252,27 @@ const Properties = () => {
                               variant={property.operation === 'rent' ? 'default' : 'secondary'}
                               className={`${
                                 property.operation === 'rent' 
-                                  ? 'bg-green-500 hover:bg-green-600' 
-                                  : 'bg-blue-500 hover:bg-blue-600'
+                                  ? 'bg-stone-500 hover:bg-stone-600' 
+                                  : 'bg-amber-500 hover:bg-amber-600'
                               } text-white`}
                             >
                               {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                             </Badge>
                           </div>
-                          <h3 className="text-xl font-semibold text-gray-800 mb-1">
+                          <h3 className="text-xl font-semibold text-stone-800 mb-1">
                             {property.title}
                           </h3>
-                          <div className="flex items-center text-gray-500 mb-4">
+                          <div className="flex items-center text-stone-500 mb-4">
                             <MapPin className="h-4 w-4 mr-1" />
                             {property.location}
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="text-stone-600 hover:bg-stone-50">
                           <Heart className="h-4 w-4" />
                         </Button>
                       </div>
                       
-                      <div className="flex items-center gap-6 text-gray-600 mb-4">
+                      <div className="flex items-center gap-6 text-stone-600 mb-4">
                         <div className="flex items-center">
                           <Bed className="h-4 w-4 mr-1" />
                           <span>{property.bedrooms} hab.</span>
@@ -286,12 +288,12 @@ const Properties = () => {
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <div className="text-2xl font-bold text-blue-600">
+                        <div className="text-2xl font-bold text-stone-600">
                           {new Intl.NumberFormat('es-ES').format(property.price)}€
                           {property.operation === 'rent' && '/mes'}
                         </div>
                         <Link to={`/property/${property.id}`}>
-                          <Button className="bg-blue-600 hover:bg-blue-700">
+                          <Button className="bg-stone-600 hover:bg-stone-700">
                             <Eye className="h-4 w-4 mr-2" />
                             Ver Detalles
                           </Button>
@@ -308,11 +310,11 @@ const Properties = () => {
         {filteredProperties.length === 0 && (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
-              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <Search className="h-16 w-16 text-stone-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-stone-800 mb-2">
                 No se encontraron propiedades
               </h3>
-              <p className="text-gray-600">
+              <p className="text-stone-600">
                 Prueba ajustando los filtros de búsqueda para encontrar más resultados.
               </p>
             </div>

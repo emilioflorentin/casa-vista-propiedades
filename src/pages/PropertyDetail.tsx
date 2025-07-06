@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar } from "lucide-react";
@@ -50,6 +51,211 @@ const propertyData = {
       email: "maria@inmobiliariaapp.com",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face"
     }
+  },
+  2: {
+    id: 2,
+    title: "Casa Familiar con Jardín",
+    type: "house",
+    price: 450000,
+    currency: "€",
+    operation: "sale" as const,
+    location: "Las Rozas, Madrid",
+    bedrooms: 4,
+    bathrooms: 3,
+    area: 180,
+    images: [
+      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1448630360428-65456885c650?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&h=600&fit=crop",
+    ],
+    description: "Magnífica casa familiar de dos plantas con amplio jardín privado. Ubicada en una zona residencial tranquila, perfecta para familias. Cuenta con espacios amplios, cocina independiente y múltiples opciones de entretenimiento al aire libre.",
+    features: [
+      "Jardín privado",
+      "Piscina",
+      "Barbacoa",
+      "Garaje para 2 coches",
+      "Trastero",
+      "Cocina independiente",
+      "Chimenea",
+      "Sistema de alarma"
+    ],
+    amenities: [
+      { icon: Wifi, label: "WiFi" },
+      { icon: Wind, label: "Aire Acondicionado" },
+      { icon: Tv, label: "TV" },
+      { icon: Car, label: "Parking" }
+    ],
+    agent: {
+      name: "Carlos Rodríguez",
+      phone: "+34 91 234 56 78",
+      email: "carlos@inmobiliariaapp.com",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    }
+  },
+  3: {
+    id: 3,
+    title: "Loft Industrial Reformado",
+    type: "loft",
+    price: 1800,
+    currency: "€",
+    operation: "rent" as const,
+    location: "Malasaña, Madrid",
+    bedrooms: 1,
+    bathrooms: 1,
+    area: 75,
+    images: [
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1615873968403-89e068629265?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&h=600&fit=crop",
+    ],
+    description: "Impresionante loft de estilo industrial completamente reformado en el corazón de Malasaña. Techos altos, espacios diáfanos y una decoración moderna que combina perfectamente con el carácter histórico del edificio.",
+    features: [
+      "Techos altos",
+      "Espacios diáfanos",
+      "Totalmente reformado",
+      "Suelos de hormigón pulido",
+      "Grandes ventanales",
+      "Cocina americana",
+      "Aire acondicionado",
+      "Totalmente amueblado"
+    ],
+    amenities: [
+      { icon: Wifi, label: "WiFi" },
+      { icon: Wind, label: "Aire Acondicionado" },
+      { icon: Tv, label: "TV" },
+      { icon: Car, label: "Parking" }
+    ],
+    agent: {
+      name: "Ana Martínez",
+      phone: "+34 91 345 67 89",
+      email: "ana@inmobiliariaapp.com",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    }
+  },
+  4: {
+    id: 4,
+    title: "Ático con Terraza Panorámica",
+    type: "apartment",
+    price: 650000,
+    currency: "€",
+    operation: "sale" as const,
+    location: "Salamanca, Madrid",
+    bedrooms: 3,
+    bathrooms: 2,
+    area: 120,
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1571624436279-b272aff752b5?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop",
+    ],
+    description: "Exclusivo ático en el prestigioso barrio de Salamanca con espectacular terraza panorámica. Vistas impresionantes de la ciudad, acabados de lujo y una ubicación inmejorable en una de las zonas más cotizadas de Madrid.",
+    features: [
+      "Terraza panorámica",
+      "Vistas a la ciudad",
+      "Acabados de lujo",
+      "Ascensor directo",
+      "Aire acondicionado",
+      "Suelos de parquet",
+      "Cocina equipada",
+      "Trastero incluido"
+    ],
+    amenities: [
+      { icon: Wifi, label: "WiFi" },
+      { icon: Wind, label: "Aire Acondicionado" },
+      { icon: Tv, label: "TV" },
+      { icon: Car, label: "Parking" }
+    ],
+    agent: {
+      name: "Luis González",
+      phone: "+34 91 456 78 90",
+      email: "luis@inmobiliariaapp.com",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
+    }
+  },
+  5: {
+    id: 5,
+    title: "Estudio Luminoso Céntrico",
+    type: "studio",
+    price: 800,
+    currency: "€",
+    operation: "rent" as const,
+    location: "Chueca, Madrid",
+    bedrooms: 1,
+    bathrooms: 1,
+    area: 45,
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800&h=600&fit=crop",
+    ],
+    description: "Acogedor estudio en el vibrante barrio de Chueca, completamente reformado y con mucha luz natural. Perfecto para jóvenes profesionales o estudiantes que buscan vivir en el centro de Madrid con todas las comodidades.",
+    features: [
+      "Completamente reformado",
+      "Mucha luz natural",
+      "Totalmente amueblado",
+      "Cocina americana equipada",
+      "Aire acondicionado",
+      "Internet de alta velocidad",
+      "Cerca del metro",
+      "Zona comercial"
+    ],
+    amenities: [
+      { icon: Wifi, label: "WiFi" },
+      { icon: Wind, label: "Aire Acondicionado" },
+      { icon: Tv, label: "TV" },
+      { icon: Car, label: "Parking" }
+    ],
+    agent: {
+      name: "Isabel Fernández",
+      phone: "+34 91 567 89 01",
+      email: "isabel@inmobiliariaapp.com",
+      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
+    }
+  },
+  6: {
+    id: 6,
+    title: "Chalet Independiente",
+    type: "house",
+    price: 850000,
+    currency: "€",
+    operation: "sale" as const,
+    location: "Pozuelo de Alarcón",
+    bedrooms: 5,
+    bathrooms: 4,
+    area: 250,
+    images: [
+      "https://images.unsplash.com/photo-1448630360428-65456885c650?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+    ],
+    description: "Impresionante chalet independiente en una de las mejores zonas de Pozuelo de Alarcón. Parcela privada con jardín maduro, piscina y múltiples espacios de entretenimiento. Ideal para familias numerosas que buscan tranquilidad y espacio.",
+    features: [
+      "Parcela privada 500m²",
+      "Piscina privada",
+      "Jardín maduro",
+      "Garaje para 3 coches",
+      "Bodega",
+      "Despacho",
+      "Sala de juegos",
+      "Sistema domótica"
+    ],
+    amenities: [
+      { icon: Wifi, label: "WiFi" },
+      { icon: Wind, label: "Aire Acondicionado" },
+      { icon: Tv, label: "TV" },
+      { icon: Car, label: "Parking" }
+    ],
+    agent: {
+      name: "Roberto Silva",
+      phone: "+34 91 678 90 12",
+      email: "roberto@inmobiliariaapp.com",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    }
   }
 };
 
@@ -64,7 +270,7 @@ const PropertyDetail = () => {
     message: ""
   });
 
-  const property = propertyData[1]; // For demo, using property 1
+  const property = propertyData[Number(id) as keyof typeof propertyData];
 
   if (!property) {
     return (
