@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { allProperties } from "@/data/properties";
+import MapComponent from "@/components/MapComponent";
 
 // Updated agent data with agency assignment and WhatsApp numbers
 const agentData = [
@@ -222,12 +223,6 @@ const PropertyDetail = () => {
     `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para la propiedad Ref: ${property.reference}`
   ];
 
-  // Function to generate Google Maps embed URL
-  const getGoogleMapsEmbedUrl = (location: string) => {
-    const encodedLocation = encodeURIComponent(location);
-    return `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodedLocation}&zoom=15&maptype=roadmap`;
-  };
-
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
@@ -345,7 +340,7 @@ const PropertyDetail = () => {
                 </p>
               </div>
 
-              {/* Google Maps Location Section */}
+              {/* OpenStreetMap Location Section */}
               <div className="py-6 border-t border-stone-200">
                 <h2 className="text-xl font-semibold mb-4 text-stone-800 flex items-center">
                   <Map className="h-5 w-5 mr-2 text-stone-600" />
@@ -357,20 +352,8 @@ const PropertyDetail = () => {
                     <span className="text-lg">{property.location}</span>
                   </div>
                   
-                  {/* Google Maps Embed */}
-                  <div className="relative w-full h-80 rounded-lg overflow-hidden border border-stone-200">
-                    <iframe
-                      src={getGoogleMapsEmbedUrl(property.location)}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`Ubicación de ${property.title}`}
-                      className="rounded-lg"
-                    />
-                  </div>
+                  {/* OpenStreetMap Component */}
+                  <MapComponent location={property.location} title={property.title} />
                   
                   {/* Location info */}
                   <div className="bg-stone-50 p-4 rounded-lg">
