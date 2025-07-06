@@ -11,11 +11,18 @@ interface LocationSearchProps {
   placeholder?: string;
 }
 
+declare global {
+  interface Window {
+    google: typeof google;
+  }
+}
+
 const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: LocationSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [radius, setRadius] = useState("1000");
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number } | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
@@ -28,14 +35,19 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;
       script.async = true;
       script.defer = true;
+      script.onload = () => {
+        setMapsLoaded(true);
+      };
       document.head.appendChild(script);
+    } else if (window.google) {
+      setMapsLoaded(true);
     }
   }, []);
 
   const initializeMap = () => {
-    if (!mapRef.current || !window.google) return;
+    if (!mapRef.current || !window.google || !mapsLoaded) return;
 
-    const map = new google.maps.Map(mapRef.current, {
+    const map = new window.google.maps.Map(mapRef.current, {
       center: { lat: 40.4168, lng: -3.7038 }, // Madrid center
       zoom: 10,
     });
@@ -49,7 +61,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         const lng = event.latLng.lng();
         
         // Reverse geocoding to get address
-        const geocoder = new google.maps.Geocoder();
+        const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
           if (status === 'OK' && results && results[0]) {
             const address = results[0].formatted_address;
@@ -62,30 +74,33 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     });
 
     // Initialize autocomplete
-    const autocomplete = new google.maps.places.Autocomplete(
-      document.getElementById('location-input') as HTMLInputElement,
-      { types: ['geocode'] }
-    );
+    const inputElement = document.getElementById('location-input') as HTMLInputElement;
+    if (inputElement) {
+      const autocomplete = new window.google.maps.places.Autocomplete(
+        inputElement,
+        { types: ['geocode'] }
+      );
 
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.geometry && place.geometry.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        const address = place.formatted_address || place.name || '';
-        
-        setSelectedLocation({ address, lat, lng });
-        setSearchQuery(address);
-        updateMapMarker(lat, lng, address);
-        
-        map.setCenter({ lat, lng });
-        map.setZoom(14);
-      }
-    });
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry && place.geometry.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const address = place.formatted_address || place.name || '';
+          
+          setSelectedLocation({ address, lat, lng });
+          setSearchQuery(address);
+          updateMapMarker(lat, lng, address);
+          
+          map.setCenter({ lat, lng });
+          map.setZoom(14);
+        }
+      });
+    }
   };
 
   const updateMapMarker = (lat: number, lng: number, address: string) => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current || !window.google) return;
 
     // Remove existing marker and circle
     if (markerRef.current) {
@@ -96,7 +111,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
 
     // Add new marker
-    const marker = new google.maps.Marker({
+    const marker = new window.google.maps.Marker({
       position: { lat, lng },
       map: mapInstanceRef.current,
       title: address,
@@ -104,11 +119,11 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     markerRef.current = marker;
 
     // Add radius circle
-    const circle = new google.maps.Circle({
-      strokeColor: '#8B5A2B',
+    const circle = new window.google.maps.Circle({
+      strokeColor: '#8B7355',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#8B5A2B',
+      fillColor: '#8B7355',
       fillOpacity: 0.15,
       map: mapInstanceRef.current,
       center: { lat, lng },
@@ -120,7 +135,9 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleShowMap = () => {
     setShowMap(true);
     setTimeout(() => {
-      initializeMap();
+      if (mapsLoaded) {
+        initializeMap();
+      }
     }, 100);
   };
 
@@ -142,8 +159,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           const lng = position.coords.longitude;
           
           // Reverse geocoding to get address
-          if (window.google) {
-            const geocoder = new google.maps.Geocoder();
+          if (window.google && mapsLoaded) {
+            const geocoder = new window.google.maps.Geocoder();
             geocoder.geocode({ location: { lat, lng } }, (results, status) => {
               if (status === 'OK' && results && results[0]) {
                 const address = results[0].formatted_address;
@@ -170,13 +187,13 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     <div className="relative">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+          <MapPin className="absolute left-3 top-3 h-5 w-5 text-amber-400" />
           <Input
             id="location-input"
             placeholder={placeholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 border-0 text-stone-700"
+            className="pl-10 h-12 border-0 text-amber-700"
             onClick={handleShowMap}
           />
         </div>
@@ -185,7 +202,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           variant="outline"
           size="sm"
           onClick={handleCurrentLocation}
-          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200"
+          className="h-12 px-3 border-0 bg-amber-100 hover:bg-amber-200"
         >
           <Target className="h-4 w-4" />
         </Button>
@@ -195,7 +212,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-lg">
           <CardContent className="p-4">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-stone-700 mb-2">
+              <label className="block text-sm font-medium text-amber-700 mb-2">
                 Radio de búsqueda
               </label>
               <Select value={radius} onValueChange={setRadius}>
@@ -214,9 +231,15 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             
             <div 
               ref={mapRef} 
-              className="w-full h-64 rounded-lg mb-4"
+              className="w-full h-64 rounded-lg mb-4 bg-amber-50"
               style={{ minHeight: '250px' }}
             />
+            
+            {!mapsLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-amber-50 rounded-lg">
+                <p className="text-amber-600">Cargando mapa...</p>
+              </div>
+            )}
             
             <div className="flex gap-2 justify-end">
               <Button
@@ -230,7 +253,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 onClick={handleApplyLocation}
                 disabled={!selectedLocation}
                 size="sm"
-                className="bg-stone-600 hover:bg-stone-700"
+                className="bg-amber-600 hover:bg-amber-700"
               >
                 Aplicar Ubicación
               </Button>
