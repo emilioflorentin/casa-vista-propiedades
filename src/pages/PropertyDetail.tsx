@@ -11,43 +11,55 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { allProperties } from "@/data/properties";
 
-// Agent data for different properties
+// Updated agent data with agency assignment and WhatsApp numbers
 const agentData = [
   {
     name: "María García",
     phone: "+34 91 123 45 67",
-    email: "maria@inmobiliariaapp.com",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face"
+    email: "maria@nazarihomes.com",
+    image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face",
+    agency: "Nazarí Homes",
+    whatsapp: "+34671030927"
   },
   {
     name: "Carlos Rodríguez", 
     phone: "+34 91 234 56 78",
-    email: "carlos@inmobiliariaapp.com",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    email: "carlos@inmobiliariaplus.com",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    agency: "Inmobiliaria Plus",
+    whatsapp: "+34600123456"
   },
   {
     name: "Ana Martínez",
     phone: "+34 91 345 67 89", 
-    email: "ana@inmobiliariaapp.com",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    email: "ana@nazarihomes.com",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    agency: "Nazarí Homes",
+    whatsapp: "+34671030927"
   },
   {
     name: "Luis González",
     phone: "+34 91 456 78 90",
-    email: "luis@inmobiliariaapp.com", 
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
+    email: "luis@casasideales.com", 
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    agency: "Casas Ideales",
+    whatsapp: "+34655987654"
   },
   {
     name: "Isabel Fernández",
     phone: "+34 91 567 89 01",
-    email: "isabel@inmobiliariaapp.com",
-    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
+    email: "isabel@nazarihomes.com",
+    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+    agency: "Nazarí Homes",
+    whatsapp: "+34671030927"
   },
   {
     name: "Roberto Silva",
     phone: "+34 91 678 90 12", 
-    email: "roberto@inmobiliariaapp.com",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    email: "roberto@propiedadeselite.com",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    agency: "Propiedades Elite",
+    whatsapp: "+34644555777"
   }
 ];
 
@@ -69,9 +81,6 @@ const PropertyDetail = () => {
     dni: "",
     signedContract: null as File | null
   });
-
-  // Fixed WhatsApp number for the business
-  const WHATSAPP_BUSINESS_NUMBER = "+34671030927";
 
   const property = allProperties.find(p => p.id === Number(id));
 
@@ -96,10 +105,24 @@ const PropertyDetail = () => {
     "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
   ];
 
-  // Get agent data (cycle through available agents)
-  const agent = agentData[property.id % agentData.length];
+  // Get agent data based on property management and cycle through available agents
+  const getAgentForProperty = (property: any) => {
+    if (property.managedBy === 'nazari') {
+      // Filter agents from Nazarí Homes
+      const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
+      return nazariAgents[property.id % nazariAgents.length];
+    } else {
+      // Filter agents from other agencies
+      const otherAgents = agentData.filter(agent => agent.agency !== 'Nazarí Homes');
+      return otherAgents[property.id % otherAgents.length];
+    }
+  };
 
-  // Generate description based on property type
+  const agent = getAgentForProperty(property);
+
+  // Use the agent's WhatsApp number (which corresponds to their agency)
+  const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp;
+
   const getDescription = (property: any) => {
     const typeDescriptions = {
       apartment: "Hermoso apartamento ubicado en una zona privilegiada. Completamente renovado con acabados de alta calidad y todas las comodidades modernas.",
@@ -401,7 +424,7 @@ const PropertyDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Agent Card */}
+            {/* Agent Card - Updated to show agency */}
             <Card className="border-stone-200">
               <CardHeader>
                 <CardTitle className="text-stone-800">Agente Inmobiliario</CardTitle>
@@ -416,6 +439,7 @@ const PropertyDetail = () => {
                   <div>
                     <h3 className="font-semibold text-lg text-stone-800">{agent.name}</h3>
                     <p className="text-stone-600">Agente Senior</p>
+                    <p className="text-sm text-stone-500 font-medium">{agent.agency}</p>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -455,7 +479,7 @@ const PropertyDetail = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-stone-600 mb-4">
-                  Chatea directamente con nosotros para agendar una cita o resolver tus dudas al instante.
+                  Chatea directamente con {agent.agency} para agendar una cita o resolver tus dudas al instante.
                 </p>
                 
                 {/* Quick message buttons */}
