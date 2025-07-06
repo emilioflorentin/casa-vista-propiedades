@@ -62,6 +62,9 @@ const PropertyDetail = () => {
   });
   const [whatsappMessage, setWhatsappMessage] = useState("");
 
+  // Fixed WhatsApp number for the business
+  const WHATSAPP_BUSINESS_NUMBER = "+34912345678";
+
   const property = allProperties.find(p => p.id === Number(id));
 
   if (!property) {
@@ -129,10 +132,9 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = () => {
-    const phoneNumber = "+34912345678"; // Número de WhatsApp del negocio
     const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (ID: ${property.id}). Me gustaría agendar una cita para visitarla.`;
     const encodedMessage = encodeURIComponent(defaultMessage);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   };
 
