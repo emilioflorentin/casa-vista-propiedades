@@ -334,7 +334,9 @@ const PropertyDetail = () => {
             <Card className="border-stone-200">
               <CardHeader>
                 <CardTitle className="text-stone-800 flex items-center">
-                  <MessageCircle className="h-5 w-5 mr-2 text-green-500" />
+                  <div className="relative mr-2">
+                    <MessageCircle className="h-5 w-5 text-white bg-green-500 rounded-full p-1 w-6 h-6" />
+                  </div>
                   Chat WhatsApp
                 </CardTitle>
               </CardHeader>
