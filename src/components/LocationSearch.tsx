@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,6 +42,32 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
       setMapsLoaded(true);
     }
   }, []);
+
+  const handleTextSearch = () => {
+    if (searchQuery.trim()) {
+      // Use text search as fallback when geolocation or maps don't work
+      const location = {
+        address: searchQuery,
+        lat: 40.4168, // Default to Madrid center as fallback
+        lng: -3.7038,
+        radius: parseInt(radius)
+      };
+      
+      setSelectedLocation({ address: searchQuery, lat: 40.4168, lng: -3.7038 });
+      onLocationSelect(location);
+      console.log('Text search applied:', location);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleTextSearch();
+    }
+  };
 
   const initializeMap = () => {
     if (!mapRef.current || !window.google || !mapsLoaded) return;
@@ -174,12 +199,32 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 }
               }
             });
+          } else {
+            // Fallback when Google Maps is not available
+            const address = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+            setSelectedLocation({ address, lat, lng });
+            setSearchQuery(address);
+            onLocationSelect({
+              address,
+              lat,
+              lng,
+              radius: parseInt(radius)
+            });
           }
         },
         (error) => {
           console.error('Error getting location:', error);
+          // Fallback to text search when geolocation fails
+          if (searchQuery.trim()) {
+            handleTextSearch();
+          }
         }
       );
+    } else {
+      // Geolocation not supported, use text search
+      if (searchQuery.trim()) {
+        handleTextSearch();
+      }
     }
   };
 
@@ -192,7 +237,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             id="location-input"
             placeholder={placeholder}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleInputChange}
+            onKeyPress={handleInputKeyPress}
             className="pl-10 h-12 border-0 text-amber-700"
             onClick={handleShowMap}
           />
@@ -256,6 +302,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 className="bg-amber-600 hover:bg-amber-700"
               >
                 Aplicar Ubicación
+              </Button>
+              <Button
+                onClick={handleTextSearch}
+                disabled={!searchQuery.trim()}
+                size="sm"
+                className="bg-stone-600 hover:bg-stone-700"
+              >
+                Buscar por Texto
               </Button>
             </div>
           </CardContent>
