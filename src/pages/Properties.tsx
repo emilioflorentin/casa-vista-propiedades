@@ -1,12 +1,15 @@
 
+
 import { useState } from "react";
-import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye } from "lucide-react";
+import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye, Heater } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
@@ -20,6 +23,10 @@ const Properties = () => {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [minBedrooms, setMinBedrooms] = useState("all");
+  const [minBathrooms, setMinBathrooms] = useState("all");
+  const [hasHeating, setHasHeating] = useState(false);
+  const [hasPool, setHasPool] = useState(false);
 
   const filteredProperties = allProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -27,8 +34,13 @@ const Properties = () => {
     const matchesType = propertyType === "all" || property.type === propertyType;
     const matchesOperation = operation === "all" || property.operation === operation;
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
+    const matchesBedrooms = minBedrooms === "all" || property.bedrooms >= parseInt(minBedrooms);
+    const matchesBathrooms = minBathrooms === "all" || property.bathrooms >= parseInt(minBathrooms);
+    const matchesHeating = !hasHeating || property.features?.includes("Calefacción");
+    const matchesPool = !hasPool || property.features?.includes("Piscina");
     
-    return matchesSearch && matchesType && matchesOperation && matchesPrice;
+    return matchesSearch && matchesType && matchesOperation && matchesPrice && 
+           matchesBedrooms && matchesBathrooms && matchesHeating && matchesPool;
   });
 
   return (
@@ -88,7 +100,7 @@ const Properties = () => {
           {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-6 p-6 bg-stone-50 rounded-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-2">
                     Rango de Precio (€)
@@ -104,6 +116,71 @@ const Properties = () => {
                   <div className="flex justify-between text-sm text-stone-500 mt-1">
                     <span>{priceRange[0].toLocaleString()}€</span>
                     <span>{priceRange[1].toLocaleString()}€</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                    Habitaciones mínimas
+                  </label>
+                  <Select value={minBedrooms} onValueChange={setMinBedrooms}>
+                    <SelectTrigger className="border-stone-300">
+                      <SelectValue placeholder="Cualquiera" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Cualquiera</SelectItem>
+                      <SelectItem value="1">1+</SelectItem>
+                      <SelectItem value="2">2+</SelectItem>
+                      <SelectItem value="3">3+</SelectItem>
+                      <SelectItem value="4">4+</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                    Baños mínimos
+                  </label>
+                  <Select value={minBathrooms} onValueChange={setMinBathrooms}>
+                    <SelectTrigger className="border-stone-300">
+                      <SelectValue placeholder="Cualquiera" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Cualquiera</SelectItem>
+                      <SelectItem value="1">1+</SelectItem>
+                      <SelectItem value="2">2+</SelectItem>
+                      <SelectItem value="3">3+</SelectItem>
+                      <SelectItem value="4">4+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex flex-col space-y-4">
+                  <label className="text-sm font-medium text-stone-700">
+                    Características
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="heating" 
+                      checked={hasHeating}
+                      onCheckedChange={setHasHeating}
+                    />
+                    <Label htmlFor="heating" className="flex items-center text-sm text-stone-600">
+                      <Heater className="h-4 w-4 mr-1" />
+                      Calefacción
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="pool" 
+                      checked={hasPool}
+                      onCheckedChange={setHasPool}
+                    />
+                    <Label htmlFor="pool" className="flex items-center text-sm text-stone-600">
+                      <Square className="h-4 w-4 mr-1" />
+                      Piscina
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -248,3 +325,4 @@ const Properties = () => {
 };
 
 export default Properties;
+
