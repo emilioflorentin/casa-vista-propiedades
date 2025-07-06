@@ -363,6 +363,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                     <SelectItem value="2000">2 kilómetros</SelectItem>
                     <SelectItem value="5000">5 kilómetros</SelectItem>
                     <SelectItem value="10000">10 kilómetros</SelectItem>
+                    <SelectItem value="50000">10km+</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
