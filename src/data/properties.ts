@@ -1,8 +1,9 @@
+import { generateUniqueReference, getAllReferences } from '../utils/referenceGenerator';
 
-export const allProperties = [
+// Base properties without references
+const baseProperties = [
   {
     id: 1,
-    reference: "9017882731",
     title: "Apartamento Moderno en el Centro",
     type: "apartment",
     price: 1200,
@@ -17,7 +18,6 @@ export const allProperties = [
   },
   {
     id: 2,
-    reference: "9017882732",
     title: "Casa Familiar con Jardín",
     type: "house",
     price: 450000,
@@ -32,7 +32,6 @@ export const allProperties = [
   },
   {
     id: 3,
-    reference: "9017882733",
     title: "Loft Industrial Reformado",
     type: "loft",
     price: 1800,
@@ -47,7 +46,6 @@ export const allProperties = [
   },
   {
     id: 4,
-    reference: "9017882734",
     title: "Ático con Terraza Panorámica",
     type: "apartment",
     price: 650000,
@@ -62,7 +60,6 @@ export const allProperties = [
   },
   {
     id: 5,
-    reference: "9017882735",
     title: "Estudio Luminoso Céntrico",
     type: "studio",
     price: 800,
@@ -77,7 +74,6 @@ export const allProperties = [
   },
   {
     id: 6,
-    reference: "9017882736",
     title: "Chalet Independiente",
     type: "house",
     price: 850000,
@@ -92,7 +88,6 @@ export const allProperties = [
   },
   {
     id: 7,
-    reference: "9017882737",
     title: "Dúplex con Piscina Comunitaria",
     type: "apartment",
     price: 2200,
@@ -107,7 +102,6 @@ export const allProperties = [
   },
   {
     id: 8,
-    reference: "9017882738",
     title: "Casa Adosada Reformada",
     type: "house",
     price: 320000,
@@ -122,7 +116,6 @@ export const allProperties = [
   },
   {
     id: 9,
-    reference: "9017882739",
     title: "Loft Artístico en Barrio Cultural",
     type: "loft",
     price: 1500,
@@ -137,7 +130,6 @@ export const allProperties = [
   },
   {
     id: 10,
-    reference: "9017882740",
     title: "Apartamento con Balcón",
     type: "apartment",
     price: 380000,
@@ -153,7 +145,6 @@ export const allProperties = [
   // Nuevas propiedades en Barcelona
   {
     id: 11,
-    reference: "9017882741",
     title: "Piso Modernista en El Eixample",
     type: "apartment",
     price: 2500,
@@ -168,7 +159,6 @@ export const allProperties = [
   },
   {
     id: 12,
-    reference: "9017882742",
     title: "Casa con Vistas al Mar",
     type: "house",
     price: 780000,
@@ -183,7 +173,6 @@ export const allProperties = [
   },
   {
     id: 13,
-    reference: "9017882743",
     title: "Estudio en el Barrio Gótico",
     type: "studio",
     price: 1200,
@@ -199,7 +188,6 @@ export const allProperties = [
   // Propiedades en Valencia
   {
     id: 14,
-    reference: "9017882744",
     title: "Apartamento Cerca de la Playa",
     type: "apartment",
     price: 950,
@@ -214,7 +202,6 @@ export const allProperties = [
   },
   {
     id: 15,
-    reference: "9017882745",
     title: "Villa con Piscina Privada",
     type: "house",
     price: 520000,
@@ -229,7 +216,6 @@ export const allProperties = [
   },
   {
     id: 16,
-    reference: "9017882746",
     title: "Loft en el Centro Histórico",
     type: "loft",
     price: 1300,
@@ -245,7 +231,6 @@ export const allProperties = [
   // Propiedades en Sevilla
   {
     id: 17,
-    reference: "9017882747",
     title: "Cortijo Andaluz Restaurado",
     type: "house",
     price: 420000,
@@ -260,7 +245,6 @@ export const allProperties = [
   },
   {
     id: 18,
-    reference: "9017882748",
     title: "Apartamento en Triana",
     type: "apartment",
     price: 850,
@@ -276,7 +260,6 @@ export const allProperties = [
   // Propiedades en Bilbao
   {
     id: 19,
-    reference: "9017882749",
     title: "Piso con Vistas a la Ría",
     type: "apartment",
     price: 1400,
@@ -291,7 +274,6 @@ export const allProperties = [
   },
   {
     id: 20,
-    reference: "9017882750",
     title: "Casa Tradicional Vasca",
     type: "house",
     price: 380000,
@@ -307,7 +289,6 @@ export const allProperties = [
   // Propiedades en Málaga
   {
     id: 21,
-    reference: "9017882751",
     title: "Apartamento con Terraza al Mar",
     type: "apartment",
     price: 1800,
@@ -322,7 +303,6 @@ export const allProperties = [
   },
   {
     id: 22,
-    reference: "9017882752",
     title: "Villa de Lujo en Primera Línea",
     type: "house",
     price: 1200000,
@@ -338,7 +318,6 @@ export const allProperties = [
   // Propiedades en Zaragoza
   {
     id: 23,
-    reference: "9017882753",
     title: "Piso Reformado en el Centro",
     type: "apartment",
     price: 180000,
@@ -353,7 +332,6 @@ export const allProperties = [
   },
   {
     id: 24,
-    reference: "9017882754",
     title: "Casa Unifamiliar con Jardín",
     type: "house",
     price: 1100,
@@ -369,7 +347,6 @@ export const allProperties = [
   // Propiedades en Alicante
   {
     id: 25,
-    reference: "9017882755",
     title: "Apartamento Turístico Renovado",
     type: "apartment",
     price: 1050,
@@ -384,7 +361,6 @@ export const allProperties = [
   },
   {
     id: 26,
-    reference: "9017882756",
     title: "Chalet con Piscina y Vistas",
     type: "house",
     price: 390000,
@@ -400,7 +376,6 @@ export const allProperties = [
   // Propiedades económicas
   {
     id: 27,
-    reference: "9017882757",
     title: "Estudio Económico",
     type: "studio",
     price: 450,
@@ -415,7 +390,6 @@ export const allProperties = [
   },
   {
     id: 28,
-    reference: "9017882758",
     title: "Piso de Inversión",
     type: "apartment",
     price: 95000,
@@ -431,7 +405,6 @@ export const allProperties = [
   // Propiedades de lujo
   {
     id: 29,
-    reference: "9017882759",
     title: "Ático de Lujo con Spa Privado",
     type: "apartment",
     price: 4500,
@@ -446,7 +419,6 @@ export const allProperties = [
   },
   {
     id: 30,
-    reference: "9017882760",
     title: "Mansión Histórica Restaurada",
     type: "house",
     price: 2800000,
@@ -461,5 +433,34 @@ export const allProperties = [
   }
 ];
 
-// Las primeras 4 propiedades son las destacadas
+// Generate unique references for all properties
+const generatePropertiesWithReferences = () => {
+  const existingReferences: string[] = [];
+  
+  return baseProperties.map(property => {
+    const reference = generateUniqueReference(existingReferences);
+    existingReferences.push(reference);
+    
+    return {
+      ...property,
+      reference
+    };
+  });
+};
+
+// Export properties with generated unique references
+export const allProperties = generatePropertiesWithReferences();
+
+// The first 4 properties are featured
 export const featuredProperties = allProperties.slice(0, 4);
+
+// Function to add a new property with unique reference
+export const addNewProperty = (propertyData: Omit<typeof allProperties[0], 'reference'>) => {
+  const existingReferences = getAllReferences(allProperties);
+  const newReference = generateUniqueReference(existingReferences);
+  
+  return {
+    ...propertyData,
+    reference: newReference
+  };
+};
