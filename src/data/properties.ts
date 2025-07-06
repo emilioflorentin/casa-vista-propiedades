@@ -1,3 +1,4 @@
+
 import { generateUniqueReference, getAllReferences } from '@/utils/referenceGenerator';
 
 export interface Property {
@@ -114,6 +115,71 @@ const baseProperties: Omit<Property, 'reference'>[] = [
     image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3",
     features: ["Jardín", "Garaje", "Piscina", "Calefacción", "Aire acondicionado"],
     description: "Impresionante chalet con todas las comodidades.",
+    managedBy: "other"
+  },
+  // Nuevas propiedades en Granada y pueblos de Granada
+  {
+    id: 7,
+    title: "Piso en el Centro de Granada",
+    type: "apartment",
+    price: 900,
+    currency: "EUR",
+    operation: "rent",
+    location: "Granada",
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 80,
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    features: ["Aire acondicionado", "Calefacción", "Balcón"],
+    description: "Apartamento céntrico con vistas a la Alhambra.",
+    managedBy: "nazari"
+  },
+  {
+    id: 8,
+    title: "Casa con Vista al Mar",
+    type: "house",
+    price: 320000,
+    currency: "EUR",
+    operation: "sale",
+    location: "Almuñécar, Granada",
+    bedrooms: 3,
+    bathrooms: 2,
+    area: 140,
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3",
+    features: ["Jardín", "Terraza", "Vista al mar", "Garaje"],
+    description: "Hermosa casa costera con vistas espectaculares.",
+    managedBy: "nazari"
+  },
+  {
+    id: 9,
+    title: "Apartamento Playa",
+    type: "apartment",
+    price: 1100,
+    currency: "EUR",
+    operation: "rent",
+    location: "Motril, Granada",
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 70,
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    features: ["Aire acondicionado", "Terraza", "Cerca de la playa"],
+    description: "Apartamento a solo 100m de la playa.",
+    managedBy: "other"
+  },
+  {
+    id: 10,
+    title: "Casa Rural Tradicional",
+    type: "house",
+    price: 280000,
+    currency: "EUR",
+    operation: "sale",
+    location: "Guadix, Granada",
+    bedrooms: 4,
+    bathrooms: 2,
+    area: 160,
+    image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3",
+    features: ["Jardín", "Chimenea", "Bodega", "Patio"],
+    description: "Auténtica casa andaluza con encanto tradicional.",
     managedBy: "other"
   }
 ];

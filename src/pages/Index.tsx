@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
 import { featuredProperties, allProperties } from "@/data/properties";
+import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
@@ -48,15 +49,35 @@ const Index = () => {
       results = results.filter(property => property.managedBy === managedBy);
     }
 
-    // Filter by location if provided - improved logic
+    // Filter by location and radius if provided
     if (selectedLocation) {
       const searchTerm = selectedLocation.address.toLowerCase();
-      console.log('Filtering by location:', searchTerm);
+      console.log('Filtering by location and radius:', searchTerm, selectedLocation.radius);
       
       results = results.filter(property => {
         const propertyLocation = property.location.toLowerCase();
         
-        // Direct location match
+        // Get coordinates for the property location
+        const propertyCoords = getCoordinatesFromLocation(property.location);
+        
+        if (propertyCoords && selectedLocation.lat && selectedLocation.lng) {
+          // Calculate distance between search location and property location
+          const distance = calculateDistance(
+            selectedLocation.lat,
+            selectedLocation.lng,
+            propertyCoords.lat,
+            propertyCoords.lng
+          );
+          
+          console.log(`Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${selectedLocation.radius}m`);
+          
+          // Check if property is within the specified radius
+          if (distance <= selectedLocation.radius) {
+            return true;
+          }
+        }
+        
+        // Fallback to text-based matching if coordinates are not available
         if (propertyLocation.includes(searchTerm)) {
           return true;
         }
@@ -78,7 +99,7 @@ const Index = () => {
           return true;
         }
         
-        // For coordinate-based searches (like "Lat: X, Lng: Y"), don't filter by text
+        // For coordinate-based searches (like "Lat: X, Lng: Y"), include all properties within radius
         if (searchTerm.includes('lat:') && searchTerm.includes('lng:')) {
           return true;
         }
