@@ -7,61 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
-
-const featuredProperties = [
-  {
-    id: 1,
-    title: "Apartamento Moderno en el Centro",
-    type: "apartment",
-    price: 1200,
-    currency: "€",
-    operation: "rent" as const,
-    location: "Madrid Centro",
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 85,
-    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Casa Familiar con Jardín",
-    type: "house",
-    price: 450000,
-    currency: "€",
-    operation: "sale" as const,
-    location: "Las Rozas, Madrid",
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 180,
-    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Loft Industrial Reformado",
-    type: "loft",
-    price: 1800,
-    currency: "€",
-    operation: "rent" as const,
-    location: "Malasaña, Madrid",
-    bedrooms: 1,
-    bathrooms: 1,
-    area: 75,
-    image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500&h=300&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Ático con Terraza Panorámica",
-    type: "apartment",
-    price: 650000,
-    currency: "€",
-    operation: "sale" as const,
-    location: "Salamanca, Madrid",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 120,
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=300&fit=crop",
-  },
-];
+import { featuredProperties } from "@/data/properties";
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
