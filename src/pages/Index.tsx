@@ -70,18 +70,18 @@ const Index = () => {
   const [operation, setOperation] = useState("");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
+      <section className="relative bg-gradient-to-br from-amber-600 via-orange-600 to-yellow-700 text-white">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
             Encuentra tu
-            <span className="block text-blue-100">Hogar Perfecto</span>
+            <span className="block text-orange-100">Hogar Perfecto</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-blue-50 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-orange-50 max-w-3xl mx-auto">
             Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.
           </p>
           
@@ -120,7 +120,7 @@ const Index = () => {
                 </SelectContent>
               </Select>
               
-              <Button size="lg" className="h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+              <Button size="lg" className="h-12 bg-amber-600 hover:bg-amber-700 text-white font-semibold">
                 <Search className="mr-2 h-5 w-5" />
                 Buscar
               </Button>
@@ -134,22 +134,22 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="p-6">
-              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="h-8 w-8 text-blue-600" />
+              <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Home className="h-8 w-8 text-amber-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">15,000+</h3>
               <p className="text-gray-600">Propiedades Disponibles</p>
             </div>
             <div className="p-6">
-              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Key className="h-8 w-8 text-blue-600" />
+              <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Key className="h-8 w-8 text-amber-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">5,000+</h3>
               <p className="text-gray-600">Clientes Satisfechos</p>
             </div>
             <div className="p-6">
-              <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-blue-600" />
+              <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-8 w-8 text-amber-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
               <p className="text-gray-600">Tasa de Éxito</p>
@@ -159,7 +159,7 @@ const Index = () => {
       </section>
 
       {/* Featured Properties */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-orange-25">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Propiedades Destacadas</h2>
@@ -176,7 +176,7 @@ const Index = () => {
           
           <div className="text-center mt-12">
             <Link to="/properties">
-              <Button size="lg" variant="outline" className="hover:bg-blue-50 border-blue-300 text-blue-700">
+              <Button size="lg" variant="outline" className="hover:bg-orange-50 border-orange-300 text-orange-700">
                 Ver Todas las Propiedades
               </Button>
             </Link>

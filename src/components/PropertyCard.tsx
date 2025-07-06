@@ -52,8 +52,8 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             variant={property.operation === 'rent' ? 'default' : 'secondary'}
             className={`${
               property.operation === 'rent' 
-                ? 'bg-blue-600 hover:bg-blue-700' 
-                : 'bg-green-600 hover:bg-green-700'
+                ? 'bg-amber-600 hover:bg-amber-700' 
+                : 'bg-orange-600 hover:bg-orange-700'
             } text-white`}
           >
             {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
@@ -98,7 +98,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.id}`}>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
               <Eye className="h-4 w-4 mr-1" />
               Ver Más
             </Button>
