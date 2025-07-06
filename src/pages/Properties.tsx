@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,8 +15,8 @@ import { allProperties } from "@/data/properties";
 
 const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [operation, setOperation] = useState("");
+  const [propertyType, setPropertyType] = useState("all");
+  const [operation, setOperation] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -23,8 +24,8 @@ const Properties = () => {
   const filteredProperties = allProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          property.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = !propertyType || property.type === propertyType;
-    const matchesOperation = !operation || property.operation === operation;
+    const matchesType = propertyType === "all" || property.type === propertyType;
+    const matchesOperation = operation === "all" || property.operation === operation;
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
     
     return matchesSearch && matchesType && matchesOperation && matchesPrice;
@@ -54,7 +55,7 @@ const Properties = () => {
                   <SelectValue placeholder="Operación" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
                   <SelectItem value="rent">Alquiler</SelectItem>
                   <SelectItem value="sale">Venta</SelectItem>
                 </SelectContent>
@@ -65,7 +66,7 @@ const Properties = () => {
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="apartment">Apartamento</SelectItem>
                   <SelectItem value="house">Casa</SelectItem>
                   <SelectItem value="loft">Loft</SelectItem>
