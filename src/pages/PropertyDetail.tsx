@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +55,7 @@ const propertyData = {
 
 const PropertyDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
@@ -97,16 +97,23 @@ const PropertyDetail = () => {
     // Here you would typically send the form data to your backend
   };
 
+    const handleGoBack = () => {
+    navigate(-1); // Goes back to the previous page in history
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
       
       <div className="container mx-auto px-6 py-6">
         {/* Back Button */}
-        <Link to="/properties" className="inline-flex items-center text-stone-600 hover:text-stone-700 mb-6">
+        <button 
+          onClick={handleGoBack}
+          className="inline-flex items-center text-stone-600 hover:text-stone-700 mb-6 cursor-pointer"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver a Propiedades
-        </Link>
+          Volver
+        </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
