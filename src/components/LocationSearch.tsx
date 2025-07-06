@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MapPin, Target } from 'lucide-react';
+import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -247,8 +247,18 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           type="button"
           variant="outline"
           size="sm"
-          onClick={handleCurrentLocation}
+          onClick={handleTextSearch}
+          disabled={!searchQuery.trim()}
           className="h-12 px-3 border-0 bg-amber-100 hover:bg-amber-200"
+        >
+          <Search className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleCurrentLocation}
+          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200"
         >
           <Target className="h-4 w-4" />
         </Button>
@@ -302,14 +312,6 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 className="bg-amber-600 hover:bg-amber-700"
               >
                 Aplicar Ubicación
-              </Button>
-              <Button
-                onClick={handleTextSearch}
-                disabled={!searchQuery.trim()}
-                size="sm"
-                className="bg-stone-600 hover:bg-stone-700"
-              >
-                Buscar por Texto
               </Button>
             </div>
           </CardContent>
