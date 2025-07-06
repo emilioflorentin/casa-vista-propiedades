@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, MessageCircle, Send } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, MessageCircle, Send, Upload, FileText, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { allProperties } from "@/data/properties";
@@ -61,6 +62,13 @@ const PropertyDetail = () => {
     message: ""
   });
   const [whatsappMessage, setWhatsappMessage] = useState("");
+  const [reservationData, setReservationData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dni: "",
+    signedContract: null as File | null
+  });
 
   // Fixed WhatsApp number for the business
   const WHATSAPP_BUSINESS_NUMBER = "+34671030927";
@@ -119,6 +127,51 @@ const PropertyDetail = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleReservationInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReservationData({
+      ...reservationData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      setReservationData({
+        ...reservationData,
+        signedContract: file
+      });
+    } else {
+      alert('Por favor, sube un archivo PDF válido');
+    }
+  };
+
+  const handleReservationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!reservationData.signedContract) {
+      alert('Por favor, adjunta el contrato firmado en PDF');
+      return;
+    }
+
+    // Validate required fields
+    if (!reservationData.fullName || !reservationData.email || !reservationData.phone || !reservationData.dni) {
+      alert('Por favor, completa todos los campos obligatorios');
+      return;
+    }
+
+    console.log("Reservation data:", reservationData);
+    
+    // Simulate payment gateway redirect
+    // In a real implementation, you would send the data to your backend first
+    alert('Datos de reserva validados. Redirigiendo a la pasarela de pago...');
+    
+    // Simulate redirect to payment gateway
+    setTimeout(() => {
+      window.open('https://checkout.stripe.com/demo', '_blank');
+    }, 1500);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -327,6 +380,129 @@ const PropertyDetail = () => {
                     <Calendar className="h-4 w-4 mr-1" />
                     Cita
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property Reservation Card */}
+            <Card className="border-stone-200 bg-gradient-to-br from-amber-50 to-orange-50">
+              <CardHeader>
+                <CardTitle className="text-stone-800 flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2 text-amber-600" />
+                  Reservar Propiedad
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-stone-600 mb-4">
+                  Completa el formulario y adjunta el contrato firmado para proceder con la reserva.
+                </p>
+                
+                <form onSubmit={handleReservationSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="fullName" className="text-sm font-medium text-stone-700">
+                      Nombre completo *
+                    </Label>
+                    <Input
+                      id="fullName"
+                      name="fullName"
+                      placeholder="Nombre y apellidos"
+                      value={reservationData.fullName}
+                      onChange={handleReservationInputChange}
+                      required
+                      className="border-stone-300 focus:border-amber-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium text-stone-700">
+                      Email *
+                    </Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="correo@ejemplo.com"
+                      value={reservationData.email}
+                      onChange={handleReservationInputChange}
+                      required
+                      className="border-stone-300 focus:border-amber-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone" className="text-sm font-medium text-stone-700">
+                      Teléfono *
+                    </Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+34 600 000 000"
+                      value={reservationData.phone}
+                      onChange={handleReservationInputChange}
+                      required
+                      className="border-stone-300 focus:border-amber-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="dni" className="text-sm font-medium text-stone-700">
+                      DNI/NIE *
+                    </Label>
+                    <Input
+                      id="dni"
+                      name="dni"
+                      placeholder="12345678A"
+                      value={reservationData.dni}
+                      onChange={handleReservationInputChange}
+                      required
+                      className="border-stone-300 focus:border-amber-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="contract" className="text-sm font-medium text-stone-700">
+                      Contrato firmado (PDF) *
+                    </Label>
+                    <div className="mt-2">
+                      <input
+                        id="contract"
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('contract')?.click()}
+                        className="w-full border-dashed border-2 border-stone-300 hover:border-amber-400 hover:bg-amber-50"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {reservationData.signedContract ? 'Cambiar archivo PDF' : 'Subir contrato firmado'}
+                      </Button>
+                      {reservationData.signedContract && (
+                        <div className="mt-2 flex items-center text-sm text-green-600">
+                          <FileText className="h-4 w-4 mr-1" />
+                          {reservationData.signedContract.name}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    type="submit"
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Proceder al Pago
+                  </Button>
+                </form>
+
+                <div className="mt-4 p-3 bg-amber-100 rounded-lg">
+                  <p className="text-xs text-amber-800 text-center">
+                    🔒 Pago seguro • Reserva inmediata • Confirmación por email
+                  </p>
                 </div>
               </CardContent>
             </Card>
