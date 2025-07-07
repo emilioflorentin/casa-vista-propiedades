@@ -1,6 +1,5 @@
-
 import { useFavorites } from "@/hooks/useFavorites";
-import { properties } from "@/data/properties";
+import { allProperties } from "@/data/properties";
 import PropertyCard from "@/components/PropertyCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +8,7 @@ import { Heart } from "lucide-react";
 const Favorites = () => {
   const { favorites } = useFavorites();
   
-  const favoriteProperties = properties.filter(property => 
+  const favoriteProperties = allProperties.filter(property => 
     favorites.includes(property.id)
   );
 
