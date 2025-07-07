@@ -32,27 +32,21 @@ export const useFavorites = () => {
       console.log('Previous favorites:', prevFavorites);
       console.log('New favorites:', newFavorites);
       
-      // Save to localStorage immediately with the new state
+      return newFavorites;
+    });
+  }, []);
+
+  // Separate effect to handle localStorage and toast when favorites change
+  useEffect(() => {
+    if (favorites.length > 0) {
       try {
-        localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
-        console.log('Saved to localStorage:', newFavorites);
+        localStorage.setItem('property-favorites', JSON.stringify(favorites));
+        console.log('Saved to localStorage:', favorites);
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
-      
-      // Show toast notification
-      setTimeout(() => {
-        toast({
-          title: isCurrentlyFavorite ? "Eliminado de favoritos" : "Añadido a favoritos",
-          description: isCurrentlyFavorite 
-            ? "La propiedad se ha eliminado de tus favoritos" 
-            : "La propiedad se ha añadido a tus favoritos",
-        });
-      }, 0);
-      
-      return newFavorites;
-    });
-  }, [toast]);
+    }
+  }, [favorites]);
 
   const isFavorite = useCallback((propertyId: number) => {
     return favorites.includes(propertyId);
