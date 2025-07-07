@@ -312,7 +312,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <Target className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[95vw] w-full max-h-[90vh] bg-white overflow-y-auto">
+          <DialogContent className="max-w-[98vw] w-full max-h-[95vh] bg-white overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
                 Buscar por ubicación
@@ -324,19 +324,20 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Buscar dirección
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full">
                   <Input
                     ref={modalInputRef}
                     placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
-                    className="flex-1 bg-white border border-gray-300 min-w-0"
+                    className="flex-1 bg-white border border-gray-300 text-base px-4 py-2"
                     onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
                     onClick={handleModalLocationSearch}
                     size="sm"
-                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0"
+                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0 px-4"
                   >
                     <Search className="h-4 w-4" />
+                    <span className="ml-2 hidden sm:inline">Buscar</span>
                   </Button>
                 </div>
               </div>
