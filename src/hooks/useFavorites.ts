@@ -6,31 +6,22 @@ export const useFavorites = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const { toast } = useToast();
 
+  // Load favorites from localStorage on mount
   useEffect(() => {
     const savedFavorites = localStorage.getItem('property-favorites');
     if (savedFavorites) {
       try {
         const parsed = JSON.parse(savedFavorites);
-        setFavorites(parsed);
-        console.log('Loaded favorites from localStorage:', parsed);
+        if (Array.isArray(parsed)) {
+          setFavorites(parsed);
+          console.log('Loaded favorites from localStorage:', parsed);
+        }
       } catch (error) {
         console.error('Error parsing favorites from localStorage:', error);
         localStorage.removeItem('property-favorites');
       }
     }
   }, []);
-
-  // Save to localStorage whenever favorites change
-  useEffect(() => {
-    if (favorites.length >= 0) { // Changed condition to handle empty arrays too
-      try {
-        localStorage.setItem('property-favorites', JSON.stringify(favorites));
-        console.log('Saved favorites to localStorage:', favorites);
-      } catch (error) {
-        console.error('Error saving to localStorage:', error);
-      }
-    }
-  }, [favorites]);
 
   const toggleFavorite = useCallback((propertyId: number) => {
     console.log('Toggling favorite for property:', propertyId);
@@ -44,6 +35,10 @@ export const useFavorites = () => {
         : [...currentFavorites, propertyId];
       
       console.log('New favorites after toggle:', newFavorites);
+      
+      // Save to localStorage immediately
+      localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
+      console.log('Saved to localStorage:', newFavorites);
       
       // Show toast notification
       toast({
