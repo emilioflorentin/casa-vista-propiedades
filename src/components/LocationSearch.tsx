@@ -31,6 +31,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const markerRef = useRef<L.Marker | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalInputRef = useRef<HTMLInputElement>(null);
 
   // Geocode location using Nominatim API (same as MapComponent)
   const geocodeLocation = async (location: string): Promise<{ lat: number; lng: number; address: string }> => {
@@ -194,11 +195,11 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   };
 
   const handleModalLocationSearch = async () => {
-    const modalInput = document.getElementById('modal-location-input') as HTMLInputElement;
-    if (modalInput && modalInput.value.trim()) {
-      console.log('Modal search triggered for:', modalInput.value);
+    if (modalInputRef.current && modalInputRef.current.value.trim()) {
+      const searchValue = modalInputRef.current.value.trim();
+      console.log('Modal search triggered for:', searchValue);
       try {
-        const result = await geocodeLocation(modalInput.value.trim());
+        const result = await geocodeLocation(searchValue);
         setSelectedLocation(result);
         setSearchQuery(result.address);
         
@@ -216,10 +217,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     if (e.key === 'Enter') {
       e.preventDefault();
       console.log('Enter key pressed in modal');
-      const modalInput = e.target as HTMLInputElement;
-      if (modalInput && modalInput.value.trim()) {
-        handleModalLocationSearch();
-      }
+      handleModalLocationSearch();
     }
   };
 
@@ -314,7 +312,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <Target className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-6xl w-full max-h-[90vh] bg-white overflow-y-auto">
+          <DialogContent className="max-w-[95vw] w-full max-h-[90vh] bg-white overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
                 Buscar por ubicación
@@ -328,7 +326,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 </label>
                 <div className="flex gap-2">
                   <Input
-                    id="modal-location-input"
+                    ref={modalInputRef}
                     placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
                     className="flex-1 bg-white border border-gray-300 min-w-0"
                     onKeyDown={handleModalInputKeyDown}
