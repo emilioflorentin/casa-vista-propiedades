@@ -25,14 +25,18 @@ export const useFavorites = () => {
         ? prev.filter(id => id !== propertyId)
         : [...prev, propertyId];
       
+      // Save to localStorage immediately
       localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
       
-      toast({
-        title: isCurrentlyFavorite ? "Eliminado de favoritos" : "Añadido a favoritos",
-        description: isCurrentlyFavorite 
-          ? "La propiedad se ha eliminado de tus favoritos" 
-          : "La propiedad se ha añadido a tus favoritos",
-      });
+      // Show toast after state update to avoid render phase update
+      setTimeout(() => {
+        toast({
+          title: isCurrentlyFavorite ? "Eliminado de favoritos" : "Añadido a favoritos",
+          description: isCurrentlyFavorite 
+            ? "La propiedad se ha eliminado de tus favoritos" 
+            : "La propiedad se ha añadido a tus favoritos",
+        });
+      }, 0);
       
       return newFavorites;
     });
