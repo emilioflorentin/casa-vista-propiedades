@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -197,6 +196,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleModalLocationSearch = async () => {
     const modalInput = document.getElementById('modal-location-input') as HTMLInputElement;
     if (modalInput && modalInput.value.trim()) {
+      console.log('Modal search triggered for:', modalInput.value);
       try {
         const result = await geocodeLocation(modalInput.value);
         setSelectedLocation(result);
@@ -215,6 +215,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleModalInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      console.log('Enter key pressed in modal');
       handleModalLocationSearch();
     }
   };
@@ -310,7 +311,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <Target className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl w-full bg-white">
+          <DialogContent className="max-w-4xl w-full max-h-[90vh] bg-white overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
                 Buscar por ubicación
@@ -326,13 +327,13 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                   <Input
                     id="modal-location-input"
                     placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
-                    className="flex-1 bg-white border border-gray-300"
+                    className="flex-1 bg-white border border-gray-300 min-w-0"
                     onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
                     onClick={handleModalLocationSearch}
                     size="sm"
-                    className="bg-stone-600 hover:bg-stone-700 text-white"
+                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0"
                   >
                     <Search className="h-4 w-4" />
                   </Button>
@@ -361,8 +362,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <div className="relative">
                 <div 
                   ref={mapRef} 
-                  className="w-full h-80 rounded-lg bg-stone-50 border border-gray-200"
-                  style={{ minHeight: '320px' }}
+                  className="w-full h-96 rounded-lg bg-stone-50 border border-gray-200"
+                  style={{ minHeight: '384px' }}
                 />
               </div>
               
