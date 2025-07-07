@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface Property {
   id: number;
@@ -26,6 +27,8 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
+  const { toggleFavorite, isFavorite } = useFavorites();
+  
   const formatPrice = (price: number, operation: string) => {
     const formattedPrice = new Intl.NumberFormat('es-ES').format(price);
     return operation === 'rent' ? `${formattedPrice}€/mes` : `${formattedPrice}€`;
@@ -44,6 +47,14 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   const getManagementLabel = (managedBy: string) => {
     return managedBy === 'nazari' ? 'Nazarí Homes' : 'Otra Inmobiliaria';
   };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(property.id);
+  };
+
+  const isPropertyFavorite = isFavorite(property.id);
 
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
@@ -86,9 +97,18 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         <Button
           size="sm"
           variant="ghost"
-          className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 h-auto"
+          className={`absolute top-3 right-3 p-2 h-auto transition-all duration-200 ${
+            isPropertyFavorite 
+              ? 'bg-red-50 hover:bg-red-100 text-red-600' 
+              : 'bg-white/90 hover:bg-white text-gray-600'
+          }`}
+          onClick={handleFavoriteClick}
         >
-          <Heart className="h-4 w-4 text-gray-600" />
+          <Heart 
+            className={`h-4 w-4 transition-all duration-200 ${
+              isPropertyFavorite ? 'fill-current' : ''
+            }`} 
+          />
         </Button>
       </div>
 

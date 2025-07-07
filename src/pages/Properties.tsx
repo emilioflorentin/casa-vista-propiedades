@@ -13,8 +13,10 @@ import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import { Link } from "react-router-dom";
 import { allProperties } from "@/data/properties";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Properties = () => {
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [operation, setOperation] = useState("all");
@@ -44,7 +46,6 @@ const Properties = () => {
     const matchesBedrooms = minBedrooms === "all" || property.bedrooms >= parseInt(minBedrooms);
     const matchesBathrooms = minBathrooms === "all" || property.bathrooms >= parseInt(minBathrooms);
     
-    // Filtros de características
     const matchesHeating = !hasHeating || property.features?.some(feature => 
       feature.toLowerCase().includes('calefacción')
     );
@@ -72,6 +73,12 @@ const Properties = () => {
            matchesPool && matchesGarage && matchesAirConditioning && matchesElevator && 
            matchesTerrace && matchesGarden;
   });
+
+  const handleFavoriteClick = (e: React.MouseEvent, propertyId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(propertyId);
+  };
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -138,7 +145,6 @@ const Properties = () => {
             </div>
           </div>
           
-          {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-6 p-6 bg-stone-50 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -368,8 +374,21 @@ const Properties = () => {
                             {property.location}
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-stone-600 hover:bg-stone-50">
-                          <Heart className="h-4 w-4" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`transition-all duration-200 ${
+                            isFavorite(property.id)
+                              ? 'text-red-600 hover:bg-red-50' 
+                              : 'text-stone-600 hover:bg-stone-50'
+                          }`}
+                          onClick={(e) => handleFavoriteClick(e, property.id)}
+                        >
+                          <Heart 
+                            className={`h-4 w-4 transition-all duration-200 ${
+                              isFavorite(property.id) ? 'fill-current' : ''
+                            }`} 
+                          />
                         </Button>
                       </div>
                       
