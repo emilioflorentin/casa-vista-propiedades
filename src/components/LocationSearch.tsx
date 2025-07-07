@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -217,7 +216,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleModalInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      console.log('Enter key pressed in modal - triggering search');
+      console.log('Enter key pressed in modal');
       handleModalLocationSearch();
     }
   };
@@ -313,7 +312,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <Target className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[98vw] w-full max-h-[95vh] bg-white overflow-y-auto p-6">
+          <DialogContent className="max-w-[95vw] w-full max-h-[90vh] bg-white overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
                 Buscar por ubicación
@@ -325,20 +324,19 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Buscar dirección
                 </label>
-                <div className="flex gap-2 w-full">
+                <div className="flex gap-2">
                   <Input
                     ref={modalInputRef}
                     placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
-                    className="flex-1 bg-white border border-gray-300 text-base px-4 py-2"
+                    className="flex-1 bg-white border border-gray-300 min-w-0"
                     onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
                     onClick={handleModalLocationSearch}
                     size="sm"
-                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0 px-4"
+                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0"
                   >
                     <Search className="h-4 w-4" />
-                    <span className="ml-2 hidden sm:inline">Buscar</span>
                   </Button>
                 </div>
               </div>
