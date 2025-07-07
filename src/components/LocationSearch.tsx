@@ -198,7 +198,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     if (modalInput && modalInput.value.trim()) {
       console.log('Modal search triggered for:', modalInput.value);
       try {
-        const result = await geocodeLocation(modalInput.value);
+        const result = await geocodeLocation(modalInput.value.trim());
         setSelectedLocation(result);
         setSearchQuery(result.address);
         
@@ -216,7 +216,10 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     if (e.key === 'Enter') {
       e.preventDefault();
       console.log('Enter key pressed in modal');
-      handleModalLocationSearch();
+      const modalInput = e.target as HTMLInputElement;
+      if (modalInput && modalInput.value.trim()) {
+        handleModalLocationSearch();
+      }
     }
   };
 
@@ -311,7 +314,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               <Target className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl w-full max-h-[90vh] bg-white overflow-y-auto">
+          <DialogContent className="max-w-6xl w-full max-h-[90vh] bg-white overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
                 Buscar por ubicación
