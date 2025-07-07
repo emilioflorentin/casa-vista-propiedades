@@ -1,10 +1,13 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Heart, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { favorites } = useFavorites();
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
@@ -34,10 +37,17 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-              <Heart className="h-4 w-4 mr-2" />
-              Favoritos
-            </Button>
+            <Link to="/favorites">
+              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50 relative">
+                <Heart className="h-4 w-4 mr-2" />
+                Favoritos
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {favorites.length}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
               <User className="h-4 w-4 mr-2" />
               Mi Cuenta
@@ -87,10 +97,17 @@ const Header = () => {
                 Contacto
               </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-stone-200">
-                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Favoritos
-                </Button>
+                <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full relative">
+                    <Heart className="h-4 w-4 mr-2" />
+                    Favoritos
+                    {favorites.length > 0 && (
+                      <span className="absolute right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {favorites.length}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
                   <User className="h-4 w-4 mr-2" />
                   Mi Cuenta
