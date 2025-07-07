@@ -1,12 +1,25 @@
+
 import { useFavorites } from "@/hooks/useFavorites";
 import { allProperties } from "@/data/properties";
 import PropertyCard from "@/components/PropertyCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Heart } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Favorites = () => {
-  const { favorites } = useFavorites();
+  const { favorites, clearAllFavorites } = useFavorites();
   
   const favoriteProperties = allProperties.filter(property => 
     favorites.includes(property.id)
@@ -18,11 +31,41 @@ const Favorites = () => {
       
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Heart className="h-8 w-8 text-red-500 fill-current" />
-            <h1 className="text-3xl font-bold text-gray-800">
-              Mis Favoritos
-            </h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Heart className="h-8 w-8 text-red-500 fill-current" />
+              <h1 className="text-3xl font-bold text-gray-800">
+                Mis Favoritos
+              </h1>
+            </div>
+            {favoriteProperties.length > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Eliminar todos
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Eliminar todos los favoritos?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta acción eliminará todas las propiedades de tu lista de favoritos. 
+                      Esta acción no se puede deshacer.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={clearAllFavorites}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Eliminar todos
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
           <p className="text-gray-600">
             {favoriteProperties.length === 0 

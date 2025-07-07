@@ -6,6 +6,7 @@ interface FavoritesContextType {
   favorites: number[];
   toggleFavorite: (propertyId: number) => void;
   isFavorite: (propertyId: number) => boolean;
+  clearAllFavorites: () => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -60,6 +61,17 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const clearAllFavorites = () => {
+    console.log('Clearing all favorites');
+    setFavorites([]);
+    localStorage.setItem('property-favorites', JSON.stringify([]));
+    
+    toast({
+      title: "Favoritos eliminados",
+      description: "Todos los favoritos han sido eliminados",
+    });
+  };
+
   const isFavorite = (propertyId: number) => {
     const result = favorites.includes(propertyId);
     console.log(`Checking if property ${propertyId} is favorite:`, result, 'Current favorites:', favorites);
@@ -69,7 +81,7 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   console.log('FavoritesProvider - current favorites:', favorites);
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite, clearAllFavorites }}>
       {children}
     </FavoritesContext.Provider>
   );
