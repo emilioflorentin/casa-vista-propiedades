@@ -102,7 +102,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     setIsSearching(false);
   };
 
-  const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleTextSearch();
@@ -212,7 +212,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
-  const handleModalInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleModalInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleModalLocationSearch();
@@ -281,7 +281,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
             placeholder={placeholder}
             value={searchQuery}
             onChange={handleInputChange}
-            onKeyPress={handleInputKeyPress}
+            onKeyDown={handleInputKeyDown}
             className="pl-10 h-12 border-0 text-stone-700"
           />
         </div>
@@ -327,7 +327,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                     id="modal-location-input"
                     placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
                     className="flex-1 bg-white border border-gray-300"
-                    onKeyPress={handleModalInputKeyPress}
+                    onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
                     onClick={handleModalLocationSearch}
