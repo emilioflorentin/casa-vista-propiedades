@@ -20,25 +20,30 @@ export const useFavorites = () => {
     }
   }, []);
 
-  const toggleFavorite = useCallback((propertyId: number) => {
-    console.log('Toggling favorite for property:', propertyId);
-    
-    setFavorites(prevFavorites => {
-      const isCurrentlyFavorite = prevFavorites.includes(propertyId);
-      const newFavorites = isCurrentlyFavorite
-        ? prevFavorites.filter(id => id !== propertyId)
-        : [...prevFavorites, propertyId];
-      
-      console.log('Previous favorites:', prevFavorites);
-      console.log('New favorites:', newFavorites);
-      
-      // Save to localStorage immediately
+  // Save to localStorage whenever favorites change
+  useEffect(() => {
+    if (favorites.length >= 0) { // Changed condition to handle empty arrays too
       try {
-        localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
-        console.log('Saved to localStorage immediately:', newFavorites);
+        localStorage.setItem('property-favorites', JSON.stringify(favorites));
+        console.log('Saved favorites to localStorage:', favorites);
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
+    }
+  }, [favorites]);
+
+  const toggleFavorite = useCallback((propertyId: number) => {
+    console.log('Toggling favorite for property:', propertyId);
+    
+    setFavorites(currentFavorites => {
+      console.log('Current favorites before toggle:', currentFavorites);
+      
+      const isCurrentlyFavorite = currentFavorites.includes(propertyId);
+      const newFavorites = isCurrentlyFavorite
+        ? currentFavorites.filter(id => id !== propertyId)
+        : [...currentFavorites, propertyId];
+      
+      console.log('New favorites after toggle:', newFavorites);
       
       // Show toast notification
       toast({
@@ -53,8 +58,12 @@ export const useFavorites = () => {
   }, [toast]);
 
   const isFavorite = useCallback((propertyId: number) => {
-    return favorites.includes(propertyId);
+    const result = favorites.includes(propertyId);
+    console.log(`Checking if property ${propertyId} is favorite:`, result, 'Current favorites:', favorites);
+    return result;
   }, [favorites]);
+
+  console.log('useFavorites hook - current favorites:', favorites);
 
   return {
     favorites,
