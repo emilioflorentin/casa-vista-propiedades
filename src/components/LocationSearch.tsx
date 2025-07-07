@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,27 +33,66 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const circleRef = useRef<L.Circle | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleTextSearch = () => {
+  // Geocode location using Nominatim API (same as MapComponent)
+  const geocodeLocation = async (location: string): Promise<{ lat: number; lng: number; address: string }> => {
+    try {
+      console.log(`Geocoding location: ${location}`);
+      
+      // Clean up the location string for better search results
+      const cleanLocation = location.replace(/,\s*/g, ', ').trim();
+      
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanLocation)}&limit=1&countrycodes=es`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Geocoding service unavailable');
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        console.log(`Found coordinates for ${location}: [${lat}, ${lng}]`);
+        return { lat, lng, address: location };
+      } else {
+        console.log(`No results found for ${location}, using Granada center as fallback`);
+        // Fallback to center of Granada if no results found
+        return { lat: 37.1773, lng: -3.5986, address: location };
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      // Fallback to center of Granada on error
+      return { lat: 37.1773, lng: -3.5986, address: location };
+    }
+  };
+
+  const handleTextSearch = async () => {
     if (searchQuery.trim() && !isSearching) {
       console.log('Executing text search for:', searchQuery);
       setIsSearching(true);
       
-      // Use the searchLocationByName function for better geocoding
-      const result = searchLocationByName(searchQuery);
-      
-      const location = {
-        address: result.address,
-        lat: result.lat,
-        lng: result.lng,
-        radius: parseInt(radius)
-      };
-      
-      setSelectedLocation({ address: result.address, lat: result.lat, lng: result.lng });
-      onLocationSelect(location);
-      console.log('Text search applied:', location);
-      
-      // Reset searching state after a brief delay
-      setTimeout(() => setIsSearching(false), 500);
+      try {
+        // Use the geocodeLocation function for dynamic geocoding
+        const result = await geocodeLocation(searchQuery);
+        
+        const location = {
+          address: result.address,
+          lat: result.lat,
+          lng: result.lng,
+          radius: parseInt(radius)
+        };
+        
+        setSelectedLocation({ address: result.address, lat: result.lat, lng: result.lng });
+        onLocationSelect(location);
+        console.log('Text search applied:', location);
+      } catch (error) {
+        console.error('Error in text search:', error);
+      } finally {
+        // Reset searching state after a brief delay
+        setTimeout(() => setIsSearching(false), 500);
+      }
     }
   };
 
@@ -154,70 +194,20 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
-  const searchLocationByName = (locationName: string) => {
-    // Enhanced geocoding for Spanish locations including Granada
-    const locationMap: { [key: string]: [number, number] } = {
-      'madrid': [40.4168, -3.7038],
-      'madrid centro': [40.4168, -3.7038],
-      'las rozas': [40.4926, -3.8739],
-      'malasaña': [40.4264, -3.7037],
-      'sol': [40.4173, -3.7053],
-      'salamanca': [40.4310, -3.6827],
-      'pozuelo': [40.4364, -3.8123],
-      'chueca': [40.4255, -3.6959],
-      'retiro': [40.4153, -3.6844],
-      'chamberí': [40.4378, -3.7044],
-      'granada': [37.1773, -3.5986], // Granada, Spain coordinates
-      'sevilla': [37.3886, -5.9823],
-      'barcelona': [41.3851, 2.1734],
-      'valencia': [39.4699, -0.3763],
-      'bilbao': [43.2627, -2.9253],
-      'málaga': [36.7213, -4.4214],
-      'córdoba': [37.8882, -4.7794],
-      'toledo': [39.8628, -4.0273]
-    };
-
-    const searchTerm = locationName.toLowerCase().trim();
-    
-    // Try exact match first
-    if (locationMap[searchTerm]) {
-      const coords = locationMap[searchTerm];
-      return {
-        lat: coords[0],
-        lng: coords[1],
-        address: locationName
-      };
-    }
-    
-    // Try partial match for cities
-    for (const [key, coords] of Object.entries(locationMap)) {
-      if (key.includes(searchTerm) || searchTerm.includes(key)) {
-        return {
-          lat: coords[0],
-          lng: coords[1],
-          address: locationName
-        };
-      }
-    }
-    
-    // Default to Madrid if no match found
-    return {
-      lat: 40.4168,
-      lng: -3.7038,
-      address: locationName
-    };
-  };
-
-  const handleModalLocationSearch = () => {
+  const handleModalLocationSearch = async () => {
     const modalInput = document.getElementById('modal-location-input') as HTMLInputElement;
     if (modalInput && modalInput.value.trim()) {
-      const result = searchLocationByName(modalInput.value);
-      setSelectedLocation(result);
-      setSearchQuery(result.address);
-      
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.setView([result.lat, result.lng], 14);
-        updateMapMarker(result.lat, result.lng, result.address);
+      try {
+        const result = await geocodeLocation(modalInput.value);
+        setSelectedLocation(result);
+        setSearchQuery(result.address);
+        
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.setView([result.lat, result.lng], 14);
+          updateMapMarker(result.lat, result.lng, result.address);
+        }
+      } catch (error) {
+        console.error('Error in modal location search:', error);
       }
     }
   };
@@ -335,7 +325,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                 <div className="flex gap-2">
                   <Input
                     id="modal-location-input"
-                    placeholder="Escribe una dirección (ej: Granada, Madrid Centro, Sevilla...)"
+                    placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
                     className="flex-1 bg-white border border-gray-300"
                     onKeyPress={handleModalInputKeyPress}
                   />
