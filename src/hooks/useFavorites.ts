@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const useFavorites = () => {
@@ -10,7 +10,9 @@ export const useFavorites = () => {
     const savedFavorites = localStorage.getItem('property-favorites');
     if (savedFavorites) {
       try {
-        setFavorites(JSON.parse(savedFavorites));
+        const parsed = JSON.parse(savedFavorites);
+        setFavorites(parsed);
+        console.log('Loaded favorites from localStorage:', parsed);
       } catch (error) {
         console.error('Error parsing favorites from localStorage:', error);
         localStorage.removeItem('property-favorites');
@@ -18,17 +20,27 @@ export const useFavorites = () => {
     }
   }, []);
 
-  const toggleFavorite = (propertyId: number) => {
-    setFavorites(prev => {
-      const isCurrentlyFavorite = prev.includes(propertyId);
+  const toggleFavorite = useCallback((propertyId: number) => {
+    console.log('Toggling favorite for property:', propertyId);
+    
+    setFavorites(prevFavorites => {
+      const isCurrentlyFavorite = prevFavorites.includes(propertyId);
       const newFavorites = isCurrentlyFavorite
-        ? prev.filter(id => id !== propertyId)
-        : [...prev, propertyId];
+        ? prevFavorites.filter(id => id !== propertyId)
+        : [...prevFavorites, propertyId];
       
-      // Save to localStorage immediately
-      localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
+      console.log('Previous favorites:', prevFavorites);
+      console.log('New favorites:', newFavorites);
       
-      // Show toast after state update to avoid render phase update
+      // Save to localStorage immediately with the new state
+      try {
+        localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
+        console.log('Saved to localStorage:', newFavorites);
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+      
+      // Show toast notification
       setTimeout(() => {
         toast({
           title: isCurrentlyFavorite ? "Eliminado de favoritos" : "Añadido a favoritos",
@@ -40,9 +52,11 @@ export const useFavorites = () => {
       
       return newFavorites;
     });
-  };
+  }, [toast]);
 
-  const isFavorite = (propertyId: number) => favorites.includes(propertyId);
+  const isFavorite = useCallback((propertyId: number) => {
+    return favorites.includes(propertyId);
+  }, [favorites]);
 
   return {
     favorites,
