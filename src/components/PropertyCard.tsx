@@ -1,10 +1,12 @@
 
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Property {
   id: number;
@@ -29,24 +31,25 @@ interface PropertyCardProps {
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { t } = useLanguage();
   
   const formatPrice = (price: number, operation: string) => {
     const formattedPrice = new Intl.NumberFormat('es-ES').format(price);
-    return operation === 'rent' ? `${formattedPrice}€/mes` : `${formattedPrice}€`;
+    return operation === 'rent' ? `${formattedPrice}€${t('properties.per_month')}` : `${formattedPrice}€`;
   };
 
   const getTypeLabel = (type: string) => {
     const types: { [key: string]: string } = {
-      apartment: 'Apartamento',
-      house: 'Casa',
-      loft: 'Loft',
-      studio: 'Estudio'
+      apartment: t('properties.type_apartment'),
+      house: t('properties.type_house'),
+      loft: t('properties.type_loft'),
+      studio: t('properties.type_studio')
     };
     return types[type] || type;
   };
 
   const getManagementLabel = (managedBy: string) => {
-    return managedBy === 'nazari' ? 'Nazarí Homes' : 'Otra Inmobiliaria';
+    return managedBy === 'nazari' ? t('properties.managed_nazari') : t('properties.managed_other');
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -75,7 +78,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
                   : 'bg-amber-500 hover:bg-amber-600'
               } text-white`}
             >
-              {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+              {property.operation === 'rent' ? t('properties.operation_rent') : t('properties.operation_sale')}
             </Badge>
             <Badge variant="outline" className="bg-white/90 text-gray-700 border-gray-300">
               {getTypeLabel(property.type)}
@@ -131,7 +134,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             <Bath className="h-4 w-4 mr-1" />
             <span className="mr-3">{property.bathrooms}</span>
             <Square className="h-4 w-4 mr-1" />
-            <span>{property.area}m²</span>
+            <span>{property.area}{t('properties.area_unit')}</span>
           </div>
         </div>
 
@@ -145,7 +148,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
               ))}
               {property.features.length > 3 && (
                 <Badge variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
-                  +{property.features.length - 3} más
+                  +{property.features.length - 3} {t('properties.more')}
                 </Badge>
               )}
             </div>
@@ -159,7 +162,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           <Link to={`/property/${property.id}`}>
             <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
               <Eye className="h-4 w-4 mr-1" />
-              Ver Más
+              {t('properties.view_details')}
             </Button>
           </Link>
         </div>
