@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'es' | 'en';
@@ -89,12 +90,6 @@ const translations = {
     'properties.area_unit': 'm²',
     'properties.per_month': '/mes',
     'properties.view_details': 'Ver Detalles',
-    
-    // all other existing translations
-    'stats.properties': 'Propiedades Disponibles',
-    'stats.clients': 'Clientes Satisfechos',
-    'stats.success_rate': 'Tasa de Éxito',
-    
     'properties.search_results': 'Resultados de Búsqueda',
     'properties.featured': 'Propiedades Destacadas',
     'properties.search_results_desc': 'Encontradas {count} propiedades que coinciden con tu búsqueda',
@@ -103,8 +98,13 @@ const translations = {
     'properties.no_results': 'No se encontraron propiedades que coincidan con tu búsqueda',
     'properties.view_all': 'Ver Todas las Propiedades',
     'properties.latest': 'Últimas Propiedades',
-    'properties.no_results_desc': 'Intenta ajustar tus filtros de búsqueda para encontrar más opciones.',
     
+    // Statistics
+    'stats.properties': 'Propiedades Disponibles',
+    'stats.clients': 'Clientes Satisfechos',
+    'stats.success_rate': 'Tasa de Éxito',
+    
+    // Property details
     'property.bedrooms': 'dormitorios',
     'property.bathrooms': 'baños',
     'property.area': 'm²',
@@ -326,12 +326,6 @@ const translations = {
     'properties.area_unit': 'm²',
     'properties.per_month': '/month',
     'properties.view_details': 'View Details',
-    
-    // all other existing translations
-    'stats.properties': 'Available Properties',
-    'stats.clients': 'Satisfied Clients',
-    'stats.success_rate': 'Success Rate',
-    
     'properties.search_results': 'Search Results',
     'properties.featured': 'Featured Properties',
     'properties.search_results_desc': 'Found {count} properties matching your search',
@@ -340,8 +334,13 @@ const translations = {
     'properties.no_results': 'No properties found matching your search',
     'properties.view_all': 'View All Properties',
     'properties.latest': 'Latest Properties',
-    'properties.no_results_desc': 'Try adjusting your search filters to find more options.',
+
+    // Statistics
+    'stats.properties': 'Available Properties',
+    'stats.clients': 'Satisfied Clients',
+    'stats.success_rate': 'Success Rate',
     
+    // Property details
     'property.bedrooms': 'bedrooms',
     'property.bathrooms': 'bathrooms',
     'property.area': 'm²',
