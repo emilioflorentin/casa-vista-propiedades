@@ -58,10 +58,12 @@ const Header = () => {
               <User className="h-4 w-4 mr-2" />
               Mi Cuenta
             </Button>
-            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
-              <Phone className="h-4 w-4 mr-2" />
-              Contactar
-            </Button>
+            <Link to="/contact">
+              <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
+                <Phone className="h-4 w-4 mr-2" />
+                Contactar
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -132,10 +134,12 @@ const Header = () => {
                   <User className="h-4 w-4 mr-2" />
                   Mi Cuenta
                 </Button>
-                <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Contactar
-                </Button>
+                <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                  <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Contactar
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>
