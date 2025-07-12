@@ -259,18 +259,22 @@ const Index = () => {
                   opts={{
                     align: "start",
                     loop: true,
+                    duration: 25,
+                    dragFree: true,
+                    containScroll: "trimSnaps",
+                    slidesToScroll: 1,
                   }}
                   className="w-full"
                 >
-                  <CarouselContent className="-ml-2 md:-ml-4">
+                  <CarouselContent className="-ml-2 md:-ml-4 transition-transform duration-700 ease-in-out">
                     {filteredProperties.map((property) => (
-                      <CarouselItem key={property.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                      <CarouselItem key={property.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105">
                         <PropertyCard property={property} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex" />
-                  <CarouselNext className="hidden md:flex" />
+                  <CarouselPrevious className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
+                  <CarouselNext className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
                 </Carousel>
               ) : (
                 /* Grid layout for search results */
