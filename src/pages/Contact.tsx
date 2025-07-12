@@ -11,7 +11,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MapComponent from '@/components/MapComponent';
 import { useLanguage } from '@/contexts/LanguageContext';
-import ReCAPTCHA from 'react-google-recaptcha';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const Contact = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -27,10 +27,10 @@ const Contact = () => {
   });
   const { toast } = useToast();
   const { t } = useLanguage();
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const hcaptchaRef = useRef<HCaptcha>(null);
 
-  // Replace with your actual reCAPTCHA site key
-  const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // This is a test key, replace with your actual key
+  // Replace with your actual hCaptcha site key
+  const HCAPTCHA_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001"; // This is a test key, replace with your actual key
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -50,12 +50,12 @@ const Contact = () => {
       return;
     }
     
-    // Verificar reCAPTCHA
-    const recaptchaValue = recaptchaRef.current?.getValue();
-    if (!recaptchaValue) {
+    // Verificar hCaptcha
+    const hcaptchaValue = hcaptchaRef.current?.getResponse();
+    if (!hcaptchaValue) {
       toast({
         title: "Error",
-        description: "Por favor, completa el reCAPTCHA para continuar.",
+        description: "Por favor, completa el hCaptcha para continuar.",
         variant: "destructive"
       });
       return;
@@ -73,7 +73,7 @@ const Contact = () => {
       formDataToSend.append('Email', formData.email);
       formDataToSend.append('Teléfono', formData.phone);
       formDataToSend.append('Mensaje', formData.message);
-      formDataToSend.append('g-recaptcha-response', recaptchaValue);
+      formDataToSend.append('h-captcha-response', hcaptchaValue);
       
       // Replace 'your-email@example.com' with your actual email
       const response = await fetch('https://formsubmit.co/nazarihomesgranada@gmail.com', {
@@ -97,7 +97,7 @@ const Contact = () => {
           message: ''
         });
         setPrivacyAccepted(false);
-        recaptchaRef.current?.reset();
+        hcaptchaRef.current?.resetCaptcha();
       } else {
         throw new Error('Error al enviar el formulario');
       }
@@ -323,11 +323,11 @@ const Contact = () => {
                       </Alert>
                     )}
 
-                    {/* reCAPTCHA */}
+                    {/* hCaptcha */}
                     <div className="flex justify-center">
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        sitekey={RECAPTCHA_SITE_KEY}
+                      <HCaptcha
+                        ref={hcaptchaRef}
+                        sitekey={HCAPTCHA_SITE_KEY}
                         theme="light"
                       />
                     </div>
