@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,12 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Verificar si se ha aceptado la política de privacidad
     if (!privacyAccepted) {
       setShowPrivacyError(true);
-      return;
+      return false;
     }
     
     setShowPrivacyError(false);
@@ -34,6 +34,8 @@ const Contact = () => {
       title: "Formulario enviado",
       description: "Te contactaremos pronto. ¡Gracias por tu interés!",
     });
+    
+    return false;
   };
 
   const handleWhatsAppClick = () => {
@@ -147,7 +149,7 @@ const Contact = () => {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div>
                     <Input
                       placeholder="Dirección del inmueble"
@@ -205,6 +207,7 @@ const Contact = () => {
                             setShowPrivacyError(false);
                           }
                         }}
+                        required
                       />
                       <label htmlFor="privacy" className="text-sm text-stone-600">
                         He leído y acepto la{' '}
@@ -226,6 +229,7 @@ const Contact = () => {
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg font-semibold bg-stone-600 hover:bg-stone-700 text-white"
+                    disabled={!privacyAccepted}
                   >
                     Enviar
                   </Button>
