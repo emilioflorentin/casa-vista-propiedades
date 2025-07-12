@@ -251,7 +251,7 @@ const Index = () => {
                 <Carousel
                   plugins={[
                     Autoplay({
-                      delay: 7000,
+                      delay: 3000,
                       stopOnInteraction: false,
                       stopOnMouseEnter: true,
                     }),
