@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,7 +58,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   const isPropertyFavorite = isFavorite(property.id);
 
   return (
-    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg h-[500px] flex flex-col">
       <div className="relative overflow-hidden">
         <img
           src={property.image}
@@ -112,7 +113,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </Button>
       </div>
 
-      <CardContent className="p-5">
+      <CardContent className="p-5 flex flex-col flex-1">
         <div className="mb-3">
           <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
             {property.title}
@@ -135,7 +136,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
 
         {property.features && property.features.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-4 flex-1">
             <div className="flex flex-wrap gap-1">
               {property.features.slice(0, 3).map((feature, index) => (
                 <Badge key={index} variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
@@ -151,7 +152,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           </div>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-auto">
           <div className="text-xl font-bold text-gray-700">
             {formatPrice(property.price, property.operation)}
           </div>
