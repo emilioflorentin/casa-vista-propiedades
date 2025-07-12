@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -91,9 +92,14 @@ const Index = () => {
     console.log('Filtered results:', results.length, 'properties found');
   };
 
-  // Make the main search button do the same immediate search
+  // The main search button now does the same as the location search
   const handleSearch = () => {
-    handleSearchWithLocation();
+    // If there's a selected location, use it directly
+    if (selectedLocation) {
+      handleSearchWithLocation();
+    }
+    // If no location is selected but there might be text in the input, 
+    // let the LocationSearch component handle it through its own search
   };
 
   const resetSearch = () => {
