@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,11 +22,16 @@ const Index = () => {
   const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
     setSelectedLocation(location);
     console.log('Selected location:', location);
+    
+    // Automatically trigger search when location is selected
+    handleSearchWithLocation(location);
   };
 
-  const handleSearch = () => {
+  const handleSearchWithLocation = (location?: { address: string; lat: number; lng: number; radius: number }) => {
+    const searchLocation = location || selectedLocation;
+    
     console.log('Search params:', {
-      location: selectedLocation,
+      location: searchLocation,
       propertyType,
       operation,
       managedBy
@@ -50,9 +56,9 @@ const Index = () => {
     }
 
     // Filter by location and radius if provided
-    if (selectedLocation) {
-      const searchTerm = selectedLocation.address.toLowerCase();
-      console.log('Filtering by location and radius:', searchTerm, selectedLocation.radius);
+    if (searchLocation) {
+      const searchTerm = searchLocation.address.toLowerCase();
+      console.log('Filtering by location and radius:', searchTerm, searchLocation.radius);
       
       results = results.filter(property => {
         const propertyLocation = property.location.toLowerCase();
@@ -60,19 +66,19 @@ const Index = () => {
         // Get coordinates for the property location
         const propertyCoords = getCoordinatesFromLocation(property.location);
         
-        if (propertyCoords && selectedLocation.lat && selectedLocation.lng) {
+        if (propertyCoords && searchLocation.lat && searchLocation.lng) {
           // Calculate distance between search location and property location
           const distance = calculateDistance(
-            selectedLocation.lat,
-            selectedLocation.lng,
+            searchLocation.lat,
+            searchLocation.lng,
             propertyCoords.lat,
             propertyCoords.lng
           );
           
-          console.log(`Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${selectedLocation.radius}m`);
+          console.log(`Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${searchLocation.radius}m`);
           
           // ONLY include properties within the specified radius
-          return distance <= selectedLocation.radius;
+          return distance <= searchLocation.radius;
         }
         
         // If coordinates are not available, exclude the property from radius search
@@ -86,6 +92,10 @@ const Index = () => {
     console.log('Filtered results:', results.length, 'properties found');
   };
 
+  const handleSearch = () => {
+    handleSearchWithLocation();
+  };
+
   const resetSearch = () => {
     setFilteredProperties(featuredProperties);
     setShowingSearchResults(false);
@@ -94,6 +104,13 @@ const Index = () => {
     setOperation("");
     setManagedBy("");
   };
+
+  // Auto-search when filters change and there's a selected location
+  useEffect(() => {
+    if (selectedLocation) {
+      handleSearchWithLocation();
+    }
+  }, [propertyType, operation, managedBy]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">

@@ -86,8 +86,10 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         };
         
         setSelectedLocation({ address: result.address, lat: result.lat, lng: result.lng });
+        
+        // Immediately apply the location search
         onLocationSelect(location);
-        console.log('Text search applied:', location);
+        console.log('Text search applied immediately:', location);
       } catch (error) {
         console.error('Error in text search:', error);
       } finally {
@@ -224,12 +226,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
 
   const handleApplyLocation = () => {
     if (selectedLocation) {
-      onLocationSelect({
+      const location = {
         ...selectedLocation,
         radius: parseInt(radius)
-      });
+      };
+      onLocationSelect(location);
       handleCloseMap();
       setIsSearching(false);
+      console.log('Map location applied immediately:', location);
     }
   };
 
