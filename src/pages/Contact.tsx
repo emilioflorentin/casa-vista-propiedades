@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,34 +11,106 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MapComponent from '@/components/MapComponent';
 import { useLanguage } from '@/contexts/LanguageContext';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Contact = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPrivacyError, setShowPrivacyError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    propertyAddress: '',
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
   const { toast } = useToast();
   const { t } = useLanguage();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Replace with your actual reCAPTCHA site key
+  const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // This is a test key, replace with your actual key
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     // Verificar si se ha aceptado la política de privacidad
     if (!privacyAccepted) {
       setShowPrivacyError(true);
-      return false;
+      return;
+    }
+    
+    // Verificar reCAPTCHA
+    const recaptchaValue = recaptchaRef.current?.getValue();
+    if (!recaptchaValue) {
+      toast({
+        title: "Error",
+        description: "Por favor, completa el reCAPTCHA para continuar.",
+        variant: "destructive"
+      });
+      return;
     }
     
     setShowPrivacyError(false);
+    setIsSubmitting(true);
     
-    // Aquí se manejaría el envío del formulario
-    console.log('Formulario enviado');
-    
-    toast({
-      title: t('contact.form_sent'),
-      description: t('contact.form_sent_desc'),
-    });
-    
-    return false;
+    try {
+      // Preparar datos para Formsubmit
+      const formDataToSend = new FormData();
+      formDataToSend.append('Dirección del inmueble', formData.propertyAddress);
+      formDataToSend.append('Nombre', formData.name);
+      formDataToSend.append('Apellidos', formData.surname);
+      formDataToSend.append('Email', formData.email);
+      formDataToSend.append('Teléfono', formData.phone);
+      formDataToSend.append('Mensaje', formData.message);
+      formDataToSend.append('g-recaptcha-response', recaptchaValue);
+      
+      // Replace 'your-email@example.com' with your actual email
+      const response = await fetch('https://formsubmit.co/nazarihomesgranada@gmail.com', {
+        method: 'POST',
+        body: formDataToSend
+      });
+
+      if (response.ok) {
+        toast({
+          title: t('contact.form_sent'),
+          description: t('contact.form_sent_desc'),
+        });
+        
+        // Reset form
+        setFormData({
+          propertyAddress: '',
+          name: '',
+          surname: '',
+          email: '',
+          phone: '',
+          message: ''
+        });
+        setPrivacyAccepted(false);
+        recaptchaRef.current?.reset();
+      } else {
+        throw new Error('Error al enviar el formulario');
+      }
+    } catch (error) {
+      console.error('Error sending form:', error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al enviar el formulario. Por favor, inténtalo de nuevo.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppClick = () => {
@@ -156,6 +227,9 @@ const Contact = () => {
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div>
                     <Input
+                      name="propertyAddress"
+                      value={formData.propertyAddress}
+                      onChange={handleInputChange}
                       placeholder={t('contact.property_address')}
                       className="w-full h-12 text-base"
                       required
@@ -164,11 +238,17 @@ const Contact = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       placeholder={t('contact.name')}
                       className="h-12 text-base"
                       required
                     />
                     <Input
+                      name="surname"
+                      value={formData.surname}
+                      onChange={handleInputChange}
                       placeholder={t('contact.surname')}
                       className="h-12 text-base"
                       required
@@ -177,13 +257,19 @@ const Contact = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
+                      name="email"
                       type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder={t('contact.email')}
                       className="h-12 text-base"
                       required
                     />
                     <Input
+                      name="phone"
                       type="tel"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       placeholder={t('contact.phone')}
                       className="h-12 text-base"
                       required
@@ -192,6 +278,9 @@ const Contact = () => {
 
                   <div>
                     <Textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
                       placeholder={t('contact.message')}
                       className="min-h-[100px] text-base"
                       rows={4}
@@ -233,14 +322,23 @@ const Contact = () => {
                         </AlertDescription>
                       </Alert>
                     )}
+
+                    {/* reCAPTCHA */}
+                    <div className="flex justify-center">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        theme="light"
+                      />
+                    </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg font-semibold bg-stone-600 hover:bg-stone-700 text-white"
-                    disabled={!privacyAccepted}
+                    disabled={!privacyAccepted || isSubmitting}
                   >
-                    {t('contact.send_button')}
+                    {isSubmitting ? 'Enviando...' : t('contact.send_button')}
                   </Button>
                 </form>
               </CardContent>
