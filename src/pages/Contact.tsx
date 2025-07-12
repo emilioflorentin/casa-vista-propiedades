@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -10,11 +11,13 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MapComponent from '@/components/MapComponent';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Contact = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPrivacyError, setShowPrivacyError] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +35,8 @@ const Contact = () => {
     console.log('Formulario enviado');
     
     toast({
-      title: "Formulario enviado",
-      description: "Te contactaremos pronto. ¡Gracias por tu interés!",
+      title: t('contact.form_sent'),
+      description: t('contact.form_sent_desc'),
     });
     
     return false;
@@ -42,7 +45,7 @@ const Contact = () => {
   const handleWhatsAppClick = () => {
     // Abre WhatsApp con un mensaje predefinido
     const phoneNumber = '34650499177'; // Formato internacional sin +
-    const message = encodeURIComponent('Hola, me gustaría información sobre sus servicios inmobiliarios.');
+    const message = encodeURIComponent(t('contact.whatsapp_message'));
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
@@ -58,8 +61,8 @@ const Contact = () => {
       <div className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white py-20">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">Contacto</h1>
-          <p className="text-xl text-stone-50">Estamos aquí para ayudarte con todas tus necesidades inmobiliarias</p>
+          <h1 className="text-5xl font-bold mb-4">{t('contact.title')}</h1>
+          <p className="text-xl text-stone-50">{t('contact.subtitle')}</p>
         </div>
       </div>
 
@@ -70,7 +73,7 @@ const Contact = () => {
             <div className="h-96">
               <MapComponent 
                 location="Granada, España" 
-                title="Nuestra zona de operación en Granada"
+                title={t('contact.operation_area')}
               />
             </div>
             
@@ -117,7 +120,7 @@ const Contact = () => {
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
                     </svg>
                     <div className="text-left">
-                      <p className="font-medium">¡Escríbenos por WhatsApp!</p>
+                      <p className="font-medium">{t('contact.whatsapp_text')}</p>
                       <p className="text-sm text-green-600">650 499 177</p>
                     </div>
                   </button>
@@ -126,10 +129,10 @@ const Contact = () => {
                 <div className="flex items-start space-x-3 text-stone-600">
                   <MapPin className="h-5 w-5 mt-1" />
                   <div>
-                    <p className="font-medium">Zona de actuación:</p>
-                    <p className="text-stone-600">Granada y provincia</p>
+                    <p className="font-medium">{t('contact.operation_zone')}</p>
+                    <p className="text-stone-600">{t('contact.granada_province')}</p>
                     <p className="text-stone-500 text-sm mt-1">
-                      *Trabajamos por toda Granada sin oficina física
+                      {t('contact.no_physical_office')}
                     </p>
                   </div>
                 </div>
@@ -143,17 +146,17 @@ const Contact = () => {
               <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-stone-800 mb-4">
-                    Deja tus datos y te llamamos
+                    {t('contact.form_title')}
                   </h2>
                   <p className="text-stone-600 text-lg font-medium">
-                    ¡Obtenga tu valoración gratuita sin compromiso!
+                    {t('contact.form_subtitle')}
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div>
                     <Input
-                      placeholder="Dirección del inmueble"
+                      placeholder={t('contact.property_address')}
                       className="w-full h-12 text-base"
                       required
                     />
@@ -161,12 +164,12 @@ const Contact = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
-                      placeholder="Nombre"
+                      placeholder={t('contact.name')}
                       className="h-12 text-base"
                       required
                     />
                     <Input
-                      placeholder="Apellidos"
+                      placeholder={t('contact.surname')}
                       className="h-12 text-base"
                       required
                     />
@@ -175,13 +178,13 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <Input
                       type="email"
-                      placeholder="Correo electrónico"
+                      placeholder={t('contact.email')}
                       className="h-12 text-base"
                       required
                     />
                     <Input
                       type="tel"
-                      placeholder="Teléfono"
+                      placeholder={t('contact.phone')}
                       className="h-12 text-base"
                       required
                     />
@@ -189,7 +192,7 @@ const Contact = () => {
 
                   <div>
                     <Textarea
-                      placeholder="Mensaje (opcional)"
+                      placeholder={t('contact.message')}
                       className="min-h-[100px] text-base"
                       rows={4}
                     />
@@ -211,14 +214,14 @@ const Contact = () => {
                         required
                       />
                       <label htmlFor="privacy" className="text-sm text-stone-600">
-                        He leído y acepto la{' '}
+                        {t('contact.privacy_text')}{' '}
                         <Link 
                           to="/privacy-policy" 
                           className="text-stone-600 hover:underline"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Política de privacidad
+                          {t('contact.privacy_policy')}
                         </Link>
                       </label>
                     </div>
@@ -226,7 +229,7 @@ const Contact = () => {
                     {showPrivacyError && (
                       <Alert variant="destructive">
                         <AlertDescription>
-                          Debes aceptar la política de privacidad para enviar el formulario.
+                          {t('contact.privacy_error')}
                         </AlertDescription>
                       </Alert>
                     )}
@@ -237,7 +240,7 @@ const Contact = () => {
                     className="w-full h-12 text-lg font-semibold bg-stone-600 hover:bg-stone-700 text-white"
                     disabled={!privacyAccepted}
                   >
-                    Enviar
+                    {t('contact.send_button')}
                   </Button>
                 </form>
               </CardContent>

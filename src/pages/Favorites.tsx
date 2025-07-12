@@ -17,13 +17,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Favorites = () => {
   const { favorites, clearAllFavorites } = useFavorites();
+  const { t } = useLanguage();
   
   const favoriteProperties = allProperties.filter(property => 
     favorites.includes(property.id)
   );
+
+  const getFavoritesCountText = () => {
+    if (favoriteProperties.length === 0) {
+      return t('favorites.no_favorites');
+    } else if (favoriteProperties.length === 1) {
+      return t('favorites.count_single');
+    } else {
+      return t('favorites.count_multiple').replace('{count}', favoriteProperties.length.toString());
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -35,7 +47,7 @@ const Favorites = () => {
             <div className="flex items-center gap-3">
               <Heart className="h-8 w-8 text-red-500 fill-current" />
               <h1 className="text-3xl font-bold text-gray-800">
-                Mis Favoritos
+                {t('favorites.title')}
               </h1>
             </div>
             {favoriteProperties.length > 0 && (
@@ -43,24 +55,23 @@ const Favorites = () => {
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Eliminar todos
+                    {t('favorites.clear_all')}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>¿Eliminar todos los favoritos?</AlertDialogTitle>
+                    <AlertDialogTitle>{t('favorites.confirm_clear_title')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Esta acción eliminará todas las propiedades de tu lista de favoritos. 
-                      Esta acción no se puede deshacer.
+                      {t('favorites.confirm_clear_desc')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogCancel>{t('favorites.cancel')}</AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={clearAllFavorites}
                       className="bg-red-600 hover:bg-red-700"
                     >
-                      Eliminar todos
+                      {t('favorites.delete_all')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -68,10 +79,7 @@ const Favorites = () => {
             )}
           </div>
           <p className="text-gray-600">
-            {favoriteProperties.length === 0 
-              ? "No tienes propiedades guardadas como favoritas aún."
-              : `Has guardado ${favoriteProperties.length} propiedad${favoriteProperties.length === 1 ? '' : 'es'} como favorita${favoriteProperties.length === 1 ? '' : 's'}.`
-            }
+            {getFavoritesCountText()}
           </p>
         </div>
 
@@ -79,10 +87,10 @@ const Favorites = () => {
           <div className="text-center py-16">
             <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-500 mb-2">
-              No hay favoritos guardados
+              {t('favorites.empty_title')}
             </h3>
             <p className="text-gray-400">
-              Empieza a explorar propiedades y marca las que te gusten como favoritas.
+              {t('favorites.empty_desc')}
             </p>
           </div>
         ) : (

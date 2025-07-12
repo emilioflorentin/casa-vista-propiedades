@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Heart, User, Phone } from "lucide-react";
@@ -173,13 +172,13 @@ const Header = () => {
               
               {/* Mobile Language Flags */}
               <div className="flex items-center space-x-3 pt-2">
-                <span className="text-sm text-gray-600">Idioma:</span>
+                <span className="text-sm text-gray-600">{t('common.language')}</span>
                 <button
                   onClick={() => {
                     setLanguage('es');
                     setIsMenuOpen(false);
                   }}
-                  className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 ${
+                  className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
                     language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70'
                   }`}
                   title="Español"
@@ -196,7 +195,7 @@ const Header = () => {
                     setLanguage('en');
                     setIsMenuOpen(false);
                   }}
-                  className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 ${
+                  className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
                     language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70'
                   }`}
                   title="English"
