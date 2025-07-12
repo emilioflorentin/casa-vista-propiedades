@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -69,9 +68,10 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     }
   };
 
-  const handleTextSearch = async () => {
+  // Single search function that both search icons will use
+  const performSearch = async () => {
     if (searchQuery.trim() && !isSearching) {
-      console.log('Executing text search for:', searchQuery);
+      console.log('Performing immediate search for:', searchQuery);
       setIsSearching(true);
       
       try {
@@ -89,9 +89,9 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         
         // Immediately apply the location search
         onLocationSelect(location);
-        console.log('Text search applied immediately:', location);
+        console.log('Search applied immediately:', location);
       } catch (error) {
-        console.error('Error in text search:', error);
+        console.error('Error in search:', error);
       } finally {
         // Reset searching state after a brief delay
         setTimeout(() => setIsSearching(false), 500);
@@ -108,7 +108,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleTextSearch();
+      performSearch();
     }
   };
 
@@ -257,14 +257,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           console.error('Error getting location:', error);
           // Fallback to text search when geolocation fails
           if (searchQuery.trim()) {
-            handleTextSearch();
+            performSearch();
           }
         }
       );
     } else {
       // Geolocation not supported, use text search
       if (searchQuery.trim()) {
-        handleTextSearch();
+        performSearch();
       }
     }
   };
@@ -296,7 +296,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           type="button"
           variant="outline"
           size="sm"
-          onClick={handleTextSearch}
+          onClick={performSearch}
           disabled={!searchQuery.trim() || isSearching}
           className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
           title="Buscar por texto"

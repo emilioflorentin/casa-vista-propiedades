@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -92,6 +91,7 @@ const Index = () => {
     console.log('Filtered results:', results.length, 'properties found');
   };
 
+  // Make the main search button do the same immediate search
   const handleSearch = () => {
     handleSearchWithLocation();
   };
