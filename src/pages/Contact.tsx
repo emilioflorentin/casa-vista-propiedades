@@ -1,19 +1,39 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MapComponent from '@/components/MapComponent';
 
 const Contact = () => {
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [showPrivacyError, setShowPrivacyError] = useState(false);
+  const { toast } = useToast();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Verificar si se ha aceptado la política de privacidad
+    if (!privacyAccepted) {
+      setShowPrivacyError(true);
+      return;
+    }
+    
+    setShowPrivacyError(false);
+    
     // Aquí se manejaría el envío del formulario
     console.log('Formulario enviado');
+    
+    toast({
+      title: "Formulario enviado",
+      description: "Te contactaremos pronto. ¡Gracias por tu interés!",
+    });
   };
 
   const handleWhatsAppClick = () => {
@@ -172,19 +192,35 @@ const Contact = () => {
                     />
                   </div>
 
-                  <div className="flex items-start space-x-2">
-                    <input
-                      type="checkbox"
-                      id="privacy"
-                      className="mt-1"
-                      required
-                    />
-                    <label htmlFor="privacy" className="text-sm text-stone-600">
-                      He leído y acepto la{' '}
-                      <a href="#" className="text-stone-600 hover:underline">
-                        Política de privacidad
-                      </a>
-                    </label>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        id="privacy"
+                        className="mt-1"
+                        checked={privacyAccepted}
+                        onChange={(e) => {
+                          setPrivacyAccepted(e.target.checked);
+                          if (e.target.checked) {
+                            setShowPrivacyError(false);
+                          }
+                        }}
+                      />
+                      <label htmlFor="privacy" className="text-sm text-stone-600">
+                        He leído y acepto la{' '}
+                        <a href="#" className="text-stone-600 hover:underline">
+                          Política de privacidad
+                        </a>
+                      </label>
+                    </div>
+
+                    {showPrivacyError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>
+                          Debes aceptar la política de privacidad para enviar el formulario.
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </div>
 
                   <Button
