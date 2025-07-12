@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'es' | 'en';
@@ -22,9 +21,41 @@ const translations = {
     'nav.contact_btn': 'Contactar',
     
     // Home page
-    'hero.title': 'Encuentra tu hogar ideal en la Costa del Sol',
-    'hero.subtitle': 'Descubre las mejores propiedades con vistas al mar, ubicaciones privilegiadas y todo lo que necesitas para vivir la vida mediterránea que siempre has soñado.',
-    'hero.cta': 'Ver Propiedades',
+    'hero.title': 'Encuentra tu',
+    'hero.title_highlight': 'Hogar Perfecto',
+    'hero.subtitle': 'Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.',
+    
+    // Search form
+    'search.location_placeholder': '¿Dónde buscas?',
+    'search.property_type': 'Tipo de propiedad',
+    'search.property_type_any': 'Cualquiera',
+    'search.property_type_apartment': 'Apartamento',
+    'search.property_type_house': 'Casa',
+    'search.property_type_loft': 'Loft',
+    'search.property_type_studio': 'Estudio',
+    'search.operation': 'Alquiler o Venta',
+    'search.operation_any': 'Cualquiera',
+    'search.operation_rent': 'Alquiler',
+    'search.operation_sale': 'Venta',
+    'search.managed_by': 'Gestionada por',
+    'search.managed_by_any': 'Cualquiera',
+    'search.managed_by_nazari': 'Nazarí Homes',
+    'search.managed_by_other': 'Otras Inmobiliarias',
+    'search.search_btn': 'Buscar',
+    
+    // Stats section
+    'stats.properties': 'Propiedades Disponibles',
+    'stats.clients': 'Clientes Satisfechos',
+    'stats.success_rate': 'Tasa de Éxito',
+    
+    // Properties section
+    'properties.search_results': 'Resultados de Búsqueda',
+    'properties.featured': 'Propiedades Destacadas',
+    'properties.search_results_desc': 'Encontradas {count} propiedades que coinciden con tu búsqueda',
+    'properties.featured_desc': 'Descubre nuestra selección de las mejores propiedades disponibles',
+    'properties.show_featured': 'Ver Propiedades Destacadas',
+    'properties.no_results': 'No se encontraron propiedades que coincidan con tu búsqueda',
+    'properties.view_all': 'Ver Todas las Propiedades',
     
     // Property search
     'search.location': 'Ubicación',
@@ -43,7 +74,6 @@ const translations = {
     'search.clear_btn': 'Limpiar filtros',
     
     // Properties
-    'properties.featured': 'Propiedades Destacadas',
     'properties.latest': 'Últimas Propiedades',
     'properties.no_results': 'No se encontraron propiedades',
     'properties.no_results_desc': 'Intenta ajustar tus filtros de búsqueda para encontrar más opciones.',
@@ -111,9 +141,41 @@ const translations = {
     'nav.contact_btn': 'Contact',
     
     // Home page
-    'hero.title': 'Find your ideal home on the Costa del Sol',
-    'hero.subtitle': 'Discover the best properties with sea views, privileged locations and everything you need to live the Mediterranean life you have always dreamed of.',
-    'hero.cta': 'View Properties',
+    'hero.title': 'Find your',
+    'hero.title_highlight': 'Perfect Home',
+    'hero.subtitle': 'Thousands of rental and sale properties await you. Discover your next home with us.',
+    
+    // Search form
+    'search.location_placeholder': 'Where are you looking?',
+    'search.property_type': 'Property Type',
+    'search.property_type_any': 'Any',
+    'search.property_type_apartment': 'Apartment',
+    'search.property_type_house': 'House',
+    'search.property_type_loft': 'Loft',
+    'search.property_type_studio': 'Studio',
+    'search.operation': 'Rent or Sale',
+    'search.operation_any': 'Any',
+    'search.operation_rent': 'Rent',
+    'search.operation_sale': 'Sale',
+    'search.managed_by': 'Managed by',
+    'search.managed_by_any': 'Any',
+    'search.managed_by_nazari': 'Nazarí Homes',
+    'search.managed_by_other': 'Other Agencies',
+    'search.search_btn': 'Search',
+    
+    // Stats section
+    'stats.properties': 'Available Properties',
+    'stats.clients': 'Satisfied Clients',
+    'stats.success_rate': 'Success Rate',
+    
+    // Properties section
+    'properties.search_results': 'Search Results',
+    'properties.featured': 'Featured Properties',
+    'properties.search_results_desc': 'Found {count} properties matching your search',
+    'properties.featured_desc': 'Discover our selection of the best available properties',
+    'properties.show_featured': 'View Featured Properties',
+    'properties.no_results': 'No properties found matching your search',
+    'properties.view_all': 'View All Properties',
     
     // Property search
     'search.location': 'Location',
@@ -132,7 +194,6 @@ const translations = {
     'search.clear_btn': 'Clear filters',
     
     // Properties
-    'properties.featured': 'Featured Properties',
     'properties.latest': 'Latest Properties',
     'properties.no_results': 'No properties found',
     'properties.no_results_desc': 'Try adjusting your search filters to find more options.',

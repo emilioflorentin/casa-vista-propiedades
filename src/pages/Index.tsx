@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -10,9 +11,11 @@ import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
 import { featuredProperties, allProperties } from "@/data/properties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
@@ -128,11 +131,11 @@ const Index = () => {
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Encuentra tu
-            <span className="block text-stone-100">Hogar Perfecto</span>
+            {t('hero.title')}
+            <span className="block text-stone-100">{t('hero.title_highlight')}</span>
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">
-            Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.
+            {t('hero.subtitle')}
           </p>
           
           {/* Search Bar */}
@@ -140,41 +143,41 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <LocationSearch
                 onLocationSelect={handleLocationSelect}
-                placeholder="¿Dónde buscas?"
+                placeholder={t('search.location_placeholder')}
               />
               
               <Select value={propertyType} onValueChange={setPropertyType}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Tipo de propiedad" />
+                  <SelectValue placeholder={t('search.property_type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="apartment">Apartamento</SelectItem>
-                  <SelectItem value="house">Casa</SelectItem>
-                  <SelectItem value="loft">Loft</SelectItem>
-                  <SelectItem value="studio">Estudio</SelectItem>
+                  <SelectItem value="any">{t('search.property_type_any')}</SelectItem>
+                  <SelectItem value="apartment">{t('search.property_type_apartment')}</SelectItem>
+                  <SelectItem value="house">{t('search.property_type_house')}</SelectItem>
+                  <SelectItem value="loft">{t('search.property_type_loft')}</SelectItem>
+                  <SelectItem value="studio">{t('search.property_type_studio')}</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={operation} onValueChange={setOperation}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Alquiler o Venta" />
+                  <SelectValue placeholder={t('search.operation')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="rent">Alquiler</SelectItem>
-                  <SelectItem value="sale">Venta</SelectItem>
+                  <SelectItem value="any">{t('search.operation_any')}</SelectItem>
+                  <SelectItem value="rent">{t('search.operation_rent')}</SelectItem>
+                  <SelectItem value="sale">{t('search.operation_sale')}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Gestionada por" />
+                  <SelectValue placeholder={t('search.managed_by')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="nazari">Nazarí Homes</SelectItem>
-                  <SelectItem value="other">Otras Inmobiliarias</SelectItem>
+                  <SelectItem value="any">{t('search.managed_by_any')}</SelectItem>
+                  <SelectItem value="nazari">{t('search.managed_by_nazari')}</SelectItem>
+                  <SelectItem value="other">{t('search.managed_by_other')}</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -184,7 +187,7 @@ const Index = () => {
                 onClick={handleSearch}
               >
                 <Search className="mr-2 h-5 w-5" />
-                Buscar
+                {t('search.search_btn')}
               </Button>
             </div>
           </div>
@@ -200,21 +203,21 @@ const Index = () => {
                 <Home className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">{allProperties.length.toLocaleString('es-ES')}+</h3>
-              <p className="text-gray-600">Propiedades Disponibles</p>
+              <p className="text-gray-600">{t('stats.properties')}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Key className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">5,000+</h3>
-              <p className="text-gray-600">Clientes Satisfechos</p>
+              <p className="text-gray-600">{t('stats.clients')}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
-              <p className="text-gray-600">Tasa de Éxito</p>
+              <p className="text-gray-600">{t('stats.success_rate')}</p>
             </div>
           </div>
         </div>
@@ -225,12 +228,12 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              {showingSearchResults ? 'Resultados de Búsqueda' : 'Propiedades Destacadas'}
+              {showingSearchResults ? t('properties.search_results') : t('properties.featured')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {showingSearchResults 
-                ? `Encontradas ${filteredProperties.length} propiedades que coinciden con tu búsqueda`
-                : 'Descubre nuestra selección de las mejores propiedades disponibles'
+                ? t('properties.search_results_desc').replace('{count}', filteredProperties.length.toString())
+                : t('properties.featured_desc')
               }
             </p>
             {showingSearchResults && (
@@ -239,7 +242,7 @@ const Index = () => {
                 variant="outline" 
                 className="mt-4 hover:bg-stone-50 border-stone-300 text-stone-700"
               >
-                Ver Propiedades Destacadas
+                {t('properties.show_featured')}
               </Button>
             )}
           </div>
@@ -288,13 +291,13 @@ const Index = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-xl text-gray-600 mb-4">
-                No se encontraron propiedades que coincidan con tu búsqueda
+                {t('properties.no_results')}
               </p>
               <Button 
                 onClick={resetSearch}
                 className="bg-stone-600 hover:bg-stone-700 text-white"
               >
-                Ver Todas las Propiedades
+                {t('properties.view_all')}
               </Button>
             </div>
           )}
@@ -303,7 +306,7 @@ const Index = () => {
             <div className="text-center mt-12">
               <Link to="/properties">
                 <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
-                  Ver Todas las Propiedades
+                  {t('properties.view_all')}
                 </Button>
               </Link>
             </div>
