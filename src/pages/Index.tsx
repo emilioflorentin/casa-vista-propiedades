@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,14 +11,20 @@ import LocationSearch from "@/components/LocationSearch";
 import { featuredProperties, allProperties } from "@/data/properties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
 import Autoplay from "embla-carousel-autoplay";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
   const [managedBy, setManagedBy] = useState("");
   const [filteredProperties, setFilteredProperties] = useState(featuredProperties);
   const [showingSearchResults, setShowingSearchResults] = useState(false);
+  
+  // Carousel refs and state for custom controls
+  const [emblaApi, setEmblaApi] = useState<any>(null);
+  const hoverIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
     setSelectedLocation(location);
@@ -119,6 +125,52 @@ const Index = () => {
     }
   }, [propertyType, operation, managedBy]);
 
+  // Custom carousel navigation functions
+  const scrollPrevious = () => {
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+    }
+  };
+
+  const scrollNext = () => {
+    if (emblaApi) {
+      emblaApi.scrollNext();
+    }
+  };
+
+  // Hover handlers for continuous scrolling
+  const handlePrevHover = () => {
+    if (emblaApi && !hoverIntervalRef.current) {
+      hoverIntervalRef.current = setInterval(() => {
+        emblaApi.scrollPrev();
+      }, 800); // Scroll every 800ms while hovering
+    }
+  };
+
+  const handleNextHover = () => {
+    if (emblaApi && !hoverIntervalRef.current) {
+      hoverIntervalRef.current = setInterval(() => {
+        emblaApi.scrollNext();
+      }, 800); // Scroll every 800ms while hovering
+    }
+  };
+
+  const handleHoverLeave = () => {
+    if (hoverIntervalRef.current) {
+      clearInterval(hoverIntervalRef.current);
+      hoverIntervalRef.current = null;
+    }
+  };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverIntervalRef.current) {
+        clearInterval(hoverIntervalRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       <Header />
@@ -128,11 +180,11 @@ const Index = () => {
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Encuentra tu
-            <span className="block text-stone-100">Hogar Perfecto</span>
+            {t('hero.title.find')}
+            <span className="block text-stone-100">{t('hero.title.perfect_home')}</span>
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">
-            Miles de propiedades en alquiler y venta te esperan. Descubre tu próximo hogar con nosotros.
+            {t('hero.subtitle')}
           </p>
           
           {/* Search Bar */}
@@ -140,41 +192,41 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <LocationSearch
                 onLocationSelect={handleLocationSelect}
-                placeholder="¿Dónde buscas?"
+                placeholder={t('search.where')}
               />
               
               <Select value={propertyType} onValueChange={setPropertyType}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Tipo de propiedad" />
+                  <SelectValue placeholder={t('search.property_type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="apartment">Apartamento</SelectItem>
-                  <SelectItem value="house">Casa</SelectItem>
-                  <SelectItem value="loft">Loft</SelectItem>
-                  <SelectItem value="studio">Estudio</SelectItem>
+                  <SelectItem value="any">{t('search.any')}</SelectItem>
+                  <SelectItem value="apartment">{t('property.apartment')}</SelectItem>
+                  <SelectItem value="house">{t('property.house')}</SelectItem>
+                  <SelectItem value="loft">{t('property.loft')}</SelectItem>
+                  <SelectItem value="studio">{t('property.studio')}</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={operation} onValueChange={setOperation}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Alquiler o Venta" />
+                  <SelectValue placeholder={t('search.rent_or_sale')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="rent">Alquiler</SelectItem>
-                  <SelectItem value="sale">Venta</SelectItem>
+                  <SelectItem value="any">{t('search.any')}</SelectItem>
+                  <SelectItem value="rent">{t('operation.rent')}</SelectItem>
+                  <SelectItem value="sale">{t('operation.sale')}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder="Gestionada por" />
+                  <SelectValue placeholder={t('search.managed_by')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="nazari">Nazarí Homes</SelectItem>
-                  <SelectItem value="other">Otras Inmobiliarias</SelectItem>
+                  <SelectItem value="any">{t('search.any')}</SelectItem>
+                  <SelectItem value="nazari">{t('management.nazari')}</SelectItem>
+                  <SelectItem value="other">{t('management.other')}</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -184,7 +236,7 @@ const Index = () => {
                 onClick={handleSearch}
               >
                 <Search className="mr-2 h-5 w-5" />
-                Buscar
+                {t('search.search')}
               </Button>
             </div>
           </div>
@@ -200,21 +252,21 @@ const Index = () => {
                 <Home className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">{allProperties.length.toLocaleString('es-ES')}+</h3>
-              <p className="text-gray-600">Propiedades Disponibles</p>
+              <p className="text-gray-600">{t('stats.properties')}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Key className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">5,000+</h3>
-              <p className="text-gray-600">Clientes Satisfechos</p>
+              <p className="text-gray-600">{t('stats.clients')}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
-              <p className="text-gray-600">Tasa de Éxito</p>
+              <p className="text-gray-600">{t('stats.success_rate')}</p>
             </div>
           </div>
         </div>
@@ -225,12 +277,12 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              {showingSearchResults ? 'Resultados de Búsqueda' : 'Propiedades Destacadas'}
+              {showingSearchResults ? t('results.title') : t('featured.title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {showingSearchResults 
-                ? `Encontradas ${filteredProperties.length} propiedades que coinciden con tu búsqueda`
-                : 'Descubre nuestra selección de las mejores propiedades disponibles'
+                ? t('results.subtitle', { count: filteredProperties.length })
+                : t('featured.subtitle')
               }
             </p>
             {showingSearchResults && (
@@ -239,7 +291,7 @@ const Index = () => {
                 variant="outline" 
                 className="mt-4 hover:bg-stone-50 border-stone-300 text-stone-700"
               >
-                Ver Propiedades Destacadas
+                {t('results.view_featured')}
               </Button>
             )}
           </div>
@@ -247,35 +299,60 @@ const Index = () => {
           {filteredProperties.length > 0 ? (
             <>
               {!showingSearchResults ? (
-                /* Carousel for featured properties */
-                <Carousel
-                  plugins={[
-                    Autoplay({
-                      delay: 3000,
-                      stopOnInteraction: false,
-                      stopOnMouseEnter: true,
-                    }),
-                  ]}
-                  opts={{
-                    align: "start",
-                    loop: true,
-                    duration: 25,
-                    dragFree: true,
-                    containScroll: "trimSnaps",
-                    slidesToScroll: 1,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent className="-ml-2 md:-ml-4 transition-transform duration-700 ease-in-out">
-                    {filteredProperties.map((property) => (
-                      <CarouselItem key={property.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105">
-                        <PropertyCard property={property} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
-                  <CarouselNext className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
-                </Carousel>
+                /* Carousel for featured properties with custom controls */
+                <div className="relative">
+                  <Carousel
+                    setApi={setEmblaApi}
+                    plugins={[
+                      Autoplay({
+                        delay: 3000,
+                        stopOnInteraction: false,
+                        stopOnMouseEnter: true,
+                      }),
+                    ]}
+                    opts={{
+                      align: "start",
+                      loop: true,
+                      duration: 25,
+                      dragFree: true,
+                      containScroll: "trimSnaps",
+                      slidesToScroll: 1,
+                    }}
+                    className="w-full"
+                  >
+                    <CarouselContent className="-ml-2 md:-ml-4 transition-transform duration-700 ease-in-out">
+                      {filteredProperties.map((property) => (
+                        <CarouselItem key={property.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105">
+                          <PropertyCard property={property} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    
+                    {/* Custom Previous Button */}
+                    <button
+                      onClick={scrollPrevious}
+                      onMouseEnter={handlePrevHover}
+                      onMouseLeave={handleHoverLeave}
+                      className="absolute -left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border border-gray-300 bg-white shadow-lg hover:bg-stone-100 hover:scale-110 transition-all duration-300 flex items-center justify-center z-10 group"
+                    >
+                      <svg className="w-5 h-5 text-stone-600 transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Custom Next Button */}
+                    <button
+                      onClick={scrollNext}
+                      onMouseEnter={handleNextHover}
+                      onMouseLeave={handleHoverLeave}
+                      className="absolute -right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border border-gray-300 bg-white shadow-lg hover:bg-stone-100 hover:scale-110 transition-all duration-300 flex items-center justify-center z-10 group"
+                    >
+                      <svg className="w-5 h-5 text-stone-600 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </Carousel>
+                </div>
               ) : (
                 /* Grid layout for search results */
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -288,13 +365,13 @@ const Index = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-xl text-gray-600 mb-4">
-                No se encontraron propiedades que coincidan con tu búsqueda
+                {t('results.no_results')}
               </p>
               <Button 
                 onClick={resetSearch}
                 className="bg-stone-600 hover:bg-stone-700 text-white"
               >
-                Ver Todas las Propiedades
+                {t('results.view_all')}
               </Button>
             </div>
           )}
@@ -303,7 +380,7 @@ const Index = () => {
             <div className="text-center mt-12">
               <Link to="/properties">
                 <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
-                  Ver Todas las Propiedades
+                  {t('featured.view_all')}
                 </Button>
               </Link>
             </div>
