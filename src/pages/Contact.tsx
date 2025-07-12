@@ -29,8 +29,8 @@ const Contact = () => {
   const { t } = useLanguage();
   const hcaptchaRef = useRef<HCaptcha>(null);
 
-  // Replace with your actual hCaptcha site key
-  const HCAPTCHA_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001"; // This is a test key, replace with your actual key
+  // Your actual hCaptcha site key
+  const HCAPTCHA_SITE_KEY = "ecb2b18e-7e28-406a-ae1c-e6fca2b0bbb4";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
