@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { Menu, X, Heart, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
@@ -25,19 +27,19 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              Inicio
+              {t('nav.home')}
             </Link>
             <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              Propiedades
+              {t('nav.properties')}
             </Link>
             <Link to="/services" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              Nuestros Servicios
+              {t('nav.services')}
             </Link>
             <Link to="/about" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              Quiénes Somos
+              {t('nav.about')}
             </Link>
             <Link to="/contact" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              Contacto
+              {t('nav.contact')}
             </Link>
           </nav>
 
@@ -46,7 +48,7 @@ const Header = () => {
             <Link to="/favorites">
               <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50 relative">
                 <Heart className="h-4 w-4 mr-2" />
-                Favoritos
+                {t('nav.favorites')}
                 {favorites.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {favorites.length}
@@ -56,14 +58,48 @@ const Header = () => {
             </Link>
             <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
               <User className="h-4 w-4 mr-2" />
-              Mi Cuenta
+              {t('nav.account')}
             </Button>
             <Link to="/contact">
               <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
                 <Phone className="h-4 w-4 mr-2" />
-                Contactar
+                {t('nav.contact_btn')}
               </Button>
             </Link>
+            
+            {/* Language Flags */}
+            <div className="flex items-center space-x-2 ml-4 border-l border-stone-200 pl-4">
+              <button
+                onClick={() => setLanguage('es')}
+                className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
+                  language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                }`}
+                title="Español"
+              >
+                <div className="w-full h-full bg-gradient-to-b from-red-500 via-yellow-400 to-red-500 flex items-center justify-center">
+                  <div className="w-full h-1/3 bg-red-500"></div>
+                  <div className="w-full h-1/3 bg-yellow-400"></div>
+                  <div className="w-full h-1/3 bg-red-500"></div>
+                </div>
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
+                  language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                }`}
+                title="English"
+              >
+                <div className="w-full h-full relative bg-blue-600">
+                  <div className="absolute inset-0 bg-blue-600"></div>
+                  <div className="absolute inset-0 bg-white clip-path-[polygon(0_0,100%_0,0_100%)]"></div>
+                  <div className="absolute inset-0 bg-red-500 clip-path-[polygon(100%_0,100%_100%,0_100%)]"></div>
+                  <div className="absolute inset-0 bg-white w-1/5 left-0"></div>
+                  <div className="absolute inset-0 bg-white h-1/5 top-2/5"></div>
+                  <div className="absolute inset-0 bg-red-500 w-1/12 left-1/12"></div>
+                  <div className="absolute inset-0 bg-red-500 h-1/12 top-5/12"></div>
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -88,41 +124,74 @@ const Header = () => {
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Inicio
+                {t('nav.home')}
               </Link>
               <Link 
                 to="/properties" 
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Propiedades
+                {t('nav.properties')}
               </Link>
               <Link 
                 to="/services" 
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Nuestros Servicios
+                {t('nav.services')}
               </Link>
               <Link 
                 to="/about" 
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Quiénes Somos
+                {t('nav.about')}
               </Link>
               <Link 
                 to="/contact" 
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Contacto
+                {t('nav.contact')}
               </Link>
+              
+              {/* Mobile Language Flags */}
+              <div className="flex items-center space-x-3 pt-2">
+                <span className="text-sm text-gray-600">Idioma:</span>
+                <button
+                  onClick={() => {
+                    setLanguage('es');
+                    setIsMenuOpen(false);
+                  }}
+                  className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 ${
+                    language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                  }`}
+                  title="Español"
+                >
+                  <div className="w-full h-full bg-gradient-to-b from-red-500 via-yellow-400 to-red-500"></div>
+                </button>
+                <button
+                  onClick={() => {
+                    setLanguage('en');
+                    setIsMenuOpen(false);
+                  }}
+                  className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 ${
+                    language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                  }`}
+                  title="English"
+                >
+                  <div className="w-full h-full bg-blue-600 relative">
+                    <div className="absolute inset-0 bg-white w-1/3"></div>
+                    <div className="absolute inset-0 bg-red-500 w-1/3 right-0"></div>
+                  </div>
+                </button>
+              </div>
+              
               <div className="flex flex-col space-y-2 pt-4 border-t border-stone-200">
                 <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full relative">
                     <Heart className="h-4 w-4 mr-2" />
-                    Favoritos
+                    {t('nav.favorites')}
                     {favorites.length > 0 && (
                       <span className="absolute right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {favorites.length}
@@ -132,12 +201,12 @@ const Header = () => {
                 </Link>
                 <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
                   <User className="h-4 w-4 mr-2" />
-                  Mi Cuenta
+                  {t('nav.account')}
                 </Button>
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
                     <Phone className="h-4 w-4 mr-2" />
-                    Contactar
+                    {t('nav.contact_btn')}
                   </Button>
                 </Link>
               </div>
