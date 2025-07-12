@@ -252,6 +252,8 @@ const Index = () => {
                   plugins={[
                     Autoplay({
                       delay: 7000,
+                      stopOnInteraction: false,
+                      stopOnMouseEnter: true,
                     }),
                   ]}
                   opts={{
