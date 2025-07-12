@@ -30,6 +30,12 @@ const Header = () => {
             <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               Propiedades
             </Link>
+            <Link to="/services" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+              Nuestros Servicios
+            </Link>
+            <Link to="/about" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+              Quiénes Somos
+            </Link>
             <Link to="/contact" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               Contacto
             </Link>
@@ -88,6 +94,20 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Propiedades
+              </Link>
+              <Link 
+                to="/services" 
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Nuestros Servicios
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Quiénes Somos
               </Link>
               <Link 
                 to="/contact" 
