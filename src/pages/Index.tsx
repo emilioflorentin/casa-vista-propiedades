@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -281,7 +282,7 @@ const Index = () => {
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {showingSearchResults 
-                ? t('results.subtitle', { count: filteredProperties.length })
+                ? `${t('results.subtitle')} ${filteredProperties.length}`
                 : t('featured.subtitle')
               }
             </p>
