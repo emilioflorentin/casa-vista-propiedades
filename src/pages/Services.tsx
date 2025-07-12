@@ -3,44 +3,77 @@ import { Settings, Home, Key, Shield, Clock, Users, Wrench, FileText } from "luc
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Services = () => {
+  const { t } = useLanguage();
+
   const services = [
     {
       icon: Home,
-      title: "Gestión Inmobiliaria Integral",
-      description: "Administramos tu propiedad de manera completa, desde el marketing hasta la entrega de llaves.",
-      features: ["Marketing profesional", "Selección de inquilinos", "Gestión de contratos", "Mantenimiento"]
+      title: t('services.management.title'),
+      description: t('services.management.description'),
+      features: [
+        t('services.management.feature1'),
+        t('services.management.feature2'),
+        t('services.management.feature3'),
+        t('services.management.feature4')
+      ]
     },
     {
       icon: Key,
-      title: "Alquiler y Venta",
-      description: "Servicios especializados tanto para alquiler como venta de propiedades residenciales y comerciales.",
-      features: ["Valoración gratuita", "Fotografía profesional", "Publicación en portales", "Visitas guiadas"]
+      title: t('services.rental.title'),
+      description: t('services.rental.description'),
+      features: [
+        t('services.rental.feature1'),
+        t('services.rental.feature2'),
+        t('services.rental.feature3'),
+        t('services.rental.feature4')
+      ]
     },
     {
       icon: Shield,
-      title: "Asesoramiento Legal",
-      description: "Te acompañamos en todos los aspectos legales de tu transacción inmobiliaria.",
-      features: ["Revisión de contratos", "Gestión de documentos", "Asesoría fiscal", "Tramitación legal"]
+      title: t('services.legal.title'),
+      description: t('services.legal.description'),
+      features: [
+        t('services.legal.feature1'),
+        t('services.legal.feature2'),
+        t('services.legal.feature3'),
+        t('services.legal.feature4')
+      ]
     },
     {
       icon: Clock,
-      title: "Atención 24/7",
-      description: "Nuestro equipo está disponible para resolver cualquier incidencia en cualquier momento.",
-      features: ["Soporte continuo", "Emergencias", "Comunicación directa", "Respuesta inmediata"]
+      title: t('services.support.title'),
+      description: t('services.support.description'),
+      features: [
+        t('services.support.feature1'),
+        t('services.support.feature2'),
+        t('services.support.feature3'),
+        t('services.support.feature4')
+      ]
     },
     {
       icon: Users,
-      title: "Gestión de Inquilinos",
-      description: "Nos encargamos de toda la relación con los inquilinos para que no tengas que preocuparte.",
-      features: ["Selección rigurosa", "Cobro de rentas", "Resolución de incidencias", "Comunicación directa"]
+      title: t('services.tenants.title'),
+      description: t('services.tenants.description'),
+      features: [
+        t('services.tenants.feature1'),
+        t('services.tenants.feature2'),
+        t('services.tenants.feature3'),
+        t('services.tenants.feature4')
+      ]
     },
     {
       icon: Wrench,
-      title: "Mantenimiento y Reformas",
-      description: "Mantenemos tu propiedad en perfecto estado con nuestro equipo de profesionales.",
-      features: ["Mantenimiento preventivo", "Reparaciones urgentes", "Reformas integrales", "Control de calidad"]
+      title: t('services.maintenance.title'),
+      description: t('services.maintenance.description'),
+      features: [
+        t('services.maintenance.feature1'),
+        t('services.maintenance.feature2'),
+        t('services.maintenance.feature3'),
+        t('services.maintenance.feature4')
+      ]
     }
   ];
 
@@ -53,11 +86,11 @@ const Services = () => {
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Nuestros
-            <span className="block text-stone-100">Servicios</span>
+            {t('services.title')}
+            <span className="block text-stone-100">{t('services.title_highlight')}</span>
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">
-            Ofrecemos una gama completa de servicios inmobiliarios para hacer que tu experiencia sea perfecta
+            {t('services.subtitle')}
           </p>
         </div>
       </section>
@@ -67,10 +100,10 @@ const Services = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              ¿Qué Podemos Hacer por Ti?
+              {t('services.what_can_we_do')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Desde la gestión completa hasta servicios específicos, adaptamos nuestros servicios a tus necesidades
+              {t('services.what_can_we_do_desc')}
             </p>
           </div>
           
@@ -105,22 +138,22 @@ const Services = () => {
       {/* CTA Section */}
       <section className="py-16 bg-stone-600 text-white">
         <div className="container mx-auto px-6 text-center">
-          <h3 className="text-3xl font-bold mb-4">¿Listo para Empezar?</h3>
+          <h3 className="text-3xl font-bold mb-4">{t('services.cta.title')}</h3>
           <p className="text-xl mb-8 text-stone-100">
-            Contacta con nosotros y descubre cómo podemos ayudarte con tu propiedad
+            {t('services.cta.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
               href="/contact" 
               className="bg-white text-stone-600 px-8 py-3 rounded-lg font-semibold hover:bg-stone-50 transition-colors"
             >
-              Contactar Ahora
+              {t('services.cta.contact_now')}
             </a>
             <a 
               href="tel:+34958123456" 
               className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-stone-600 transition-colors"
             >
-              Llamar Directamente
+              {t('services.cta.call_directly')}
             </a>
           </div>
         </div>

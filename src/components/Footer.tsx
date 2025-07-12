@@ -1,8 +1,11 @@
 
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-stone-700 text-white">
       <div className="container mx-auto px-6 py-16">
@@ -17,8 +20,7 @@ const Footer = () => {
               />
             </Link>
             <p className="text-gray-300 leading-relaxed">
-              Tu partner de confianza para encontrar la propiedad perfecta. 
-              Más de 10 años de experiencia en el sector inmobiliario.
+              {t('footer.company_description')}
             </p>
             <div className="flex space-x-4">
               <Facebook className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
@@ -30,31 +32,31 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.quick_links')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-                  Inicio
+                  {t('nav.home')}
                 </Link>
               </li>
               <li>
                 <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
-                  Propiedades
+                  {t('nav.properties')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
-                  Contacto
+                  {t('nav.contact')}
                 </Link>
               </li>
               <li>
                 <Link to="/services" className="text-gray-300 hover:text-white transition-colors">
-                  Nuestros Servicios
+                  {t('nav.services')}
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-                  Quiénes Somos
+                  {t('nav.about')}
                 </Link>
               </li>
             </ul>
@@ -62,26 +64,26 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Servicios</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.services_section')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
-                  Alquiler de Propiedades
+                  {t('footer.rental_properties')}
                 </Link>
               </li>
               <li>
                 <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
-                  Venta de Propiedades
+                  {t('footer.sale_properties')}
                 </Link>
               </li>
               <li>
                 <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  Tasación Gratuita
+                  {t('footer.free_valuation')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  Asesoría Legal
+                  {t('footer.legal_advice')}
                 </a>
               </li>
             </ul>
@@ -89,24 +91,24 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contacto</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.contact_section')}</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-gray-300" />
                 <span className="text-gray-300">
-                  Calle Gran Vía 123, Madrid
+                  {t('footer.address')}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-gray-300" />
                 <span className="text-gray-300">
-                  +34 91 123 45 67
+                  {t('footer.phone')}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-gray-300" />
                 <span className="text-gray-300">
-                  nazarihomesgranada@gmail.com
+                  {t('footer.email')}
                 </span>
               </div>
             </div>
@@ -115,7 +117,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-600 mt-12 pt-8 text-center">
           <p className="text-gray-300">
-            © 2025 Nazarí Homes. Todos los derechos reservados.
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

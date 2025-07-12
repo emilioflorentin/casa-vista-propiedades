@@ -3,36 +3,39 @@ import { Award, Users, Clock, MapPin, Heart, Target } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const About = () => {
+  const { t } = useLanguage();
+
   const values = [
     {
       icon: Heart,
-      title: "Compromiso",
-      description: "Nos comprometemos al 100% con cada cliente y cada propiedad que gestionamos."
+      title: t('about.commitment.title'),
+      description: t('about.commitment.description')
     },
     {
       icon: Target,
-      title: "Profesionalidad",
-      description: "Aplicamos los más altos estándares de calidad en todos nuestros servicios."
+      title: t('about.professionalism.title'),
+      description: t('about.professionalism.description')
     },
     {
       icon: Users,
-      title: "Confianza",
-      description: "Construimos relaciones duraderas basadas en la transparencia y honestidad."
+      title: t('about.trust.title'),
+      description: t('about.trust.description')
     },
     {
       icon: Award,
-      title: "Excelencia",
-      description: "Buscamos la excelencia en cada detalle para superar las expectativas."
+      title: t('about.excellence.title'),
+      description: t('about.excellence.description')
     }
   ];
 
   const stats = [
-    { number: "15+", label: "Años de Experiencia" },
-    { number: "1000+", label: "Propiedades Gestionadas" },
-    { number: "5000+", label: "Clientes Satisfechos" },
-    { number: "98%", label: "Tasa de Satisfacción" }
+    { number: "15+", label: t('about.stats.years') },
+    { number: "1000+", label: t('about.stats.properties') },
+    { number: "5000+", label: t('about.stats.clients') },
+    { number: "98%", label: t('about.stats.satisfaction') }
   ];
 
   return (
@@ -44,11 +47,11 @@ const About = () => {
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Quiénes
-            <span className="block text-stone-100">Somos</span>
+            {t('about.title')}
+            <span className="block text-stone-100">{t('about.title_highlight')}</span>
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">
-            Más de 15 años ayudando a encontrar el hogar perfecto en Granada y toda Andalucía
+            {t('about.subtitle')}
           </p>
         </div>
       </section>
@@ -58,18 +61,12 @@ const About = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">Nuestra Historia</h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-6">{t('about.our_story')}</h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Nazarí Homes nació en 2009 con una visión clara: revolucionar el sector inmobiliario 
-                en Granada ofreciendo un servicio personalizado, transparente y de máxima calidad. 
-                Comenzamos como una pequeña empresa familiar y hemos crecido hasta convertirnos en 
-                una de las inmobiliarias de referencia en Andalucía.
+                {t('about.story_p1')}
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Nuestro nombre rinde homenaje al Reino Nazarí de Granada, reflejando nuestro 
-                profundo amor por esta ciudad y nuestro compromiso con su patrimonio arquitectónico 
-                y cultural. Cada propiedad que gestionamos es tratada con el mismo cuidado y 
-                atención al detalle que caracterizaba a los maestros constructores nazaríes.
+                {t('about.story_p2')}
               </p>
             </div>
           </div>
@@ -94,9 +91,9 @@ const About = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Nuestros Valores</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">{t('about.our_values')}</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Los principios que guían cada una de nuestras acciones y decisiones
+              {t('about.values_desc')}
             </p>
           </div>
           
@@ -124,9 +121,9 @@ const About = () => {
       <section className="py-20 bg-stone-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Nuestro Equipo</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">{t('about.our_team')}</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Profesionales apasionados por el sector inmobiliario
+              {t('about.team_desc')}
             </p>
           </div>
           
@@ -137,12 +134,11 @@ const About = () => {
                   <div className="w-24 h-24 bg-stone-200 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Users className="h-12 w-12 text-stone-600" />
                   </div>
-                  <CardTitle className="text-xl text-gray-800">Equipo Comercial</CardTitle>
+                  <CardTitle className="text-xl text-gray-800">{t('about.sales_team.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <CardDescription className="text-gray-600">
-                    Nuestros agentes comerciales tienen años de experiencia en el mercado local 
-                    y conocen cada barrio de Granada como la palma de su mano.
+                    {t('about.sales_team.description')}
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -152,12 +148,11 @@ const About = () => {
                   <div className="w-24 h-24 bg-stone-200 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <MapPin className="h-12 w-12 text-stone-600" />
                   </div>
-                  <CardTitle className="text-xl text-gray-800">Equipo de Gestión</CardTitle>
+                  <CardTitle className="text-xl text-gray-800">{t('about.management_team.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <CardDescription className="text-gray-600">
-                    Nuestro equipo de gestión se encarga de que todo funcione perfectamente, 
-                    desde el mantenimiento hasta la atención al cliente.
+                    {t('about.management_team.description')}
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -169,20 +164,20 @@ const About = () => {
       {/* CTA Section */}
       <section className="py-16 bg-stone-600 text-white">
         <div className="container mx-auto px-6 text-center">
-          <h3 className="text-3xl font-bold mb-4">¿Quieres Conocernos Mejor?</h3>
+          <h3 className="text-3xl font-bold mb-4">{t('about.cta.title')}</h3>
           <p className="text-xl mb-8 text-stone-100">
-            Ven a visitarnos a nuestra oficina en Granada o contacta con nosotros
+            {t('about.cta.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
               href="/contact" 
               className="bg-white text-stone-600 px-8 py-3 rounded-lg font-semibold hover:bg-stone-50 transition-colors"
             >
-              Contactar
+              {t('about.cta.contact')}
             </a>
             <div className="flex items-center justify-center text-stone-100">
               <MapPin className="h-5 w-5 mr-2" />
-              <span>Calle Real de la Alhambra, 15 - Granada</span>
+              <span>{t('about.cta.address')}</span>
             </div>
           </div>
         </div>
