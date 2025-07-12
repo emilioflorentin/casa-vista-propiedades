@@ -76,7 +76,7 @@ const Contact = () => {
       formDataToSend.append('h-captcha-response', hcaptchaValue);
       
       // Replace 'your-email@example.com' with your actual email
-      const response = await fetch('https://formsubmit.co/nazarihomesgranada@gmail.com', {
+      const response = await fetch('https://formsubmit.co/8832813ceba0f7b74908663853554267', {
         method: 'POST',
         body: formDataToSend
       });
