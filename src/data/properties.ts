@@ -358,4 +358,4 @@ export const allProperties: Property[] = baseProperties.map(property => {
   };
 });
 
-export const featuredProperties = allProperties.slice(0, 4);
+export const featuredProperties = allProperties.slice(0, 8); // Increased from 4 to 8 properties

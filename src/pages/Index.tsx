@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap } from "lucide-react";
@@ -12,6 +10,7 @@ import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
 import { featuredProperties, allProperties } from "@/data/properties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
+import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
@@ -250,6 +249,11 @@ const Index = () => {
               {!showingSearchResults ? (
                 /* Carousel for featured properties */
                 <Carousel
+                  plugins={[
+                    Autoplay({
+                      delay: 7000,
+                    }),
+                  ]}
                   opts={{
                     align: "start",
                     loop: true,
@@ -307,4 +311,3 @@ const Index = () => {
 };
 
 export default Index;
-
