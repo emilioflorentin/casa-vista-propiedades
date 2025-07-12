@@ -17,15 +17,15 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       <Header />
       
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <div className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white py-20">
+        <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-4">Contacto</h1>
-          <p className="text-xl text-blue-100">Estamos aquí para ayudarte con todas tus necesidades inmobiliarias</p>
+          <p className="text-xl text-stone-50">Estamos aquí para ayudarte con todas tus necesidades inmobiliarias</p>
         </div>
       </div>
 
@@ -43,22 +43,22 @@ const Contact = () => {
             {/* Información de contacto */}
             <Card>
               <CardContent className="p-6 space-y-4">
-                <div className="flex items-center space-x-3 text-blue-600">
+                <div className="flex items-center space-x-3 text-stone-600">
                   <Mail className="h-5 w-5" />
                   <span className="font-medium">info@inmobiliaria.com</span>
                 </div>
                 
-                <div className="flex items-center space-x-3 text-blue-600">
+                <div className="flex items-center space-x-3 text-stone-600">
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">958 467 433</span>
                 </div>
                 
-                <div className="flex items-center space-x-3 text-blue-600">
+                <div className="flex items-center space-x-3 text-stone-600">
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">650 499 177</span>
                 </div>
                 
-                <div className="flex items-start space-x-3 text-blue-600">
+                <div className="flex items-start space-x-3 text-stone-600">
                   <MapPin className="h-5 w-5 mt-1" />
                   <div>
                     <p className="font-medium">Zona de actuación:</p>
@@ -80,7 +80,7 @@ const Contact = () => {
                   <h2 className="text-3xl font-bold text-stone-800 mb-4">
                     Deja tus datos y te llamamos
                   </h2>
-                  <p className="text-blue-600 text-lg font-medium">
+                  <p className="text-stone-600 text-lg font-medium">
                     ¡Obtenga tu valoración gratuita sin compromiso!
                   </p>
                 </div>
@@ -139,7 +139,7 @@ const Contact = () => {
                     />
                     <label htmlFor="privacy" className="text-sm text-stone-600">
                       He leído y acepto la{' '}
-                      <a href="#" className="text-blue-600 hover:underline">
+                      <a href="#" className="text-stone-600 hover:underline">
                         Política de privacidad
                       </a>
                     </label>
@@ -147,7 +147,7 @@ const Contact = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-lg font-semibold bg-orange-500 hover:bg-orange-600 text-white"
+                    className="w-full h-12 text-lg font-semibold bg-stone-600 hover:bg-stone-700 text-white"
                   >
                     Enviar
                   </Button>
