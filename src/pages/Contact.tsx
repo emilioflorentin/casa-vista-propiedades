@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -70,7 +71,13 @@ const Contact = () => {
                     onClick={handleWhatsAppClick}
                     className="flex items-center space-x-3 text-green-600 hover:text-green-700 transition-colors w-full p-3 bg-green-50 hover:bg-green-100 rounded-lg"
                   >
-                    <MessageCircle className="h-5 w-5" />
+                    <svg
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.25 7.24c-.22-.64-1.08-1.26-1.63-1.26-.55 0-1.26.38-1.58.89-.32.51-.32 1.33.06 1.84.38.51 1.01.89 1.58.89.95 0 1.77-.76 1.77-1.77 0-.32-.06-.51-.2-.59zm-1.58 6.27c-.57 0-1.14-.19-1.58-.51-.44-.32-.76-.76-.95-1.26-.19-.51-.19-1.08 0-1.58.19-.51.51-.95.95-1.26.44-.32 1.01-.51 1.58-.51.95 0 1.77.76 1.77 1.77 0 .32-.06.63-.13.89-.06.25-.19.44-.38.57-.19.13-.44.19-.7.19zm-3.73-3.16c0-.51-.19-1.01-.51-1.39-.32-.38-.76-.63-1.26-.63-.89 0-1.58.63-1.89 1.52-.32.89-.19 1.84.32 2.6.51.76 1.26 1.26 2.15 1.26.89 0 1.58-.51 1.89-1.39.32-.89.19-1.84-.32-2.6-.51-.76-1.26-1.26-2.15-1.26z"/>
+                    </svg>
                     <div className="text-left">
                       <p className="font-medium">¡Escríbenos por WhatsApp!</p>
                       <p className="text-sm text-green-600">650 499 177</p>
