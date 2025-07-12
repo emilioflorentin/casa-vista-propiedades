@@ -54,12 +54,47 @@ const translations = {
     'search.bedrooms_all': 'Cualquier número',
     'search.clear_btn': 'Limpiar filtros',
     
-    // Stats section
+    // Properties page translations
+    'properties.page_title': 'Propiedades Encontradas',
+    'properties.search_placeholder': 'Buscar por ubicación, tipo de propiedad...',
+    'properties.operation_all': 'Todas',
+    'properties.operation_rent': 'Alquiler',
+    'properties.operation_sale': 'Venta',
+    'properties.type_all': 'Todos',
+    'properties.type_apartment': 'Apartamento',
+    'properties.type_house': 'Casa',
+    'properties.type_loft': 'Loft',
+    'properties.type_studio': 'Estudio',
+    'properties.managed_all': 'Todas',
+    'properties.managed_nazari': 'Nazarí Homes',
+    'properties.managed_other': 'Otras Inmobiliarias',
+    'properties.filters': 'Filtros',
+    'properties.price_range': 'Rango de Precio (€)',
+    'properties.min_bedrooms': 'Habitaciones mínimas',
+    'properties.min_bathrooms': 'Baños mínimos',
+    'properties.features': 'Características',
+    'properties.heating': 'Calefacción',
+    'properties.pool': 'Piscina',
+    'properties.garage': 'Garaje',
+    'properties.air_conditioning': 'Aire Acondicionado',
+    'properties.elevator': 'Ascensor',
+    'properties.terrace': 'Terraza/Balcón',
+    'properties.garden': 'Jardín',
+    'properties.results_subtitle': 'Resultados de tu búsqueda',
+    'properties.no_results_title': 'No se encontraron propiedades',
+    'properties.no_results_desc': 'Prueba ajustando los filtros de búsqueda para encontrar más resultados.',
+    'properties.any': 'Cualquiera',
+    'properties.bedrooms_unit': 'hab.',
+    'properties.bathrooms_unit': 'baños',
+    'properties.area_unit': 'm²',
+    'properties.per_month': '/mes',
+    'properties.view_details': 'Ver Detalles',
+    
+    // all other existing translations
     'stats.properties': 'Propiedades Disponibles',
     'stats.clients': 'Clientes Satisfechos',
     'stats.success_rate': 'Tasa de Éxito',
     
-    // Properties section
     'properties.search_results': 'Resultados de Búsqueda',
     'properties.featured': 'Propiedades Destacadas',
     'properties.search_results_desc': 'Encontradas {count} propiedades que coinciden con tu búsqueda',
@@ -70,13 +105,12 @@ const translations = {
     'properties.latest': 'Últimas Propiedades',
     'properties.no_results_desc': 'Intenta ajustar tus filtros de búsqueda para encontrar más opciones.',
     
-    // Property card
     'property.bedrooms': 'dormitorios',
     'property.bathrooms': 'baños',
     'property.area': 'm²',
     'property.view_details': 'Ver detalles',
     
-    // Services page
+    // Services page translations
     'services.title': 'Nuestros',
     'services.title_highlight': 'Servicios',
     'services.subtitle': 'Ofrecemos una gama completa de servicios inmobiliarios para hacer que tu experiencia sea perfecta',
@@ -123,7 +157,7 @@ const translations = {
     'services.cta.contact_now': 'Contactar Ahora',
     'services.cta.call_directly': 'Llamar Directamente',
     
-    // About page
+    // About page translations
     'about.title': 'Quiénes',
     'about.title_highlight': 'Somos',
     'about.subtitle': 'Más de 15 años ayudando a encontrar el hogar perfecto en Granada y toda Andalucía',
@@ -155,7 +189,7 @@ const translations = {
     'about.cta.contact': 'Contactar',
     'about.cta.address': 'Calle Real de la Alhambra, 15 - Granada',
     
-    // Footer
+    // Footer translations
     'footer.company_description': 'Tu partner de confianza para encontrar la propiedad perfecta. Más de 10 años de experiencia en el sector inmobiliario.',
     'footer.quick_links': 'Enlaces Rápidos',
     'footer.services_section': 'Servicios',
@@ -169,7 +203,7 @@ const translations = {
     'footer.email': 'nazarihomesgranada@gmail.com',
     'footer.copyright': '© 2025 Nazarí Homes. Todos los derechos reservados.',
     
-    // Contact page
+    // Contact, Favorites, and Common translations
     'contact.title': 'Contacto',
     'contact.subtitle': 'Estamos aquí para ayudarte con todas tus necesidades inmobiliarias',
     'contact.operation_area': 'Nuestra zona de operación en Granada',
@@ -193,7 +227,6 @@ const translations = {
     'contact.form_sent_desc': 'Te contactaremos pronto. ¡Gracias por tu interés!',
     'contact.whatsapp_message': 'Hola, me gustaría información sobre sus servicios inmobiliarios.',
     
-    // Favorites page
     'favorites.title': 'Mis Favoritos',
     'favorites.clear_all': 'Eliminar todos',
     'favorites.confirm_clear_title': '¿Eliminar todos los favoritos?',
@@ -206,7 +239,6 @@ const translations = {
     'favorites.empty_title': 'No hay favoritos guardados',
     'favorites.empty_desc': 'Empieza a explorar propiedades y marca las que te gusten como favoritas.',
     
-    // Common
     'common.loading': 'Cargando...',
     'common.error': 'Error',
     'common.back': 'Volver',
@@ -215,7 +247,7 @@ const translations = {
     'common.language': 'Idioma:',
   },
   en: {
-    // Header
+    // Header translations
     'nav.home': 'Home',
     'nav.properties': 'Properties',
     'nav.services': 'Our Services',
@@ -225,12 +257,12 @@ const translations = {
     'nav.account': 'My Account',
     'nav.contact_btn': 'Contact',
     
-    // Home page
+    // Home page translations
     'hero.title': 'Find your',
     'hero.title_highlight': 'Perfect Home',
     'hero.subtitle': 'Thousands of rental and sale properties await you. Discover your next home with us.',
     
-    // Search form
+    // Search form translations
     'search.location_placeholder': 'Where are you looking?',
     'search.property_type': 'Property Type',
     'search.property_type_any': 'Any',
@@ -259,12 +291,47 @@ const translations = {
     'search.bedrooms_all': 'Any number',
     'search.clear_btn': 'Clear filters',
     
-    // Stats section
+    // Properties page translations
+    'properties.page_title': 'Properties Found',
+    'properties.search_placeholder': 'Search by location, property type...',
+    'properties.operation_all': 'All',
+    'properties.operation_rent': 'Rent',
+    'properties.operation_sale': 'Sale',
+    'properties.type_all': 'All',
+    'properties.type_apartment': 'Apartment',
+    'properties.type_house': 'House',
+    'properties.type_loft': 'Loft',
+    'properties.type_studio': 'Studio',
+    'properties.managed_all': 'All',
+    'properties.managed_nazari': 'Nazarí Homes',
+    'properties.managed_other': 'Other Agencies',
+    'properties.filters': 'Filters',
+    'properties.price_range': 'Price Range (€)',
+    'properties.min_bedrooms': 'Minimum bedrooms',
+    'properties.min_bathrooms': 'Minimum bathrooms',
+    'properties.features': 'Features',
+    'properties.heating': 'Heating',
+    'properties.pool': 'Pool',
+    'properties.garage': 'Garage',
+    'properties.air_conditioning': 'Air Conditioning',
+    'properties.elevator': 'Elevator',
+    'properties.terrace': 'Terrace/Balcony',
+    'properties.garden': 'Garden',
+    'properties.results_subtitle': 'Search results',
+    'properties.no_results_title': 'No properties found',
+    'properties.no_results_desc': 'Try adjusting your search filters to find more results.',
+    'properties.any': 'Any',
+    'properties.bedrooms_unit': 'bed.',
+    'properties.bathrooms_unit': 'baths',
+    'properties.area_unit': 'm²',
+    'properties.per_month': '/month',
+    'properties.view_details': 'View Details',
+    
+    // all other existing translations
     'stats.properties': 'Available Properties',
     'stats.clients': 'Satisfied Clients',
     'stats.success_rate': 'Success Rate',
     
-    // Properties section
     'properties.search_results': 'Search Results',
     'properties.featured': 'Featured Properties',
     'properties.search_results_desc': 'Found {count} properties matching your search',
@@ -275,13 +342,12 @@ const translations = {
     'properties.latest': 'Latest Properties',
     'properties.no_results_desc': 'Try adjusting your search filters to find more options.',
     
-    // Property card
     'property.bedrooms': 'bedrooms',
     'property.bathrooms': 'bathrooms',
     'property.area': 'm²',
     'property.view_details': 'View details',
     
-    // Services page
+    // Services, About, Footer, Contact, Favorites, and Common translations
     'services.title': 'Our',
     'services.title_highlight': 'Services',
     'services.subtitle': 'We offer a complete range of real estate services to make your experience perfect',
@@ -328,7 +394,6 @@ const translations = {
     'services.cta.contact_now': 'Contact Now',
     'services.cta.call_directly': 'Call Directly',
     
-    // About page
     'about.title': 'About',
     'about.title_highlight': 'Us',
     'about.subtitle': 'Over 15 years helping to find the perfect home in Granada and all of Andalusia',
@@ -360,7 +425,6 @@ const translations = {
     'about.cta.contact': 'Contact',
     'about.cta.address': 'Calle Real de la Alhambra, 15 - Granada',
     
-    // Footer
     'footer.company_description': 'Your trusted partner to find the perfect property. Over 10 years of experience in the real estate sector.',
     'footer.quick_links': 'Quick Links',
     'footer.services_section': 'Services',
@@ -374,7 +438,6 @@ const translations = {
     'footer.email': 'nazarihomesgranada@gmail.com',
     'footer.copyright': '© 2025 Nazarí Homes. All rights reserved.',
     
-    // Contact page
     'contact.title': 'Contact',
     'contact.subtitle': 'We are here to help you with all your real estate needs',
     'contact.operation_area': 'Our operation area in Granada',
@@ -398,7 +461,6 @@ const translations = {
     'contact.form_sent_desc': 'We will contact you soon. Thank you for your interest!',
     'contact.whatsapp_message': 'Hello, I would like information about your real estate services.',
     
-    // Favorites page
     'favorites.title': 'My Favorites',
     'favorites.clear_all': 'Clear all',
     'favorites.confirm_clear_title': 'Clear all favorites?',
@@ -411,7 +473,6 @@ const translations = {
     'favorites.empty_title': 'No saved favorites',
     'favorites.empty_desc': 'Start exploring properties and mark the ones you like as favorites.',
     
-    // Common
     'common.loading': 'Loading...',
     'common.error': 'Error',
     'common.back': 'Back',
