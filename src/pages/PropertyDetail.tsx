@@ -11,6 +11,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { allProperties } from "@/data/properties";
 import MapComponent from "@/components/MapComponent";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Updated agent data with agency assignment and WhatsApp numbers
 const agentData = [
@@ -67,6 +68,7 @@ const agentData = [
 const PropertyDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
@@ -89,9 +91,9 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-stone-800 mb-4">Propiedad no encontrada</h1>
+          <h1 className="text-2xl font-bold text-stone-800 mb-4">{t('property.not_found')}</h1>
           <Link to="/properties">
-            <Button className="bg-stone-600 hover:bg-stone-700">Volver a Propiedades</Button>
+            <Button className="bg-stone-600 hover:bg-stone-700">{t('property.back_to_properties')}</Button>
           </Link>
         </div>
       </div>
@@ -126,24 +128,24 @@ const PropertyDetail = () => {
 
   const getDescription = (property: any) => {
     const typeDescriptions = {
-      apartment: "Hermoso apartamento ubicado en una zona privilegiada. Completamente renovado con acabados de alta calidad y todas las comodidades modernas.",
-      house: "Magnífica casa familiar perfecta para disfrutar en familia. Espacios amplios y bien distribuidos con múltiples opciones de entretenimiento.",
-      loft: "Impresionante loft de estilo moderno con espacios diáfanos y una decoración contemporánea que combina funcionalidad y estilo.",
-      studio: "Acogedor estudio completamente reformado y con mucha luz natural. Perfecto para jóvenes profesionales o estudiantes."
+      apartment: t('property.apartment_description'),
+      house: t('property.house_description'), 
+      loft: t('property.loft_description'),
+      studio: t('property.studio_description')
     };
-    return typeDescriptions[property.type as keyof typeof typeDescriptions] || "Excelente propiedad en ubicación privilegiada.";
+    return typeDescriptions[property.type as keyof typeof typeDescriptions] || t('property.default_description');
   };
 
   const amenities = [
-    { icon: Wifi, label: "WiFi" },
-    { icon: Wind, label: "Aire Acondicionado" }, 
-    { icon: Tv, label: "TV" },
-    { icon: Car, label: "Parking" }
+    { icon: Wifi, label: t('property.wifi') },
+    { icon: Wind, label: t('property.air_conditioning') }, 
+    { icon: Tv, label: t('property.tv') },
+    { icon: Car, label: t('property.parking') }
   ];
 
   const formatPrice = (price: number, operation: string) => {
     const formattedPrice = new Intl.NumberFormat('es-ES').format(price);
-    return operation === 'rent' ? `${formattedPrice}€/mes` : `${formattedPrice}€`;
+    return operation === 'rent' ? `${formattedPrice}€${t('property.per_month')}` : `${formattedPrice}€`;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -209,7 +211,12 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = () => {
-    const defaultMessage = whatsappMessage || `Hola! Estoy interesado en la propiedad "${property.title}" (Ref: ${property.reference}) ubicada en ${property.location}. ${formatPrice(property.price, property.operation)}. Me gustaría agendar una cita para visitarla.`;
+    const defaultMessage = whatsappMessage || t('property.whatsapp_default_message', {
+      title: property.title,
+      reference: property.reference,
+      location: property.location,
+      price: formatPrice(property.price, property.operation)
+    });
     const encodedMessage = encodeURIComponent(defaultMessage);
     const whatsappUrl = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
@@ -217,10 +224,10 @@ const PropertyDetail = () => {
 
   // Updated quick messages with consistent "Ref:" format
   const quickMessages = [
-    `Quiero agendar una visita para la propiedad "${property.title}" Ref: ${property.reference} en ${property.location}`,
-    `¿Está disponible la propiedad Ref: ${property.reference} por ${formatPrice(property.price, property.operation)}?`,
-    `¿Cuáles son los horarios de visita para la propiedad Ref: ${property.reference} en ${property.location}?`,
-    `Necesito más información sobre el precio de ${formatPrice(property.price, property.operation)} para la propiedad Ref: ${property.reference}`
+    t('property.quick_message_visit', { title: property.title, reference: property.reference, location: property.location }),
+    t('property.quick_message_available', { reference: property.reference, price: formatPrice(property.price, property.operation) }),
+    t('property.quick_message_schedule', { reference: property.reference, location: property.location }),
+    t('property.quick_message_price_info', { price: formatPrice(property.price, property.operation), reference: property.reference })
   ];
 
   return (
@@ -234,7 +241,7 @@ const PropertyDetail = () => {
           className="inline-flex items-center text-stone-600 hover:text-stone-700 mb-6 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver
+          {t('common.back')}
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -260,7 +267,7 @@ const PropertyDetail = () => {
                   >
                     <img
                       src={image}
-                      alt={`Vista ${index + 1}`}
+                      alt={t('property.view_number', { number: index + 1 })}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -281,10 +288,10 @@ const PropertyDetail = () => {
                           : 'bg-amber-500 hover:bg-amber-600'
                       } text-white`}
                     >
-                      {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+                      {property.operation === 'rent' ? t('search.operation_rent') : t('search.operation_sale')}
                     </Badge>
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-mono">
-                      Ref: {property.reference}
+                      {t('property.reference')}: {property.reference}
                     </Badge>
                   </div>
                   <h1 className="text-3xl font-bold text-stone-800 mb-2">
@@ -313,28 +320,28 @@ const PropertyDetail = () => {
                 <div className="text-center">
                   <Bed className="h-6 w-6 mx-auto text-stone-400 mb-2" />
                   <div className="font-semibold">{property.bedrooms}</div>
-                  <div className="text-sm text-stone-600">Habitaciones</div>
+                  <div className="text-sm text-stone-600">{t('property.bedrooms')}</div>
                 </div>
                 <div className="text-center">
                   <Bath className="h-6 w-6 mx-auto text-stone-400 mb-2" />
                   <div className="font-semibold">{property.bathrooms}</div>
-                  <div className="text-sm text-stone-600">Baños</div>
+                  <div className="text-sm text-stone-600">{t('property.bathrooms')}</div>
                 </div>
                 <div className="text-center">
                   <Square className="h-6 w-6 mx-auto text-stone-400 mb-2" />
                   <div className="font-semibold">{property.area}m²</div>
-                  <div className="text-sm text-stone-600">Superficie</div>
+                  <div className="text-sm text-stone-600">{t('property.area_label')}</div>
                 </div>
                 <div className="text-center">
                   <Car className="h-6 w-6 mx-auto text-stone-400 mb-2" />
                   <div className="font-semibold">1</div>
-                  <div className="text-sm text-stone-600">Parking</div>
+                  <div className="text-sm text-stone-600">{t('property.parking')}</div>
                 </div>
               </div>
 
               {/* Description */}
               <div className="py-6">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800">Descripción</h2>
+                <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.description')}</h2>
                 <p className="text-stone-700 leading-relaxed">
                   {getDescription(property)}
                 </p>
@@ -344,7 +351,7 @@ const PropertyDetail = () => {
               <div className="py-6 border-t border-stone-200">
                 <h2 className="text-xl font-semibold mb-4 text-stone-800 flex items-center">
                   <Map className="h-5 w-5 mr-2 text-stone-600" />
-                  Ubicación
+                  {t('property.location')}
                 </h2>
                 <div className="space-y-4">
                   <div className="flex items-center text-stone-600 mb-4">
@@ -357,10 +364,9 @@ const PropertyDetail = () => {
                   
                   {/* Location info */}
                   <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">Información de la zona</h3>
+                    <h3 className="font-medium text-stone-800 mb-2">{t('property.area_info')}</h3>
                     <p className="text-stone-600 text-sm">
-                      Excelente ubicación en una zona residencial tranquila, cerca de transporte público, 
-                      centros comerciales y servicios básicos. Fácil acceso a las principales vías de comunicación.
+                      {t('property.area_description')}
                     </p>
                   </div>
                 </div>
@@ -369,7 +375,7 @@ const PropertyDetail = () => {
               {/* Features */}
               {property.features && property.features.length > 0 && (
                 <div className="py-6 border-t border-stone-200">
-                  <h2 className="text-xl font-semibold mb-4 text-stone-800">Características</h2>
+                  <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.features')}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {property.features.map((feature, index) => (
                       <div key={index} className="flex items-center">
@@ -380,27 +386,27 @@ const PropertyDetail = () => {
                     {/* Add more sample features to fill the space */}
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Ascensor</span>
+                      <span className="text-stone-700">{t('property.elevator')}</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Balcón</span>
+                      <span className="text-stone-700">{t('property.balcony')}</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Calefacción</span>
+                      <span className="text-stone-700">{t('property.heating')}</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Terraza</span>
+                      <span className="text-stone-700">{t('property.terrace')}</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Armarios empotrados</span>
+                      <span className="text-stone-700">{t('property.built_in_wardrobes')}</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">Cocina equipada</span>
+                      <span className="text-stone-700">{t('property.equipped_kitchen')}</span>
                     </div>
                   </div>
                 </div>
@@ -408,7 +414,7 @@ const PropertyDetail = () => {
 
               {/* Amenities/Services */}
               <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-6 text-stone-800">Servicios</h2>
+                <h2 className="text-xl font-semibold mb-6 text-stone-800">{t('property.services')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                   {amenities.map((amenity, index) => (
                     <div key={index} className="text-center p-4 bg-stone-50 rounded-lg">
@@ -421,27 +427,24 @@ const PropertyDetail = () => {
 
               {/* Additional Information Section */}
               <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800">Información Adicional</h2>
+                <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.additional_info')}</h2>
                 <div className="space-y-4">
                   <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">Transporte</h3>
+                    <h3 className="font-medium text-stone-800 mb-2">{t('property.transport')}</h3>
                     <p className="text-stone-600 text-sm">
-                      A 5 minutos caminando de la estación de metro. Múltiples líneas de autobús cercanas.
-                      Fácil acceso a las principales vías de comunicación.
+                      {t('property.transport_description')}
                     </p>
                   </div>
                   <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">Zona</h3>
+                    <h3 className="font-medium text-stone-800 mb-2">{t('property.neighborhood')}</h3>
                     <p className="text-stone-600 text-sm">
-                      Barrio familiar con colegios, parques, centros de salud y comercios en los alrededores.
-                      Ambiente seguro y tranquilo ideal para familias.
+                      {t('property.neighborhood_description')}
                     </p>
                   </div>
                   <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">Servicios cercanos</h3>
+                    <h3 className="font-medium text-stone-800 mb-2">{t('property.nearby_services')}</h3>
                     <p className="text-stone-600 text-sm">
-                      Supermercados, farmacias, restaurantes y cafeterías en un radio de 300 metros.
-                      Centro médico y biblioteca municipal a 10 minutos a pie.
+                      {t('property.nearby_services_description')}
                     </p>
                   </div>
                 </div>
@@ -454,7 +457,7 @@ const PropertyDetail = () => {
             {/* Agent Card - Updated to show agency */}
             <Card className="border-stone-200">
               <CardHeader>
-                <CardTitle className="text-stone-800">Agente Inmobiliario</CardTitle>
+                <CardTitle className="text-stone-800">{t('property.real_estate_agent')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center mb-4">
@@ -465,7 +468,7 @@ const PropertyDetail = () => {
                   />
                   <div>
                     <h3 className="font-semibold text-lg text-stone-800">{agent.name}</h3>
-                    <p className="text-stone-600">Agente Senior</p>
+                    <p className="text-stone-600">{t('property.senior_agent')}</p>
                     <p className="text-sm text-stone-500 font-medium">{agent.agency}</p>
                   </div>
                 </div>
@@ -482,11 +485,11 @@ const PropertyDetail = () => {
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700">
                     <Phone className="h-4 w-4 mr-1" />
-                    Llamar
+                    {t('property.call')}
                   </Button>
                   <Button variant="outline" size="sm" className="border-stone-300 text-stone-600 hover:bg-stone-50">
                     <Calendar className="h-4 w-4 mr-1" />
-                    Cita
+                    {t('property.appointment')}
                   </Button>
                 </div>
               </CardContent>
@@ -501,17 +504,17 @@ const PropertyDetail = () => {
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.516" fill="#25D366"/>
                     </svg>
                   </div>
-                  Chat WhatsApp
+                  {t('property.whatsapp_chat')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-stone-600 mb-4">
-                  Chatea directamente con {agent.agency} para agendar una cita o resolver tus dudas al instante.
+                  {t('property.whatsapp_description', { agency: agent.agency })}
                 </p>
                 
                 {/* Quick message buttons */}
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm font-medium text-stone-700">Mensajes rápidos:</p>
+                  <p className="text-sm font-medium text-stone-700">{t('property.quick_messages')}:</p>
                   {quickMessages.map((message, index) => (
                     <button
                       key={index}
@@ -526,7 +529,7 @@ const PropertyDetail = () => {
                 {/* Custom message input */}
                 <div className="space-y-3">
                   <Textarea
-                    placeholder="Escribe tu mensaje personalizado..."
+                    placeholder={t('property.custom_message_placeholder')}
                     value={whatsappMessage}
                     onChange={(e) => setWhatsappMessage(e.target.value)}
                     rows={3}
@@ -537,13 +540,13 @@ const PropertyDetail = () => {
                     className="w-full bg-green-500 hover:bg-green-600 text-white"
                   >
                     <Send className="h-4 w-4 mr-2" />
-                    Abrir WhatsApp
+                    {t('property.open_whatsapp')}
                   </Button>
                 </div>
 
                 <div className="mt-3 p-3 bg-green-50 rounded-lg">
                   <p className="text-xs text-green-700 text-center">
-                    📱 Te responderemos en menos de 5 minutos
+                    📱 {t('property.quick_response')}
                   </p>
                 </div>
               </CardContent>
@@ -554,23 +557,23 @@ const PropertyDetail = () => {
               <CardHeader>
                 <CardTitle className="text-stone-800 flex items-center">
                   <CreditCard className="h-5 w-5 mr-2 text-amber-600" />
-                  Reservar Propiedad
+                  {t('property.reserve_property')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-stone-600 mb-4">
-                  Completa el formulario y adjunta el contrato firmado para proceder con la reserva.
+                  {t('property.reservation_description')}
                 </p>
                 
                 <form onSubmit={handleReservationSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="fullName" className="text-sm font-medium text-stone-700">
-                      Nombre completo *
+                      {t('property.full_name')} *
                     </Label>
                     <Input
                       id="fullName"
                       name="fullName"
-                      placeholder="Nombre y apellidos"
+                      placeholder={t('property.full_name_placeholder')}
                       value={reservationData.fullName}
                       onChange={handleReservationInputChange}
                       required
@@ -580,13 +583,13 @@ const PropertyDetail = () => {
                   
                   <div>
                     <Label htmlFor="email" className="text-sm font-medium text-stone-700">
-                      Email *
+                      {t('contact.email')} *
                     </Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="correo@ejemplo.com"
+                      placeholder={t('property.email_placeholder')}
                       value={reservationData.email}
                       onChange={handleReservationInputChange}
                       required
@@ -596,13 +599,13 @@ const PropertyDetail = () => {
                   
                   <div>
                     <Label htmlFor="phone" className="text-sm font-medium text-stone-700">
-                      Teléfono *
+                      {t('contact.phone')} *
                     </Label>
                     <Input
                       id="phone"
                       name="phone"
                       type="tel"
-                      placeholder="+34 600 000 000"
+                      placeholder={t('property.phone_placeholder')}
                       value={reservationData.phone}
                       onChange={handleReservationInputChange}
                       required
@@ -612,12 +615,12 @@ const PropertyDetail = () => {
                   
                   <div>
                     <Label htmlFor="dni" className="text-sm font-medium text-stone-700">
-                      DNI/NIE *
+                      {t('property.dni_nie')} *
                     </Label>
                     <Input
                       id="dni"
                       name="dni"
-                      placeholder="12345678A"
+                      placeholder={t('property.dni_placeholder')}
                       value={reservationData.dni}
                       onChange={handleReservationInputChange}
                       required
@@ -627,7 +630,7 @@ const PropertyDetail = () => {
                   
                   <div>
                     <Label htmlFor="contract" className="text-sm font-medium text-stone-700">
-                      Contrato firmado (PDF) *
+                      {t('property.signed_contract')} (PDF) *
                     </Label>
                     <div className="mt-2">
                       <input
@@ -644,7 +647,7 @@ const PropertyDetail = () => {
                         className="w-full border-dashed border-2 border-stone-300 hover:border-amber-400 hover:bg-amber-50"
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        {reservationData.signedContract ? 'Cambiar archivo PDF' : 'Subir contrato firmado'}
+                        {reservationData.signedContract ? t('property.change_pdf') : t('property.upload_contract')}
                       </Button>
                       {reservationData.signedContract && (
                         <div className="mt-2 flex items-center text-sm text-green-600">
@@ -660,13 +663,13 @@ const PropertyDetail = () => {
                     className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium"
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Proceder al Pago
+                    {t('property.proceed_payment')}
                   </Button>
                 </form>
 
                 <div className="mt-4 p-3 bg-amber-100 rounded-lg">
                   <p className="text-xs text-amber-800 text-center">
-                    🔒 Pago seguro • Reserva inmediata • Confirmación por email
+                    🔒 {t('property.secure_payment')}
                   </p>
                 </div>
               </CardContent>
@@ -675,13 +678,13 @@ const PropertyDetail = () => {
             {/* Contact Form */}
             <Card className="border-stone-200">
               <CardHeader>
-                <CardTitle className="text-stone-800">Solicitar Información</CardTitle>
+                <CardTitle className="text-stone-800">{t('property.request_info')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <Input
                     name="name"
-                    placeholder="Nombre completo"
+                    placeholder={t('property.full_name_placeholder')}
                     value={formData.name}
                     onChange={handleInputChange}
                     required
@@ -690,7 +693,7 @@ const PropertyDetail = () => {
                   <Input
                     name="email"
                     type="email"
-                    placeholder="Email"
+                    placeholder={t('contact.email')}
                     value={formData.email}
                     onChange={handleInputChange}
                     required
@@ -699,7 +702,7 @@ const PropertyDetail = () => {
                   <Input
                     name="phone"
                     type="tel"
-                    placeholder="Teléfono"
+                    placeholder={t('contact.phone')}
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
@@ -707,14 +710,14 @@ const PropertyDetail = () => {
                   />
                   <Textarea
                     name="message"
-                    placeholder="Mensaje (opcional)"
+                    placeholder={t('contact.message')}
                     value={formData.message}
                     onChange={handleInputChange}
                     rows={4}
                     className="border-stone-300 focus:border-stone-500"
                   />
                   <Button type="submit" className="w-full bg-stone-600 hover:bg-stone-700">
-                    Enviar Consulta
+                    {t('property.send_inquiry')}
                   </Button>
                 </form>
               </CardContent>
