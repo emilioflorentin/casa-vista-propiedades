@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,10 @@ const Contact = () => {
     const phoneNumber = '34650499177'; // Formato internacional sin +
     const message = encodeURIComponent('Hola, me gustaría información sobre sus servicios inmobiliarios.');
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+  };
+
+  const handlePhoneCall = (phoneNumber: string) => {
+    window.open(`tel:${phoneNumber}`, '_self');
   };
 
   return (
@@ -51,18 +56,29 @@ const Contact = () => {
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center space-x-3 text-stone-600">
                   <Mail className="h-5 w-5" />
-                  <span className="font-medium">info@inmobiliaria.com</span>
+                  <a 
+                    href="mailto:info@inmobiliaria.com"
+                    className="font-medium hover:text-stone-800 transition-colors"
+                  >
+                    info@inmobiliaria.com
+                  </a>
                 </div>
                 
-                <div className="flex items-center space-x-3 text-stone-600">
+                <button
+                  onClick={() => handlePhoneCall('958467433')}
+                  className="flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors"
+                >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">958 467 433</span>
-                </div>
+                </button>
                 
-                <div className="flex items-center space-x-3 text-stone-600">
+                <button
+                  onClick={() => handlePhoneCall('650499177')}
+                  className="flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors"
+                >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">650 499 177</span>
-                </div>
+                </button>
 
                 {/* Sección de WhatsApp */}
                 <div className="border-t pt-4 mt-4">
