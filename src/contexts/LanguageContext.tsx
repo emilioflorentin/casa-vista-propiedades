@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'es' | 'en';
@@ -55,6 +54,22 @@ const translations = {
     'search.bedrooms_all': 'Cualquier número',
     'search.clear_btn': 'Limpiar filtros',
     
+    // Location search
+    'location.search_text': 'Buscar por texto',
+    'location.search_location': 'Buscar por ubicación',
+    'location.search_by_location': 'Buscar por ubicación',
+    'location.search_address': 'Buscar dirección',
+    'location.address_placeholder': 'Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)',
+    'location.search_radius': 'Radio de búsqueda',
+    'location.radius_500m': '500 metros',
+    'location.radius_1km': '1 kilómetro',
+    'location.radius_2km': '2 kilómetros',
+    'location.radius_5km': '5 kilómetros',
+    'location.radius_10km': '10 kilómetros',
+    'location.radius_10km_plus': '10km+',
+    'location.my_location': 'Mi Ubicación',
+    'location.apply_location': 'Aplicar Ubicación',
+    
     // Properties page translations
     'properties.page_title': 'Propiedades Encontradas',
     'properties.search_placeholder': 'Buscar por ubicación, tipo de propiedad...',
@@ -98,6 +113,7 @@ const translations = {
     'properties.no_results': 'No se encontraron propiedades que coincidan con tu búsqueda',
     'properties.view_all': 'Ver Todas las Propiedades',
     'properties.latest': 'Últimas Propiedades',
+    'properties.more': 'más',
     
     // Statistics
     'stats.properties': 'Propiedades Disponibles',
@@ -245,6 +261,8 @@ const translations = {
     'common.next': 'Siguiente',
     'common.previous': 'Anterior',
     'common.language': 'Idioma:',
+    'common.search': 'Buscar',
+    'common.cancel': 'Cancelar',
   },
   en: {
     // Header translations
@@ -291,6 +309,22 @@ const translations = {
     'search.bedrooms_all': 'Any number',
     'search.clear_btn': 'Clear filters',
     
+    // Location search
+    'location.search_text': 'Search by text',
+    'location.search_location': 'Search by location',
+    'location.search_by_location': 'Search by location',
+    'location.search_address': 'Search address',
+    'location.address_placeholder': 'Enter an address (e.g.: Madrid, Barcelona, Seville...)',
+    'location.search_radius': 'Search radius',
+    'location.radius_500m': '500 meters',
+    'location.radius_1km': '1 kilometer',
+    'location.radius_2km': '2 kilometers',
+    'location.radius_5km': '5 kilometers',
+    'location.radius_10km': '10 kilometers',
+    'location.radius_10km_plus': '10km+',
+    'location.my_location': 'My Location',
+    'location.apply_location': 'Apply Location',
+    
     // Properties page translations
     'properties.page_title': 'Properties Found',
     'properties.search_placeholder': 'Search by location, property type...',
@@ -334,6 +368,7 @@ const translations = {
     'properties.no_results': 'No properties found matching your search',
     'properties.view_all': 'View All Properties',
     'properties.latest': 'Latest Properties',
+    'properties.more': 'more',
 
     // Statistics
     'stats.properties': 'Available Properties',
@@ -478,6 +513,8 @@ const translations = {
     'common.next': 'Next',
     'common.previous': 'Previous',
     'common.language': 'Language:',
+    'common.search': 'Search',
+    'common.cancel': 'Cancel',
   }
 };
 

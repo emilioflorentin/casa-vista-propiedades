@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useLanguage } from '@/contexts/LanguageContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -20,7 +21,8 @@ interface LocationSearchProps {
   placeholder?: string;
 }
 
-const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: LocationSearchProps) => {
+const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [radius, setRadius] = useState("1000");
   const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number } | null>(null);
@@ -243,7 +245,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const address = `Mi ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+          const address = `${t('contact.my_location')}: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
           
           setSelectedLocation({ address, lat, lng });
           setSearchQuery(address);
@@ -278,6 +280,8 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
     };
   }, []);
 
+  const defaultPlaceholder = placeholder || t('search.location_placeholder');
+
   return (
     <div className="relative">
       <div className="flex gap-2">
@@ -285,7 +289,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-600" />
           <Input
             ref={inputRef}
-            placeholder={placeholder}
+            placeholder={defaultPlaceholder}
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
@@ -299,7 +303,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           onClick={performSearch}
           disabled={!searchQuery.trim() || isSearching}
           className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
-          title="Buscar por texto"
+          title={t('location.search_text')}
         >
           <Search className="h-4 w-4" />
         </Button>
@@ -312,7 +316,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
               size="sm"
               onClick={handleShowMap}
               className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
-              title="Buscar por ubicación"
+              title={t('location.search_location')}
             >
               <Target className="h-4 w-4" />
             </Button>
@@ -320,19 +324,19 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
           <DialogContent className="max-w-[98vw] w-full max-h-[95vh] bg-white overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-stone-800">
-                Buscar por ubicación
+                {t('location.search_by_location')}
               </DialogTitle>
             </DialogHeader>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Buscar dirección
+                  {t('location.search_address')}
                 </label>
                 <div className="flex gap-2 w-full">
                   <Input
                     ref={modalInputRef}
-                    placeholder="Escribe una dirección (ej: Jaén, Madrid Centro, Sevilla...)"
+                    placeholder={t('location.address_placeholder')}
                     className="flex-1 bg-white border border-gray-300 text-base px-4 py-2"
                     onKeyDown={handleModalInputKeyDown}
                   />
@@ -342,26 +346,26 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                     className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0 px-4"
                   >
                     <Search className="h-4 w-4" />
-                    <span className="ml-2 hidden sm:inline">Buscar</span>
+                    <span className="ml-2 hidden sm:inline">{t('common.search')}</span>
                   </Button>
                 </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Radio de búsqueda
+                  {t('location.search_radius')}
                 </label>
                 <Select value={radius} onValueChange={setRadius}>
                   <SelectTrigger className="w-full bg-white border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                    <SelectItem value="500">500 metros</SelectItem>
-                    <SelectItem value="1000">1 kilómetro</SelectItem>
-                    <SelectItem value="2000">2 kilómetros</SelectItem>
-                    <SelectItem value="5000">5 kilómetros</SelectItem>
-                    <SelectItem value="10000">10 kilómetros</SelectItem>
-                    <SelectItem value="50000">10km+</SelectItem>
+                    <SelectItem value="500">{t('location.radius_500m')}</SelectItem>
+                    <SelectItem value="1000">{t('location.radius_1km')}</SelectItem>
+                    <SelectItem value="2000">{t('location.radius_2km')}</SelectItem>
+                    <SelectItem value="5000">{t('location.radius_5km')}</SelectItem>
+                    <SelectItem value="10000">{t('location.radius_10km')}</SelectItem>
+                    <SelectItem value="50000">{t('location.radius_10km_plus')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -381,14 +385,14 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                   size="sm"
                   className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleCurrentLocation}
                   size="sm"
                   className="bg-stone-600 hover:bg-stone-700 text-white"
                 >
-                  Mi Ubicación
+                  {t('location.my_location')}
                 </Button>
                 <Button
                   onClick={handleApplyLocation}
@@ -396,7 +400,7 @@ const LocationSearch = ({ onLocationSelect, placeholder = "¿Dónde buscas?" }: 
                   size="sm"
                   className="bg-stone-600 hover:bg-stone-700 text-white disabled:opacity-50"
                 >
-                  Aplicar Ubicación
+                  {t('location.apply_location')}
                 </Button>
               </div>
             </div>
