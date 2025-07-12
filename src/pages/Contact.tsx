@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { MapPin, Mail, Phone } from 'lucide-react';
+import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +13,13 @@ const Contact = () => {
     e.preventDefault();
     // Aquí se manejaría el envío del formulario
     console.log('Formulario enviado');
+  };
+
+  const handleWhatsAppClick = () => {
+    // Abre WhatsApp con un mensaje predefinido
+    const phoneNumber = '34650499177'; // Formato internacional sin +
+    const message = encodeURIComponent('Hola, me gustaría información sobre sus servicios inmobiliarios.');
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
   return (
@@ -56,6 +62,20 @@ const Contact = () => {
                 <div className="flex items-center space-x-3 text-stone-600">
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">650 499 177</span>
+                </div>
+
+                {/* Sección de WhatsApp */}
+                <div className="border-t pt-4 mt-4">
+                  <button
+                    onClick={handleWhatsAppClick}
+                    className="flex items-center space-x-3 text-green-600 hover:text-green-700 transition-colors w-full p-3 bg-green-50 hover:bg-green-100 rounded-lg"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    <div className="text-left">
+                      <p className="font-medium">¡Escríbenos por WhatsApp!</p>
+                      <p className="text-sm text-green-600">650 499 177</p>
+                    </div>
+                  </button>
                 </div>
                 
                 <div className="flex items-start space-x-3 text-stone-600">
