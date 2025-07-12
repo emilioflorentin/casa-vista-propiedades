@@ -60,7 +60,7 @@ const Contact = () => {
                     href="mailto:info@inmobiliaria.com"
                     className="font-medium hover:text-stone-800 transition-colors"
                   >
-                    info@inmobiliaria.com
+                    nazarihomesgranada@gmail.com
                   </a>
                 </div>
                 
