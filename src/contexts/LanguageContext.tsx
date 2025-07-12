@@ -42,6 +42,17 @@ const translations = {
     'search.managed_by_nazari': 'Nazarí Homes',
     'search.managed_by_other': 'Otras Inmobiliarias',
     'search.search_btn': 'Buscar',
+    'search.location': 'Ubicación',
+    'search.type': 'Tipo de Propiedad',
+    'search.type_all': 'Todos los tipos',
+    'search.type_villa': 'Villa',
+    'search.type_penthouse': 'Ático',
+    'search.type_townhouse': 'Casa adosada',
+    'search.price': 'Precio',
+    'search.price_all': 'Cualquier precio',
+    'search.bedrooms': 'Dormitorios',
+    'search.bedrooms_all': 'Cualquier número',
+    'search.clear_btn': 'Limpiar filtros',
     
     // Stats section
     'stats.properties': 'Propiedades Disponibles',
@@ -56,26 +67,7 @@ const translations = {
     'properties.show_featured': 'Ver Propiedades Destacadas',
     'properties.no_results': 'No se encontraron propiedades que coincidan con tu búsqueda',
     'properties.view_all': 'Ver Todas las Propiedades',
-    
-    // Property search
-    'search.location': 'Ubicación',
-    'search.location_placeholder': 'Buscar por ciudad o zona...',
-    'search.type': 'Tipo de Propiedad',
-    'search.type_all': 'Todos los tipos',
-    'search.type_apartment': 'Apartamento',
-    'search.type_villa': 'Villa',
-    'search.type_penthouse': 'Ático',
-    'search.type_townhouse': 'Casa adosada',
-    'search.price': 'Precio',
-    'search.price_all': 'Cualquier precio',
-    'search.bedrooms': 'Dormitorios',
-    'search.bedrooms_all': 'Cualquier número',
-    'search.search_btn': 'Buscar',
-    'search.clear_btn': 'Limpiar filtros',
-    
-    // Properties
     'properties.latest': 'Últimas Propiedades',
-    'properties.no_results': 'No se encontraron propiedades',
     'properties.no_results_desc': 'Intenta ajustar tus filtros de búsqueda para encontrar más opciones.',
     
     // Property card
@@ -162,6 +154,17 @@ const translations = {
     'search.managed_by_nazari': 'Nazarí Homes',
     'search.managed_by_other': 'Other Agencies',
     'search.search_btn': 'Search',
+    'search.location': 'Location',
+    'search.type': 'Property Type',
+    'search.type_all': 'All types',
+    'search.type_villa': 'Villa',
+    'search.type_penthouse': 'Penthouse',
+    'search.type_townhouse': 'Townhouse',
+    'search.price': 'Price',
+    'search.price_all': 'Any price',
+    'search.bedrooms': 'Bedrooms',
+    'search.bedrooms_all': 'Any number',
+    'search.clear_btn': 'Clear filters',
     
     // Stats section
     'stats.properties': 'Available Properties',
@@ -176,26 +179,7 @@ const translations = {
     'properties.show_featured': 'View Featured Properties',
     'properties.no_results': 'No properties found matching your search',
     'properties.view_all': 'View All Properties',
-    
-    // Property search
-    'search.location': 'Location',
-    'search.location_placeholder': 'Search by city or area...',
-    'search.type': 'Property Type',
-    'search.type_all': 'All types',
-    'search.type_apartment': 'Apartment',
-    'search.type_villa': 'Villa',
-    'search.type_penthouse': 'Penthouse',
-    'search.type_townhouse': 'Townhouse',
-    'search.price': 'Price',
-    'search.price_all': 'Any price',
-    'search.bedrooms': 'Bedrooms',
-    'search.bedrooms_all': 'Any number',
-    'search.search_btn': 'Search',
-    'search.clear_btn': 'Clear filters',
-    
-    // Properties
     'properties.latest': 'Latest Properties',
-    'properties.no_results': 'No properties found',
     'properties.no_results_desc': 'Try adjusting your search filters to find more options.',
     
     // Property card
