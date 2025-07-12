@@ -62,8 +62,7 @@ const Header = () => {
             </Button>
             <Link to="/contact">
               <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
-                <Phone className="h-4 w-4 mr-2" />
-                {t('nav.contact_btn')}
+                <Phone className="h-4 w-4" />
               </Button>
             </Link>
             
@@ -71,32 +70,49 @@ const Header = () => {
             <div className="flex items-center space-x-2 ml-4 border-l border-stone-200 pl-4">
               <button
                 onClick={() => setLanguage('es')}
-                className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
+                className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
                   language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="Español"
               >
-                <div className="w-full h-full bg-gradient-to-b from-red-500 via-yellow-400 to-red-500 flex items-center justify-center">
-                  <div className="w-full h-1/3 bg-red-500"></div>
-                  <div className="w-full h-1/3 bg-yellow-400"></div>
-                  <div className="w-full h-1/3 bg-red-500"></div>
+                {/* Spain Flag */}
+                <div className="w-full h-full relative">
+                  <div className="w-full h-1/4 bg-red-600"></div>
+                  <div className="w-full h-2/4 bg-yellow-400"></div>
+                  <div className="w-full h-1/4 bg-red-600"></div>
                 </div>
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
+                className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
                   language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="English"
               >
-                <div className="w-full h-full relative bg-blue-600">
-                  <div className="absolute inset-0 bg-blue-600"></div>
-                  <div className="absolute inset-0 bg-white clip-path-[polygon(0_0,100%_0,0_100%)]"></div>
-                  <div className="absolute inset-0 bg-red-500 clip-path-[polygon(100%_0,100%_100%,0_100%)]"></div>
-                  <div className="absolute inset-0 bg-white w-1/5 left-0"></div>
-                  <div className="absolute inset-0 bg-white h-1/5 top-2/5"></div>
-                  <div className="absolute inset-0 bg-red-500 w-1/12 left-1/12"></div>
-                  <div className="absolute inset-0 bg-red-500 h-1/12 top-5/12"></div>
+                {/* UK Flag */}
+                <div className="w-full h-full relative bg-blue-800">
+                  {/* Blue background */}
+                  <div className="absolute inset-0 bg-blue-800"></div>
+                  
+                  {/* White diagonal cross */}
+                  <div className="absolute inset-0">
+                    <div className="absolute w-full h-0.5 bg-white top-1/2 transform -translate-y-0.5 rotate-45 origin-center"></div>
+                    <div className="absolute w-full h-0.5 bg-white top-1/2 transform -translate-y-0.5 -rotate-45 origin-center"></div>
+                  </div>
+                  
+                  {/* Red diagonal cross */}
+                  <div className="absolute inset-0">
+                    <div className="absolute w-full h-px bg-red-600 top-1/2 transform -translate-y-0.5 rotate-45 origin-center"></div>
+                    <div className="absolute w-full h-px bg-red-600 top-1/2 transform -translate-y-0.5 -rotate-45 origin-center"></div>
+                  </div>
+                  
+                  {/* White cross */}
+                  <div className="absolute w-full h-0.5 bg-white top-1/2 transform -translate-y-0.5"></div>
+                  <div className="absolute h-full w-0.5 bg-white left-1/2 transform -translate-x-0.5"></div>
+                  
+                  {/* Red cross */}
+                  <div className="absolute w-full h-px bg-red-600 top-1/2 transform -translate-y-0.5"></div>
+                  <div className="absolute h-full w-px bg-red-600 left-1/2 transform -translate-x-0.5"></div>
                 </div>
               </button>
             </div>
@@ -163,26 +179,35 @@ const Header = () => {
                     setLanguage('es');
                     setIsMenuOpen(false);
                   }}
-                  className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 ${
+                  className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 ${
                     language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70'
                   }`}
                   title="Español"
                 >
-                  <div className="w-full h-full bg-gradient-to-b from-red-500 via-yellow-400 to-red-500"></div>
+                  {/* Spain Flag */}
+                  <div className="w-full h-full relative">
+                    <div className="w-full h-1/4 bg-red-600"></div>
+                    <div className="w-full h-2/4 bg-yellow-400"></div>
+                    <div className="w-full h-1/4 bg-red-600"></div>
+                  </div>
                 </button>
                 <button
                   onClick={() => {
                     setLanguage('en');
                     setIsMenuOpen(false);
                   }}
-                  className={`w-8 h-6 rounded overflow-hidden transition-all duration-200 ${
+                  className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 ${
                     language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70'
                   }`}
                   title="English"
                 >
-                  <div className="w-full h-full bg-blue-600 relative">
-                    <div className="absolute inset-0 bg-white w-1/3"></div>
-                    <div className="absolute inset-0 bg-red-500 w-1/3 right-0"></div>
+                  {/* UK Flag */}
+                  <div className="w-full h-full relative bg-blue-800">
+                    <div className="absolute inset-0 bg-blue-800"></div>
+                    <div className="absolute w-full h-0.5 bg-white top-1/2 transform -translate-y-0.5"></div>
+                    <div className="absolute h-full w-0.5 bg-white left-1/2 transform -translate-x-0.5"></div>
+                    <div className="absolute w-full h-px bg-red-600 top-1/2 transform -translate-y-0.5"></div>
+                    <div className="absolute h-full w-px bg-red-600 left-1/2 transform -translate-x-0.5"></div>
                   </div>
                 </button>
               </div>
@@ -205,8 +230,7 @@ const Header = () => {
                 </Button>
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
-                    <Phone className="h-4 w-4 mr-2" />
-                    {t('nav.contact_btn')}
+                    <Phone className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>
