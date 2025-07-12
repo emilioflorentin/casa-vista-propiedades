@@ -57,7 +57,7 @@ const Contact = () => {
                 <div className="flex items-center space-x-3 text-stone-600">
                   <Mail className="h-5 w-5" />
                   <a 
-                    href="mailto:info@inmobiliaria.com"
+                    href="mailto:nazarihomesgranada@gmail.com"
                     className="font-medium hover:text-stone-800 transition-colors"
                   >
                     nazarihomesgranada@gmail.com
