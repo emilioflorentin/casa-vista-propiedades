@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MapComponent from '@/components/MapComponent';
@@ -211,9 +212,14 @@ const Contact = () => {
                       />
                       <label htmlFor="privacy" className="text-sm text-stone-600">
                         He leído y acepto la{' '}
-                        <a href="#" className="text-stone-600 hover:underline">
+                        <Link 
+                          to="/privacy-policy" 
+                          className="text-stone-600 hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Política de privacidad
-                        </a>
+                        </Link>
                       </label>
                     </div>
 
