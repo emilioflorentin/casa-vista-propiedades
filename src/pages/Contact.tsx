@@ -76,7 +76,7 @@ const Contact = () => {
       formDataToSend.append('h-captcha-response', hcaptchaValue);
       
       // Usando el token hash de FormSubmit
-      const response = await fetch('YOUR_FORMSUBMIT_TOKEN_HERE', {
+      const response = await fetch('https://formsubmit.co/8832813ceba0f7b74908663853554267', {
         method: 'POST',
         body: formDataToSend
       });
