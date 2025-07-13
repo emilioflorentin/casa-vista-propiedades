@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Heart, User, Phone } from "lucide-react";
@@ -55,10 +56,12 @@ const Header = () => {
                 )}
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-              <User className="h-4 w-4 mr-2" />
-              {t('nav.account')}
-            </Button>
+            <Link to="/account">
+              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                <User className="h-4 w-4 mr-2" />
+                {t('nav.account')}
+              </Button>
+            </Link>
             <Link to="/contact">
               <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
                 <Phone className="h-4 w-4" />
@@ -223,10 +226,12 @@ const Header = () => {
                     )}
                   </Button>
                 </Link>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                  <User className="h-4 w-4 mr-2" />
-                  {t('nav.account')}
-                </Button>
+                <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                    <User className="h-4 w-4 mr-2" />
+                    {t('nav.account')}
+                  </Button>
+                </Link>
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
                     <Phone className="h-4 w-4" />
