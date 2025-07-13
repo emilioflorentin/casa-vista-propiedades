@@ -1,14 +1,16 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Chrome } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Account = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +21,19 @@ const Account = () => {
     password: "",
     confirmPassword: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
+  
   const { t } = useLanguage();
+  const { user, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users to home
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,15 +43,80 @@ const Account = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí se implementaría la lógica de autenticación
-    console.log("Form submitted:", formData);
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await signInWithEmail(formData.email, formData.password);
+        if (error) {
+          toast({
+            title: "Error al iniciar sesión",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "¡Bienvenido!",
+            description: "Has iniciado sesión correctamente",
+          });
+        }
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Error",
+            description: "Las contraseñas no coinciden",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await signUpWithEmail(formData.email, formData.password, formData.name);
+        if (error) {
+          toast({
+            title: "Error al crear cuenta",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "¡Cuenta creada!",
+            description: "Revisa tu email para confirmar tu cuenta",
+          });
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Ha ocurrido un error inesperado",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleAuth = () => {
-    // Aquí se implementaría la autenticación con Google
-    console.log("Google authentication");
+  const handleGoogleAuth = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Ha ocurrido un error con Google",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -66,6 +145,7 @@ const Account = () => {
                 variant="outline"
                 className="w-full h-12 border-stone-200 hover:bg-stone-50 text-stone-700"
                 onClick={handleGoogleAuth}
+                disabled={isLoading}
               >
                 <Chrome className="w-5 h-5 mr-3" />
                 {isLogin 
@@ -101,6 +181,7 @@ const Account = () => {
                         onChange={handleInputChange}
                         className="pl-10 h-12 border-stone-200 focus:border-stone-400"
                         required={!isLogin}
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -121,6 +202,7 @@ const Account = () => {
                       onChange={handleInputChange}
                       className="pl-10 h-12 border-stone-200 focus:border-stone-400"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -140,11 +222,13 @@ const Account = () => {
                       onChange={handleInputChange}
                       className="pl-10 pr-10 h-12 border-stone-200 focus:border-stone-400"
                       required
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                      disabled={isLoading}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -167,6 +251,7 @@ const Account = () => {
                         onChange={handleInputChange}
                         className="pl-10 h-12 border-stone-200 focus:border-stone-400"
                         required={!isLogin}
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -186,11 +271,15 @@ const Account = () => {
                 <Button
                   type="submit"
                   className="w-full h-12 bg-stone-600 hover:bg-stone-700 text-white font-medium"
+                  disabled={isLoading}
                 >
-                  {isLogin 
-                    ? t('account.loginButton') || 'Iniciar Sesión'
-                    : t('account.registerButton') || 'Crear Cuenta'
-                  }
+                  {isLoading ? (
+                    "Cargando..."
+                  ) : (
+                    isLogin 
+                      ? t('account.loginButton') || 'Iniciar Sesión'
+                      : t('account.registerButton') || 'Crear Cuenta'
+                  )}
                 </Button>
               </form>
 
@@ -203,6 +292,7 @@ const Account = () => {
                   <button
                     onClick={() => setIsLogin(!isLogin)}
                     className="text-stone-700 hover:text-stone-900 font-medium underline"
+                    disabled={isLoading}
                   >
                     {isLogin 
                       ? t('account.createAccount') || 'Crear cuenta'

@@ -5,11 +5,14 @@ import { Menu, X, Heart, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import UserProfile from "./UserProfile";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { language, setLanguage, t } = useLanguage();
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
@@ -56,12 +59,18 @@ const Header = () => {
                 )}
               </Button>
             </Link>
-            <Link to="/account">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                <User className="h-4 w-4 mr-2" />
-                {t('nav.account')}
-              </Button>
-            </Link>
+            
+            {user ? (
+              <UserProfile />
+            ) : (
+              <Link to="/account">
+                <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                  <User className="h-4 w-4 mr-2" />
+                  {t('nav.account')}
+                </Button>
+              </Link>
+            )}
+            
             <Link to="/contact">
               <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
                 <Phone className="h-4 w-4" />
@@ -226,12 +235,20 @@ const Header = () => {
                     )}
                   </Button>
                 </Link>
-                <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                    <User className="h-4 w-4 mr-2" />
-                    {t('nav.account')}
-                  </Button>
-                </Link>
+                
+                {user ? (
+                  <div className="px-3 py-2">
+                    <UserProfile />
+                  </div>
+                ) : (
+                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                      <User className="h-4 w-4 mr-2" />
+                      {t('nav.account')}
+                    </Button>
+                  </Link>
+                )}
+                
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
                     <Phone className="h-4 w-4" />
