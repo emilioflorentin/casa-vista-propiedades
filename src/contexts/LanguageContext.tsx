@@ -125,6 +125,24 @@ const translations: Translations = {
       hasAccount: '¿Ya tienes cuenta?',
       createAccount: 'Crear cuenta',
       loginHere: 'Inicia sesión aquí'
+    },
+    properties: {
+      type_all: 'Todos',
+      type_apartment: 'Apartamento',
+      type_house: 'Casa',
+      type_loft: 'Loft',
+      type_studio: 'Estudio',
+      managed_all: 'Todos',
+      managed_nazari: 'Gestionado por Nazarí',
+      managed_other: 'Otros',
+      area_unit: ' m²',
+      more: 'más',
+      per_month: '/mes',
+      view_details: 'Ver detalles'
+    },
+    search: {
+      property_type: 'Tipo de propiedad',
+      managed_by: 'Gestionado por'
     }
   },
   en: {
@@ -235,6 +253,24 @@ const translations: Translations = {
       hasAccount: 'Already have an account?',
       createAccount: 'Create account',
       loginHere: 'Sign in here'
+    },
+    properties: {
+      type_all: 'All',
+      type_apartment: 'Apartment',
+      type_house: 'House',
+      type_loft: 'Loft',
+      type_studio: 'Studio',
+      managed_all: 'All',
+      managed_nazari: 'Managed by Nazarí',
+      managed_other: 'Others',
+      area_unit: ' m²',
+      more: 'more',
+      per_month: '/month',
+      view_details: 'View details'
+    },
+    search: {
+      property_type: 'Property type',
+      managed_by: 'Managed by'
     }
   }
 };
