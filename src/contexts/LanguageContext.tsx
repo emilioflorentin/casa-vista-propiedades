@@ -77,8 +77,7 @@ const translations: Translations = {
     },
     hero: {
       title: 'Encuentra tu hogar ideal',
-      title_highlight: 'en la Costa Tropical',
-      subtitle: 'Descubre las mejores propiedades en la Costa Tropical',
+      subtitle: 'Descubre las mejores propiedades',
       searchPlaceholder: '¿Qué estás buscando?',
     },
     services: {
