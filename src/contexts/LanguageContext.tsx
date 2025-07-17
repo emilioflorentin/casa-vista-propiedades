@@ -59,6 +59,7 @@ const translations: Translations = {
     },
     hero: {
       title: 'Encuentra tu hogar ideal',
+      title_highlight: 'en la Costa Tropical',
       subtitle: 'Descubre las mejores propiedades en la Costa Tropical',
       searchPlaceholder: '¿Qué estás buscando?',
     },
@@ -138,11 +139,33 @@ const translations: Translations = {
       area_unit: ' m²',
       more: 'más',
       per_month: '/mes',
-      view_details: 'Ver detalles'
+      view_details: 'Ver detalles',
+      featured: 'Propiedades destacadas',
+      featured_desc: 'Descubre nuestra selección de propiedades más exclusivas',
+      search_results: 'Resultados de búsqueda',
+      search_results_desc: 'Se encontraron {count} propiedades que coinciden con tus criterios'
     },
     search: {
       property_type: 'Tipo de propiedad',
-      managed_by: 'Gestionado por'
+      managed_by: 'Gestionado por',
+      operation: 'Operación',
+      operation_any: 'Cualquiera',
+      operation_rent: 'Alquiler',
+      operation_sale: 'Venta',
+      search_btn: 'Buscar'
+    },
+    stats: {
+      properties: 'Propiedades',
+      clients: 'Clientes satisfechos',
+      success_rate: 'Tasa de éxito'
+    },
+    about: {
+      stats: {
+        years: 'Años de experiencia',
+        properties: 'Propiedades vendidas',
+        clients: 'Clientes satisfechos',
+        satisfaction: 'Satisfacción del cliente'
+      }
     }
   },
   en: {
@@ -187,6 +210,7 @@ const translations: Translations = {
     },
     hero: {
       title: 'Find your ideal home',
+      title_highlight: 'on the Tropical Coast',
       subtitle: 'Discover the best properties on the Tropical Coast',
       searchPlaceholder: 'What are you looking for?',
     },
@@ -266,11 +290,33 @@ const translations: Translations = {
       area_unit: ' m²',
       more: 'more',
       per_month: '/month',
-      view_details: 'View details'
+      view_details: 'View details',
+      featured: 'Featured properties',
+      featured_desc: 'Discover our selection of most exclusive properties',
+      search_results: 'Search results',
+      search_results_desc: 'Found {count} properties matching your criteria'
     },
     search: {
       property_type: 'Property type',
-      managed_by: 'Managed by'
+      managed_by: 'Managed by',
+      operation: 'Operation',
+      operation_any: 'Any',
+      operation_rent: 'Rent',
+      operation_sale: 'Sale',
+      search_btn: 'Search'
+    },
+    stats: {
+      properties: 'Properties',
+      clients: 'Satisfied clients',
+      success_rate: 'Success rate'
+    },
+    about: {
+      stats: {
+        years: 'Years of experience',
+        properties: 'Properties sold',
+        clients: 'Satisfied clients',
+        satisfaction: 'Customer satisfaction'
+      }
     }
   }
 };
