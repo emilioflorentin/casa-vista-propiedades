@@ -1,7 +1,7 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Chrome } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Account = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,6 +22,15 @@ const Account = () => {
     confirmPassword: ""
   });
   const { t } = useLanguage();
+  const { user, loading, signUp, signIn, signOut, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
+
+  // Si el usuario ya está autenticado, mostrar perfil
+  useEffect(() => {
+    if (user && !loading) {
+      // El usuario está logueado, podemos mostrar su perfil
+    }
+  }, [user, loading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,16 +40,138 @@ const Account = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí se implementaría la lógica de autenticación
-    console.log("Form submitted:", formData);
+    
+    if (loading) return;
+
+    // Validaciones básicas
+    if (!formData.email || !formData.password) {
+      toast.error('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    if (!isLogin) {
+      // Validaciones para registro
+      if (!formData.name) {
+        toast.error('El nombre es requerido');
+        return;
+      }
+      
+      if (formData.password !== formData.confirmPassword) {
+        toast.error('Las contraseñas no coinciden');
+        return;
+      }
+      
+      if (formData.password.length < 6) {
+        toast.error('La contraseña debe tener al menos 6 caracteres');
+        return;
+      }
+
+      // Registrar usuario
+      const { error } = await signUp(formData.email, formData.password, formData.name);
+      if (error) {
+        toast.error(error);
+      } else {
+        // Reset form
+        setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+      }
+    } else {
+      // Iniciar sesión
+      const { error } = await signIn(formData.email, formData.password);
+      if (error) {
+        toast.error(error);
+      } else {
+        navigate('/');
+      }
+    }
   };
 
-  const handleGoogleAuth = () => {
-    // Aquí se implementaría la autenticación con Google
-    console.log("Google authentication");
+  const handleGoogleAuth = async () => {
+    if (loading) return;
+    
+    const { error } = await signInWithGoogle();
+    if (error) {
+      toast.error(error);
+    }
   };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  // Si el usuario está cargando, mostrar loading
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-600 mx-auto mb-4"></div>
+          <p className="text-stone-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si el usuario está autenticado, mostrar perfil
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+        <Header />
+        
+        <main className="container mx-auto px-6 py-20">
+          <div className="max-w-md mx-auto">
+            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="text-center pb-8">
+                <CardTitle className="text-2xl font-bold text-stone-800">
+                  Mi Perfil
+                </CardTitle>
+                <CardDescription className="text-stone-600">
+                  Bienvenido de vuelta
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-6">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-stone-200 rounded-full mx-auto flex items-center justify-center">
+                    <User className="w-8 h-8 text-stone-500" />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold text-stone-800">
+                      {user.user_metadata?.full_name || 'Usuario'}
+                    </h3>
+                    <p className="text-stone-600">{user.email}</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <p className="text-sm text-stone-600">
+                    <strong>Miembro desde:</strong> {new Date(user.created_at).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-stone-600">
+                    <strong>Email confirmado:</strong> {user.email_confirmed_at ? 'Sí' : 'No'}
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -185,12 +318,19 @@ const Account = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-stone-600 hover:bg-stone-700 text-white font-medium"
+                  disabled={loading}
+                  className="w-full h-12 bg-stone-600 hover:bg-stone-700 text-white font-medium disabled:opacity-50"
                 >
-                  {isLogin 
-                    ? t('account.loginButton') || 'Iniciar Sesión'
-                    : t('account.registerButton') || 'Crear Cuenta'
-                  }
+                  {loading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      {isLogin ? 'Iniciando...' : 'Creando...'}
+                    </div>
+                  ) : (
+                    isLogin 
+                      ? t('account.loginButton') || 'Iniciar Sesión'
+                      : t('account.registerButton') || 'Crear Cuenta'
+                  )}
                 </Button>
               </form>
 

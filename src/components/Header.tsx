@@ -1,15 +1,24 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone } from "lucide-react";
+import { Menu, X, Heart, User, Phone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { language, setLanguage, t } = useLanguage();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
@@ -56,12 +65,46 @@ const Header = () => {
                 )}
               </Button>
             </Link>
-            <Link to="/account">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                <User className="h-4 w-4 mr-2" />
-                {t('nav.account')}
-              </Button>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                    <User className="h-4 w-4 mr-2" />
+                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user.user_metadata?.full_name || 'Usuario'}
+                  </div>
+                  <div className="px-2 py-1.5 text-xs text-gray-500">
+                    {user.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="w-full">
+                      <User className="h-4 w-4 mr-2" />
+                      Mi Perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={signOut}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Cerrar Sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/account">
+                <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                  <User className="h-4 w-4 mr-2" />
+                  {t('nav.account')}
+                </Button>
+              </Link>
+            )}
             <Link to="/contact">
               <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
                 <Phone className="h-4 w-4" />
@@ -226,12 +269,41 @@ const Header = () => {
                     )}
                   </Button>
                 </Link>
-                <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50">
-                    <User className="h-4 w-4 mr-2" />
-                    {t('nav.account')}
-                  </Button>
-                </Link>
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="px-2 py-2 text-sm font-medium text-gray-700">
+                      {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
+                    </div>
+                    <div className="px-2 text-xs text-gray-500">
+                      {user.email}
+                    </div>
+                    <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full">
+                        <User className="h-4 w-4 mr-2" />
+                        Mi Perfil
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar Sesión
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full">
+                      <User className="h-4 w-4 mr-2" />
+                      {t('nav.account')}
+                    </Button>
+                  </Link>
+                )}
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
                     <Phone className="h-4 w-4" />
