@@ -65,6 +65,17 @@ const MapComponent: React.FC<MapComponentProps> = ({ location, title }) => {
       setError(null);
 
       try {
+        // Clean up any existing map instance first
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+        }
+
+        // Clear the container
+        if (mapRef.current) {
+          mapRef.current.innerHTML = '';
+        }
+
         // Get coordinates for the location
         const coordinates = await geocodeLocation(location);
 
