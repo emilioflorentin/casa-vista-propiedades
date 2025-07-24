@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut, Building, Phone } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -16,6 +18,8 @@ import { toast } from "sonner";
 const Account = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -83,6 +87,16 @@ const Account = () => {
         toast.error('El teléfono es requerido');
         return;
       }
+
+      if (!acceptPrivacy) {
+        toast.error('Debe aceptar la política de privacidad');
+        return;
+      }
+
+      if (!captchaToken) {
+        toast.error('Debe completar el captcha');
+        return;
+      }
       
       if (formData.password !== formData.confirmPassword) {
         toast.error('Las contraseñas no coinciden');
@@ -113,6 +127,8 @@ const Account = () => {
           companyName: "",
           phone: ""
         });
+        setAcceptPrivacy(false);
+        setCaptchaToken(null);
       }
     } else {
       // Iniciar sesión
@@ -406,6 +422,41 @@ const Account = () => {
                           required={!isLogin}
                         />
                       </div>
+                    </div>
+                  </div>
+                 )}
+
+                {/* Política de privacidad y hCAPTCHA para registro */}
+                {!isLogin && (
+                  <div className="space-y-4">
+                    {/* Política de privacidad */}
+                    <div className="flex items-start space-x-3">
+                      <Checkbox
+                        id="privacy-policy"
+                        checked={acceptPrivacy}
+                        onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
+                        className="mt-0.5"
+                      />
+                      <label htmlFor="privacy-policy" className="text-sm text-stone-600 leading-5">
+                        Acepto el tratamiento de mis datos conforme a la{' '}
+                        <Link 
+                          to="/contact" 
+                          className="text-stone-700 hover:text-stone-900 underline"
+                          target="_blank"
+                        >
+                          política de privacidad
+                        </Link>
+                      </label>
+                    </div>
+
+                    {/* hCAPTCHA */}
+                    <div className="flex justify-center">
+                      <HCaptcha
+                        sitekey="10000000-ffff-ffff-ffff-000000000001"
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaToken(null)}
+                        onError={() => setCaptchaToken(null)}
+                      />
                     </div>
                   </div>
                 )}
