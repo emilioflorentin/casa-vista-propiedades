@@ -7,7 +7,7 @@ interface AuthContextProps {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error?: string }>;
+  signUp: (email: string, password: string, fullName?: string, additionalData?: Record<string, any>) => Promise<{ error?: string }>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error?: string }>;
@@ -53,19 +53,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
+  const signUp = async (email: string, password: string, fullName?: string, additionalData?: Record<string, any>) => {
     try {
       setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
+      
+      const userData = {
+        full_name: fullName,
+        ...additionalData
+      };
       
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-          }
+          data: userData
         }
       });
 

@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut, Building, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,7 +20,10 @@ const Account = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    userType: "",
+    companyName: "",
+    phone: ""
   });
   const { t } = useLanguage();
   const { user, loading, signUp, signIn, signOut, signInWithGoogle } = useAuth();
@@ -34,6 +38,13 @@ const Account = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -57,6 +68,21 @@ const Account = () => {
         toast.error('El nombre es requerido');
         return;
       }
+
+      if (!formData.userType) {
+        toast.error('Debe seleccionar si es particular o empresa');
+        return;
+      }
+
+      if (formData.userType === 'empresa' && !formData.companyName) {
+        toast.error('El nombre de la empresa es requerido');
+        return;
+      }
+
+      if (!formData.phone) {
+        toast.error('El teléfono es requerido');
+        return;
+      }
       
       if (formData.password !== formData.confirmPassword) {
         toast.error('Las contraseñas no coinciden');
@@ -68,13 +94,25 @@ const Account = () => {
         return;
       }
 
-      // Registrar usuario
-      const { error } = await signUp(formData.email, formData.password, formData.name);
+      // Registrar usuario con datos adicionales
+      const { error } = await signUp(formData.email, formData.password, formData.name, {
+        user_type: formData.userType,
+        company_name: formData.companyName,
+        phone: formData.phone
+      });
       if (error) {
         toast.error(error);
       } else {
         // Reset form
-        setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+        setFormData({ 
+          name: "", 
+          email: "", 
+          password: "", 
+          confirmPassword: "",
+          userType: "",
+          companyName: "",
+          phone: ""
+        });
       }
     } else {
       // Iniciar sesión
@@ -301,6 +339,73 @@ const Account = () => {
                         className="pl-10 h-12 border-stone-200 focus:border-stone-400"
                         required={!isLogin}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {/* Cuestionario para registro */}
+                {!isLogin && (
+                  <div className="space-y-4 p-4 bg-stone-50 rounded-lg border">
+                    <h3 className="text-sm font-semibold text-stone-700 mb-3">
+                      Información adicional
+                    </h3>
+                    
+                    {/* Tipo de usuario */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-stone-700">
+                        ¿Eres particular o empresa?
+                      </label>
+                      <Select value={formData.userType} onValueChange={(value) => handleSelectChange('userType', value)}>
+                        <SelectTrigger className="h-12 border-stone-200 focus:border-stone-400">
+                          <SelectValue placeholder="Selecciona una opción" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="particular">Particular</SelectItem>
+                          <SelectItem value="empresa">Empresa/Inmobiliaria</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Nombre de empresa (solo si es empresa) */}
+                    {formData.userType === 'empresa' && (
+                      <div className="space-y-2">
+                        <label htmlFor="companyName" className="text-sm font-medium text-stone-700">
+                          Nombre de la empresa
+                        </label>
+                        <div className="relative">
+                          <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
+                          <Input
+                            id="companyName"
+                            name="companyName"
+                            type="text"
+                            placeholder="Ej: Inmobiliaria ABC"
+                            value={formData.companyName}
+                            onChange={handleInputChange}
+                            className="pl-10 h-12 border-stone-200 focus:border-stone-400"
+                            required={formData.userType === 'empresa'}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Teléfono */}
+                    <div className="space-y-2">
+                      <label htmlFor="phone" className="text-sm font-medium text-stone-700">
+                        Teléfono de contacto
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          placeholder="Ej: +34 600 123 456"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="pl-10 h-12 border-stone-200 focus:border-stone-400"
+                          required={!isLogin}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
