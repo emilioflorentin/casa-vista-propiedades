@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut, Building, Phone } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Chrome, LogOut, Building, Phone, Plus, Upload, Edit, Trash2, Camera, Home, Bed, Bath, Square } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,17 +8,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Property {
+  id: string;
+  reference: string;
+  title: string;
+  type: "apartment" | "house" | "loft" | "studio";
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image?: string;
+  features?: string[];
+  description?: string;
+  created_at: string;
+}
+
+interface UserProfile {
+  id: string;
+  full_name?: string;
+  avatar_url?: string;
+  user_type?: string;
+  company_name?: string;
+  phone?: string;
+}
 
 const Account = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProperties, setUserProperties] = useState<Property[]>([]);
+  const [showPropertyForm, setShowPropertyForm] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,16 +65,66 @@ const Account = () => {
     companyName: "",
     phone: ""
   });
+  const [propertyForm, setPropertyForm] = useState({
+    title: "",
+    type: "apartment" as "apartment" | "house" | "loft" | "studio",
+    price: "",
+    currency: "EUR",
+    operation: "rent" as "rent" | "sale",
+    location: "",
+    bedrooms: "1",
+    bathrooms: "1",
+    area: "",
+    description: "",
+    features: [] as string[],
+    image: null as File | null
+  });
+
   const { t } = useLanguage();
   const { user, loading, signUp, signIn, signOut, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  // Si el usuario ya está autenticado, mostrar perfil
+  // Cargar perfil y propiedades del usuario
   useEffect(() => {
-    if (user && !loading) {
-      // El usuario está logueado, podemos mostrar su perfil
+    if (user) {
+      loadUserProfile();
+      loadUserProperties();
     }
-  }, [user, loading]);
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
+
+  const loadUserProperties = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setUserProperties(data || []);
+    } catch (error) {
+      console.error('Error loading properties:', error);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,6 +139,101 @@ const Account = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePropertyFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setPropertyForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePropertySelectChange = (name: string, value: string) => {
+    setPropertyForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFeatureAdd = (feature: string) => {
+    if (feature && !propertyForm.features.includes(feature)) {
+      setPropertyForm(prev => ({
+        ...prev,
+        features: [...prev.features, feature]
+      }));
+    }
+  };
+
+  const handleFeatureRemove = (feature: string) => {
+    setPropertyForm(prev => ({
+      ...prev,
+      features: prev.features.filter(f => f !== feature)
+    }));
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!user) return null;
+    
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('property-images')
+        .upload(fileName, file);
+      
+      if (error) throw error;
+      
+      const { data: urlData } = supabase.storage
+        .from('property-images')
+        .getPublicUrl(fileName);
+      
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Error al subir la imagen');
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!user) return;
+    
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('profile-avatars')
+        .upload(fileName, file, { upsert: true });
+      
+      if (error) throw error;
+      
+      const { data: urlData } = supabase.storage
+        .from('profile-avatars')
+        .getPublicUrl(fileName);
+      
+      // Actualizar perfil con nueva URL del avatar
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: urlData.publicUrl })
+        .eq('id', user.id);
+      
+      if (updateError) throw updateError;
+      
+      setUserProfile(prev => prev ? {...prev, avatar_url: urlData.publicUrl} : null);
+      toast.success('Avatar actualizado correctamente');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Error al subir el avatar');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -141,6 +322,123 @@ const Account = () => {
     }
   };
 
+  const handlePropertySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) return;
+
+    // Validaciones
+    if (!propertyForm.title || !propertyForm.location || !propertyForm.price || !propertyForm.area) {
+      toast.error('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    try {
+      let imageUrl = null;
+      
+      // Subir imagen si hay una
+      if (propertyForm.image) {
+        imageUrl = await handleImageUpload(propertyForm.image);
+        if (!imageUrl) return; // Error al subir imagen
+      }
+
+      const propertyData = {
+        user_id: user.id,
+        title: propertyForm.title,
+        type: propertyForm.type,
+        price: parseFloat(propertyForm.price),
+        currency: propertyForm.currency,
+        operation: propertyForm.operation,
+        location: propertyForm.location,
+        bedrooms: parseInt(propertyForm.bedrooms),
+        bathrooms: parseInt(propertyForm.bathrooms),
+        area: parseFloat(propertyForm.area),
+        description: propertyForm.description,
+        features: propertyForm.features,
+        image: imageUrl
+      };
+
+      if (editingProperty) {
+        // Actualizar propiedad existente
+        const { error } = await supabase
+          .from('properties')
+          .update(propertyData)
+          .eq('id', editingProperty.id);
+        
+        if (error) throw error;
+        toast.success('Propiedad actualizada correctamente');
+      } else {
+        // Crear nueva propiedad
+        const { error } = await supabase
+          .from('properties')
+          .insert([propertyData]);
+        
+        if (error) throw error;
+        toast.success('Propiedad publicada correctamente');
+      }
+
+      // Reset form
+      setPropertyForm({
+        title: "",
+        type: "apartment",
+        price: "",
+        currency: "EUR",
+        operation: "rent",
+        location: "",
+        bedrooms: "1",
+        bathrooms: "1",
+        area: "",
+        description: "",
+        features: [],
+        image: null
+      });
+      setShowPropertyForm(false);
+      setEditingProperty(null);
+      loadUserProperties();
+    } catch (error) {
+      console.error('Error saving property:', error);
+      toast.error('Error al guardar la propiedad');
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId);
+      
+      if (error) throw error;
+      
+      toast.success('Propiedad eliminada correctamente');
+      loadUserProperties();
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast.error('Error al eliminar la propiedad');
+    }
+  };
+
+  const handleEditProperty = (property: Property) => {
+    setEditingProperty(property);
+    setPropertyForm({
+      title: property.title,
+      type: property.type,
+      price: property.price.toString(),
+      currency: property.currency,
+      operation: property.operation,
+      location: property.location,
+      bedrooms: property.bedrooms.toString(),
+      bathrooms: property.bathrooms.toString(),
+      area: property.area.toString(),
+      description: property.description || "",
+      features: property.features || [],
+      image: null
+    });
+    setShowPropertyForm(true);
+  };
+
   const handleGoogleAuth = async () => {
     if (loading) return;
     
@@ -166,59 +464,504 @@ const Account = () => {
     );
   }
 
-  // Si el usuario está autenticado, mostrar perfil
+  // Si el usuario está autenticado, mostrar perfil y propiedades
   if (user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
         <Header />
         
         <main className="container mx-auto px-6 py-20">
-          <div className="max-w-md mx-auto">
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl font-bold text-stone-800">
-                  Mi Perfil
-                </CardTitle>
-                <CardDescription className="text-stone-600">
-                  Bienvenido de vuelta
-                </CardDescription>
-              </CardHeader>
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-stone-800 mb-2">Mi Cuenta</h1>
+              <p className="text-stone-600">Gestiona tu perfil y propiedades</p>
+            </div>
 
-              <CardContent className="space-y-6">
-                <div className="text-center space-y-4">
-                  <div className="w-20 h-20 bg-stone-200 rounded-full mx-auto flex items-center justify-center">
-                    <User className="w-8 h-8 text-stone-500" />
-                  </div>
-                  
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
+                <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="profile" className="space-y-6">
+                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle>Información Personal</CardTitle>
+                    <CardDescription>Gestiona tu información de perfil</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center space-x-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 bg-stone-200 rounded-full overflow-hidden">
+                          {userProfile?.avatar_url ? (
+                            <img 
+                              src={userProfile.avatar_url} 
+                              alt="Avatar" 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <User className="w-8 h-8 text-stone-500" />
+                            </div>
+                          )}
+                        </div>
+                        <label className="absolute -bottom-2 -right-2 bg-stone-700 text-white p-2 rounded-full cursor-pointer hover:bg-stone-600 transition-colors">
+                          <Camera className="w-4 h-4" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleAvatarUpload(file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-stone-800">
+                          {userProfile?.full_name || 'Usuario'}
+                        </h3>
+                        <p className="text-stone-600">{user.email}</p>
+                        <p className="text-sm text-stone-500">
+                          {userProfile?.user_type === 'empresa' ? 'Empresa' : 'Particular'}
+                          {userProfile?.company_name && ` - ${userProfile.company_name}`}
+                        </p>
+                        {userProfile?.phone && (
+                          <p className="text-sm text-stone-500">
+                            📞 {userProfile.phone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <strong>Miembro desde:</strong> {new Date(user.created_at).toLocaleDateString()}
+                      </div>
+                      <div>
+                        <strong>Email confirmado:</strong> {user.email_confirmed_at ? 'Sí' : 'No'}
+                      </div>
+                      <div>
+                        <strong>Propiedades publicadas:</strong> {userProperties.length}
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={handleSignOut}
+                      variant="outline"
+                      className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Cerrar Sesión
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="properties" className="space-y-6">
+                <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-semibold text-stone-800">
-                      {user.user_metadata?.full_name || 'Usuario'}
-                    </h3>
-                    <p className="text-stone-600">{user.email}</p>
+                    <h2 className="text-2xl font-bold text-stone-800">Mis Propiedades</h2>
+                    <p className="text-stone-600">Gestiona tus propiedades publicadas</p>
                   </div>
+                  <Button
+                    onClick={() => {
+                      setShowPropertyForm(true);
+                      setEditingProperty(null);
+                      setPropertyForm({
+                        title: "",
+                        type: "apartment",
+                        price: "",
+                        currency: "EUR",
+                        operation: "rent",
+                        location: "",
+                        bedrooms: "1",
+                        bathrooms: "1",
+                        area: "",
+                        description: "",
+                        features: [],
+                        image: null
+                      });
+                    }}
+                    className="bg-stone-700 hover:bg-stone-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Publicar Propiedad
+                  </Button>
                 </div>
 
-                <Separator />
+                {showPropertyForm && (
+                  <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle>
+                        {editingProperty ? 'Editar Propiedad' : 'Nueva Propiedad'}
+                      </CardTitle>
+                      <CardDescription>
+                        Completa todos los campos para publicar tu propiedad
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handlePropertySubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Título de la propiedad *
+                            </label>
+                            <Input
+                              name="title"
+                              value={propertyForm.title}
+                              onChange={handlePropertyFormChange}
+                              placeholder="Ej: Apartamento moderno en el centro"
+                              required
+                            />
+                          </div>
 
-                <div className="space-y-3">
-                  <p className="text-sm text-stone-600">
-                    <strong>Miembro desde:</strong> {new Date(user.created_at).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-stone-600">
-                    <strong>Email confirmado:</strong> {user.email_confirmed_at ? 'Sí' : 'No'}
-                  </p>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Ubicación *
+                            </label>
+                            <Input
+                              name="location"
+                              value={propertyForm.location}
+                              onChange={handlePropertyFormChange}
+                              placeholder="Ej: Madrid Centro"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Tipo de propiedad
+                            </label>
+                            <Select value={propertyForm.type} onValueChange={(value) => handlePropertySelectChange('type', value)}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="apartment">Apartamento</SelectItem>
+                                <SelectItem value="house">Casa</SelectItem>
+                                <SelectItem value="loft">Loft</SelectItem>
+                                <SelectItem value="studio">Estudio</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Operación
+                            </label>
+                            <Select value={propertyForm.operation} onValueChange={(value) => handlePropertySelectChange('operation', value)}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="rent">Alquiler</SelectItem>
+                                <SelectItem value="sale">Venta</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Precio *
+                            </label>
+                            <div className="flex">
+                              <Input
+                                name="price"
+                                type="number"
+                                value={propertyForm.price}
+                                onChange={handlePropertyFormChange}
+                                placeholder="1200"
+                                className="rounded-r-none"
+                                required
+                              />
+                              <Select value={propertyForm.currency} onValueChange={(value) => handlePropertySelectChange('currency', value)}>
+                                <SelectTrigger className="w-20 rounded-l-none">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="EUR">€</SelectItem>
+                                  <SelectItem value="USD">$</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Área (m²) *
+                            </label>
+                            <Input
+                              name="area"
+                              type="number"
+                              value={propertyForm.area}
+                              onChange={handlePropertyFormChange}
+                              placeholder="85"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Habitaciones
+                            </label>
+                            <Select value={propertyForm.bedrooms} onValueChange={(value) => handlePropertySelectChange('bedrooms', value)}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[1,2,3,4,5,6].map(num => (
+                                  <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-stone-700">
+                              Baños
+                            </label>
+                            <Select value={propertyForm.bathrooms} onValueChange={(value) => handlePropertySelectChange('bathrooms', value)}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[1,2,3,4,5,6].map(num => (
+                                  <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-stone-700">
+                            Descripción
+                          </label>
+                          <Textarea
+                            name="description"
+                            value={propertyForm.description}
+                            onChange={handlePropertyFormChange}
+                            placeholder="Describe las características principales de tu propiedad..."
+                            rows={4}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-stone-700">
+                            Características
+                          </label>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {propertyForm.features.map((feature, index) => (
+                              <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                                {feature}
+                                <button
+                                  type="button"
+                                  onClick={() => handleFeatureRemove(feature)}
+                                  className="ml-1 text-red-500 hover:text-red-700"
+                                >
+                                  ×
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Ej: Aire acondicionado"
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const target = e.target as HTMLInputElement;
+                                  handleFeatureAdd(target.value);
+                                  target.value = '';
+                                }
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={(e) => {
+                                const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                                handleFeatureAdd(input.value);
+                                input.value = '';
+                              }}
+                            >
+                              Añadir
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-stone-700">
+                            Imagen principal
+                          </label>
+                          <div className="border-2 border-dashed border-stone-300 rounded-lg p-6 text-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  setPropertyForm(prev => ({ ...prev, image: file }));
+                                }
+                              }}
+                              className="hidden"
+                              id="property-image"
+                            />
+                            <label htmlFor="property-image" className="cursor-pointer">
+                              <Upload className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+                              <p className="text-stone-600">
+                                {propertyForm.image ? propertyForm.image.name : 'Selecciona una imagen'}
+                              </p>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setShowPropertyForm(false);
+                              setEditingProperty(null);
+                            }}
+                            className="flex-1"
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            type="submit"
+                            disabled={isUploading}
+                            className="flex-1 bg-stone-700 hover:bg-stone-600"
+                          >
+                            {isUploading ? 'Subiendo...' : editingProperty ? 'Actualizar' : 'Publicar'}
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Lista de propiedades */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {userProperties.map((property) => (
+                    <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                      <div className="aspect-video bg-stone-200 relative">
+                        {property.image ? (
+                          <img 
+                            src={property.image} 
+                            alt={property.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Home className="w-12 h-12 text-stone-400" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 flex gap-1">
+                          <Badge className="bg-stone-700 text-white">
+                            {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+                          </Badge>
+                          <Badge variant="secondary">
+                            {property.type === 'apartment' ? 'Apartamento' :
+                             property.type === 'house' ? 'Casa' :
+                             property.type === 'loft' ? 'Loft' : 'Estudio'}
+                          </Badge>
+                        </div>
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/80 hover:bg-white"
+                            onClick={() => handleEditProperty(property)}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/80 hover:bg-white text-red-600 hover:text-red-700"
+                            onClick={() => handleDeleteProperty(property.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold text-lg text-stone-800 mb-2 line-clamp-2">
+                          {property.title}
+                        </h3>
+                        
+                        <p className="text-stone-600 text-sm mb-2">{property.location}</p>
+                        
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-2xl font-bold text-stone-700">
+                            {property.price.toLocaleString()} {property.currency}
+                            {property.operation === 'rent' && <span className="text-sm font-normal">/mes</span>}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-stone-600">
+                          <div className="flex items-center gap-1">
+                            <Bed className="w-4 h-4" />
+                            {property.bedrooms}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Bath className="w-4 h-4" />
+                            {property.bathrooms}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Square className="w-4 h-4" />
+                            {property.area} m²
+                          </div>
+                        </div>
+
+                        <div className="mt-3 text-xs text-stone-500">
+                          Ref: {property.reference}
+                        </div>
+
+                        <div className="mt-3">
+                          <a
+                            href={`https://wa.me/${userProfile?.phone?.replace(/\s+/g, '').replace(/^\+/, '')}?text=Hola, estoy interesado en la propiedad "${property.title}" (Ref: ${property.reference})`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-600 hover:text-green-700 text-sm font-medium"
+                          >
+                            💬 Chat WhatsApp
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
 
-                <Button
-                  onClick={handleSignOut}
-                  variant="outline"
-                  className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Cerrar Sesión
-                </Button>
-              </CardContent>
-            </Card>
+                {userProperties.length === 0 && !showPropertyForm && (
+                  <Card className="text-center py-12">
+                    <CardContent>
+                      <Home className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-stone-700 mb-2">
+                        No tienes propiedades publicadas
+                      </h3>
+                      <p className="text-stone-500 mb-6">
+                        Comienza publicando tu primera propiedad
+                      </p>
+                      <Button
+                        onClick={() => setShowPropertyForm(true)}
+                        className="bg-stone-700 hover:bg-stone-600"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Publicar Primera Propiedad
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
 
@@ -462,10 +1205,10 @@ const Account = () => {
                 )}
 
                 {isLogin && (
-                  <div className="text-right">
+                  <div className="text-center">
                     <Link 
-                      to="/forgot-password" 
-                      className="text-sm text-stone-600 hover:text-stone-800 underline"
+                      to="/reset-password" 
+                      className="text-sm text-stone-600 hover:text-stone-700 underline"
                     >
                       {t('account.forgotPassword') || '¿Olvidaste tu contraseña?'}
                     </Link>
@@ -474,38 +1217,36 @@ const Account = () => {
 
                 <Button
                   type="submit"
+                  className="w-full h-12 bg-stone-700 hover:bg-stone-600 text-white font-semibold"
                   disabled={loading}
-                  className="w-full h-12 bg-stone-600 hover:bg-stone-700 text-white font-medium disabled:opacity-50"
                 >
-                  {loading ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      {isLogin ? 'Iniciando...' : 'Creando...'}
-                    </div>
-                  ) : (
-                    isLogin 
-                      ? t('account.loginButton') || 'Iniciar Sesión'
-                      : t('account.registerButton') || 'Crear Cuenta'
-                  )}
+                  {loading 
+                    ? (isLogin ? 'Iniciando sesión...' : 'Creando cuenta...')
+                    : (isLogin 
+                      ? t('account.login') || 'Iniciar Sesión'
+                      : t('account.createAccount') || 'Crear Cuenta'
+                    )
+                  }
                 </Button>
               </form>
 
-              <div className="text-center pt-4">
-                <p className="text-sm text-stone-600">
+              <div className="text-center">
+                <span className="text-sm text-stone-600">
                   {isLogin 
                     ? t('account.noAccount') || '¿No tienes cuenta?'
                     : t('account.hasAccount') || '¿Ya tienes cuenta?'
-                  }{' '}
-                  <button
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="text-stone-700 hover:text-stone-900 font-medium underline"
-                  >
-                    {isLogin 
-                      ? t('account.createAccount') || 'Crear cuenta'
-                      : t('account.loginHere') || 'Inicia sesión aquí'
-                    }
-                  </button>
-                </p>
+                  }
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="ml-1 text-sm font-semibold text-stone-700 hover:text-stone-900 underline"
+                >
+                  {isLogin 
+                    ? t('account.register') || 'Regístrate'
+                    : t('account.login') || 'Inicia sesión'
+                  }
+                </button>
               </div>
             </CardContent>
           </Card>

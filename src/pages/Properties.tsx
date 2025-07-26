@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, Grid3X3, List, MapPin, Bed, Bath, Square, Heart, Eye, Heater, Waves, Car, Zap, Home, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,34 @@ import { Link } from "react-router-dom";
 import { allProperties } from "@/data/properties";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface DBProperty {
+  id: string;
+  reference: string;
+  title: string;
+  type: "apartment" | "house" | "loft" | "studio";
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image?: string;
+  features?: string[];
+  description?: string;
+  user_id: string;
+  created_at: string;
+}
+
+interface Profile {
+  id: string;
+  full_name?: string;
+  phone?: string;
+  user_type?: string;
+  company_name?: string;
+}
 
 const Properties = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -28,6 +56,9 @@ const Properties = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [minBedrooms, setMinBedrooms] = useState("all");
   const [minBathrooms, setMinBathrooms] = useState("all");
+  const [dbProperties, setDbProperties] = useState<DBProperty[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [loading, setLoading] = useState(true);
   
   // Filtros de características
   const [hasHeating, setHasHeating] = useState(false);
@@ -38,7 +69,62 @@ const Properties = () => {
   const [hasTerrace, setHasTerrace] = useState(false);
   const [hasGarden, setHasGarden] = useState(false);
 
-  const filteredProperties = allProperties.filter((property) => {
+  // Load database properties and profiles
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const { data: propertiesData, error: propertiesError } = await supabase
+          .from('properties')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (propertiesError) throw propertiesError;
+        setDbProperties(propertiesData || []);
+
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, phone, user_type, company_name');
+        
+        if (profilesError) throw profilesError;
+        const profilesMap = (profilesData || []).reduce((acc, profile) => {
+          acc[profile.id] = profile;
+          return acc;
+        }, {} as Record<string, Profile>);
+        setProfiles(profilesMap);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Convert DB properties to match static property format
+  const convertedDbProperties = dbProperties.map(prop => ({
+    id: parseInt(prop.id.slice(-8), 16), // Convert UUID to number for compatibility
+    reference: prop.reference,
+    title: prop.title,
+    type: prop.type,
+    price: prop.price,
+    currency: prop.currency,
+    operation: prop.operation,
+    location: prop.location,
+    bedrooms: prop.bedrooms,
+    bathrooms: prop.bathrooms,
+    area: prop.area,
+    image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    features: prop.features || [],
+    description: prop.description,
+    managedBy: (profiles[prop.user_id]?.user_type === 'empresa' ? 'other' : 'nazari') as "other" | "nazari",
+    userProfile: profiles[prop.user_id]
+  }));
+
+  // Combine static and database properties
+  const allCombinedProperties = [...allProperties, ...convertedDbProperties];
+
+  const filteredProperties = allCombinedProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          property.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = propertyType === "all" || property.type === propertyType;
