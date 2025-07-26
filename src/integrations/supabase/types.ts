@@ -47,12 +47,75 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          area: number
+          bathrooms: number
+          bedrooms: number
+          created_at: string
+          currency: string
+          description: string | null
+          features: string[] | null
+          id: string
+          image: string | null
+          location: string
+          operation: string
+          price: number
+          reference: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area: number
+          bathrooms: number
+          bedrooms: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          image?: string | null
+          location: string
+          operation: string
+          price: number
+          reference: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area?: number
+          bathrooms?: number
+          bedrooms?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          image?: string | null
+          location?: string
+          operation?: string
+          price?: number
+          reference?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_property_reference: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
