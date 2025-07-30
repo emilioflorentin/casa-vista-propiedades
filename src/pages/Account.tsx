@@ -17,6 +17,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getUserHash, clearUserHash } from "@/utils/userHash";
+import { 
+  saveLocalProperty, 
+  updateLocalProperty, 
+  deleteLocalProperty, 
+  getUserProperties, 
+  generatePropertyReference,
+  LocalProperty 
+} from "@/utils/localProperties";
 
 interface Property {
   id: string;
@@ -52,9 +61,10 @@ const Account = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userProperties, setUserProperties] = useState<Property[]>([]);
+  const [userProperties, setUserProperties] = useState<LocalProperty[]>([]);
+  const [userHash, setUserHash] = useState<string | null>(null);
   const [showPropertyForm, setShowPropertyForm] = useState(false);
-  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [editingProperty, setEditingProperty] = useState<LocalProperty | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -88,9 +98,16 @@ const Account = () => {
   useEffect(() => {
     if (user) {
       loadUserProfile();
-      loadUserProperties();
+      loadUserHash();
     }
   }, [user]);
+
+  // Cargar propiedades cuando tengamos el hash
+  useEffect(() => {
+    if (userHash) {
+      loadUserProperties();
+    }
+  }, [userHash]);
 
   const loadUserProfile = async () => {
     if (!user) return;
@@ -109,18 +126,23 @@ const Account = () => {
     }
   };
 
-  const loadUserProperties = async () => {
+  const loadUserHash = async () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setUserProperties(data || []);
+      const hash = await getUserHash();
+      setUserHash(hash);
+    } catch (error) {
+      console.error('Error loading user hash:', error);
+    }
+  };
+
+  const loadUserProperties = () => {
+    if (!userHash) return;
+    
+    try {
+      const properties = getUserProperties(userHash);
+      setUserProperties(properties);
     } catch (error) {
       console.error('Error loading properties:', error);
     }
@@ -325,7 +347,7 @@ const Account = () => {
   const handlePropertySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) return;
+    if (!user || !userHash) return;
 
     // Validaciones
     if (!propertyForm.title || !propertyForm.location || !propertyForm.price || !propertyForm.area) {
@@ -336,14 +358,15 @@ const Account = () => {
     try {
       let imageUrl = null;
       
-      // Subir imagen si hay una
+      // Subir imagen si hay una (mantenemos Supabase Storage para imágenes)
       if (propertyForm.image) {
         imageUrl = await handleImageUpload(propertyForm.image);
         if (!imageUrl) return; // Error al subir imagen
       }
 
       const propertyData = {
-        user_id: user.id,
+        userHash,
+        reference: editingProperty ? editingProperty.reference : generatePropertyReference(),
         title: propertyForm.title,
         type: propertyForm.type,
         price: parseFloat(propertyForm.price),
@@ -360,20 +383,12 @@ const Account = () => {
 
       if (editingProperty) {
         // Actualizar propiedad existente
-        const { error } = await supabase
-          .from('properties')
-          .update(propertyData)
-          .eq('id', editingProperty.id);
-        
-        if (error) throw error;
+        const success = updateLocalProperty(editingProperty.id, propertyData);
+        if (!success) throw new Error('No se pudo actualizar la propiedad');
         toast.success('Propiedad actualizada correctamente');
       } else {
         // Crear nueva propiedad
-        const { error } = await supabase
-          .from('properties')
-          .insert([propertyData]);
-        
-        if (error) throw error;
+        saveLocalProperty(propertyData);
         toast.success('Propiedad publicada correctamente');
       }
 
@@ -401,16 +416,12 @@ const Account = () => {
     }
   };
 
-  const handleDeleteProperty = async (propertyId: string) => {
+  const handleDeleteProperty = (propertyId: string) => {
     if (!confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) return;
     
     try {
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', propertyId);
-      
-      if (error) throw error;
+      const success = deleteLocalProperty(propertyId);
+      if (!success) throw new Error('No se pudo eliminar la propiedad');
       
       toast.success('Propiedad eliminada correctamente');
       loadUserProperties();
@@ -420,7 +431,7 @@ const Account = () => {
     }
   };
 
-  const handleEditProperty = (property: Property) => {
+  const handleEditProperty = (property: LocalProperty) => {
     setEditingProperty(property);
     setPropertyForm({
       title: property.title,
@@ -449,6 +460,7 @@ const Account = () => {
   };
 
   const handleSignOut = async () => {
+    await clearUserHash(); // Limpiar hash del usuario
     await signOut();
   };
 

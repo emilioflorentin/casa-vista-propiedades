@@ -16,6 +16,7 @@ import { allProperties } from "@/data/properties";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getLocalProperties, LocalProperty } from "@/utils/localProperties";
 
 interface DBProperty {
   id: string;
@@ -57,6 +58,7 @@ const Properties = () => {
   const [minBedrooms, setMinBedrooms] = useState("all");
   const [minBathrooms, setMinBathrooms] = useState("all");
   const [dbProperties, setDbProperties] = useState<DBProperty[]>([]);
+  const [localProperties, setLocalProperties] = useState<LocalProperty[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [loading, setLoading] = useState(true);
   
@@ -69,7 +71,7 @@ const Properties = () => {
   const [hasTerrace, setHasTerrace] = useState(false);
   const [hasGarden, setHasGarden] = useState(false);
 
-  // Load database properties and profiles
+  // Load database properties, local properties and profiles
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -80,6 +82,10 @@ const Properties = () => {
         
         if (propertiesError) throw propertiesError;
         setDbProperties(propertiesData || []);
+
+        // Load local properties
+        const localProps = getLocalProperties();
+        setLocalProperties(localProps);
 
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
@@ -121,8 +127,28 @@ const Properties = () => {
     userProfile: profiles[prop.user_id]
   }));
 
-  // Combine static and database properties
-  const allCombinedProperties = [...allProperties, ...convertedDbProperties];
+  // Convert local properties to match static property format
+  const convertedLocalProperties = localProperties.map(prop => ({
+    id: parseInt(prop.id), // Convert string ID to number for compatibility
+    reference: prop.reference,
+    title: prop.title,
+    type: prop.type,
+    price: prop.price,
+    currency: prop.currency,
+    operation: prop.operation,
+    location: prop.location,
+    bedrooms: prop.bedrooms,
+    bathrooms: prop.bathrooms,
+    area: prop.area,
+    image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    features: prop.features || [],
+    description: prop.description,
+    managedBy: 'other' as const, // Local properties are managed by users
+    userHash: prop.userHash
+  }));
+
+  // Combine static, database and local properties
+  const allCombinedProperties = [...allProperties, ...convertedDbProperties, ...convertedLocalProperties];
 
   const filteredProperties = allCombinedProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

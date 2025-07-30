@@ -18,12 +18,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getLocalProperties } from "@/utils/localProperties";
+import { useState, useEffect } from "react";
 
 const Favorites = () => {
   const { favorites, clearAllFavorites } = useFavorites();
   const { t } = useLanguage();
-  
-  const favoriteProperties = allProperties.filter(property => 
+  const [localProperties, setLocalProperties] = useState<any[]>([]);
+
+  useEffect(() => {
+    const props = getLocalProperties();
+    setLocalProperties(props.map(p => ({
+      ...p,
+      id: parseInt(p.id)
+    })));
+  }, []);
+
+  // Combine all properties (static + local) and filter favorites
+  const allCombinedProperties = [...allProperties, ...localProperties];
+  const favoriteProperties = allCombinedProperties.filter(property => 
     favorites.includes(property.id)
   );
 
