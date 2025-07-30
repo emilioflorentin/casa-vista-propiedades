@@ -12,7 +12,7 @@ export interface LocalProperty {
   bedrooms: number;
   bathrooms: number;
   area: number;
-  image?: string;
+  images?: string[];
   features?: string[];
   description?: string;
   created_at: string;

@@ -140,7 +140,7 @@ const Properties = () => {
     bedrooms: prop.bedrooms,
     bathrooms: prop.bathrooms,
     area: prop.area,
-    image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    image: prop.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
     features: prop.features || [],
     description: prop.description,
     managedBy: 'other' as const, // Local properties are managed by users

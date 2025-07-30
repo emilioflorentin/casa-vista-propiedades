@@ -87,8 +87,43 @@ const Account = () => {
     area: "",
     description: "",
     features: [] as string[],
-    image: null as File | null
+    images: [] as File[]
   });
+  
+  // Características predefinidas
+  const predefinedFeatures = [
+    "Aire acondicionado",
+    "Calefacción",
+    "Parking",
+    "Terraza",
+    "Balcón", 
+    "Jardín",
+    "Piscina",
+    "Ascensor",
+    "Amueblado",
+    "Cocina equipada",
+    "Lavadero",
+    "Trastero",
+    "Chimenea",
+    "Suelo de parquet",
+    "Suelo de mármol",
+    "Ventanas de aluminio",
+    "Puerta blindada",
+    "Videoportero",
+    "Conserje",
+    "Zona verde",
+    "Cerca del metro",
+    "Cerca de colegios",
+    "Zona comercial",
+    "Vista al mar",
+    "Vista a la montaña",
+    "Luminoso",
+    "Exterior",
+    "Reformado",
+    "A estrenar"
+  ];
+  
+  const [customFeature, setCustomFeature] = useState("");
 
   const { t } = useLanguage();
   const { user, loading, signUp, signIn, signOut, signInWithGoogle } = useAuth();
@@ -356,12 +391,14 @@ const Account = () => {
     }
 
     try {
-      let imageUrl = null;
+      let imageUrls: string[] = [];
       
-      // Subir imagen si hay una (mantenemos Supabase Storage para imágenes)
-      if (propertyForm.image) {
-        imageUrl = await handleImageUpload(propertyForm.image);
-        if (!imageUrl) return; // Error al subir imagen
+      // Subir múltiples imágenes si hay alguna
+      if (propertyForm.images.length > 0) {
+        for (const image of propertyForm.images) {
+          const imageUrl = await handleImageUpload(image);
+          if (imageUrl) imageUrls.push(imageUrl);
+        }
       }
 
       const propertyData = {
@@ -378,7 +415,7 @@ const Account = () => {
         area: parseFloat(propertyForm.area),
         description: propertyForm.description,
         features: propertyForm.features,
-        image: imageUrl
+        images: imageUrls
       };
 
       if (editingProperty) {
@@ -405,7 +442,7 @@ const Account = () => {
         area: "",
         description: "",
         features: [],
-        image: null
+        images: []
       });
       setShowPropertyForm(false);
       setEditingProperty(null);
@@ -445,7 +482,7 @@ const Account = () => {
       area: property.area.toString(),
       description: property.description || "",
       features: property.features || [],
-      image: null
+      images: []
     });
     setShowPropertyForm(true);
   };
@@ -596,7 +633,7 @@ const Account = () => {
                         area: "",
                         description: "",
                         features: [],
-                        image: null
+        images: []
                       });
                     }}
                     className="bg-stone-700 hover:bg-stone-600"
@@ -607,17 +644,23 @@ const Account = () => {
                 </div>
 
                 {showPropertyForm && (
-                  <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                    <CardHeader>
-                      <CardTitle>
-                        {editingProperty ? 'Editar Propiedad' : 'Nueva Propiedad'}
-                      </CardTitle>
-                      <CardDescription>
-                        Completa todos los campos para publicar tu propiedad
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <form onSubmit={handlePropertySubmit} className="space-y-6">
+                  <PropertyForm
+                    propertyForm={propertyForm}
+                    editingProperty={editingProperty}
+                    isUploading={isUploading}
+                    onSubmit={handlePropertySubmit}
+                    onCancel={() => {
+                      setShowPropertyForm(false);
+                      setEditingProperty(null);
+                    }}
+                    onFormChange={(field, value) => {
+                      setPropertyForm(prev => ({
+                        ...prev,
+                        [field]: value
+                      }));
+                    }}
+                  />
+                )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-stone-700">
@@ -818,7 +861,7 @@ const Account = () => {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  setPropertyForm(prev => ({ ...prev, image: file }));
+                                  setPropertyForm(prev => ({ ...prev, images: file ? [file] : [] }));
                                 }
                               }}
                               className="hidden"
@@ -827,7 +870,7 @@ const Account = () => {
                             <label htmlFor="property-image" className="cursor-pointer">
                               <Upload className="w-8 h-8 text-stone-400 mx-auto mb-2" />
                               <p className="text-stone-600">
-                                {propertyForm.image ? propertyForm.image.name : 'Selecciona una imagen'}
+                                {propertyForm.images.length > 0 ? `${propertyForm.images.length} imagen(es)` : 'Selecciona imágenes'}
                               </p>
                             </label>
                           </div>
@@ -852,24 +895,19 @@ const Account = () => {
                           >
                             {isUploading ? 'Subiendo...' : editingProperty ? 'Actualizar' : 'Publicar'}
                           </Button>
-                        </div>
-                      </form>
-                    </CardContent>
-                  </Card>
-                )}
 
                 {/* Lista de propiedades */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {userProperties.map((property) => (
                     <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                       <div className="aspect-video bg-stone-200 relative">
-                        {property.image ? (
-                          <img 
-                            src={property.image} 
-                            alt={property.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
+        {property.images && property.images.length > 0 ? (
+          <img 
+            src={property.images[0]} 
+            alt={property.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Home className="w-12 h-12 text-stone-400" />
                           </div>
