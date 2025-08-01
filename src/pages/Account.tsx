@@ -66,15 +66,14 @@ const Account = () => {
           setUserProperties(getUserProperties(hash));
         }
         
-        // Load user avatar from profiles table
-        const { data: profile } = await supabase
+        // Load user avatar from profiles table - change to array query instead of single
+        const { data: profiles } = await supabase
           .from('profiles')
           .select('avatar_url')
-          .eq('id', user.id)
-          .single();
+          .eq('id', user.id);
         
-        if (profile?.avatar_url) {
-          setAvatarUrl(profile.avatar_url);
+        if (profiles && profiles.length > 0 && profiles[0]?.avatar_url) {
+          setAvatarUrl(profiles[0].avatar_url);
         }
       }
     };
@@ -184,14 +183,13 @@ const Account = () => {
     setUploadingAvatar(true);
     
     try {
-      // Upload file to Supabase storage
+      // Upload file to Supabase storage with user ID as folder
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}.${fileExt}`;
-      const filePath = fileName;
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('profile-avatars')
-        .upload(filePath, file, {
+        .upload(fileName, file, {
           upsert: true
         });
 
@@ -203,16 +201,22 @@ const Account = () => {
       // Get the public URL
       const { data } = supabase.storage
         .from('profile-avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       const publicUrl = data.publicUrl;
 
-      // Update user profile in database
+      // Update user profile in database - use upsert to handle both insert and update
       const { error: updateError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          avatar_url: publicUrl
+          avatar_url: publicUrl,
+          full_name: user.user_metadata?.full_name || '',
+          user_type: user.user_metadata?.user_type || 'particular',
+          company_name: user.user_metadata?.company_name || '',
+          phone: user.user_metadata?.phone || ''
+        }, {
+          onConflict: 'id'
         });
 
       if (updateError) {
