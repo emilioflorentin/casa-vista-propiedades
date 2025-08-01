@@ -39,7 +39,15 @@ const Account = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Profile form state
+  const [profileData, setProfileData] = useState({
+    full_name: '',
+    phone: '',
+    description: ''
+  });
 
   const [propertyForm, setPropertyForm] = useState({
     title: '',
@@ -66,14 +74,29 @@ const Account = () => {
           setUserProperties(getUserProperties(hash));
         }
         
-        // Load user avatar from profiles table - change to array query instead of single
+        // Load user profile data
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('avatar_url')
+          .select('avatar_url, full_name, phone, description')
           .eq('id', user.id);
         
-        if (profiles && profiles.length > 0 && profiles[0]?.avatar_url) {
-          setAvatarUrl(profiles[0].avatar_url);
+        if (profiles && profiles.length > 0) {
+          const profile = profiles[0];
+          if (profile.avatar_url) {
+            setAvatarUrl(profile.avatar_url);
+          }
+          setProfileData({
+            full_name: profile.full_name || user.user_metadata?.full_name || '',
+            phone: profile.phone || user.user_metadata?.phone || '',
+            description: profile.description || ''
+          });
+        } else {
+          // Set initial data from user metadata if no profile exists
+          setProfileData({
+            full_name: user.user_metadata?.full_name || '',
+            phone: user.user_metadata?.phone || '',
+            description: ''
+          });
         }
       }
     };
@@ -174,6 +197,46 @@ const Account = () => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    setSavingProfile(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          full_name: profileData.full_name,
+          phone: profileData.phone,
+          description: profileData.description,
+          avatar_url: avatarUrl,
+          user_type: user.user_metadata?.user_type || 'particular',
+          company_name: user.user_metadata?.company_name || ''
+        }, {
+          onConflict: 'id'
+        });
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        return;
+      }
+
+      console.log('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleProfileDataChange = (field: string, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -336,7 +399,8 @@ const Account = () => {
                       <Label htmlFor="name">Nombre completo</Label>
                       <Input 
                         id="name"
-                        defaultValue=""
+                        value={profileData.full_name}
+                        onChange={(e) => handleProfileDataChange('full_name', e.target.value)}
                         placeholder="Tu nombre completo"
                       />
                     </div>
@@ -357,6 +421,8 @@ const Account = () => {
                       <Input 
                         id="phone"
                         type="tel"
+                        value={profileData.phone}
+                        onChange={(e) => handleProfileDataChange('phone', e.target.value)}
                         placeholder="+34 600 000 000"
                       />
                     </div>
@@ -374,14 +440,20 @@ const Account = () => {
                     <Label htmlFor="bio">Biografía</Label>
                     <Textarea 
                       id="bio"
+                      value={profileData.description}
+                      onChange={(e) => handleProfileDataChange('description', e.target.value)}
                       placeholder="Cuéntanos sobre ti..."
                       rows={3}
                     />
                   </div>
 
                   <div className="flex gap-4">
-                    <Button className="bg-stone-700 hover:bg-stone-600">
-                      Guardar cambios
+                    <Button 
+                      onClick={handleSaveProfile}
+                      disabled={savingProfile}
+                      className="bg-stone-700 hover:bg-stone-600"
+                    >
+                      {savingProfile ? 'Guardando...' : 'Guardar cambios'}
                     </Button>
                     <Button variant="outline">
                       Cancelar
