@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ import {
 import { getUserHash } from '../utils/userHash';
 import { getUserProperties, deleteLocalProperty, saveLocalProperty, updateLocalProperty } from '../utils/localProperties';
 import type { LocalProperty } from '../utils/localProperties';
+import { supabase } from '@/integrations/supabase/client';
 import { generatePropertyReference } from '../utils/localProperties';
 
 const Account = () => {
@@ -36,6 +37,9 @@ const Account = () => {
   const [userProperties, setUserProperties] = useState<LocalProperty[]>([]);
   const [userHash, setUserHash] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [propertyForm, setPropertyForm] = useState({
     title: '',
@@ -60,6 +64,17 @@ const Account = () => {
         if (hash) {
           setUserHash(hash);
           setUserProperties(getUserProperties(hash));
+        }
+        
+        // Load user avatar from profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.avatar_url) {
+          setAvatarUrl(profile.avatar_url);
         }
       }
     };
@@ -162,6 +177,61 @@ const Account = () => {
     }
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingAvatar(true);
+    
+    try {
+      // Upload file to Supabase storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}.${fileExt}`;
+      const filePath = fileName;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-avatars')
+        .upload(filePath, file, {
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Error uploading avatar:', uploadError);
+        return;
+      }
+
+      // Get the public URL
+      const { data } = supabase.storage
+        .from('profile-avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      // Update user profile in database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          avatar_url: publicUrl
+        });
+
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+        return;
+      }
+
+      setAvatarUrl(publicUrl);
+    } catch (error) {
+      console.error('Error handling avatar upload:', error);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -232,15 +302,29 @@ const Account = () => {
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <Avatar className="w-20 h-20">
-                      <AvatarImage src="" />
+                      <AvatarImage src={avatarUrl} />
                       <AvatarFallback className="bg-stone-700 text-white text-xl">
-                        {user.email?.[0]?.toUpperCase()}
+                        {user?.email?.[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <Button variant="outline" size="sm">
-                      <Camera className="w-4 h-4 mr-2" />
-                      Cambiar foto
-                    </Button>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={triggerFileInput}
+                        disabled={uploadingAvatar}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        {uploadingAvatar ? 'Subiendo...' : 'Cambiar foto'}
+                      </Button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarUpload}
+                        className="hidden"
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -258,7 +342,7 @@ const Account = () => {
                       <Input 
                         id="email"
                         type="email"
-                        value={user.email}
+                        value={user?.email || ''}
                         disabled
                         className="bg-stone-50"
                       />
