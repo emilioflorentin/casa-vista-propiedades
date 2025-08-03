@@ -147,9 +147,6 @@ const Account = () => {
     setIsUploading(true);
     
     try {
-      // Convert images to URLs (in real app, upload to storage)
-      const imageUrls = propertyForm.images.map(file => URL.createObjectURL(file));
-      
       const propertyData = {
         userHash,
         reference: editingProperty?.reference || generatePropertyReference(),
@@ -163,14 +160,13 @@ const Account = () => {
         bathrooms: parseInt(propertyForm.bathrooms),
         area: parseInt(propertyForm.area),
         description: propertyForm.description,
-        features: propertyForm.features,
-        images: imageUrls
+        features: propertyForm.features
       };
       
       if (editingProperty) {
-        updateLocalProperty(editingProperty.id, propertyData);
+        await updateLocalProperty(editingProperty.id, propertyData, propertyForm.images);
       } else {
-        saveLocalProperty(propertyData);
+        await saveLocalProperty(propertyData, propertyForm.images);
       }
       
       setUserProperties(getUserProperties(userHash));

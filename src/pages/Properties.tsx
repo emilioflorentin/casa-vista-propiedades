@@ -141,10 +141,12 @@ const Properties = () => {
     bathrooms: prop.bathrooms,
     area: prop.area,
     image: prop.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    images: prop.images, // Include all images for detail view
     features: prop.features || [],
     description: prop.description,
     managedBy: 'other' as const, // Local properties are managed by users
-    userHash: prop.userHash
+    userHash: prop.userHash,
+    isLocal: true // Flag to identify local properties
   }));
 
   // Combine static, database and local properties

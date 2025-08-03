@@ -18,6 +18,22 @@ export interface LocalProperty {
   created_at: string;
 }
 
+// Function to convert files to base64 for localStorage storage
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+// Function to convert multiple files to base64
+export const filesToBase64 = async (files: File[]): Promise<string[]> => {
+  const promises = files.map(file => fileToBase64(file));
+  return Promise.all(promises);
+};
+
 const PROPERTIES_KEY = 'local_properties';
 
 // Get all local properties
@@ -31,12 +47,21 @@ export const getLocalProperties = (): LocalProperty[] => {
   }
 };
 
-// Save a new property
-export const saveLocalProperty = (property: Omit<LocalProperty, 'id' | 'created_at'>): LocalProperty => {
+// Save a new property with images as base64
+export const saveLocalProperty = async (
+  property: Omit<LocalProperty, 'id' | 'created_at'>, 
+  imageFiles?: File[]
+): Promise<LocalProperty> => {
   const properties = getLocalProperties();
+  
+  let images: string[] = [];
+  if (imageFiles && imageFiles.length > 0) {
+    images = await filesToBase64(imageFiles);
+  }
   
   const newProperty: LocalProperty = {
     ...property,
+    images: images.length > 0 ? images : property.images,
     id: Date.now().toString(),
     created_at: new Date().toISOString()
   };
@@ -47,14 +72,24 @@ export const saveLocalProperty = (property: Omit<LocalProperty, 'id' | 'created_
   return newProperty;
 };
 
-// Update an existing property
-export const updateLocalProperty = (id: string, updates: Partial<LocalProperty>): boolean => {
+// Update an existing property with optional image files
+export const updateLocalProperty = async (
+  id: string, 
+  updates: Partial<LocalProperty>, 
+  imageFiles?: File[]
+): Promise<boolean> => {
   const properties = getLocalProperties();
   const index = properties.findIndex(p => p.id === id);
   
   if (index === -1) return false;
   
-  properties[index] = { ...properties[index], ...updates };
+  let finalUpdates = { ...updates };
+  if (imageFiles && imageFiles.length > 0) {
+    const images = await filesToBase64(imageFiles);
+    finalUpdates.images = images;
+  }
+  
+  properties[index] = { ...properties[index], ...finalUpdates };
   localStorage.setItem(PROPERTIES_KEY, JSON.stringify(properties));
   
   return true;

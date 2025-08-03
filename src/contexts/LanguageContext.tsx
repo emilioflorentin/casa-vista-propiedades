@@ -340,7 +340,17 @@ const translations: Translations = {
       noAccount: '¿No tienes cuenta?',
       hasAccount: '¿Ya tienes cuenta?',
       createAccount: 'Crear cuenta',
-      loginHere: 'Inicia sesión aquí'
+      loginHere: 'Inicia sesión aquí',
+      loginRequired: 'Debes iniciar sesión para acceder a esta funcionalidad',
+      logout: 'Cerrar sesión',
+      myAccount: 'Mi cuenta',
+      myProperties: 'Mis propiedades',
+      favorites: 'Favoritos',
+      profile: 'Perfil',
+      uploadAvatar: 'Subir avatar',
+      changeAvatar: 'Cambiar avatar',
+      saveChanges: 'Guardar cambios',
+      cancel: 'Cancelar'
     },
     // Property detail page translations
     property: {
