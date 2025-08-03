@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -305,27 +306,33 @@ const Account = () => {
             <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl font-bold text-stone-800">
-                  {t('account.accessAccount') || 'Accede a tu cuenta'}
+                  {t('account.accessAccount')}
                 </CardTitle>
                 <p className="text-stone-600 mt-2">
-                  {t('account.loginRequired') || 'Inicia sesión para acceder a tu cuenta'}
+                  {t('account.loginRequired')}
                 </p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-                    {t('account.login') || 'Iniciar Sesión'}
-                  </button>
+                  <Link 
+                    to="/auth"
+                    className="w-full bg-stone-700 hover:bg-stone-600 text-white py-3 px-4 rounded-lg font-medium transition-colors block text-center"
+                  >
+                    {t('account.login')}
+                  </Link>
                   
                   <div className="text-center">
                     <span className="text-stone-600 text-sm">
-                      {t('account.noAccount') || '¿No tienes cuenta?'}
+                      {t('account.noAccount')}
                     </span>
                   </div>
                   
-                  <button className="w-full border border-stone-300 hover:bg-stone-50 text-stone-700 py-3 px-4 rounded-lg font-medium transition-colors">
-                    {t('account.register') || 'Registrarse'}
-                  </button>
+                  <Link 
+                    to="/auth"
+                    className="w-full border border-stone-300 hover:bg-stone-50 text-stone-700 py-3 px-4 rounded-lg font-medium transition-colors block text-center"
+                  >
+                    {t('account.register')}
+                  </Link>
                 </div>
               </CardContent>
             </Card>

@@ -350,7 +350,10 @@ const translations: Translations = {
       uploadAvatar: 'Subir avatar',
       changeAvatar: 'Cambiar avatar',
       saveChanges: 'Guardar cambios',
-      cancel: 'Cancelar'
+      cancel: 'Cancelar',
+      accessAccount: 'Accede a tu cuenta',
+      accountAccess: 'Acceso a cuenta',
+      authenticationRequired: 'Autenticación requerida'
     },
     // Property detail page translations
     property: {

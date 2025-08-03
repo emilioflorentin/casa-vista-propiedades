@@ -71,42 +71,64 @@ const MapComponent: React.FC<MapComponentProps> = ({ location, title }) => {
           mapInstanceRef.current = null;
         }
 
-        // Clear the container
+        // Clear the container completely
         if (mapRef.current) {
           mapRef.current.innerHTML = '';
+          // Remove any Leaflet classes
+          mapRef.current.className = mapRef.current.className.replace(/leaflet-\S+/g, '').trim();
         }
+
+        // Small delay to ensure cleanup
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         // Get coordinates for the location
         const coordinates = await geocodeLocation(location);
 
-        // Initialize the map
-        mapInstanceRef.current = L.map(mapRef.current).setView(coordinates, 15);
+        // Initialize the map with a fresh container
+        try {
+          mapInstanceRef.current = L.map(mapRef.current, {
+            center: coordinates,
+            zoom: 15,
+            zoomControl: true,
+            preferCanvas: true
+          });
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(mapInstanceRef.current);
+          // Add OpenStreetMap tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+          }).addTo(mapInstanceRef.current);
 
-        // Add a marker
-        L.marker(coordinates)
-          .addTo(mapInstanceRef.current)
-          .bindPopup(`<strong>${title}</strong><br/>${location}`)
-          .openPopup();
+          // Add a marker
+          L.marker(coordinates)
+            .addTo(mapInstanceRef.current)
+            .bindPopup(`<strong>${title}</strong><br/>${location}`)
+            .openPopup();
 
-        setIsLoading(false);
+          setIsLoading(false);
+        } catch (mapError) {
+          console.error('Leaflet map creation error:', mapError);
+          throw new Error('Error creating map instance');
+        }
       } catch (error) {
         console.error('Map initialization error:', error);
-        setError('Error loading map location');
+        setError('Error al cargar el mapa. Inténtalo de nuevo más tarde.');
         setIsLoading(false);
       }
     };
 
-    initializeMap();
+    // Debounce map initialization
+    const timeoutId = setTimeout(initializeMap, 200);
 
     // Cleanup function
     return () => {
+      clearTimeout(timeoutId);
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch (e) {
+          console.warn('Error during map cleanup:', e);
+        }
         mapInstanceRef.current = null;
       }
     };
