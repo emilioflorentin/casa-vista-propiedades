@@ -28,10 +28,12 @@ import { getUserProperties, deleteLocalProperty, saveLocalProperty, updateLocalP
 import type { LocalProperty } from '../utils/localProperties';
 import { supabase } from '@/integrations/supabase/client';
 import { generatePropertyReference } from '../utils/localProperties';
+import { useToast } from '@/hooks/use-toast';
 
 const Account = () => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [showPropertyForm, setShowPropertyForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<LocalProperty | null>(null);
@@ -165,9 +167,20 @@ const Account = () => {
       };
       
       if (editingProperty) {
-        await updateLocalProperty(editingProperty.id, propertyData, propertyForm.images);
+        const success = await updateLocalProperty(editingProperty.id, propertyData, propertyForm.images);
+        if (!success) {
+          throw new Error('No se pudo actualizar la propiedad');
+        }
+        toast({
+          title: "Éxito",
+          description: "Propiedad actualizada correctamente",
+        });
       } else {
         await saveLocalProperty(propertyData, propertyForm.images);
+        toast({
+          title: "Éxito",
+          description: "Propiedad publicada correctamente",
+        });
       }
       
       setUserProperties(getUserProperties(userHash));
@@ -191,6 +204,11 @@ const Account = () => {
       });
     } catch (error) {
       console.error('Error saving property:', error);
+      toast({
+        title: "Error",
+        description: "Error al guardar la propiedad: " + error.message,
+        variant: "destructive"
+      });
     } finally {
       setIsUploading(false);
     }
