@@ -13,6 +13,7 @@ import { allProperties } from "@/data/properties";
 import MapComponent from "@/components/MapComponent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getLocalProperties } from "@/utils/localProperties";
+import { supabase } from "@/integrations/supabase/client";
 
 // Updated agent data with agency assignment and WhatsApp numbers
 const agentData = [
@@ -72,6 +73,7 @@ const PropertyDetail = () => {
   const { t } = useLanguage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [property, setProperty] = useState<any>(null);
+  const [propertyAgent, setPropertyAgent] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -88,36 +90,63 @@ const PropertyDetail = () => {
   });
 
   useEffect(() => {
-    // First try to find in static properties
-    let foundProperty = allProperties.find(p => p.id === Number(id));
-    
-    // If not found, try to find in local properties
-    if (!foundProperty) {
-      const localProperties = getLocalProperties();
-      const localProperty = localProperties.find(p => p.id === id);
+    const loadPropertyAndAgent = async () => {
+      // First try to find in static properties
+      let foundProperty = allProperties.find(p => p.id === Number(id));
       
-      if (localProperty) {
-        // Convert local property to match the expected format
-        foundProperty = {
-          id: Number(localProperty.id),
-          title: localProperty.title,
-          price: localProperty.price,
-          currency: localProperty.currency,
-          operation: localProperty.operation,
-          location: localProperty.location,
-          bedrooms: localProperty.bedrooms,
-          bathrooms: localProperty.bathrooms,
-          area: localProperty.area,
-          type: localProperty.type,
-          image: localProperty.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-          features: localProperty.features || [],
-          reference: localProperty.reference,
-          managedBy: 'other' // Mark as locally managed
-        };
+      // If not found, try to find in local properties
+      if (!foundProperty) {
+        const localProperties = getLocalProperties();
+        const localProperty = localProperties.find(p => p.id === id);
+        
+        if (localProperty) {
+          // Convert local property to match the expected format
+          foundProperty = {
+            id: Number(localProperty.id),
+            title: localProperty.title,
+            price: localProperty.price,
+            currency: localProperty.currency,
+            operation: localProperty.operation,
+            location: localProperty.location,
+            bedrooms: localProperty.bedrooms,
+            bathrooms: localProperty.bathrooms,
+            area: localProperty.area,
+            type: localProperty.type,
+            image: localProperty.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+            features: localProperty.features || [],
+            reference: localProperty.reference,
+            managedBy: 'other' // Mark as locally managed
+          };
+
+          // Fetch the owner's profile from Supabase using userHash
+          try {
+            const { data: profiles, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', localProperty.userHash)
+              .single();
+
+            if (!error && profiles) {
+              // Set the property owner as the agent
+              setPropertyAgent({
+                name: profiles.full_name || 'Propietario',
+                phone: profiles.phone || 'No disponible',
+                email: 'No disponible', // We don't store email in profiles for privacy
+                image: profiles.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                agency: 'Propietario particular',
+                whatsapp: profiles.phone || '+34600000000'
+              });
+            }
+          } catch (error) {
+            console.error('Error fetching property owner profile:', error);
+          }
+        }
       }
-    }
-    
-    setProperty(foundProperty);
+      
+      setProperty(foundProperty);
+    };
+
+    loadPropertyAndAgent();
   }, [id]);
 
   if (!property) {
@@ -157,6 +186,12 @@ const PropertyDetail = () => {
 
   // Get agent data based on property management and cycle through available agents
   const getAgentForProperty = (property: any) => {
+    // If we have a custom property agent (property owner), use it
+    if (propertyAgent) {
+      return propertyAgent;
+    }
+    
+    // Otherwise use the static agents
     if (property.managedBy === 'nazari') {
       // Filter agents from Nazarí Homes
       const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
@@ -170,7 +205,7 @@ const PropertyDetail = () => {
 
   const agent = getAgentForProperty(property);
 
-  // Use the agent's WhatsApp number (which corresponds to their agency)
+  // Use the agent's WhatsApp number (which corresponds to their agency or owner)
   const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp;
 
   const getDescription = (property: any) => {
