@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, Send, Upload, FileText, CreditCard, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import { allProperties } from "@/data/properties";
 import MapComponent from "@/components/MapComponent";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getLocalProperties } from "@/utils/localProperties";
 
 // Updated agent data with agency assignment and WhatsApp numbers
 const agentData = [
@@ -70,6 +71,7 @@ const PropertyDetail = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [property, setProperty] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -85,7 +87,38 @@ const PropertyDetail = () => {
     signedContract: null as File | null
   });
 
-  const property = allProperties.find(p => p.id === Number(id));
+  useEffect(() => {
+    // First try to find in static properties
+    let foundProperty = allProperties.find(p => p.id === Number(id));
+    
+    // If not found, try to find in local properties
+    if (!foundProperty) {
+      const localProperties = getLocalProperties();
+      const localProperty = localProperties.find(p => p.id === id);
+      
+      if (localProperty) {
+        // Convert local property to match the expected format
+        foundProperty = {
+          id: Number(localProperty.id),
+          title: localProperty.title,
+          price: localProperty.price,
+          currency: localProperty.currency,
+          operation: localProperty.operation,
+          location: localProperty.location,
+          bedrooms: localProperty.bedrooms,
+          bathrooms: localProperty.bathrooms,
+          area: localProperty.area,
+          type: localProperty.type,
+          image: localProperty.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+          features: localProperty.features || [],
+          reference: localProperty.reference,
+          managedBy: 'other' // Mark as locally managed
+        };
+      }
+    }
+    
+    setProperty(foundProperty);
+  }, [id]);
 
   if (!property) {
     return (
@@ -101,12 +134,26 @@ const PropertyDetail = () => {
   }
 
   // Generate multiple images for the property
-  const images = [
-    property.image,
-    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
-  ];
+  const getPropertyImages = () => {
+    // For local properties, use uploaded images
+    if (property.managedBy === 'other') {
+      const localProperties = getLocalProperties();
+      const localProperty = localProperties.find(p => p.id === id);
+      if (localProperty && localProperty.images && localProperty.images.length > 0) {
+        return localProperty.images;
+      }
+    }
+    
+    // For static properties, use default images
+    return [
+      property.image,
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+    ];
+  };
+
+  const images = getPropertyImages();
 
   // Get agent data based on property management and cycle through available agents
   const getAgentForProperty = (property: any) => {
