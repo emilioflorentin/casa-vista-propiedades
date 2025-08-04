@@ -18,8 +18,38 @@ export interface LocalProperty {
   created_at: string;
 }
 
-// Function to convert files to base64 for localStorage storage
+// Function to compress and resize images
+const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions maintaining aspect ratio
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedDataUrl);
+    };
+    
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+// Function to convert files to compressed base64 for localStorage storage
 export const fileToBase64 = (file: File): Promise<string> => {
+  // Check if it's an image file
+  if (file.type.startsWith('image/')) {
+    return compressImage(file);
+  }
+  
+  // For non-image files, use regular base64 conversion
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
