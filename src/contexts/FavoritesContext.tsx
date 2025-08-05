@@ -1,6 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getUserId } from '@/utils/userIdentification';
+import Cookies from 'js-cookie';
 
 interface FavoritesContextType {
   favorites: number[];
@@ -15,24 +17,43 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const { toast } = useToast();
 
-  // Load favorites from localStorage on mount
+  // Load favorites from cookies on mount
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('property-favorites');
+    // Check if cookies are accepted
+    const cookieConsent = Cookies.get('cookie_consent');
+    if (cookieConsent !== 'accepted') {
+      return; // Don't load favorites if cookies not accepted
+    }
+
+    const userId = getUserId();
+    const savedFavorites = Cookies.get(`favorites_${userId}`);
+    
     if (savedFavorites) {
       try {
         const parsed = JSON.parse(savedFavorites);
         if (Array.isArray(parsed)) {
           setFavorites(parsed);
-          console.log('Loaded favorites from localStorage:', parsed);
+          console.log('Loaded favorites from cookies for user:', userId, parsed);
         }
       } catch (error) {
-        console.error('Error parsing favorites from localStorage:', error);
-        localStorage.removeItem('property-favorites');
+        console.error('Error parsing favorites from cookies:', error);
+        Cookies.remove(`favorites_${userId}`);
       }
     }
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
+    // Check if cookies are accepted
+    const cookieConsent = Cookies.get('cookie_consent');
+    if (cookieConsent !== 'accepted') {
+      toast({
+        title: "Cookies requeridas",
+        description: "Para usar favoritos necesitas aceptar las cookies. Revisa el banner en la parte inferior.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     console.log('Toggling favorite for property:', propertyId);
     
     setFavorites(currentFavorites => {
@@ -45,9 +66,13 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       
       console.log('New favorites after toggle:', newFavorites);
       
-      // Save to localStorage immediately
-      localStorage.setItem('property-favorites', JSON.stringify(newFavorites));
-      console.log('Saved to localStorage:', newFavorites);
+      // Save to cookies with user ID
+      const userId = getUserId();
+      Cookies.set(`favorites_${userId}`, JSON.stringify(newFavorites), { 
+        expires: 365, 
+        sameSite: 'strict' 
+      });
+      console.log('Saved to cookies for user:', userId, newFavorites);
       
       // Show toast notification
       toast({
@@ -64,7 +89,10 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const clearAllFavorites = () => {
     console.log('Clearing all favorites');
     setFavorites([]);
-    localStorage.setItem('property-favorites', JSON.stringify([]));
+    
+    // Clear from cookies
+    const userId = getUserId();
+    Cookies.remove(`favorites_${userId}`);
     
     toast({
       title: "Favoritos eliminados",

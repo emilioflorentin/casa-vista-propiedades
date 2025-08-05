@@ -81,6 +81,25 @@ const PrivacyPolicy = () => {
               {t('privacy.what_data_p3')}
             </p>
 
+            <h2 className="text-2xl font-bold text-stone-800 mb-4">Uso de Cookies</h2>
+            <p className="text-gray-700 mb-4">
+              Utilizamos cookies para mejorar su experiencia en nuestro sitio web y proporcionar funcionalidades personalizadas:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 mb-6 text-gray-700">
+              <li><strong>Cookies esenciales:</strong> Necesarias para el funcionamiento básico del sitio web</li>
+              <li><strong>Cookies de preferencias:</strong> Para recordar sus configuraciones, idioma y propiedades favoritas</li>
+              <li><strong>Cookies analíticas:</strong> Para entender cómo usa nuestro sitio (solo si las acepta)</li>
+            </ul>
+            <p className="text-gray-700 mb-4">
+              Para la funcionalidad de favoritos, utilizamos un identificador único que se almacena en una cookie. 
+              Este identificador no contiene información personal y se utiliza únicamente para asociar 
+              sus propiedades favoritas con su navegador.
+            </p>
+            <p className="text-gray-700 mb-8">
+              Puede gestionar sus preferencias de cookies a través del banner que aparece en su primera visita 
+              al sitio. Si rechaza las cookies, algunas funcionalidades como recordar sus favoritos no estarán disponibles.
+            </p>
+
             <h2 className="text-2xl font-bold text-stone-800 mb-4">{t('privacy.why_use_data')}</h2>
             <p className="text-gray-700 mb-4">
               {t('privacy.why_use_data_p1')}
