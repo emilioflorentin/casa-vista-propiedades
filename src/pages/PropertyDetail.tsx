@@ -118,24 +118,28 @@ const PropertyDetail = () => {
             managedBy: 'other' // Mark as locally managed
           };
 
-          // Fetch the owner's profile from Supabase using userHash
+          // Fetch the current user's profile from Supabase since they're the owner
           try {
-            const { data: profiles, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', localProperty.userHash)
-              .single();
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (user) {
+              const { data: profiles, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
 
-            if (!error && profiles) {
-              // Set the property owner as the agent
-              setPropertyAgent({
-                name: profiles.full_name || 'Propietario',
-                phone: profiles.phone || 'No disponible',
-                email: 'No disponible', // We don't store email in profiles for privacy
-                image: profiles.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                agency: 'Propietario particular',
-                whatsapp: profiles.phone || '+34600000000'
-              });
+              if (!error && profiles) {
+                // Set the current user as the agent for their property
+                setPropertyAgent({
+                  name: profiles.full_name || 'Propietario',
+                  phone: profiles.phone || 'No disponible',
+                  email: user.email || 'No disponible',
+                  image: profiles.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                  agency: profiles.company_name || 'Propietario particular',
+                  whatsapp: profiles.phone || '+34600000000'
+                });
+              }
             }
           } catch (error) {
             console.error('Error fetching property owner profile:', error);

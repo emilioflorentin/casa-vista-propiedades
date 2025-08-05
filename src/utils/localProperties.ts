@@ -86,7 +86,13 @@ export const saveLocalProperty = async (
   
   let images: string[] = [];
   if (imageFiles && imageFiles.length > 0) {
-    images = await filesToBase64(imageFiles);
+    try {
+      images = await filesToBase64(imageFiles);
+    } catch (error) {
+      console.error('Error processing images:', error);
+      // Continue without images if there's an error
+      images = [];
+    }
   }
   
   const newProperty: LocalProperty = {
@@ -96,8 +102,15 @@ export const saveLocalProperty = async (
     created_at: new Date().toISOString()
   };
   
-  properties.push(newProperty);
-  localStorage.setItem(PROPERTIES_KEY, JSON.stringify(properties));
+  try {
+    properties.push(newProperty);
+    localStorage.setItem(PROPERTIES_KEY, JSON.stringify(properties));
+  } catch (error) {
+    if (error instanceof Error && error.name === 'QuotaExceededError') {
+      throw new Error('No hay suficiente espacio en el navegador para guardar las imágenes. Intenta con imágenes más pequeñas o menos imágenes.');
+    }
+    throw error;
+  }
   
   return newProperty;
 };
