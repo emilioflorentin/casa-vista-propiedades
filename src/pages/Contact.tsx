@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const Contact = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPrivacyError, setShowPrivacyError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
   const [formData, setFormData] = useState({
     propertyAddress: '',
     name: '',
@@ -38,6 +40,14 @@ const Contact = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleCaptchaVerify = (token: string) => {
+    setIsCaptchaVerified(true);
+  };
+
+  const handleCaptchaExpire = () => {
+    setIsCaptchaVerified(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +108,7 @@ const Contact = () => {
         });
         setPrivacyAccepted(false);
         hcaptchaRef.current?.resetCaptcha();
+        setIsCaptchaVerified(false);
       } else {
         throw new Error('Error al enviar el formulario');
       }
@@ -114,6 +125,15 @@ const Contact = () => {
   };
 
   const handleWhatsAppClick = () => {
+    if (!isCaptchaVerified) {
+      toast({
+        title: "Verificación requerida",
+        description: "Por favor, completa el hCaptcha para acceder a WhatsApp.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Abre WhatsApp con un mensaje predefinido
     const phoneNumber = '34650499177'; // Formato internacional sin +
     const message = encodeURIComponent(t('contact.whatsapp_message'));
@@ -121,7 +141,29 @@ const Contact = () => {
   };
 
   const handlePhoneCall = (phoneNumber: string) => {
+    if (!isCaptchaVerified) {
+      toast({
+        title: "Verificación requerida",
+        description: "Por favor, completa el hCaptcha para acceder al teléfono.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     window.open(`tel:${phoneNumber}`, '_self');
+  };
+
+  const handleEmailClick = () => {
+    if (!isCaptchaVerified) {
+      toast({
+        title: "Verificación requerida",
+        description: "Por favor, completa el hCaptcha para acceder al email.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    window.open('mailto:nazarihomesgranada@gmail.com', '_self');
   };
 
   return (
@@ -151,19 +193,27 @@ const Contact = () => {
             {/* Información de contacto */}
             <Card>
               <CardContent className="p-6 space-y-4">
-                <div className="flex items-center space-x-3 text-stone-600">
+                {!isCaptchaVerified && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-700 text-sm text-center">
+                      Completa el hCaptcha en el formulario para ver los datos de contacto
+                    </p>
+                  </div>
+                )}
+                
+                <div className={`flex items-center space-x-3 text-stone-600 ${!isCaptchaVerified ? 'filter blur-sm pointer-events-none' : ''}`}>
                   <Mail className="h-5 w-5" />
-                  <a 
-                    href="mailto:nazarihomesgranada@gmail.com"
+                  <button
+                    onClick={handleEmailClick}
                     className="font-medium hover:text-stone-800 transition-colors"
                   >
                     nazarihomesgranada@gmail.com
-                  </a>
+                  </button>
                 </div>
                 
                 <button
                   onClick={() => handlePhoneCall('958467433')}
-                  className="flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors"
+                  className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? 'filter blur-sm pointer-events-none' : ''}`}
                 >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">958 467 433</span>
@@ -171,7 +221,7 @@ const Contact = () => {
                 
                 <button
                   onClick={() => handlePhoneCall('650499177')}
-                  className="flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors"
+                  className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? 'filter blur-sm pointer-events-none' : ''}`}
                 >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">650 499 177</span>
@@ -181,7 +231,7 @@ const Contact = () => {
                 <div className="border-t pt-4 mt-4">
                   <button
                     onClick={handleWhatsAppClick}
-                    className="flex items-center space-x-3 text-green-600 hover:text-green-700 transition-colors w-full p-3 bg-green-50 hover:bg-green-100 rounded-lg"
+                    className={`flex items-center space-x-3 text-green-600 hover:text-green-700 transition-colors w-full p-3 bg-green-50 hover:bg-green-100 rounded-lg ${!isCaptchaVerified ? 'filter blur-sm' : ''}`}
                   >
                     <svg
                       className="h-5 w-5"
@@ -329,6 +379,8 @@ const Contact = () => {
                         ref={hcaptchaRef}
                         sitekey={HCAPTCHA_SITE_KEY}
                         theme="light"
+                        onVerify={handleCaptchaVerify}
+                        onExpire={handleCaptchaExpire}
                       />
                     </div>
                   </div>
