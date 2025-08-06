@@ -19,6 +19,8 @@ const CookieBanner = () => {
   const acceptCookies = () => {
     Cookies.set('cookie_consent', 'accepted', { expires: 365, sameSite: 'strict' });
     setShowBanner(false);
+    // Dispatch event to notify other components
+    window.dispatchEvent(new CustomEvent('cookies-accepted'));
   };
 
   const rejectCookies = () => {

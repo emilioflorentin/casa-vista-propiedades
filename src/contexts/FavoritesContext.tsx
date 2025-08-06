@@ -47,15 +47,17 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     // Load favorites initially
     loadFavorites();
 
-    // Set up interval to check for cookie consent changes
-    const interval = setInterval(() => {
-      const cookieConsent = Cookies.get('cookie_consent');
-      if (cookieConsent === 'accepted' && favorites.length === 0) {
-        loadFavorites();
-      }
-    }, 1000);
+    // Listen for cookies accepted event
+    const handleCookiesAccepted = () => {
+      console.log('Cookies accepted event received, loading favorites...');
+      loadFavorites();
+    };
 
-    return () => clearInterval(interval);
+    window.addEventListener('cookies-accepted', handleCookiesAccepted);
+
+    return () => {
+      window.removeEventListener('cookies-accepted', handleCookiesAccepted);
+    };
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
