@@ -15,6 +15,7 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const { toast } = useToast();
 
   // Load favorites from cookies on mount and when cookie consent changes
@@ -22,7 +23,10 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     const loadFavorites = () => {
       // Check if cookies are accepted
       const cookieConsent = Cookies.get('cookie_consent');
-      if (cookieConsent !== 'accepted') {
+      const accepted = cookieConsent === 'accepted';
+      setCookiesAccepted(accepted);
+      
+      if (!accepted) {
         setFavorites([]); // Clear favorites if cookies not accepted
         return;
       }
@@ -50,7 +54,9 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     // Listen for cookies accepted event
     const handleCookiesAccepted = () => {
       console.log('Cookies accepted event received, loading favorites...');
-      loadFavorites();
+      setTimeout(() => {
+        loadFavorites();
+      }, 100); // Small delay to ensure cookie is set
     };
 
     window.addEventListener('cookies-accepted', handleCookiesAccepted);
@@ -61,9 +67,8 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
-    // Check if cookies are accepted
-    const cookieConsent = Cookies.get('cookie_consent');
-    if (cookieConsent !== 'accepted') {
+    // Check if cookies are accepted using state instead of reading cookie directly
+    if (!cookiesAccepted) {
       toast({
         title: "Cookies requeridas",
         description: "Para usar favoritos necesitas aceptar las cookies. Revisa el banner en la parte inferior.",
