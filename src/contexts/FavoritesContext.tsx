@@ -15,22 +15,12 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
-  const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const { toast } = useToast();
 
-  // Load favorites from cookies on mount and when cookie consent changes
+  // Load favorites from cookies on mount
   useEffect(() => {
-    const loadFavorites = () => {
-      // Check if cookies are accepted
-      const cookieConsent = Cookies.get('cookie_consent');
-      const accepted = cookieConsent === 'accepted';
-      setCookiesAccepted(accepted);
-      
-      if (!accepted) {
-        setFavorites([]); // Clear favorites if cookies not accepted
-        return;
-      }
-
+    const cookieConsent = Cookies.get('cookie_consent');
+    if (cookieConsent === 'accepted') {
       const userId = getUserId();
       const savedFavorites = Cookies.get(`favorites_${userId}`);
       
@@ -46,29 +36,37 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
           Cookies.remove(`favorites_${userId}`);
         }
       }
-    };
+    }
+  }, []);
 
-    // Load favorites initially
-    loadFavorites();
-
-    // Listen for cookies accepted event
+  // Listen for cookie acceptance
+  useEffect(() => {
     const handleCookiesAccepted = () => {
-      console.log('Cookies accepted event received, loading favorites...');
-      setTimeout(() => {
-        loadFavorites();
-      }, 100); // Small delay to ensure cookie is set
+      console.log('Cookies accepted, reloading favorites...');
+      // Reload favorites when cookies are accepted
+      const userId = getUserId();
+      const savedFavorites = Cookies.get(`favorites_${userId}`);
+      
+      if (savedFavorites) {
+        try {
+          const parsed = JSON.parse(savedFavorites);
+          if (Array.isArray(parsed)) {
+            setFavorites(parsed);
+            console.log('Reloaded favorites after cookie acceptance:', parsed);
+          }
+        } catch (error) {
+          console.error('Error parsing favorites from cookies:', error);
+        }
+      }
     };
 
     window.addEventListener('cookies-accepted', handleCookiesAccepted);
-
-    return () => {
-      window.removeEventListener('cookies-accepted', handleCookiesAccepted);
-    };
+    return () => window.removeEventListener('cookies-accepted', handleCookiesAccepted);
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
-    // Check if cookies are accepted using state instead of reading cookie directly
-    if (!cookiesAccepted) {
+    const cookieConsent = Cookies.get('cookie_consent');
+    if (cookieConsent !== 'accepted') {
       toast({
         title: "Cookies requeridas",
         description: "Para usar favoritos necesitas aceptar las cookies. Revisa el banner en la parte inferior.",
