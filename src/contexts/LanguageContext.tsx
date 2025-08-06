@@ -490,6 +490,13 @@ const translations: Translations = {
       policy_changes_p1: 'Inmobiliaria Granadal se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.',
       policy_changes_p2: 'Te notificaremos sobre cualquier cambio publicando la nueva Política de Privacidad en esta página.',
       policy_changes_p3: 'Te recomendamos revisar esta política periódicamente para estar informado sobre cómo protegemos tu información.'
+    },
+    cookies: {
+      title: 'Uso de Cookies',
+      description: 'Utilizamos cookies para mejorar tu experiencia, personalizar contenido y recordar tus preferencias como los favoritos. Al continuar navegando, aceptas nuestro uso de cookies.',
+      privacy_policy: 'Política de Privacidad',
+      accept: 'Aceptar',
+      reject: 'Rechazar'
     }
   },
   en: {
@@ -952,6 +959,13 @@ const translations: Translations = {
       policy_changes_p1: 'Inmobiliaria Granadal reserves the right to change the terms of this Privacy Policy at any time.',
       policy_changes_p2: 'We will notify you of any changes by posting the new Privacy Policy on this page.',
       policy_changes_p3: 'We recommend reviewing this policy periodically to stay informed about how we protect your information.'
+    },
+    cookies: {
+      title: 'Cookie Usage',
+      description: 'We use cookies to improve your experience, personalize content and remember your preferences like favorites. By continuing to browse, you accept our use of cookies.',
+      privacy_policy: 'Privacy Policy',
+      accept: 'Accept',
+      reject: 'Reject'
     }
   }
 };
