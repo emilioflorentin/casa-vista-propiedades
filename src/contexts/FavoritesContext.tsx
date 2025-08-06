@@ -17,29 +17,45 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const { toast } = useToast();
 
-  // Load favorites from cookies on mount
+  // Load favorites from cookies on mount and when cookie consent changes
   useEffect(() => {
-    // Check if cookies are accepted
-    const cookieConsent = Cookies.get('cookie_consent');
-    if (cookieConsent !== 'accepted') {
-      return; // Don't load favorites if cookies not accepted
-    }
-
-    const userId = getUserId();
-    const savedFavorites = Cookies.get(`favorites_${userId}`);
-    
-    if (savedFavorites) {
-      try {
-        const parsed = JSON.parse(savedFavorites);
-        if (Array.isArray(parsed)) {
-          setFavorites(parsed);
-          console.log('Loaded favorites from cookies for user:', userId, parsed);
-        }
-      } catch (error) {
-        console.error('Error parsing favorites from cookies:', error);
-        Cookies.remove(`favorites_${userId}`);
+    const loadFavorites = () => {
+      // Check if cookies are accepted
+      const cookieConsent = Cookies.get('cookie_consent');
+      if (cookieConsent !== 'accepted') {
+        setFavorites([]); // Clear favorites if cookies not accepted
+        return;
       }
-    }
+
+      const userId = getUserId();
+      const savedFavorites = Cookies.get(`favorites_${userId}`);
+      
+      if (savedFavorites) {
+        try {
+          const parsed = JSON.parse(savedFavorites);
+          if (Array.isArray(parsed)) {
+            setFavorites(parsed);
+            console.log('Loaded favorites from cookies for user:', userId, parsed);
+          }
+        } catch (error) {
+          console.error('Error parsing favorites from cookies:', error);
+          Cookies.remove(`favorites_${userId}`);
+        }
+      }
+    };
+
+    // Load favorites initially
+    loadFavorites();
+
+    // Set up interval to check for cookie consent changes
+    const interval = setInterval(() => {
+      const cookieConsent = Cookies.get('cookie_consent');
+      if (cookieConsent === 'accepted' && favorites.length === 0) {
+        loadFavorites();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
