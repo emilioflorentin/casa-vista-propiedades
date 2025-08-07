@@ -118,31 +118,72 @@ const PropertyDetail = () => {
             managedBy: 'other' // Mark as locally managed
           };
 
-          // Fetch the current user's profile from Supabase since they're the owner
-          try {
-            const { data: { user } } = await supabase.auth.getUser();
-            
-            if (user) {
+          // Try to find the owner of this property using the userHash
+          if (localProperty.userHash) {
+            try {
+              // Get all profiles to search for the one that matches this userHash
               const { data: profiles, error } = await supabase
                 .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
+                .select('*');
 
               if (!error && profiles) {
-                // Set the current user as the agent for their property
+                // Check which user's hash matches the property's userHash
+                let matchingProfile = null;
+                
+                for (const profile of profiles) {
+                  const storedHash = localStorage.getItem(`user_hash_${profile.id}`);
+                  if (storedHash === localProperty.userHash) {
+                    matchingProfile = profile;
+                    break;
+                  }
+                }
+
+                if (matchingProfile) {
+                  // Set the property owner as the agent
+                  setPropertyAgent({
+                    name: matchingProfile.full_name || 'Propietario',
+                    phone: matchingProfile.phone || 'No disponible',
+                    email: 'contacto@ejemplo.com', // Don't expose real email for privacy
+                    image: matchingProfile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                    agency: matchingProfile.company_name || 'Propietario particular',
+                    whatsapp: matchingProfile.phone || '+34600000000'
+                  });
+                } else {
+                  console.log('No matching profile found for userHash:', localProperty.userHash);
+                  // Set a default agent if no matching profile found
+                  setPropertyAgent({
+                    name: 'Propietario',
+                    phone: 'No disponible',
+                    email: 'contacto@ejemplo.com',
+                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                    agency: 'Propietario particular',
+                    whatsapp: '+34600000000'
+                  });
+                }
+              } else {
+                console.error('Error fetching profiles:', error);
+                // Set a default agent if there's an error
                 setPropertyAgent({
-                  name: profiles.full_name || 'Propietario',
-                  phone: profiles.phone || 'No disponible',
-                  email: user.email || 'No disponible',
-                  image: profiles.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                  agency: profiles.company_name || 'Propietario particular',
-                  whatsapp: profiles.phone || '+34600000000'
+                  name: 'Propietario',
+                  phone: 'No disponible',
+                  email: 'contacto@ejemplo.com',
+                  image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                  agency: 'Propietario particular',
+                  whatsapp: '+34600000000'
                 });
               }
+            } catch (error) {
+              console.error('Error fetching property owner profile:', error);
+              // Set a default agent if there's an error
+              setPropertyAgent({
+                name: 'Propietario',
+                phone: 'No disponible',
+                email: 'contacto@ejemplo.com',
+                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                agency: 'Propietario particular',
+                whatsapp: '+34600000000'
+              });
             }
-          } catch (error) {
-            console.error('Error fetching property owner profile:', error);
           }
         }
       }
