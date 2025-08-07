@@ -17,9 +17,13 @@ const CookieBanner = () => {
   }, []);
 
   const acceptCookies = () => {
+    console.log('BANNER: Setting cookie_consent to accepted');
     Cookies.set('cookie_consent', 'accepted', { expires: 365, sameSite: 'strict' });
+    console.log('BANNER: Cookie set, current value:', Cookies.get('cookie_consent'));
     setShowBanner(false);
+    
     // Dispatch event to notify other components
+    console.log('BANNER: Dispatching cookies-accepted event');
     window.dispatchEvent(new CustomEvent('cookies-accepted'));
   };
 

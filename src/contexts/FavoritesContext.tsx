@@ -42,10 +42,13 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   // Listen for cookie acceptance
   useEffect(() => {
     const handleCookiesAccepted = () => {
-      console.log('Cookies accepted, reloading favorites...');
+      console.log('FAVORITES: Cookies accepted event received');
+      console.log('FAVORITES: Current cookie_consent value:', Cookies.get('cookie_consent'));
       // Reload favorites when cookies are accepted
       const userId = getUserId();
+      console.log('FAVORITES: User ID:', userId);
       const savedFavorites = Cookies.get(`favorites_${userId}`);
+      console.log('FAVORITES: Saved favorites cookie:', savedFavorites);
       
       if (savedFavorites) {
         try {
