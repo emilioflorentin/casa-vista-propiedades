@@ -18,13 +18,25 @@ const CookieBanner = () => {
 
   const acceptCookies = () => {
     console.log('BANNER: Setting cookie_consent to accepted');
-    Cookies.set('cookie_consent', 'accepted', { expires: 365, sameSite: 'strict' });
-    console.log('BANNER: Cookie set, current value:', Cookies.get('cookie_consent'));
+    
+    // Set the cookie with proper configuration
+    Cookies.set('cookie_consent', 'accepted', { 
+      expires: 365, 
+      sameSite: 'strict',
+      secure: false // Allow for localhost
+    });
+    
+    // Verify it was set correctly
+    const verifyValue = Cookies.get('cookie_consent');
+    console.log('BANNER: Cookie verification - value is:', verifyValue);
+    
     setShowBanner(false);
     
-    // Dispatch event to notify other components
-    console.log('BANNER: Dispatching cookies-accepted event');
-    window.dispatchEvent(new CustomEvent('cookies-accepted'));
+    // Small delay to ensure cookie is fully set before dispatching event
+    setTimeout(() => {
+      console.log('BANNER: Dispatching cookies-accepted event');
+      window.dispatchEvent(new CustomEvent('cookies-accepted'));
+    }, 100);
   };
 
   const rejectCookies = () => {
