@@ -65,8 +65,12 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
+    // Force refresh cookie consent status
     const cookieConsent = Cookies.get('cookie_consent');
+    console.log('Current cookie consent when toggling favorite:', cookieConsent);
+    
     if (cookieConsent !== 'accepted') {
+      console.log('Cookies not accepted, showing toast');
       toast({
         title: "Cookies requeridas",
         description: "Para usar favoritos necesitas aceptar las cookies. Revisa el banner en la parte inferior.",
@@ -74,6 +78,8 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       });
       return;
     }
+    
+    console.log('Cookies accepted, proceeding with favorite toggle');
 
     console.log('Toggling favorite for property:', propertyId);
     
