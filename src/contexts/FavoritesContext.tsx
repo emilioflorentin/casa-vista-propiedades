@@ -15,50 +15,58 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const { toast } = useToast();
 
-  // Load favorites from cookies on mount
+  // Check cookie consent on mount
   useEffect(() => {
-    const cookieConsent = Cookies.get('cookie_consent');
-    if (cookieConsent === 'accepted') {
-      const userId = getUserId();
-      const savedFavorites = Cookies.get(`favorites_${userId}`);
+    const checkCookieConsent = () => {
+      const consent = Cookies.get('cookie_consent');
+      console.log('FAVORITES: Initial cookie consent check:', consent);
+      setCookiesAccepted(consent === 'accepted');
       
-      if (savedFavorites) {
-        try {
-          const parsed = JSON.parse(savedFavorites);
-          if (Array.isArray(parsed)) {
-            setFavorites(parsed);
-            console.log('Loaded favorites from cookies for user:', userId, parsed);
+      if (consent === 'accepted') {
+        const userId = getUserId();
+        const savedFavorites = Cookies.get(`favorites_${userId}`);
+        console.log('FAVORITES: Loading saved favorites:', savedFavorites);
+        
+        if (savedFavorites) {
+          try {
+            const parsed = JSON.parse(savedFavorites);
+            if (Array.isArray(parsed)) {
+              setFavorites(parsed);
+              console.log('FAVORITES: Loaded favorites:', parsed);
+            }
+          } catch (error) {
+            console.error('FAVORITES: Error parsing favorites:', error);
           }
-        } catch (error) {
-          console.error('Error parsing favorites from cookies:', error);
-          Cookies.remove(`favorites_${userId}`);
         }
       }
-    }
+    };
+
+    checkCookieConsent();
   }, []);
 
   // Listen for cookie acceptance
   useEffect(() => {
     const handleCookiesAccepted = () => {
       console.log('FAVORITES: Cookies accepted event received');
-      console.log('FAVORITES: Current cookie_consent value:', Cookies.get('cookie_consent'));
-      // Reload favorites when cookies are accepted
+      setCookiesAccepted(true);
+      
+      // Load saved favorites
       const userId = getUserId();
-      console.log('FAVORITES: User ID:', userId);
       const savedFavorites = Cookies.get(`favorites_${userId}`);
-      console.log('FAVORITES: Saved favorites cookie:', savedFavorites);
+      console.log('FAVORITES: Loading favorites after acceptance:', savedFavorites);
       
       if (savedFavorites) {
         try {
           const parsed = JSON.parse(savedFavorites);
           if (Array.isArray(parsed)) {
             setFavorites(parsed);
-            console.log('Reloaded favorites after cookie acceptance:', parsed);
+            console.log('FAVORITES: Loaded favorites after acceptance:', parsed);
           }
         } catch (error) {
-          console.error('Error parsing favorites from cookies:', error);
+          console.error('FAVORITES: Error parsing favorites after acceptance:', error);
         }
       }
     };
@@ -68,12 +76,11 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleFavorite = (propertyId: number) => {
-    // Force refresh cookie consent status
-    const cookieConsent = Cookies.get('cookie_consent');
-    console.log('Current cookie consent when toggling favorite:', cookieConsent);
+    console.log('FAVORITES: Toggle favorite called for property:', propertyId);
+    console.log('FAVORITES: Current cookies accepted state:', cookiesAccepted);
     
-    if (cookieConsent !== 'accepted') {
-      console.log('Cookies not accepted, showing toast');
+    if (!cookiesAccepted) {
+      console.log('FAVORITES: Cookies not accepted, showing toast');
       toast({
         title: "Cookies requeridas",
         description: "Para usar favoritos necesitas aceptar las cookies. Revisa el banner en la parte inferior.",
@@ -81,8 +88,8 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       });
       return;
     }
-    
-    console.log('Cookies accepted, proceeding with favorite toggle');
+
+    console.log('FAVORITES: Proceeding with favorite toggle');
 
     console.log('Toggling favorite for property:', propertyId);
     
