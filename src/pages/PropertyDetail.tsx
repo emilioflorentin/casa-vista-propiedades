@@ -139,15 +139,11 @@ const PropertyDetail = () => {
                 }
 
                 if (matchingProfile) {
-                  // Create a simple email based on the first name
-                  const firstName = matchingProfile.full_name?.split(' ')[0]?.toLowerCase() || 'propietario';
-                  const email = `${firstName}@inmobiliaria.com`;
-                  
-                  // Set the property owner as the agent
+                  // Set the property owner as the agent using their real email
                   setPropertyAgent({
                     name: matchingProfile.full_name || 'Propietario',
                     phone: matchingProfile.phone || 'No disponible',
-                    email: email,
+                    email: matchingProfile.email || 'contacto@propietario.com',
                     image: matchingProfile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                     agency: matchingProfile.company_name || 'Propietario particular',
                     whatsapp: matchingProfile.phone || '+34600000000'
