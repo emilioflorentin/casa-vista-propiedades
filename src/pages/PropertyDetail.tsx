@@ -143,7 +143,7 @@ const PropertyDetail = () => {
                   setPropertyAgent({
                     name: matchingProfile.full_name || 'Propietario',
                     phone: matchingProfile.phone || 'No disponible',
-                    email: 'contacto@ejemplo.com', // Don't expose real email for privacy
+                    email: `contacto.${matchingProfile.full_name?.toLowerCase().replace(/\s+/g, '.')}@propietario.com` || 'contacto@propietario.com',
                     image: matchingProfile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                     agency: matchingProfile.company_name || 'Propietario particular',
                     whatsapp: matchingProfile.phone || '+34600000000'
