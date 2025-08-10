@@ -75,28 +75,39 @@ const Properties = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const { data: propertiesData, error: propertiesError } = await supabase
-          .from('properties')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (propertiesError) throw propertiesError;
-        setDbProperties(propertiesData || []);
+        // Load everything in parallel for better performance
+        const [propertiesResponse, profilesResponse] = await Promise.all([
+          supabase
+            .from('properties')
+            .select('*')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('profiles')
+            .select('id, full_name, phone, user_type, company_name')
+        ]);
 
-        // Load local properties
+        // Handle properties
+        if (propertiesResponse.error) {
+          console.error('Error loading properties:', propertiesResponse.error);
+        } else {
+          setDbProperties(propertiesResponse.data || []);
+        }
+
+        // Handle profiles
+        if (profilesResponse.error) {
+          console.error('Error loading profiles:', profilesResponse.error);
+        } else {
+          const profilesMap = (profilesResponse.data || []).reduce((acc, profile) => {
+            acc[profile.id] = profile;
+            return acc;
+          }, {} as Record<string, Profile>);
+          setProfiles(profilesMap);
+        }
+
+        // Load local properties (always available)
         const localProps = getLocalProperties();
         setLocalProperties(localProps);
 
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, phone, user_type, company_name');
-        
-        if (profilesError) throw profilesError;
-        const profilesMap = (profilesData || []).reduce((acc, profile) => {
-          acc[profile.id] = profile;
-          return acc;
-        }, {} as Record<string, Profile>);
-        setProfiles(profilesMap);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
