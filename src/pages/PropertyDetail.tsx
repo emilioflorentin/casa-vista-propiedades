@@ -134,6 +134,24 @@ const PropertyDetail = () => {
                   const storedHash = localStorage.getItem(`user_hash_${profile.id}`);
                   if (storedHash === localProperty.userHash) {
                     matchingProfile = profile;
+                    
+                    // If email is missing, try to update it
+                    if (!matchingProfile.email) {
+                      try {
+                        await supabase.rpc('update_profile_email');
+                        // Refetch the profile to get the updated email
+                        const { data: updatedProfile } = await supabase
+                          .from('profiles')
+                          .select('*')
+                          .eq('id', matchingProfile.id)
+                          .single();
+                        if (updatedProfile) {
+                          matchingProfile = updatedProfile;
+                        }
+                      } catch (updateError) {
+                        console.error('Error updating profile email:', updateError);
+                      }
+                    }
                     break;
                   }
                 }
