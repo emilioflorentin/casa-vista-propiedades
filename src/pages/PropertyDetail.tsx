@@ -91,16 +91,83 @@ const PropertyDetail = () => {
 
   useEffect(() => {
     const loadPropertyAndAgent = async () => {
-      // First try to find in static properties
-      let foundProperty = allProperties.find(p => p.id === Number(id));
-      
-      // If not found, try to find in local properties
+      let foundProperty = null;
+      let agentInfo = null;
+
+      // First try to find in database properties
+      try {
+        const { data: dbProperty, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!error && dbProperty) {
+          foundProperty = {
+            id: parseInt(dbProperty.id.slice(-8), 16),
+            reference: dbProperty.reference,
+            title: dbProperty.title,
+            type: dbProperty.type,
+            price: dbProperty.price,
+            currency: dbProperty.currency,
+            operation: dbProperty.operation,
+            location: dbProperty.location,
+            bedrooms: dbProperty.bedrooms,
+            bathrooms: dbProperty.bathrooms,
+            area: dbProperty.area,
+            image: dbProperty.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+            features: dbProperty.features || [],
+            description: dbProperty.description,
+            managedBy: 'database' as const,
+            user_id: dbProperty.user_id
+          };
+
+          // Fetch the property owner's contact info using the secure function
+          try {
+            const { data: contactInfo, error: contactError } = await supabase
+              .rpc('get_property_owner_contact', { property_id: id });
+
+            if (!contactError && contactInfo && contactInfo.length > 0) {
+              const owner = contactInfo[0];
+              agentInfo = {
+                name: owner.full_name || 'Propietario',
+                phone: owner.phone || 'No disponible',
+                email: owner.email || 'contacto@propietario.com',
+                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                agency: owner.company_name || 'Propietario particular',
+                whatsapp: owner.phone || '+34600000000'
+              };
+            }
+          } catch (contactError) {
+            console.error('Error fetching property owner contact:', contactError);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching database property:', error);
+      }
+
+      // If not found in database, try static properties
+      if (!foundProperty) {
+        foundProperty = allProperties.find(p => p.id === Number(id));
+        
+        if (foundProperty) {
+          // For static properties, assign a consistent agent based on the property
+          if (foundProperty.managedBy === 'nazari') {
+            const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
+            agentInfo = nazariAgents[0]; // Always use the first Nazarí agent for consistency
+          } else {
+            const otherAgents = agentData.filter(agent => agent.agency !== 'Nazarí Homes');
+            agentInfo = otherAgents[0]; // Always use the first other agent for consistency
+          }
+        }
+      }
+
+      // If still not found, try local properties
       if (!foundProperty) {
         const localProperties = getLocalProperties();
         const localProperty = localProperties.find(p => p.id === id);
         
         if (localProperty) {
-          // Convert local property to match the expected format
           foundProperty = {
             id: Number(localProperty.id),
             title: localProperty.title,
@@ -115,19 +182,17 @@ const PropertyDetail = () => {
             image: localProperty.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
             features: localProperty.features || [],
             reference: localProperty.reference,
-            managedBy: 'other' // Mark as locally managed
+            managedBy: 'local' as const
           };
 
-          // Try to find the owner of this property using the userHash
+          // Try to find the owner of this local property using the userHash
           if (localProperty.userHash) {
             try {
-              // Get all profiles to search for the one that matches this userHash
               const { data: profiles, error } = await supabase
                 .from('profiles')
                 .select('*');
 
               if (!error && profiles) {
-                // Check which user's hash matches the property's userHash
                 let matchingProfile = null;
                 
                 for (const profile of profiles) {
@@ -135,16 +200,14 @@ const PropertyDetail = () => {
                   if (storedHash === localProperty.userHash) {
                     matchingProfile = profile;
                     
-                    // If email is missing, try to update it
                     if (!matchingProfile.email) {
                       try {
                         await supabase.rpc('update_profile_email');
-                        // Refetch the profile to get the updated email
                         const { data: updatedProfile } = await supabase
                           .from('profiles')
                           .select('*')
                           .eq('id', matchingProfile.id)
-                          .single();
+                          .maybeSingle();
                         if (updatedProfile) {
                           matchingProfile = updatedProfile;
                         }
@@ -157,59 +220,42 @@ const PropertyDetail = () => {
                 }
 
                 if (matchingProfile) {
-                  // Set the property owner as the agent using their real email
-                  setPropertyAgent({
+                  agentInfo = {
                     name: matchingProfile.full_name || 'Propietario',
                     phone: matchingProfile.phone || 'No disponible',
                     email: matchingProfile.email || 'contacto@propietario.com',
                     image: matchingProfile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                     agency: matchingProfile.company_name || 'Propietario particular',
                     whatsapp: matchingProfile.phone || '+34600000000'
-                  });
-                } else {
-                  console.log('No matching profile found for userHash:', localProperty.userHash);
-                  // Set a default agent if no matching profile found
-                  setPropertyAgent({
-                    name: 'Propietario',
-                    phone: 'No disponible',
-                    email: 'contacto@ejemplo.com',
-                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                    agency: 'Propietario particular',
-                    whatsapp: '+34600000000'
-                  });
+                  };
                 }
-              } else {
-                console.error('Error fetching profiles:', error);
-                // Set a default agent if there's an error
-                setPropertyAgent({
-                  name: 'Propietario',
-                  phone: 'No disponible',
-                  email: 'contacto@ejemplo.com',
-                  image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                  agency: 'Propietario particular',
-                  whatsapp: '+34600000000'
-                });
               }
             } catch (error) {
-              console.error('Error fetching property owner profile:', error);
-              // Set a default agent if there's an error
-              setPropertyAgent({
-                name: 'Propietario',
-                phone: 'No disponible',
-                email: 'contacto@ejemplo.com',
-                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                agency: 'Propietario particular',
-                whatsapp: '+34600000000'
-              });
+              console.error('Error fetching local property owner profile:', error);
             }
+          }
+
+          // If no agent found for local property, set default
+          if (!agentInfo) {
+            agentInfo = {
+              name: 'Propietario',
+              phone: 'No disponible',
+              email: 'contacto@ejemplo.com',
+              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+              agency: 'Propietario particular',
+              whatsapp: '+34600000000'
+            };
           }
         }
       }
       
       setProperty(foundProperty);
+      setPropertyAgent(agentInfo);
     };
 
-    loadPropertyAndAgent();
+    if (id) {
+      loadPropertyAndAgent();
+    }
   }, [id]);
 
   if (!property) {
@@ -228,7 +274,7 @@ const PropertyDetail = () => {
   // Generate multiple images for the property
   const getPropertyImages = () => {
     // For local properties, use uploaded images
-    if (property.managedBy === 'other') {
+    if (property.managedBy === 'local') {
       const localProperties = getLocalProperties();
       const localProperty = localProperties.find(p => p.id === id);
       if (localProperty && localProperty.images && localProperty.images.length > 0) {
@@ -236,7 +282,7 @@ const PropertyDetail = () => {
       }
     }
     
-    // For static properties, use default images
+    // For static and database properties, use default images
     return [
       property.image,
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
@@ -247,22 +293,20 @@ const PropertyDetail = () => {
 
   const images = getPropertyImages();
 
-  // Get agent data based on property management and cycle through available agents
+  // Get agent data based on property management
   const getAgentForProperty = (property: any) => {
     // If we have a custom property agent (property owner), use it
     if (propertyAgent) {
       return propertyAgent;
     }
     
-    // Otherwise use the static agents
+    // Fallback to static agents if no propertyAgent is set
     if (property.managedBy === 'nazari') {
-      // Filter agents from Nazarí Homes
       const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
-      return nazariAgents[property.id % nazariAgents.length];
+      return nazariAgents[0]; // Always use the first agent for consistency
     } else {
-      // Filter agents from other agencies
       const otherAgents = agentData.filter(agent => agent.agency !== 'Nazarí Homes');
-      return otherAgents[property.id % otherAgents.length];
+      return otherAgents[0]; // Always use the first agent for consistency
     }
   };
 
