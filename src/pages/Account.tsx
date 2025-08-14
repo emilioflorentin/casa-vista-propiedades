@@ -64,7 +64,10 @@ const Account = () => {
     area: '',
     description: '',
     features: [] as string[],
-    images: [] as File[]
+    images: [] as File[],
+    email: '',
+    phone: '',
+    useRegisteredPhone: false
   });
 
   // Load user properties on mount and when user changes
@@ -76,6 +79,12 @@ const Account = () => {
           setUserHash(hash);
           setUserProperties(getUserProperties(hash));
         }
+
+        // Initialize email in property form
+        setPropertyForm(prev => ({
+          ...prev,
+          email: user.email || ''
+        }));
         
         // Load user profile data
         const { data: profiles } = await supabase
@@ -131,7 +140,10 @@ const Account = () => {
       area: property.area.toString(),
       description: property.description || '',
       features: property.features || [],
-      images: []
+      images: [],
+      email: user?.email || '',
+      phone: '',
+      useRegisteredPhone: false
     });
     setShowPropertyForm(true);
   };
@@ -141,6 +153,29 @@ const Account = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleShowNewPropertyForm = () => {
+    setEditingProperty(null);
+    // Reset form with user email
+    setPropertyForm({
+      title: '',
+      type: 'apartment',
+      price: '',
+      currency: 'EUR',
+      operation: 'rent',
+      location: '',
+      bedrooms: '',
+      bathrooms: '',
+      area: '',
+      description: '',
+      features: [],
+      images: [],
+      email: user?.email || '',
+      phone: '',
+      useRegisteredPhone: false
+    });
+    setShowPropertyForm(true);
   };
 
   const handlePropertySubmit = async (e: React.FormEvent) => {
@@ -200,7 +235,10 @@ const Account = () => {
         area: '',
         description: '',
         features: [],
-        images: []
+        images: [],
+        email: user?.email || '',
+        phone: '',
+        useRegisteredPhone: false
       });
     } catch (error) {
       console.error('Error saving property:', error);
@@ -500,7 +538,7 @@ const Account = () => {
                   <p className="text-stone-600">Gestiona tus propiedades publicadas</p>
                 </div>
                 <Button
-                  onClick={() => setShowPropertyForm(true)}
+                  onClick={handleShowNewPropertyForm}
                   className="bg-stone-700 hover:bg-stone-600"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -614,7 +652,7 @@ const Account = () => {
                       ¡Publica tu primera propiedad y comienza a recibir consultas!
                     </p>
                     <Button
-                      onClick={() => setShowPropertyForm(true)}
+                      onClick={handleShowNewPropertyForm}
                       className="bg-stone-700 hover:bg-stone-600"
                     >
                       <Plus className="w-4 h-4 mr-2" />

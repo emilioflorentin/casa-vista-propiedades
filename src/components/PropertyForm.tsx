@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, X, Plus, Image as ImageIcon } from 'lucide-react';
 import { LocalProperty } from '@/utils/localProperties';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PropertyFormProps {
   propertyForm: {
@@ -23,6 +25,9 @@ interface PropertyFormProps {
     description: string;
     features: string[];
     images: File[];
+    email: string;
+    phone: string;
+    useRegisteredPhone: boolean;
   };
   editingProperty: LocalProperty | null;
   isUploading: boolean;
@@ -72,6 +77,19 @@ export function PropertyForm({
   onFormChange 
 }: PropertyFormProps) {
   const [customFeature, setCustomFeature] = useState("");
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<{ phone?: string } | null>(null);
+
+  // Load user profile data on mount
+  React.useEffect(() => {
+    const loadUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase.from('profiles').select('phone').eq('id', user.id).single();
+        setUserProfile(data);
+      }
+    };
+    loadUserProfile();
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -271,6 +289,73 @@ export function PropertyForm({
               placeholder="Describe las características principales de tu propiedad..."
               rows={4}
             />
+          </div>
+
+          {/* Contact Information */}
+          <div className="space-y-4 pt-4 border-t border-stone-200">
+            <h3 className="text-lg font-medium text-stone-700">Información de Contacto</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700">
+                  Email de contacto *
+                </label>
+                <Input
+                  name="email"
+                  type="email"
+                  value={propertyForm.email}
+                  onChange={handleInputChange}
+                  placeholder="email@ejemplo.com"
+                  required
+                  readOnly
+                  className="bg-stone-50"
+                />
+                <p className="text-xs text-stone-500">
+                  El email coincide con tu cuenta de Supabase
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700">
+                  Teléfono de contacto *
+                </label>
+                {userProfile?.phone && (
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="useRegisteredPhone"
+                        checked={propertyForm.useRegisteredPhone}
+                        onCheckedChange={(checked) => {
+                          const isChecked = checked === true;
+                          onFormChange('useRegisteredPhone', isChecked);
+                          if (isChecked && userProfile?.phone) {
+                            onFormChange('phone', userProfile.phone);
+                          } else {
+                            onFormChange('phone', '');
+                          }
+                        }}
+                      />
+                      <label htmlFor="useRegisteredPhone" className="text-sm text-stone-700">
+                        Usar teléfono registrado: {userProfile.phone}
+                      </label>
+                    </div>
+                  </div>
+                )}
+                <Input
+                  name="phone"
+                  type="tel"
+                  value={propertyForm.phone}
+                  onChange={handleInputChange}
+                  placeholder="+34 123 456 789"
+                  required
+                  disabled={propertyForm.useRegisteredPhone && !!userProfile?.phone}
+                  className={propertyForm.useRegisteredPhone && userProfile?.phone ? "bg-stone-50" : ""}
+                />
+                <p className="text-xs text-stone-500">
+                  {propertyForm.useRegisteredPhone ? "Usando teléfono registrado" : "Puedes usar un teléfono diferente al registrado"}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Características predefinidas */}
