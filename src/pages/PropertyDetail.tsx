@@ -9,63 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { allProperties } from "@/data/properties";
+// Removed static properties import - only using user properties now
 import MapComponent from "@/components/MapComponent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getLocalProperties } from "@/utils/localProperties";
 import { supabase } from "@/integrations/supabase/client";
 
-// Updated agent data with agency assignment and WhatsApp numbers
-const agentData = [
-  {
-    name: "María García",
-    phone: "+34 91 123 45 67",
-    email: "maria@nazarihomes.com",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b789?w=150&h=150&fit=crop&crop=face",
-    agency: "Nazarí Homes",
-    whatsapp: "+34671030927"
-  },
-  {
-    name: "Carlos Rodríguez", 
-    phone: "+34 91 234 56 78",
-    email: "carlos@inmobiliariaplus.com",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    agency: "Inmobiliaria Plus",
-    whatsapp: "+34600123456"
-  },
-  {
-    name: "Ana Martínez",
-    phone: "+34 91 345 67 89", 
-    email: "ana@nazarihomes.com",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-    agency: "Nazarí Homes",
-    whatsapp: "+34671030927"
-  },
-  {
-    name: "Luis González",
-    phone: "+34 91 456 78 90",
-    email: "luis@casasideales.com", 
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-    agency: "Casas Ideales",
-    whatsapp: "+34655987654"
-  },
-  {
-    name: "Isabel Fernández",
-    phone: "+34 91 567 89 01",
-    email: "isabel@nazarihomes.com",
-    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
-    agency: "Nazarí Homes",
-    whatsapp: "+34671030927"
-  },
-  {
-    name: "Roberto Silva",
-    phone: "+34 91 678 90 12", 
-    email: "roberto@propiedadeselite.com",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    agency: "Propiedades Elite",
-    whatsapp: "+34644555777"
-  }
-];
+// Removed static agent data - only using property owners now
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -146,21 +96,7 @@ const PropertyDetail = () => {
         console.error('Error fetching database property:', error);
       }
 
-      // If not found in database, try static properties
-      if (!foundProperty) {
-        foundProperty = allProperties.find(p => p.id === Number(id));
-        
-        if (foundProperty) {
-          // For static properties, assign a consistent agent based on the property
-          if (foundProperty.managedBy === 'nazari') {
-            const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
-            agentInfo = nazariAgents[0]; // Always use the first Nazarí agent for consistency
-          } else {
-            const otherAgents = agentData.filter(agent => agent.agency !== 'Nazarí Homes');
-            agentInfo = otherAgents[0]; // Always use the first other agent for consistency
-          }
-        }
-      }
+      // Skip static properties search - only use database and local properties
 
       // If still not found, try local properties
       if (!foundProperty) {
@@ -293,21 +229,22 @@ const PropertyDetail = () => {
 
   const images = getPropertyImages();
 
-  // Get agent data based on property management
+  // Get agent data based on property owner
   const getAgentForProperty = (property: any) => {
-    // If we have a custom property agent (property owner), use it
+    // Always use the property owner information if available
     if (propertyAgent) {
       return propertyAgent;
     }
     
-    // Fallback to static agents if no propertyAgent is set
-    if (property.managedBy === 'nazari') {
-      const nazariAgents = agentData.filter(agent => agent.agency === 'Nazarí Homes');
-      return nazariAgents[0]; // Always use the first agent for consistency
-    } else {
-      const otherAgents = agentData.filter(agent => agent.agency !== 'Nazarí Homes');
-      return otherAgents[0]; // Always use the first agent for consistency
-    }
+    // Fallback for properties without owner info
+    return {
+      name: 'Propietario',
+      phone: 'No disponible',
+      email: 'contacto@propietario.com',
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      agency: 'Propietario particular',
+      whatsapp: '+34600000000'
+    };
   };
 
   const agent = getAgentForProperty(property);

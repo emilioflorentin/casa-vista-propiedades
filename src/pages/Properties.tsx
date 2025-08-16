@@ -12,7 +12,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import { Link } from "react-router-dom";
-import { allProperties } from "@/data/properties";
+// Removed static properties import - only using user properties now
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -160,8 +160,8 @@ const Properties = () => {
     isLocal: true // Flag to identify local properties
   }));
 
-  // Combine static, database and local properties
-  const allCombinedProperties = [...allProperties, ...convertedDbProperties, ...convertedLocalProperties];
+  // Combine only database and local properties (no static properties)
+  const allCombinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
 
   const filteredProperties = allCombinedProperties.filter((property) => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -9,7 +9,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
-import { featuredProperties, allProperties } from "@/data/properties";
+import { supabase } from "@/integrations/supabase/client";
+import { getLocalProperties } from "@/utils/localProperties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Autoplay from "embla-carousel-autoplay";
@@ -20,8 +21,10 @@ const Index = () => {
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
   const [managedBy, setManagedBy] = useState("");
-  const [filteredProperties, setFilteredProperties] = useState(featuredProperties);
+  const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
   const [showingSearchResults, setShowingSearchResults] = useState(false);
+  const [allUserProperties, setAllUserProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
     setSelectedLocation(location);
@@ -42,7 +45,7 @@ const Index = () => {
     });
 
     // Filter properties based on search criteria
-    let results = [...allProperties];
+    let results = [...allUserProperties];
 
     // Filter by property type if selected
     if (propertyType && propertyType !== "any") {
@@ -107,13 +110,78 @@ const Index = () => {
   };
 
   const resetSearch = () => {
-    setFilteredProperties(featuredProperties);
+    setFilteredProperties(allUserProperties.slice(0, 8)); // Show first 8 properties as featured
     setShowingSearchResults(false);
     setSelectedLocation(null);
     setPropertyType("");
     setOperation("");
     setManagedBy("");
   };
+
+  // Load user properties on component mount
+  useEffect(() => {
+    const loadUserProperties = async () => {
+      try {
+        // Load database properties
+        const { data: dbProperties, error } = await supabase
+          .from('properties')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        // Load local properties
+        const localProperties = getLocalProperties();
+
+        // Convert and combine properties
+        const convertedDbProperties = (dbProperties || []).map(prop => ({
+          id: parseInt(prop.id.slice(-8), 16),
+          reference: prop.reference,
+          title: prop.title,
+          type: prop.type,
+          price: prop.price,
+          currency: prop.currency,
+          operation: prop.operation,
+          location: prop.location,
+          bedrooms: prop.bedrooms,
+          bathrooms: prop.bathrooms,
+          area: prop.area,
+          image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+          features: prop.features || [],
+          description: prop.description,
+          managedBy: 'other' as const,
+          user_id: prop.user_id
+        }));
+
+        const convertedLocalProperties = localProperties.map(prop => ({
+          id: parseInt(prop.id),
+          reference: prop.reference,
+          title: prop.title,
+          type: prop.type,
+          price: prop.price,
+          currency: prop.currency,
+          operation: prop.operation,
+          location: prop.location,
+          bedrooms: prop.bedrooms,
+          bathrooms: prop.bathrooms,
+          area: prop.area,
+          image: prop.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+          features: prop.features || [],
+          description: prop.description,
+          managedBy: 'other' as const,
+          userHash: prop.userHash
+        }));
+
+        const combinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
+        setAllUserProperties(combinedProperties);
+        setFilteredProperties(combinedProperties.slice(0, 8)); // Show first 8 as featured
+      } catch (error) {
+        console.error('Error loading properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserProperties();
+  }, []);
 
   // Auto-search when filters change and there's a selected location
   useEffect(() => {
@@ -202,7 +270,7 @@ const Index = () => {
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home className="h-8 w-8 text-stone-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">{allProperties.length.toLocaleString('es-ES')}+</h3>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">{allUserProperties.length.toLocaleString('es-ES')}+</h3>
               <p className="text-gray-600">{t('stats.properties')}</p>
             </div>
             <div className="p-6">
