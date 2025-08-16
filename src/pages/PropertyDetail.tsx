@@ -24,6 +24,7 @@ const PropertyDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [property, setProperty] = useState<any>(null);
   const [propertyAgent, setPropertyAgent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,7 +76,7 @@ const PropertyDetail = () => {
           // Fetch the property owner's contact info using the secure function
           try {
             const { data: contactInfo, error: contactError } = await supabase
-              .rpc('get_property_owner_contact', { property_id: id });
+              .rpc('get_property_owner_contact', { property_id: dbProperty.id });
 
             if (!contactError && contactInfo && contactInfo.length > 0) {
               const owner = contactInfo[0];
@@ -187,12 +188,25 @@ const PropertyDetail = () => {
       
       setProperty(foundProperty);
       setPropertyAgent(agentInfo);
+      setLoading(false);
     };
 
     if (id) {
       loadPropertyAndAgent();
     }
   }, [id]);
+
+  // Show loading while fetching property data
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-600 mx-auto mb-4"></div>
+          <p className="text-stone-600">Cargando propiedad...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
