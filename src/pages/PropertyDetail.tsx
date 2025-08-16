@@ -75,11 +75,15 @@ const PropertyDetail = () => {
 
           // Fetch the property owner's contact info using the secure function
           try {
+            console.log('Fetching owner contact for property ID:', dbProperty.id);
             const { data: contactInfo, error: contactError } = await supabase
               .rpc('get_property_owner_contact', { property_id: dbProperty.id });
 
+            console.log('Contact info response:', { contactInfo, contactError });
+
             if (!contactError && contactInfo && contactInfo.length > 0) {
               const owner = contactInfo[0];
+              console.log('Found property owner:', owner);
               agentInfo = {
                 name: owner.full_name || 'Propietario',
                 phone: owner.phone || 'No disponible',
@@ -88,6 +92,8 @@ const PropertyDetail = () => {
                 agency: owner.company_name || 'Propietario particular',
                 whatsapp: owner.phone || '+34600000000'
               };
+            } else {
+              console.log('No contact info found or error occurred:', contactError);
             }
           } catch (contactError) {
             console.error('Error fetching property owner contact:', contactError);
@@ -99,12 +105,14 @@ const PropertyDetail = () => {
 
       // Skip static properties search - only use database and local properties
 
-      // If still not found, try local properties
+      // If not found in database, try local properties
       if (!foundProperty) {
+        console.log('Searching in local properties for ID:', id);
         const localProperties = getLocalProperties();
         const localProperty = localProperties.find(p => p.id === id);
         
         if (localProperty) {
+          console.log('Found local property:', localProperty);
           foundProperty = {
             id: Number(localProperty.id),
             title: localProperty.title,
@@ -122,7 +130,8 @@ const PropertyDetail = () => {
             managedBy: 'local' as const
           };
 
-          // Try to find the owner of this local property using the userHash
+          // For local properties, try to find the owner using userHash
+          console.log('Trying to find owner using userHash:', localProperty.userHash);
           if (localProperty.userHash) {
             try {
               const { data: profiles, error } = await supabase
@@ -157,6 +166,7 @@ const PropertyDetail = () => {
                 }
 
                 if (matchingProfile) {
+                  console.log('Found matching profile for local property:', matchingProfile);
                   agentInfo = {
                     name: matchingProfile.full_name || 'Propietario',
                     phone: matchingProfile.phone || 'No disponible',
@@ -174,6 +184,7 @@ const PropertyDetail = () => {
 
           // If no agent found for local property, set default
           if (!agentInfo) {
+            console.log('No agent info found, using default');
             agentInfo = {
               name: 'Propietario',
               phone: 'No disponible',
@@ -186,6 +197,8 @@ const PropertyDetail = () => {
         }
       }
       
+      console.log('Final property:', foundProperty);
+      console.log('Final agent info:', agentInfo);
       setProperty(foundProperty);
       setPropertyAgent(agentInfo);
       setLoading(false);
@@ -245,12 +258,15 @@ const PropertyDetail = () => {
 
   // Get agent data based on property owner
   const getAgentForProperty = (property: any) => {
+    console.log('Getting agent for property. PropertyAgent:', propertyAgent);
     // Always use the property owner information if available
     if (propertyAgent) {
+      console.log('Using property agent:', propertyAgent);
       return propertyAgent;
     }
     
     // Fallback for properties without owner info
+    console.log('No property agent found, using fallback');
     return {
       name: 'Propietario',
       phone: 'No disponible',
