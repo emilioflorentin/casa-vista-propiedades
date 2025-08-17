@@ -73,63 +73,29 @@ const PropertyDetail = () => {
             user_id: dbProperty.user_id
           };
 
-          // Fetch the property owner's contact info using the secure function
+          // Get the property owner's profile directly from profiles table
           try {
-            const { data: contactInfo, error: contactError } = await supabase
-              .rpc('get_property_owner_contact', { property_id: dbProperty.id });
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', dbProperty.user_id)
+              .maybeSingle();
 
-            if (!contactError && contactInfo && contactInfo.length > 0) {
-              const owner = contactInfo[0];
+            if (!profileError && profile) {
               agentInfo = {
-                name: owner.full_name || 'Propietario',
-                phone: owner.phone || 'No disponible',
-                email: owner.email || 'contacto@propietario.com',
-                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                agency: owner.company_name || 'Propietario particular',
-                whatsapp: owner.phone || '+34600000000'
+                name: profile.full_name || 'Propietario',
+                phone: profile.phone || 'No disponible',
+                email: profile.email || 'contacto@propietario.com',
+                image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                agency: profile.company_name || 'Propietario particular',
+                whatsapp: profile.phone || '+34600000000'
               };
+              console.log('Found property owner profile:', profile);
             } else {
-              // If no contact found via function, get profile directly
-              const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', dbProperty.user_id)
-                .maybeSingle();
-
-              if (!profileError && profile) {
-                agentInfo = {
-                  name: profile.full_name || 'Propietario',
-                  phone: profile.phone || 'No disponible',
-                  email: profile.email || 'contacto@propietario.com',
-                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                  agency: profile.company_name || 'Propietario particular',
-                  whatsapp: profile.phone || '+34600000000'
-                };
-              }
+              console.log('No profile found for user_id:', dbProperty.user_id);
             }
-          } catch (contactError) {
-            console.error('Error fetching property owner contact:', contactError);
-            // Still try to get profile as fallback
-            try {
-              const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', dbProperty.user_id)
-                .maybeSingle();
-
-              if (!profileError && profile) {
-                agentInfo = {
-                  name: profile.full_name || 'Propietario',
-                  phone: profile.phone || 'No disponible', 
-                  email: profile.email || 'contacto@propietario.com',
-                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                  agency: profile.company_name || 'Propietario particular',
-                  whatsapp: profile.phone || '+34600000000'
-                };
-              }
-            } catch (fallbackError) {
-              console.error('Error fetching profile as fallback:', fallbackError);
-            }
+          } catch (profileError) {
+            console.error('Error fetching property owner profile:', profileError);
           }
         }
       } catch (error) {
