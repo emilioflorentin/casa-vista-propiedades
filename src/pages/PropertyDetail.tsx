@@ -88,9 +88,48 @@ const PropertyDetail = () => {
                 agency: owner.company_name || 'Propietario particular',
                 whatsapp: owner.phone || '+34600000000'
               };
+            } else {
+              // If no contact found via function, get profile directly
+              const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', dbProperty.user_id)
+                .maybeSingle();
+
+              if (!profileError && profile) {
+                agentInfo = {
+                  name: profile.full_name || 'Propietario',
+                  phone: profile.phone || 'No disponible',
+                  email: profile.email || 'contacto@propietario.com',
+                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                  agency: profile.company_name || 'Propietario particular',
+                  whatsapp: profile.phone || '+34600000000'
+                };
+              }
             }
           } catch (contactError) {
             console.error('Error fetching property owner contact:', contactError);
+            // Still try to get profile as fallback
+            try {
+              const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', dbProperty.user_id)
+                .maybeSingle();
+
+              if (!profileError && profile) {
+                agentInfo = {
+                  name: profile.full_name || 'Propietario',
+                  phone: profile.phone || 'No disponible', 
+                  email: profile.email || 'contacto@propietario.com',
+                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                  agency: profile.company_name || 'Propietario particular',
+                  whatsapp: profile.phone || '+34600000000'
+                };
+              }
+            } catch (fallbackError) {
+              console.error('Error fetching profile as fallback:', fallbackError);
+            }
           }
         }
       } catch (error) {
