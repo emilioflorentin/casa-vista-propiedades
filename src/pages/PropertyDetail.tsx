@@ -45,13 +45,17 @@ const PropertyDetail = () => {
       let foundProperty = null;
       let agentInfo = null;
 
-      // First try to find in database properties
-      try {
-        const { data: dbProperty, error } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle();
+      // Check if ID is a UUID format (database property) or timestamp (local property)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+      if (isUUID) {
+        // Try to find in database properties
+        try {
+          const { data: dbProperty, error } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
 
         if (!error && dbProperty) {
           foundProperty = {
@@ -100,6 +104,7 @@ const PropertyDetail = () => {
         }
       } catch (error) {
         console.error('Error fetching database property:', error);
+      }
       }
 
       // Skip static properties search - only use database and local properties
