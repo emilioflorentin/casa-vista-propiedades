@@ -14,6 +14,7 @@ import MapComponent from "@/components/MapComponent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getLocalProperties } from "@/utils/localProperties";
 import { supabase } from "@/integrations/supabase/client";
+import { getUserHash } from "@/utils/userHash";
 
 // Removed static agent data - only using property owners now
 
@@ -140,7 +141,7 @@ const PropertyDetail = () => {
               
               if (user) {
                 // Check if the current user owns this property
-                const currentUserHash = localStorage.getItem(`user_hash_${user.id}`);
+                const currentUserHash = await getUserHash();
                 
                 if (currentUserHash === localProperty.userHash) {
                   // Current user owns this property, get their profile
