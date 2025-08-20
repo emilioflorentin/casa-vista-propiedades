@@ -135,46 +135,48 @@ const PropertyDetail = () => {
           // Try to find the owner of this local property using the userHash
           if (localProperty.userHash) {
             try {
-              const { data: profiles, error } = await supabase
-                .from('profiles')
-                .select('*');
-
-              if (!error && profiles) {
-                let matchingProfile = null;
+              // Get current user
+              const { data: { user } } = await supabase.auth.getUser();
+              
+              if (user) {
+                // Check if the current user owns this property
+                const currentUserHash = localStorage.getItem(`user_hash_${user.id}`);
                 
-                for (const profile of profiles) {
-                  const storedHash = localStorage.getItem(`user_hash_${profile.id}`);
-                  if (storedHash === localProperty.userHash) {
-                    matchingProfile = profile;
-                    
-                    if (!matchingProfile.email) {
+                if (currentUserHash === localProperty.userHash) {
+                  // Current user owns this property, get their profile
+                  const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                  if (!error && profile) {
+                    // Update email if missing
+                    if (!profile.email) {
                       try {
                         await supabase.rpc('update_profile_email');
                         const { data: updatedProfile } = await supabase
                           .from('profiles')
                           .select('*')
-                          .eq('id', matchingProfile.id)
+                          .eq('id', profile.id)
                           .maybeSingle();
                         if (updatedProfile) {
-                          matchingProfile = updatedProfile;
+                          profile.email = updatedProfile.email;
                         }
                       } catch (updateError) {
                         console.error('Error updating profile email:', updateError);
                       }
                     }
-                    break;
-                  }
-                }
 
-                if (matchingProfile) {
-                  agentInfo = {
-                    name: matchingProfile.full_name || 'Propietario',
-                    phone: matchingProfile.phone || 'No disponible',
-                    email: matchingProfile.email || 'contacto@propietario.com',
-                    image: matchingProfile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                    agency: matchingProfile.company_name || 'Propietario particular',
-                    whatsapp: matchingProfile.phone || '+34600000000'
-                  };
+                    agentInfo = {
+                      name: profile.full_name || 'Propietario',
+                      phone: profile.phone || 'No disponible',
+                      email: profile.email || 'contacto@propietario.com',
+                      image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                      agency: profile.company_name || 'Propietario particular',
+                      whatsapp: profile.phone || '+34600000000'
+                    };
+                  }
                 }
               }
             } catch (error) {
