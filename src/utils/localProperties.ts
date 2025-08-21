@@ -2,6 +2,7 @@
 export interface LocalProperty {
   id: string;
   userHash: string;
+  userId?: string; // Add userId for direct profile lookup
   reference: string;
   title: string;
   type: "apartment" | "house" | "loft" | "studio";

@@ -187,6 +187,7 @@ const Account = () => {
     try {
       const propertyData = {
         userHash,
+        userId: user?.id, // Add userId for direct profile lookup
         reference: editingProperty?.reference || generatePropertyReference(),
         title: propertyForm.title,
         type: propertyForm.type,

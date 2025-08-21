@@ -133,52 +133,42 @@ const PropertyDetail = () => {
             managedBy: 'local' as const
           };
 
-          // Try to find the owner of this local property using the userHash
-          if (localProperty.userHash) {
+          // Try to find the owner of this local property using the userId
+          if (localProperty.userId) {
             try {
-              // Get current user
-              const { data: { user } } = await supabase.auth.getUser();
-              
-              if (user) {
-                // Check if the current user owns this property
-                const currentUserHash = await getUserHash();
-                
-                if (currentUserHash === localProperty.userHash) {
-                  // Current user owns this property, get their profile
-                  const { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .maybeSingle();
+              // Get the property owner's profile directly using the userId
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', localProperty.userId)
+                .maybeSingle();
 
-                  if (!error && profile) {
-                    // Update email if missing
-                    if (!profile.email) {
-                      try {
-                        await supabase.rpc('update_profile_email');
-                        const { data: updatedProfile } = await supabase
-                          .from('profiles')
-                          .select('*')
-                          .eq('id', profile.id)
-                          .maybeSingle();
-                        if (updatedProfile) {
-                          profile.email = updatedProfile.email;
-                        }
-                      } catch (updateError) {
-                        console.error('Error updating profile email:', updateError);
-                      }
+              if (!error && profile) {
+                // Update email if missing
+                if (!profile.email) {
+                  try {
+                    await supabase.rpc('update_profile_email');
+                    const { data: updatedProfile } = await supabase
+                      .from('profiles')
+                      .select('*')
+                      .eq('id', profile.id)
+                      .maybeSingle();
+                    if (updatedProfile) {
+                      profile.email = updatedProfile.email;
                     }
-
-                    agentInfo = {
-                      name: profile.full_name || 'Propietario',
-                      phone: profile.phone || 'No disponible',
-                      email: profile.email || 'contacto@propietario.com',
-                      image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                      agency: profile.company_name || 'Propietario particular',
-                      whatsapp: profile.phone || '+34600000000'
-                    };
+                  } catch (updateError) {
+                    console.error('Error updating profile email:', updateError);
                   }
                 }
+
+                agentInfo = {
+                  name: profile.full_name || 'Propietario',
+                  phone: profile.phone || 'No disponible',
+                  email: profile.email || 'contacto@propietario.com',
+                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                  agency: profile.company_name || 'Propietario particular',
+                  whatsapp: profile.phone || '+34600000000'
+                };
               }
             } catch (error) {
               console.error('Error fetching local property owner profile:', error);
