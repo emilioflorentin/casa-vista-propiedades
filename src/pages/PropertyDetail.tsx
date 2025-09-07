@@ -12,7 +12,7 @@ import Footer from "@/components/Footer";
 // Removed static properties import - only using user properties now
 import MapComponent from "@/components/MapComponent";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getLocalProperties } from "@/utils/localProperties";
+import { getLocalProperties, updateLocalProperty } from "@/utils/localProperties";
 import { supabase } from "@/integrations/supabase/client";
 import { getUserHash } from "@/utils/userHash";
 
@@ -195,8 +195,52 @@ const PropertyDetail = () => {
             } catch (error) {
               console.error('🔍 DEBUG - Error fetching local property owner profile:', error);
             }
+          } else if (localProperty.userHash) {
+            // Try to match with current user's hash for older properties without userId
+            console.log('🔍 DEBUG - No userId but has userHash, trying to match with current user');
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                const currentUserHash = await getUserHash();
+                console.log('🔍 DEBUG - Current user hash:', currentUserHash, 'Property hash:', localProperty.userHash);
+                
+                if (currentUserHash === localProperty.userHash) {
+                  console.log('🔍 DEBUG - Hash match! Fetching current user profile');
+                  // Hash matches, get current user's profile
+                  const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                  if (!error && profile) {
+                    console.log('🔍 DEBUG - Profile found for current user');
+                    
+                    // Update the local property with userId for future use
+                    await updateLocalProperty(localProperty.id, { userId: user.id });
+                    console.log('🔍 DEBUG - Updated local property with userId');
+
+                    agentInfo = {
+                      name: profile.full_name || 'Propietario',
+                      phone: profile.phone || 'No disponible',
+                      email: profile.email || 'contacto@propietario.com',
+                      image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                      agency: profile.company_name || 'Propietario particular',
+                      whatsapp: profile.phone || '+34600000000'
+                    };
+                    console.log('🔍 DEBUG - Agent info set from matched hash profile');
+                  }
+                } else {
+                  console.log('🔍 DEBUG - Hash does not match current user');
+                }
+              } else {
+                console.log('🔍 DEBUG - No current user authenticated');
+              }
+            } catch (error) {
+              console.error('🔍 DEBUG - Error matching user hash:', error);
+            }
           } else {
-            console.log('🔍 DEBUG - No userId found in local property, cannot fetch profile');
+            console.log('🔍 DEBUG - No userId or userHash found in local property');
           }
 
           // If no agent found for local property, set default
