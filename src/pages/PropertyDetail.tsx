@@ -196,21 +196,48 @@ const PropertyDetail = () => {
               console.error('🔍 DEBUG - Error fetching local property owner profile:', error);
             }
           } else {
-            console.log('🔍 DEBUG - No userId found in local property, will use generic agent info');
+            console.log('🔍 DEBUG - No userId found in local property, trying to find real owner');
+            // For older properties without userId, try to find the owner by checking if this property 
+            // exists in the database (which would mean it was published by an authenticated user)
+            try {
+              const { data: dbProperty, error } = await supabase
+                .from('properties')
+                .select('user_id')
+                .eq('reference', localProperty.reference)
+                .maybeSingle();
+
+              if (!error && dbProperty) {
+                console.log('🔍 DEBUG - Found property in database, fetching owner profile');
+                const { data: profile, error: profileError } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', dbProperty.user_id)
+                  .maybeSingle();
+
+                if (!profileError && profile) {
+                  console.log('🔍 DEBUG - Found real property owner:', profile.full_name);
+                  
+                  // Update local property with the real userId for future
+                  await updateLocalProperty(localProperty.id, { userId: dbProperty.user_id });
+
+                  agentInfo = {
+                    name: profile.full_name || 'Propietario',
+                    phone: profile.phone || 'No disponible',
+                    email: profile.email || 'contacto@propietario.com',
+                    image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                    agency: profile.company_name || 'Propietario particular',
+                    whatsapp: profile.phone || '+34600000000'
+                  };
+                }
+              } else {
+                console.log('🔍 DEBUG - Property not found in database, truly local-only property');
+              }
+            } catch (error) {
+              console.error('🔍 DEBUG - Error searching for property owner:', error);
+            }
           }
 
-          // If no agent found for local property, set consistent generic agent
-          if (!agentInfo) {
-            console.log('🔍 DEBUG - No agent info found, using consistent generic agent');
-            agentInfo = {
-              name: 'Propietario particular',
-              phone: 'No disponible',
-              email: 'contacto@propietario.com',
-              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-              agency: 'Propietario particular',
-              whatsapp: '+34600000000'
-            };
-          }
+          // Only set agentInfo if we found a real owner - no random/generic agents
         }
       }
       
