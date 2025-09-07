@@ -133,8 +133,18 @@ const PropertyDetail = () => {
             managedBy: 'local' as const
           };
 
+          // DEBUG: Log local property data
+          console.log('🔍 DEBUG - Local Property Data:', {
+            propertyId: localProperty.id,
+            userId: localProperty.userId,
+            userHash: localProperty.userHash,
+            hasUserId: !!localProperty.userId,
+            hasUserHash: !!localProperty.userHash
+          });
+
           // Try to find the owner of this local property using the userId
           if (localProperty.userId) {
+            console.log('🔍 DEBUG - Searching for profile with userId:', localProperty.userId);
             try {
               // Get the property owner's profile directly using the userId
               const { data: profile, error } = await supabase
@@ -143,7 +153,16 @@ const PropertyDetail = () => {
                 .eq('id', localProperty.userId)
                 .maybeSingle();
 
+              console.log('🔍 DEBUG - Profile query result:', { profile, error, hasProfile: !!profile });
+
               if (!error && profile) {
+                console.log('🔍 DEBUG - Profile found:', {
+                  id: profile.id,
+                  full_name: profile.full_name,
+                  company_name: profile.company_name,
+                  email: profile.email
+                });
+
                 // Update email if missing
                 if (!profile.email) {
                   try {
@@ -169,14 +188,20 @@ const PropertyDetail = () => {
                   agency: profile.company_name || 'Propietario particular',
                   whatsapp: profile.phone || '+34600000000'
                 };
+                console.log('🔍 DEBUG - Agent info set from profile:', agentInfo);
+              } else {
+                console.log('🔍 DEBUG - No profile found or error occurred');
               }
             } catch (error) {
-              console.error('Error fetching local property owner profile:', error);
+              console.error('🔍 DEBUG - Error fetching local property owner profile:', error);
             }
+          } else {
+            console.log('🔍 DEBUG - No userId found in local property, cannot fetch profile');
           }
 
           // If no agent found for local property, set default
           if (!agentInfo) {
+            console.log('🔍 DEBUG - No agent info found, using default random agent');
             agentInfo = {
               name: 'Propietario',
               phone: 'No disponible',
