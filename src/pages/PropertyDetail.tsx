@@ -335,7 +335,12 @@ const PropertyDetail = () => {
   const agent = getAgentForProperty(property);
 
   // Use the agent's WhatsApp number (which corresponds to their agency or owner)
-  const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp;
+  // Clean phone number for WhatsApp (remove spaces, dashes, etc.)
+  const cleanPhoneNumber = (phone: string) => {
+    return phone.replace(/\D/g, ''); // Remove all non-digits
+  };
+  
+  const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp ? cleanPhoneNumber(agent.whatsapp) : '34600000000';
 
   const getDescription = (property: any) => {
     const typeDescriptions = {
