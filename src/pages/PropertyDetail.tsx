@@ -441,7 +441,18 @@ const PropertyDetail = () => {
       price: formatPrice(property.price, property.operation)
     });
     const encodedMessage = encodeURIComponent(defaultMessage);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
+    
+    // Debug: Log the phone number and URL being generated
+    console.log('🔍 WhatsApp Debug:', {
+      originalPhone: agent.whatsapp,
+      cleanedNumber: WHATSAPP_BUSINESS_NUMBER,
+      message: defaultMessage
+    });
+    
+    // Use WhatsApp Web URL for better compatibility
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_BUSINESS_NUMBER}&text=${encodedMessage}`;
+    console.log('🔍 WhatsApp URL:', whatsappUrl);
+    
     window.open(whatsappUrl, '_blank');
   };
 
