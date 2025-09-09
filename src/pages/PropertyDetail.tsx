@@ -147,11 +147,19 @@ const PropertyDetail = () => {
             console.log('🔍 DEBUG - Searching for profile with userId:', localProperty.userId);
             try {
               // Get the property owner's profile directly using the userId
-              const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', localProperty.userId)
+              const { data: profileData, error } = await supabase
+                .rpc('get_complete_profile_info', { profile_user_id: localProperty.userId })
                 .maybeSingle();
+              
+              const profile = profileData as {
+                id: string;
+                full_name: string;
+                user_type: string;
+                company_name: string;
+                phone: string;
+                email: string;
+                avatar_url: string;
+              } | null;
 
               console.log('🔍 DEBUG - Profile query result:', { profile, error, hasProfile: !!profile });
 
@@ -208,11 +216,19 @@ const PropertyDetail = () => {
 
               if (!error && dbProperty) {
                 console.log('🔍 DEBUG - Found property in database, fetching owner profile');
-                const { data: profile, error: profileError } = await supabase
-                  .from('profiles')
-                  .select('*')
-                  .eq('id', dbProperty.user_id)
+                const { data: profileData, error: profileError } = await supabase
+                  .rpc('get_complete_profile_info', { profile_user_id: dbProperty.user_id })
                   .maybeSingle();
+                
+                const profile = profileData as {
+                  id: string;
+                  full_name: string;
+                  user_type: string;
+                  company_name: string;
+                  phone: string;
+                  email: string;
+                  avatar_url: string;
+                } | null;
 
                 if (!profileError && profile) {
                   console.log('🔍 DEBUG - Found real property owner:', profile.full_name);

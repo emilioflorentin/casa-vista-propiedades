@@ -119,6 +119,18 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_complete_profile_info: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar_url: string
+          company_name: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          user_type: string
+        }[]
+      }
       get_property_owner_contact: {
         Args: { property_id: string }
         Returns: {
