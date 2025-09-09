@@ -337,7 +337,14 @@ const PropertyDetail = () => {
   // Use the agent's WhatsApp number (which corresponds to their agency or owner)
   // Clean phone number for WhatsApp (remove spaces, dashes, etc.)
   const cleanPhoneNumber = (phone: string) => {
-    return phone.replace(/\D/g, ''); // Remove all non-digits
+    let cleaned = phone.replace(/\D/g, ''); // Remove all non-digits
+    
+    // Add Spanish country code if not present
+    if (cleaned.length === 9 && cleaned.startsWith('6') || cleaned.startsWith('7') || cleaned.startsWith('8') || cleaned.startsWith('9')) {
+      cleaned = '34' + cleaned; // Add Spain country code
+    }
+    
+    return cleaned;
   };
   
   const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp ? cleanPhoneNumber(agent.whatsapp) : '34600000000';
