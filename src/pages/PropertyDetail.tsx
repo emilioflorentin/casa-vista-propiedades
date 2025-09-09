@@ -449,11 +449,32 @@ const PropertyDetail = () => {
       message: defaultMessage
     });
     
-    // Use WhatsApp Web URL for better compatibility
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_BUSINESS_NUMBER}&text=${encodedMessage}`;
-    console.log('🔍 WhatsApp URL:', whatsappUrl);
+    // Try multiple WhatsApp URLs for better compatibility
+    const whatsappUrls = [
+      `whatsapp://send?phone=${WHATSAPP_BUSINESS_NUMBER}&text=${encodedMessage}`, // Native app
+      `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`, // wa.me
+      `https://api.whatsapp.com/send?phone=${WHATSAPP_BUSINESS_NUMBER}&text=${encodedMessage}` // API
+    ];
     
-    window.open(whatsappUrl, '_blank');
+    // Try to open WhatsApp with fallbacks
+    let opened = false;
+    for (const url of whatsappUrls) {
+      try {
+        console.log('🔍 Trying WhatsApp URL:', url);
+        window.open(url, '_blank');
+        opened = true;
+        break;
+      } catch (error) {
+        console.warn('Failed to open WhatsApp URL:', url, error);
+      }
+    }
+    
+    if (!opened) {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(`${WHATSAPP_BUSINESS_NUMBER}: ${defaultMessage}`).then(() => {
+        alert('No se pudo abrir WhatsApp. El número y mensaje han sido copiados al portapapeles.');
+      });
+    }
   };
 
   // Updated quick messages with consistent "Ref:" format
