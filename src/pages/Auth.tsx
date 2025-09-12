@@ -43,9 +43,38 @@ const Auth = () => {
       return false;
     }
 
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
-      return false;
+    // Validación de contraseña segura solo para registro
+    if (!isLogin) {
+      if (password.length < 8) {
+        setError('La contraseña debe tener al menos 8 caracteres.');
+        return false;
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        setError('La contraseña debe contener al menos una letra mayúscula.');
+        return false;
+      }
+
+      if (!/[a-z]/.test(password)) {
+        setError('La contraseña debe contener al menos una letra minúscula.');
+        return false;
+      }
+
+      if (!/[0-9]/.test(password)) {
+        setError('La contraseña debe contener al menos un número.');
+        return false;
+      }
+
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        setError('La contraseña debe contener al menos un carácter especial (!@#$%^&*()_+-=[]{};\':"\\|,.<>/?}');
+        return false;
+      }
+    } else {
+      // Para login, solo verificar longitud mínima
+      if (password.length < 6) {
+        setError('La contraseña debe tener al menos 6 caracteres.');
+        return false;
+      }
     }
 
     return true;
