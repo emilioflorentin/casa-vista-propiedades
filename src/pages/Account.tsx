@@ -49,7 +49,8 @@ const Account = () => {
   const [profileData, setProfileData] = useState({
     full_name: '',
     phone: '',
-    description: ''
+    description: '',
+    user_type: ''
   });
 
   const [propertyForm, setPropertyForm] = useState({
@@ -89,7 +90,7 @@ const Account = () => {
         // Load user profile data
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('avatar_url, full_name, phone, description')
+          .select('avatar_url, full_name, phone, description, user_type')
           .eq('id', user.id);
         
         if (profiles && profiles.length > 0) {
@@ -100,14 +101,16 @@ const Account = () => {
           setProfileData({
             full_name: profile.full_name || user.user_metadata?.full_name || '',
             phone: profile.phone || user.user_metadata?.phone || '',
-            description: profile.description || ''
+            description: profile.description || '',
+            user_type: profile.user_type || user.user_metadata?.user_type || 'particular'
           });
         } else {
           // Set initial data from user metadata if no profile exists
           setProfileData({
             full_name: user.user_metadata?.full_name || '',
             phone: user.user_metadata?.phone || '',
-            description: ''
+            description: '',
+            user_type: user.user_metadata?.user_type || 'particular'
           });
         }
       }
@@ -156,6 +159,16 @@ const Account = () => {
   };
 
   const handleShowNewPropertyForm = () => {
+    // Verificar límite para usuarios particulares
+    if (profileData.user_type === 'particular' && userProperties.length >= 3) {
+      toast({
+        title: "Límite alcanzado",
+        description: "Los usuarios particulares pueden publicar máximo 3 propiedades. Para publicaciones ilimitadas, cambia a cuenta profesional.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setEditingProperty(null);
     // Reset form with user email
     setPropertyForm({
@@ -536,15 +549,30 @@ const Account = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-stone-800">Mis Propiedades</h2>
-                  <p className="text-stone-600">Gestiona tus propiedades publicadas</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-stone-600">Gestiona tus propiedades publicadas</p>
+                    {profileData.user_type === 'particular' && (
+                      <Badge variant="outline" className="text-xs">
+                        {userProperties.length}/3 propiedades
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                <Button
-                  onClick={handleShowNewPropertyForm}
-                  className="bg-stone-700 hover:bg-stone-600"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nueva Propiedad
-                </Button>
+                <div className="text-right">
+                  <Button
+                    onClick={handleShowNewPropertyForm}
+                    className="bg-stone-700 hover:bg-stone-600"
+                    disabled={profileData.user_type === 'particular' && userProperties.length >= 3}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nueva Propiedad
+                  </Button>
+                  {profileData.user_type === 'particular' && userProperties.length >= 3 && (
+                    <p className="text-xs text-stone-500 mt-1">
+                      Límite de propiedades alcanzado
+                    </p>
+                  )}
+                </div>
               </div>
 
               {showPropertyForm && (
