@@ -16,6 +16,8 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [userType, setUserType] = useState('particular');
+  const [companyName, setCompanyName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,7 +99,7 @@ const Auth = () => {
           navigate('/account');
         }
       } else {
-        const { error } = await signUp(email, password, fullName);
+        const { error } = await signUp(email, password, fullName, userType, companyName);
         
         if (error) {
           setError(error);
@@ -135,6 +137,8 @@ const Auth = () => {
     setPassword('');
     setConfirmPassword('');
     setFullName('');
+    setUserType('particular');
+    setCompanyName('');
     setError('');
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -206,20 +210,71 @@ const Auth = () => {
               {/* Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
-                  <div className="space-y-2">
-                    <label htmlFor="fullName" className="text-sm font-medium text-stone-700">
-                      {t('account.fullName')}
-                    </label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder={t('account.enterName')}
-                      required={!isLogin}
-                      className="h-12 border-stone-300"
-                    />
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <label htmlFor="fullName" className="text-sm font-medium text-stone-700">
+                        {t('account.fullName')}
+                      </label>
+                      <Input
+                        id="fullName"
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder={t('account.enterName')}
+                        required={!isLogin}
+                        className="h-12 border-stone-300"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-stone-700">
+                        Tipo de usuario
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            userType === 'particular'
+                              ? 'border-stone-700 bg-stone-50 text-stone-800'
+                              : 'border-stone-200 hover:border-stone-300'
+                          }`}
+                          onClick={() => setUserType('particular')}
+                        >
+                          <div className="text-sm font-medium">Particular</div>
+                          <div className="text-xs text-stone-500 mt-1">Uso personal</div>
+                        </button>
+                        <button
+                          type="button"
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            userType === 'profesional'
+                              ? 'border-stone-700 bg-stone-50 text-stone-800'
+                              : 'border-stone-200 hover:border-stone-300'
+                          }`}
+                          onClick={() => setUserType('profesional')}
+                        >
+                          <div className="text-sm font-medium">Profesional</div>
+                          <div className="text-xs text-stone-500 mt-1">Inmobiliaria</div>
+                        </button>
+                      </div>
+                    </div>
+
+                    {userType === 'profesional' && (
+                      <div className="space-y-2">
+                        <label htmlFor="companyName" className="text-sm font-medium text-stone-700">
+                          Nombre de la empresa
+                        </label>
+                        <Input
+                          id="companyName"
+                          type="text"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          placeholder="Ej. Inmobiliaria López S.L."
+                          required={userType === 'profesional'}
+                          className="h-12 border-stone-300"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="space-y-2">
