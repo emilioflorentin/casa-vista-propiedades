@@ -16,6 +16,7 @@ export interface LocalProperty {
   images?: string[];
   features?: string[];
   description?: string;
+  is_rented?: boolean; // Add rented status field
   created_at: string;
 }
 
@@ -100,6 +101,7 @@ export const saveLocalProperty = async (
     ...property,
     images: images.length > 0 ? images : property.images,
     id: Date.now().toString(),
+    is_rented: false, // Initialize as not rented
     created_at: new Date().toISOString()
   };
   

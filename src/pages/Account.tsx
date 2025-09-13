@@ -21,7 +21,8 @@ import {
   Plus, 
   Home, 
   Edit2, 
-  Trash2
+  Trash2,
+  Check
 } from 'lucide-react';
 import { getUserHash } from '../utils/userHash';
 import { getUserProperties, deleteLocalProperty, saveLocalProperty, updateLocalProperty } from '../utils/localProperties';
@@ -129,6 +130,40 @@ const Account = () => {
     if (userHash) {
       deleteLocalProperty(propertyId);
       setUserProperties(getUserProperties(userHash));
+    }
+  };
+
+  const handleMarkAsRented = (propertyId: string) => {
+    if (userHash) {
+      // Find the property and update it
+      const properties = getUserProperties(userHash);
+      const property = properties.find(p => p.id === propertyId);
+      if (property) {
+        const updatedProperty = { ...property, is_rented: true };
+        updateLocalProperty(propertyId, updatedProperty, []);
+        setUserProperties(getUserProperties(userHash));
+        toast({
+          title: "Éxito",
+          description: "Propiedad marcada como alquilada",
+        });
+      }
+    }
+  };
+
+  const handleMarkAsAvailable = (propertyId: string) => {
+    if (userHash) {
+      // Find the property and update it
+      const properties = getUserProperties(userHash);
+      const property = properties.find(p => p.id === propertyId);
+      if (property) {
+        const updatedProperty = { ...property, is_rented: false };
+        updateLocalProperty(propertyId, updatedProperty, []);
+        setUserProperties(getUserProperties(userHash));
+        toast({
+          title: "Éxito",
+          description: "Propiedad marcada como disponible",
+        });
+      }
     }
   };
 
@@ -445,9 +480,10 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
               <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
+              <TabsTrigger value="rented">Mis Propiedades Alquiladas</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -619,9 +655,9 @@ const Account = () => {
                 </Card>
               )}
 
-              {/* Lista de propiedades */}
+              {/* Lista de propiedades disponibles */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userProperties.map((property) => (
+                {userProperties.filter(property => !property.is_rented).map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                     <div className="aspect-video bg-stone-200 relative">
                       {property.images && property.images.length > 0 ? (
@@ -645,14 +681,127 @@ const Account = () => {
                             property.type === 'studio' ? 'Estudio' : 'Loft'}
                          </Badge>
                       </div>
+                       <div className="absolute top-2 right-2 flex gap-1">
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm"
+                           onClick={() => handleEditProperty(property)}
+                         >
+                           <Edit2 className="w-3 h-3" />
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm text-green-600 hover:bg-green-50"
+                           onClick={() => handleMarkAsRented(property.id)}
+                         >
+                           <Check className="w-3 h-3" />
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm text-red-600 hover:bg-red-50"
+                           onClick={() => handleDeleteProperty(property.id)}
+                         >
+                           <Trash2 className="w-3 h-3" />
+                         </Button>
+                       </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 text-stone-800">{property.title}</h3>
+                      <div className="flex items-center text-stone-600 mb-2">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span className="text-sm">{property.location}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-stone-700 mb-3">
+                        €{property.price.toLocaleString()}
+                        {property.operation === 'rent' && <span className="text-sm font-normal">/mes</span>}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {property.features.slice(0, 3).map((feature, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {feature}
+                          </Badge>
+                        ))}
+                        {property.features.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{property.features.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {userProperties.filter(property => !property.is_rented).length === 0 && !showPropertyForm && (
+                <Card className="text-center p-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                  <CardContent>
+                    <Home className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-stone-800 mb-2">
+                      No tienes propiedades aún
+                    </h3>
+                    <p className="text-stone-600 mb-6">
+                      ¡Publica tu primera propiedad y comienza a recibir consultas!
+                    </p>
+                    <Button
+                      onClick={handleShowNewPropertyForm}
+                      className="bg-stone-700 hover:bg-stone-600"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Publicar Primera Propiedad
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="rented" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-stone-800">Mis Propiedades Alquiladas</h2>
+                  <p className="text-stone-600">Propiedades que ya están alquiladas</p>
+                </div>
+              </div>
+
+              {/* Lista de propiedades alquiladas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userProperties.filter(property => property.is_rented).map((property) => (
+                  <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                    <div className="aspect-video bg-stone-200 relative">
+                      {property.images && property.images.length > 0 ? (
+                        <img 
+                          src={property.images[0]} 
+                          alt={property.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Home className="w-12 h-12 text-stone-400" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 flex gap-1">
+                        <Badge className="bg-green-600 text-white">
+                          Alquilada
+                        </Badge>
+                        <Badge className="bg-stone-700 text-white">
+                          {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
+                        </Badge>
+                         <Badge variant="secondary">
+                           {property.type === 'apartment' ? 'Apartamento' :
+                            property.type === 'house' ? 'Casa' :
+                            property.type === 'studio' ? 'Estudio' : 'Loft'}
+                         </Badge>
+                      </div>
                       <div className="absolute top-2 right-2 flex gap-1">
                         <Button
                           size="sm"
                           variant="outline"
-                          className="bg-white/80 backdrop-blur-sm"
-                          onClick={() => handleEditProperty(property)}
+                          className="bg-white/80 backdrop-blur-sm text-blue-600 hover:bg-blue-50"
+                          onClick={() => handleMarkAsAvailable(property.id)}
                         >
-                          <Edit2 className="w-3 h-3" />
+                          Marcar como Disponible
                         </Button>
                         <Button
                           size="sm"
@@ -691,23 +840,16 @@ const Account = () => {
                 ))}
               </div>
 
-              {userProperties.length === 0 && !showPropertyForm && (
+              {userProperties.filter(property => property.is_rented).length === 0 && (
                 <Card className="text-center p-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent>
                     <Home className="w-16 h-16 text-stone-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-stone-800 mb-2">
-                      No tienes propiedades aún
+                      No tienes propiedades alquiladas
                     </h3>
-                    <p className="text-stone-600 mb-6">
-                      ¡Publica tu primera propiedad y comienza a recibir consultas!
+                    <p className="text-stone-600">
+                      Cuando marques una propiedad como alquilada, aparecerá aquí.
                     </p>
-                    <Button
-                      onClick={handleShowNewPropertyForm}
-                      className="bg-stone-700 hover:bg-stone-600"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Publicar Primera Propiedad
-                    </Button>
                   </CardContent>
                 </Card>
               )}
