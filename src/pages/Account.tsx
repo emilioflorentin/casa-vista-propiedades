@@ -281,19 +281,34 @@ const Account = () => {
           description: profileData.description,
           avatar_url: avatarUrl,
           user_type: user.user_metadata?.user_type || 'particular',
-          company_name: user.user_metadata?.company_name || ''
+          company_name: user.user_metadata?.company_name || '',
+          email: user.email
         }, {
           onConflict: 'id'
         });
 
       if (error) {
         console.error('Error updating profile:', error);
+        toast({
+          title: "Error",
+          description: "No se pudieron guardar los cambios del perfil",
+          variant: "destructive"
+        });
         return;
       }
 
+      toast({
+        title: "Éxito", 
+        description: "Perfil actualizado correctamente"
+      });
       console.log('Profile saved successfully');
     } catch (error) {
       console.error('Error saving profile:', error);
+      toast({
+        title: "Error",
+        description: "Error al guardar el perfil",
+        variant: "destructive"
+      });
     } finally {
       setSavingProfile(false);
     }
