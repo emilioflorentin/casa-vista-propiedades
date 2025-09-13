@@ -50,6 +50,7 @@ const Account = () => {
     full_name: '',
     phone: '',
     description: '',
+    location: '',
     user_type: ''
   });
 
@@ -90,7 +91,7 @@ const Account = () => {
         // Load user profile data
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('avatar_url, full_name, phone, description, user_type')
+          .select('avatar_url, full_name, phone, description, location, user_type')
           .eq('id', user.id);
         
         if (profiles && profiles.length > 0) {
@@ -102,6 +103,7 @@ const Account = () => {
             full_name: profile.full_name || user.user_metadata?.full_name || '',
             phone: profile.phone || user.user_metadata?.phone || '',
             description: profile.description || '',
+            location: profile.location || '',
             user_type: profile.user_type || user.user_metadata?.user_type || 'particular'
           });
         } else {
@@ -110,6 +112,7 @@ const Account = () => {
             full_name: user.user_metadata?.full_name || '',
             phone: user.user_metadata?.phone || '',
             description: '',
+            location: '',
             user_type: user.user_metadata?.user_type || 'particular'
           });
         }
@@ -279,6 +282,7 @@ const Account = () => {
           full_name: profileData.full_name,
           phone: profileData.phone,
           description: profileData.description,
+          location: profileData.location,
           avatar_url: avatarUrl,
           user_type: user.user_metadata?.user_type || 'particular',
           company_name: user.user_metadata?.company_name || '',
@@ -515,13 +519,15 @@ const Account = () => {
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Ubicación</Label>
-                      <Input 
-                        id="location"
-                        placeholder="Tu ciudad"
-                      />
-                    </div>
+                     <div className="space-y-2">
+                       <Label htmlFor="location">Ubicación</Label>
+                       <Input 
+                         id="location"
+                         value={profileData.location}
+                         onChange={(e) => handleProfileDataChange('location', e.target.value)}
+                         placeholder="Tu ciudad"
+                       />
+                     </div>
                   </div>
 
                   <div className="space-y-2">
