@@ -171,3 +171,14 @@ export const generatePropertyReference = (): string => {
   
   return newReference;
 };
+
+// Clear all local properties
+export const clearAllLocalProperties = (): boolean => {
+  try {
+    localStorage.removeItem(PROPERTIES_KEY);
+    return true;
+  } catch (error) {
+    console.error('Error clearing local properties:', error);
+    return false;
+  }
+};
