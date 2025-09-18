@@ -80,6 +80,7 @@ const Properties = () => {
           supabase
             .from('properties')
             .select('*')
+            .or('is_rented.is.null,is_rented.eq.false') // Only show available properties
             .order('created_at', { ascending: false }),
           supabase
             .from('profiles')
@@ -104,8 +105,10 @@ const Properties = () => {
           setProfiles(profilesMap);
         }
 
-        // Load local properties (always available)
-        const localProps = getLocalProperties();
+        // Load local properties (only available ones)
+        const localProps = getLocalProperties().filter(prop => !prop.is_rented);
+        console.log('PROPERTIES: All local properties:', getLocalProperties().length);
+        console.log('PROPERTIES: Available local properties:', localProps.length);
         setLocalProperties(localProps);
 
       } catch (error) {
