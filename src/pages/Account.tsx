@@ -39,6 +39,11 @@ const Account = () => {
   const [showPropertyForm, setShowPropertyForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<LocalProperty | null>(null);
   const [userProperties, setUserProperties] = useState<LocalProperty[]>([]);
+  
+  // Debug userProperties changes
+  useEffect(() => {
+    console.log('ACCOUNT: userProperties state changed:', userProperties.length, userProperties);
+  }, [userProperties]);
   const [userHash, setUserHash] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
@@ -76,11 +81,15 @@ const Account = () => {
   // Load user properties on mount and when user changes
   useEffect(() => {
     const loadUserData = async () => {
+      console.log('ACCOUNT: loadUserData called, user:', user?.id);
       if (user) {
         const hash = await getUserHash();
+        console.log('ACCOUNT: userHash obtained:', hash);
         if (hash) {
           setUserHash(hash);
-          setUserProperties(getUserProperties(hash));
+          const properties = getUserProperties(hash);
+          console.log('ACCOUNT: properties loaded from localStorage:', properties.length, properties);
+          setUserProperties(properties);
         }
 
         // Initialize email in property form
@@ -121,6 +130,11 @@ const Account = () => {
     };
     loadUserData();
   }, [user]);
+
+  // Debug user changes
+  useEffect(() => {
+    console.log('ACCOUNT: user changed:', user?.id, 'userHash:', userHash);
+  }, [user, userHash]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -657,7 +671,13 @@ const Account = () => {
 
               {/* Lista de propiedades disponibles */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userProperties.filter(property => !property.is_rented).map((property) => (
+                {(() => {
+                  const availableProperties = userProperties.filter(property => !property.is_rented);
+                  console.log('ACCOUNT: Rendering available properties:', availableProperties.length, 'out of total:', userProperties.length);
+                  console.log('ACCOUNT: All userProperties:', userProperties);
+                  console.log('ACCOUNT: Available properties:', availableProperties);
+                  return availableProperties;
+                })().map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                     <div className="aspect-video bg-stone-200 relative">
                       {property.images && property.images.length > 0 ? (
