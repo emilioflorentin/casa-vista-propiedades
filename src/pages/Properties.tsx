@@ -75,6 +75,13 @@ const Properties = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('PROPERTIES: Starting fresh data load...');
+        
+        // Clear any cached state first
+        setDbProperties([]);
+        setLocalProperties([]);
+        setProfiles({});
+        
         // Load everything in parallel for better performance
         const [propertiesResponse, profilesResponse] = await Promise.all([
           supabase
@@ -86,6 +93,8 @@ const Properties = () => {
             .from('profiles')
             .select('id, full_name, phone, user_type, company_name')
         ]);
+
+        console.log('PROPERTIES: Database response:', propertiesResponse.data?.length || 0, 'properties');
 
         // Handle properties
         if (propertiesResponse.error) {
