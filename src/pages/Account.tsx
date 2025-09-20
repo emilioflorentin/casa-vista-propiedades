@@ -814,24 +814,32 @@ const Account = () => {
                             property.type === 'studio' ? 'Estudio' : 'Loft'}
                          </Badge>
                       </div>
-                      <div className="absolute top-2 right-2 flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-white/80 backdrop-blur-sm text-blue-600 hover:bg-blue-50"
-                          onClick={() => handleMarkAsAvailable(property.id)}
-                        >
-                          Marcar como Disponible
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-white/80 backdrop-blur-sm text-red-600 hover:bg-red-50"
-                          onClick={() => handleDeleteProperty(property.id)}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
+                       <div className="absolute top-2 right-2 flex gap-1">
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm text-orange-600 hover:bg-orange-50"
+                           onClick={() => window.location.href = `/manage-rental/${property.id}`}
+                         >
+                           Gestionar Alquiler
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm text-blue-600 hover:bg-blue-50"
+                           onClick={() => handleMarkAsAvailable(property.id)}
+                         >
+                           Marcar como Disponible
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="bg-white/80 backdrop-blur-sm text-red-600 hover:bg-red-50"
+                           onClick={() => handleDeleteProperty(property.id)}
+                         >
+                           <Trash2 className="w-3 h-3" />
+                         </Button>
+                       </div>
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-lg mb-2 text-stone-800">{property.title}</h3>

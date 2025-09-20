@@ -116,6 +116,83 @@ export type Database = {
         }
         Relationships: []
       }
+      property_floor_plans: {
+        Row: {
+          created_at: string
+          floor_plan_data: Json | null
+          id: string
+          property_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          floor_plan_data?: Json | null
+          id?: string
+          property_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          floor_plan_data?: Json | null
+          id?: string
+          property_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      room_assignments: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          floor_plan_id: string
+          id: string
+          rent_amount: number | null
+          room_id: string
+          start_date: string | null
+          tenant_email: string | null
+          tenant_name: string | null
+          tenant_phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          floor_plan_id: string
+          id?: string
+          rent_amount?: number | null
+          room_id: string
+          start_date?: string | null
+          tenant_email?: string | null
+          tenant_name?: string | null
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          floor_plan_id?: string
+          id?: string
+          rent_amount?: number | null
+          room_id?: string
+          start_date?: string | null
+          tenant_email?: string | null
+          tenant_name?: string | null
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_assignments_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "property_floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
