@@ -195,6 +195,7 @@ const ManageRental = () => {
         selectable: true
       });
       fabricCanvas.add(rect);
+      fabricCanvas.renderAll();
     } else if (tool === 'circle') {
       const circle = new Circle({
         left: 100,
@@ -206,6 +207,7 @@ const ManageRental = () => {
         selectable: true
       });
       fabricCanvas.add(circle);
+      fabricCanvas.renderAll();
     } else if (tool === 'text') {
       const text = new FabricText('Habitación', {
         left: 100,
@@ -215,6 +217,7 @@ const ManageRental = () => {
         selectable: true
       });
       fabricCanvas.add(text);
+      fabricCanvas.renderAll();
     }
   };
 
