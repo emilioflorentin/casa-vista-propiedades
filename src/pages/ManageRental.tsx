@@ -131,6 +131,9 @@ const ManageRental = () => {
     });
 
     setFabricCanvas(canvas);
+    try {
+      toast({ title: 'Lienzo listo', description: 'Puedes empezar a crear el plano.' });
+    } catch (_) {}
 
     return () => {
       canvas.dispose();
@@ -179,9 +182,23 @@ const ManageRental = () => {
   const handleToolClick = (tool: typeof activeTool) => {
     setActiveTool(tool);
 
-    if (!fabricCanvas) return;
+    // Ensure canvas is initialized
+    let c = fabricCanvas;
+    if (!c && canvasRef.current) {
+      c = new FabricCanvas(canvasRef.current, {
+        width: 800,
+        height: 600,
+        backgroundColor: '#f8f9fa',
+      });
+      setFabricCanvas(c);
+    }
 
-    fabricCanvas.isDrawingMode = false;
+    if (!c) {
+      toast({ title: 'Lienzo no inicializado', description: 'Recarga la página e inténtalo de nuevo.', variant: 'destructive' });
+      return;
+    }
+
+    c.isDrawingMode = false;
 
     if (tool === 'rectangle') {
       const rect = new Rect({
@@ -194,8 +211,9 @@ const ManageRental = () => {
         height: 80,
         selectable: true
       });
-      fabricCanvas.add(rect);
-      fabricCanvas.renderAll();
+      c.add(rect);
+      c.renderAll();
+      toast({ title: 'Rectángulo añadido', description: 'Puedes arrastrarlo y ajustar su tamaño.' });
     } else if (tool === 'circle') {
       const circle = new Circle({
         left: 100,
@@ -206,8 +224,9 @@ const ManageRental = () => {
         radius: 50,
         selectable: true
       });
-      fabricCanvas.add(circle);
-      fabricCanvas.renderAll();
+      c.add(circle);
+      c.renderAll();
+      toast({ title: 'Círculo añadido', description: 'Puedes arrastrarlo y ajustar su tamaño.' });
     } else if (tool === 'text') {
       const text = new FabricText('Habitación', {
         left: 100,
@@ -216,8 +235,9 @@ const ManageRental = () => {
         fill: '#333',
         selectable: true
       });
-      fabricCanvas.add(text);
-      fabricCanvas.renderAll();
+      c.add(text);
+      c.renderAll();
+      toast({ title: 'Texto añadido', description: 'Haz doble clic para editar el texto.' });
     }
   };
 
