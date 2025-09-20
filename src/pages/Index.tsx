@@ -122,14 +122,15 @@ const Index = () => {
   useEffect(() => {
     const loadUserProperties = async () => {
       try {
-        // Load database properties
+        // Load database properties (only available ones)
         const { data: dbProperties, error } = await supabase
           .from('properties')
           .select('*')
+          .or('is_rented.is.null,is_rented.eq.false') // Only show available properties
           .order('created_at', { ascending: false });
 
-        // Load local properties
-        const localProperties = getLocalProperties();
+        // Load local properties (only available ones)
+        const localProperties = getLocalProperties().filter(prop => !prop.is_rented);
 
         // Convert and combine properties
         const convertedDbProperties = (dbProperties || []).map(prop => ({
