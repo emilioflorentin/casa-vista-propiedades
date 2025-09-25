@@ -1,28 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Canvas as FabricCanvas, Rect, Circle, FabricText } from 'fabric';
+import { Canvas as FabricCanvas, Rect, Circle, FabricText, Line, Path } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import FloorPlanToolbar, { ToolType } from '../components/FloorPlanToolbar';
+import FloorPlanProperties from '../components/FloorPlanProperties';
+import FloorPlanTemplates from '../components/FloorPlanTemplates';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft,
-  Plus,
-  Square,
-  Circle as CircleIcon,
-  Type,
-  Save,
-  Users,
-  Edit,
-  Trash2
+  Users
 } from 'lucide-react';
 import { getUserProperties, LocalProperty } from '@/utils/localProperties';
 import { getUserHash } from '@/utils/userHash';
@@ -52,12 +48,17 @@ const ManageRental = () => {
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
-  const [activeTool, setActiveTool] = useState<'select' | 'rectangle' | 'circle' | 'text'>('select');
+  const [activeTool, setActiveTool] = useState<ToolType>('select');
   const [property, setProperty] = useState<LocalProperty | null>(null);
   const [floorPlan, setFloorPlan] = useState<FloorPlanData | null>(null);
   const [roomAssignments, setRoomAssignments] = useState<RoomAssignment[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [selectedObject, setSelectedObject] = useState<any>(null);
   const [showRoomDialog, setShowRoomDialog] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyStep, setHistoryStep] = useState(-1);
   const [roomForm, setRoomForm] = useState({
     tenant_name: '',
     tenant_phone: '',
@@ -125,14 +126,82 @@ const ManageRental = () => {
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 800,
-      height: 600,
-      backgroundColor: '#f8f9fa',
+      width: 1000,
+      height: 700,
+      backgroundColor: '#ffffff',
+      selection: true,
     });
 
+    // Enable object caching for better performance
+    canvas.renderOnAddRemove = true;
+    canvas.enableRetinaScaling = true;
+
+    // Add grid pattern
+    const addGrid = () => {
+      const gridObjects = [];
+      const gridSize = 20;
+      
+      for (let i = 0; i <= canvas.width! / gridSize; i++) {
+        gridObjects.push(new Line([i * gridSize, 0, i * gridSize, canvas.height!], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      
+      for (let i = 0; i <= canvas.height! / gridSize; i++) {
+        gridObjects.push(new Line([0, i * gridSize, canvas.width!, i * gridSize], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      
+      gridObjects.forEach(line => canvas.add(line));
+      // Send grid objects to back
+      gridObjects.forEach(obj => canvas.sendObjectToBack(obj));
+    };
+
+    // Add initial grid
+    addGrid();
+    
+    // Send grid to back
+    canvas.getObjects().forEach(obj => {
+      if (obj.excludeFromExport) {
+        canvas.sendObjectToBack(obj);
+      }
+    });
+
+    // Setup event handlers
+    canvas.on('selection:created', (e) => {
+      setSelectedObject(e.selected[0]);
+    });
+
+    canvas.on('selection:updated', (e) => {
+      setSelectedObject(e.selected[0]);
+    });
+
+    canvas.on('selection:cleared', () => {
+      setSelectedObject(null);
+    });
+
+    canvas.on('object:added', () => saveToHistory());
+    canvas.on('object:removed', () => saveToHistory());
+    canvas.on('object:modified', () => saveToHistory());
+
     setFabricCanvas(canvas);
+    
+    // Save initial state
+    saveToHistory();
+    
     try {
-      toast({ title: 'Lienzo listo', description: 'Puedes empezar a crear el plano.' });
+      toast({ title: 'Editor de planos listo', description: 'Usa las herramientas para crear tu plano.' });
     } catch (_) {}
 
     return () => {
@@ -143,7 +212,7 @@ const ManageRental = () => {
   // Load floor plan data
   useEffect(() => {
     const loadFloorPlan = async () => {
-      if (!propertyId || !user) return;
+      if (!propertyId || !user || !fabricCanvas) return;
 
       const { data } = await supabase
         .from('property_floor_plans')
@@ -154,15 +223,16 @@ const ManageRental = () => {
 
       if (data) {
         setFloorPlan(data);
-        if (data.floor_plan_data && fabricCanvas) {
+        if (data.floor_plan_data) {
           fabricCanvas.loadFromJSON(data.floor_plan_data, () => {
             fabricCanvas.renderAll();
+            // Reset history after loading
+            setHistory([JSON.stringify(fabricCanvas.toJSON())]);
+            setHistoryStep(0);
           });
         }
-      }
 
-      // Load room assignments
-      if (data) {
+        // Load room assignments
         const { data: assignments } = await supabase
           .from('room_assignments')
           .select('*')
@@ -174,71 +244,209 @@ const ManageRental = () => {
       }
     };
 
-    if (fabricCanvas) {
-      loadFloorPlan();
-    }
+    loadFloorPlan();
   }, [propertyId, user, fabricCanvas]);
 
-  const handleToolClick = (tool: typeof activeTool) => {
+  // History management
+  const saveToHistory = () => {
+    if (!fabricCanvas) return;
+    
+    const state = JSON.stringify(fabricCanvas.toJSON());
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyStep + 1);
+      newHistory.push(state);
+      return newHistory.slice(-50); // Keep last 50 states
+    });
+    setHistoryStep(prev => Math.min(prev + 1, 49));
+  };
+
+  const handleToolClick = (tool: ToolType) => {
     setActiveTool(tool);
 
-    // Ensure canvas is initialized
-    let c = fabricCanvas;
-    if (!c && canvasRef.current) {
-      c = new FabricCanvas(canvasRef.current, {
-        width: 800,
-        height: 600,
-        backgroundColor: '#f8f9fa',
-      });
-      setFabricCanvas(c);
-    }
-
-    if (!c) {
-      toast({ title: 'Lienzo no inicializado', description: 'Recarga la página e inténtalo de nuevo.', variant: 'destructive' });
+    if (!fabricCanvas) {
+      toast({ title: 'Editor no listo', description: 'Espera a que se cargue completamente.', variant: 'destructive' });
       return;
     }
 
-    c.isDrawingMode = false;
+    fabricCanvas.isDrawingMode = tool === 'eraser';
+    fabricCanvas.selection = tool === 'select';
 
     if (tool === 'rectangle') {
       const rect = new Rect({
-        left: 100,
-        top: 100,
-        fill: 'rgba(0, 123, 255, 0.3)',
-        stroke: '#007bff',
+        left: 100 + Math.random() * 200,
+        top: 100 + Math.random() * 200,
+        fill: 'rgba(59, 130, 246, 0.3)',
+        stroke: '#1e40af',
         strokeWidth: 2,
-        width: 100,
-        height: 80,
-        selectable: true
+        width: 120,
+        height: 100,
+        selectable: true,
+        id: `room_${Date.now()}`
       });
-      c.add(rect);
-      c.renderAll();
-      toast({ title: 'Rectángulo añadido', description: 'Puedes arrastrarlo y ajustar su tamaño.' });
+      fabricCanvas.add(rect);
+      fabricCanvas.setActiveObject(rect);
+      setSelectedObject(rect);
     } else if (tool === 'circle') {
       const circle = new Circle({
-        left: 100,
-        top: 100,
-        fill: 'rgba(40, 167, 69, 0.3)',
-        stroke: '#28a745',
+        left: 100 + Math.random() * 200,
+        top: 100 + Math.random() * 200,
+        fill: 'rgba(16, 185, 129, 0.3)',
+        stroke: '#065f46',
         strokeWidth: 2,
-        radius: 50,
-        selectable: true
+        radius: 60,
+        selectable: true,
+        id: `area_${Date.now()}`
       });
-      c.add(circle);
-      c.renderAll();
-      toast({ title: 'Círculo añadido', description: 'Puedes arrastrarlo y ajustar su tamaño.' });
+      fabricCanvas.add(circle);
+      fabricCanvas.setActiveObject(circle);
+      setSelectedObject(circle);
     } else if (tool === 'text') {
       const text = new FabricText('Habitación', {
-        left: 100,
-        top: 100,
+        left: 100 + Math.random() * 200,
+        top: 100 + Math.random() * 200,
         fontSize: 16,
-        fill: '#333',
-        selectable: true
+        fill: '#374151',
+        selectable: true,
+        id: `text_${Date.now()}`
       });
-      c.add(text);
-      c.renderAll();
-      toast({ title: 'Texto añadido', description: 'Haz doble clic para editar el texto.' });
+      fabricCanvas.add(text);
+      fabricCanvas.setActiveObject(text);
+      setSelectedObject(text);
+    } else if (tool === 'line') {
+      const line = new Line([100, 100, 200, 100], {
+        stroke: '#6b7280',
+        strokeWidth: 3,
+        selectable: true,
+        id: `line_${Date.now()}`
+      });
+      fabricCanvas.add(line);
+      fabricCanvas.setActiveObject(line);
+      setSelectedObject(line);
+    } else if (tool === 'arrow') {
+      const arrowPath = 'M 0 0 L 80 0 M 70 -5 L 80 0 L 70 5';
+      const arrow = new Path(arrowPath, {
+        left: 100 + Math.random() * 200,
+        top: 100 + Math.random() * 200,
+        stroke: '#ef4444',
+        strokeWidth: 2,
+        fill: '',
+        selectable: true,
+        id: `arrow_${Date.now()}`
+      });
+      fabricCanvas.add(arrow);
+      fabricCanvas.setActiveObject(arrow);
+      setSelectedObject(arrow);
     }
+
+    fabricCanvas.renderAll();
+  };
+
+  // Canvas controls
+  const handleUndo = () => {
+    if (historyStep > 0) {
+      setHistoryStep(prev => prev - 1);
+      fabricCanvas?.loadFromJSON(history[historyStep - 1], () => {
+        fabricCanvas.renderAll();
+      });
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyStep < history.length - 1) {
+      setHistoryStep(prev => prev + 1);
+      fabricCanvas?.loadFromJSON(history[historyStep + 1], () => {
+        fabricCanvas.renderAll();
+      });
+    }
+  };
+
+  const handleZoomIn = () => {
+    if (!fabricCanvas) return;
+    const newZoom = Math.min(zoom * 1.1, 3);
+    setZoom(newZoom);
+    fabricCanvas.setZoom(newZoom);
+    fabricCanvas.renderAll();
+  };
+
+  const handleZoomOut = () => {
+    if (!fabricCanvas) return;
+    const newZoom = Math.max(zoom / 1.1, 0.2);
+    setZoom(newZoom);
+    fabricCanvas.setZoom(newZoom);
+    fabricCanvas.renderAll();
+  };
+
+  const handleToggleGrid = () => {
+    setShowGrid(prev => !prev);
+    if (!fabricCanvas) return;
+
+    // Toggle grid visibility
+    fabricCanvas.getObjects().forEach(obj => {
+      if (obj.excludeFromExport) {
+        obj.set('visible', !showGrid);
+      }
+    });
+    fabricCanvas.renderAll();
+  };
+
+  const handleExportImage = () => {
+    if (!fabricCanvas) return;
+    
+    // Hide grid for export
+    fabricCanvas.getObjects().forEach(obj => {
+      if (obj.excludeFromExport) {
+        obj.set('visible', false);
+      }
+    });
+    
+    const dataURL = fabricCanvas.toDataURL({
+      format: 'png',
+      quality: 1,
+      multiplier: 2
+    });
+    
+    // Restore grid visibility
+    fabricCanvas.getObjects().forEach(obj => {
+      if (obj.excludeFromExport) {
+        obj.set('visible', showGrid);
+      }
+    });
+    fabricCanvas.renderAll();
+    
+    // Download image
+    const link = document.createElement('a');
+    link.download = `plano_${property?.title || 'vivienda'}.png`;
+    link.href = dataURL;
+    link.click();
+    
+    toast({ title: 'Plano exportado', description: 'La imagen se ha descargado correctamente.' });
+  };
+
+  const handleUpdateObject = (properties: any) => {
+    if (!selectedObject || !fabricCanvas) return;
+    
+    selectedObject.set(properties);
+    fabricCanvas.renderAll();
+    saveToHistory();
+  };
+
+  const handleDeleteObject = () => {
+    if (!selectedObject || !fabricCanvas) return;
+    
+    fabricCanvas.remove(selectedObject);
+    setSelectedObject(null);
+    fabricCanvas.renderAll();
+  };
+
+  const handleLoadTemplate = (template: any) => {
+    if (!fabricCanvas) return;
+    
+    fabricCanvas.clear();
+    fabricCanvas.loadFromJSON(template.data, () => {
+      fabricCanvas.renderAll();
+      saveToHistory();
+      toast({ title: 'Plantilla cargada', description: `Se ha cargado ${template.name}` });
+    });
   };
 
   const saveFloorPlan = async () => {
@@ -425,101 +633,108 @@ const ManageRental = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Floor Plan Editor */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Plano de la Vivienda
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant={activeTool === 'select' ? 'default' : 'outline'}
-                        onClick={() => setActiveTool('select')}
-                      >
-                        Seleccionar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={activeTool === 'rectangle' ? 'default' : 'outline'}
-                        onClick={() => handleToolClick('rectangle')}
-                      >
-                        <Square className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={activeTool === 'circle' ? 'default' : 'outline'}
-                        onClick={() => handleToolClick('circle')}
-                      >
-                        <CircleIcon className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={activeTool === 'text' ? 'default' : 'outline'}
-                        onClick={() => handleToolClick('text')}
-                      >
-                        <Type className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={saveFloorPlan}
-                        className="bg-stone-700 hover:bg-stone-600"
-                      >
-                        <Save className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="border border-stone-200 rounded-lg overflow-hidden">
-                    <canvas ref={canvasRef} className="max-w-full" />
-                  </div>
-                  <p className="text-sm text-stone-600 mt-2">
-                    Haz doble clic en las habitaciones para asignar inquilinos
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Professional Floor Plan Designer */}
+          <div className="space-y-6">
+            {/* Toolbar */}
+            <FloorPlanToolbar
+              activeTool={activeTool}
+              onToolClick={handleToolClick}
+              onSave={saveFloorPlan}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onToggleGrid={handleToggleGrid}
+              onExport={handleExportImage}
+              showGrid={showGrid}
+              canUndo={historyStep > 0}
+              canRedo={historyStep < history.length - 1}
+              zoom={zoom}
+            />
 
-            {/* Room Assignments List */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Asignaciones de Habitaciones
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {roomAssignments.length === 0 ? (
-                    <p className="text-stone-600 text-center py-4">
-                      No hay habitaciones asignadas aún
-                    </p>
-                  ) : (
-                    roomAssignments.map((assignment) => (
-                      <div key={assignment.id} className="border border-stone-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant={assignment.tenant_name ? "destructive" : "secondary"}>
-                            {assignment.tenant_name ? "Ocupada" : "Disponible"}
-                          </Badge>
-                        </div>
-                        {assignment.tenant_name && (
-                          <div className="space-y-1 text-sm">
-                            <p><strong>Inquilino:</strong> {assignment.tenant_name}</p>
-                            {assignment.tenant_phone && (
-                              <p><strong>Teléfono:</strong> {assignment.tenant_phone}</p>
-                            )}
-                            {assignment.rent_amount && (
-                              <p><strong>Renta:</strong> €{assignment.rent_amount}/mes</p>
-                            )}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              {/* Main Canvas Area */}
+              <div className="xl:col-span-3">
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-lg overflow-hidden relative">
+                      <canvas 
+                        ref={canvasRef} 
+                        className="block border-0 bg-white shadow-inner"
+                        style={{ maxWidth: '100%', height: 'auto' }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Sidebar with Tabs */}
+              <div className="xl:col-span-1 space-y-6">
+                <Tabs defaultValue="properties" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="properties">Propiedades</TabsTrigger>
+                    <TabsTrigger value="rooms">Habitaciones</TabsTrigger>
+                    <TabsTrigger value="templates">Plantillas</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="properties" className="mt-4">
+                    <FloorPlanProperties
+                      selectedObject={selectedObject}
+                      onUpdateObject={handleUpdateObject}
+                      onDeleteObject={handleDeleteObject}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="rooms" className="mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Users className="w-5 h-5" />
+                          Asignaciones
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {roomAssignments.length === 0 ? (
+                          <div className="text-center py-8">
+                            <Users className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                            <p className="text-stone-600 text-sm">
+                              Haz doble clic en las habitaciones del plano para asignar inquilinos
+                            </p>
                           </div>
+                        ) : (
+                          roomAssignments.map((assignment) => (
+                            <div key={assignment.id} className="border border-stone-200 rounded-lg p-4 hover:bg-stone-50 transition-colors">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge variant={assignment.tenant_name ? "destructive" : "secondary"}>
+                                  {assignment.tenant_name ? "Ocupada" : "Disponible"}
+                                </Badge>
+                              </div>
+                              {assignment.tenant_name && (
+                                <div className="space-y-1 text-sm">
+                                  <p><strong>Inquilino:</strong> {assignment.tenant_name}</p>
+                                  {assignment.tenant_phone && (
+                                    <p><strong>Teléfono:</strong> {assignment.tenant_phone}</p>
+                                  )}
+                                  {assignment.rent_amount && (
+                                    <p><strong>Renta:</strong> €{assignment.rent_amount}/mes</p>
+                                  )}
+                                  {assignment.start_date && (
+                                    <p><strong>Desde:</strong> {new Date(assignment.start_date).toLocaleDateString()}</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))
                         )}
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="templates" className="mt-4">
+                    <FloorPlanTemplates onLoadTemplate={handleLoadTemplate} />
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
           </div>
         </div>
