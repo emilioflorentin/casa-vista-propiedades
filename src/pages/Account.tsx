@@ -814,44 +814,28 @@ const Account = () => {
                             property.type === 'studio' ? 'Estudio' : 'Loft'}
                          </Badge>
                       </div>
-                       <div className="absolute top-2 right-2 flex gap-1">
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           className="bg-white/80 backdrop-blur-sm text-orange-600 hover:bg-orange-50"
-                           onClick={() => window.location.href = `/manage-rental/${property.id}`}
-                         >
-                           Gestionar Alquiler
-                         </Button>
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           className="bg-white/80 backdrop-blur-sm text-blue-600 hover:bg-blue-50"
-                           onClick={() => handleMarkAsAvailable(property.id)}
-                         >
-                           Marcar como Disponible
-                         </Button>
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           className="bg-white/80 backdrop-blur-sm text-red-600 hover:bg-red-50"
-                           onClick={() => handleDeleteProperty(property.id)}
-                         >
-                           <Trash2 className="w-3 h-3" />
-                         </Button>
-                       </div>
+                      <div className="absolute top-2 right-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-white/80 backdrop-blur-sm text-red-600 hover:bg-red-50"
+                          onClick={() => handleDeleteProperty(property.id)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 text-stone-800">{property.title}</h3>
-                      <div className="flex items-center text-stone-600 mb-2">
+                    <CardContent className="p-4 space-y-3">
+                      <h3 className="font-semibold text-lg text-stone-800">{property.title}</h3>
+                      <div className="flex items-center text-stone-600">
                         <MapPin className="w-4 h-4 mr-1" />
                         <span className="text-sm">{property.location}</span>
                       </div>
-                      <div className="text-2xl font-bold text-stone-700 mb-3">
+                      <div className="text-2xl font-bold text-stone-700">
                         €{property.price.toLocaleString()}
                         {property.operation === 'rent' && <span className="text-sm font-normal">/mes</span>}
                       </div>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 mb-3">
                         {property.features.slice(0, 3).map((feature, idx) => (
                           <Badge key={idx} variant="outline" className="text-xs">
                             {feature}
@@ -862,6 +846,24 @@ const Account = () => {
                             +{property.features.length - 3}
                           </Badge>
                         )}
+                      </div>
+                      <div className="flex flex-col gap-2 pt-2 border-t">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full text-orange-600 hover:bg-orange-50 border-orange-200"
+                          onClick={() => window.location.href = `/manage-rental/${property.id}`}
+                        >
+                          Gestionar Alquiler
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full text-blue-600 hover:bg-blue-50 border-blue-200"
+                          onClick={() => handleMarkAsAvailable(property.id)}
+                        >
+                          Marcar como Disponible
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
