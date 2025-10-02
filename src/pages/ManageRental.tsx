@@ -59,6 +59,7 @@ const ManageRental = () => {
   const [zoom, setZoom] = useState(1);
   const [history, setHistory] = useState<string[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [roomForm, setRoomForm] = useState({
     tenant_name: '',
     tenant_phone: '',
@@ -133,50 +134,8 @@ const ManageRental = () => {
     });
 
     // Enable object caching for better performance
-    canvas.renderOnAddRemove = true;
+    canvas.renderOnAddRemove = false; // Disable for faster initial load
     canvas.enableRetinaScaling = true;
-
-    // Add grid pattern
-    const addGrid = () => {
-      const gridObjects = [];
-      const gridSize = 20;
-      
-      for (let i = 0; i <= canvas.width! / gridSize; i++) {
-        gridObjects.push(new Line([i * gridSize, 0, i * gridSize, canvas.height!], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
-      
-      for (let i = 0; i <= canvas.height! / gridSize; i++) {
-        gridObjects.push(new Line([0, i * gridSize, canvas.width!, i * gridSize], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
-      
-      gridObjects.forEach(line => canvas.add(line));
-      // Send grid objects to back
-      gridObjects.forEach(obj => canvas.sendObjectToBack(obj));
-    };
-
-    // Add initial grid
-    addGrid();
-    
-    // Send grid to back
-    canvas.getObjects().forEach(obj => {
-      if (obj.excludeFromExport) {
-        canvas.sendObjectToBack(obj);
-      }
-    });
 
     // Setup event handlers
     canvas.on('selection:created', (e) => {
@@ -191,28 +150,87 @@ const ManageRental = () => {
       setSelectedObject(null);
     });
 
-    canvas.on('object:added', () => saveToHistory());
-    canvas.on('object:removed', () => saveToHistory());
-    canvas.on('object:modified', () => saveToHistory());
+    // Lazy history saving
+    const debouncedSaveHistory = () => {
+      setTimeout(() => {
+        const state = JSON.stringify(canvas.toJSON());
+        setHistory(prev => {
+          const newHistory = prev.slice(0, historyStep + 1);
+          newHistory.push(state);
+          return newHistory.slice(-50);
+        });
+        setHistoryStep(prev => Math.min(prev + 1, 49));
+      }, 100);
+    };
+
+    canvas.on('object:added', debouncedSaveHistory);
+    canvas.on('object:removed', debouncedSaveHistory);
+    canvas.on('object:modified', debouncedSaveHistory);
+
+    // Initialize freeDrawingBrush
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.width = 2;
+      canvas.freeDrawingBrush.color = '#000000';
+    }
 
     setFabricCanvas(canvas);
     
-    // Save initial state
-    saveToHistory();
+    // Mark canvas as ready
+    setIsCanvasReady(true);
+    canvas.renderOnAddRemove = true; // Re-enable after setup
     
-    try {
-      toast({ title: 'Editor de planos listo', description: 'Usa las herramientas para crear tu plano.' });
-    } catch (_) {}
+    toast({ 
+      title: 'Editor listo', 
+      description: 'Puedes comenzar a diseñar tu plano.' 
+    });
 
     return () => {
       canvas.dispose();
     };
   }, []);
 
+  // Add grid when needed
+  useEffect(() => {
+    if (!fabricCanvas || !isCanvasReady) return;
+
+    const addGrid = () => {
+      const gridObjects = [];
+      const gridSize = 20;
+      
+      for (let i = 0; i <= fabricCanvas.width! / gridSize; i++) {
+        gridObjects.push(new Line([i * gridSize, 0, i * gridSize, fabricCanvas.height!], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      
+      for (let i = 0; i <= fabricCanvas.height! / gridSize; i++) {
+        gridObjects.push(new Line([0, i * gridSize, fabricCanvas.width!, i * gridSize], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      
+      gridObjects.forEach(line => fabricCanvas.add(line));
+      gridObjects.forEach(obj => fabricCanvas.sendObjectToBack(obj));
+      fabricCanvas.renderAll();
+    };
+
+    addGrid();
+  }, [fabricCanvas, isCanvasReady]);
+
   // Load floor plan data
   useEffect(() => {
     const loadFloorPlan = async () => {
-      if (!propertyId || !user || !fabricCanvas) return;
+      if (!propertyId || !user || !fabricCanvas || !isCanvasReady) return;
 
       const { data } = await supabase
         .from('property_floor_plans')
@@ -245,7 +263,7 @@ const ManageRental = () => {
     };
 
     loadFloorPlan();
-  }, [propertyId, user, fabricCanvas]);
+  }, [propertyId, user, fabricCanvas, isCanvasReady]);
 
   // History management
   const saveToHistory = () => {
@@ -261,12 +279,12 @@ const ManageRental = () => {
   };
 
   const handleToolClick = (tool: ToolType) => {
-    setActiveTool(tool);
-
-    if (!fabricCanvas) {
-      toast({ title: 'Editor no listo', description: 'Espera a que se cargue completamente.', variant: 'destructive' });
+    if (!fabricCanvas || !isCanvasReady) {
+      toast({ title: 'Cargando...', description: 'El editor se está inicializando, espera un momento.', variant: 'destructive' });
       return;
     }
+
+    setActiveTool(tool);
 
     fabricCanvas.isDrawingMode = tool === 'eraser';
     fabricCanvas.selection = tool === 'select';
@@ -439,12 +457,60 @@ const ManageRental = () => {
   };
 
   const handleLoadTemplate = (template: any) => {
-    if (!fabricCanvas) return;
+    if (!fabricCanvas || !isCanvasReady) {
+      toast({ title: 'Cargando...', description: 'El editor se está inicializando.', variant: 'destructive' });
+      return;
+    }
     
     fabricCanvas.clear();
-    fabricCanvas.loadFromJSON(template.data, () => {
+    
+    // Convert old text objects to textbox for Fabric v6
+    const updatedData = {
+      ...template.data,
+      objects: template.data.objects.map((obj: any) => {
+        if (obj.type === 'text') {
+          return { ...obj, type: 'textbox' };
+        }
+        return obj;
+      })
+    };
+    
+    fabricCanvas.loadFromJSON(updatedData, () => {
+      // Re-add grid after loading template
+      const gridSize = 20;
+      for (let i = 0; i <= fabricCanvas.width! / gridSize; i++) {
+        fabricCanvas.add(new Line([i * gridSize, 0, i * gridSize, fabricCanvas.height!], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      for (let i = 0; i <= fabricCanvas.height! / gridSize; i++) {
+        fabricCanvas.add(new Line([0, i * gridSize, fabricCanvas.width!, i * gridSize], {
+          stroke: '#e5e7eb',
+          strokeWidth: 0.5,
+          selectable: false,
+          evented: false,
+          excludeFromExport: true,
+          visible: showGrid
+        }));
+      }
+      fabricCanvas.getObjects().forEach(obj => {
+        if (obj.excludeFromExport) {
+          fabricCanvas.sendObjectToBack(obj);
+        }
+      });
+      
       fabricCanvas.renderAll();
-      saveToHistory();
+      
+      // Save to history
+      const state = JSON.stringify(fabricCanvas.toJSON());
+      setHistory([state]);
+      setHistoryStep(0);
+      
       toast({ title: 'Plantilla cargada', description: `Se ha cargado ${template.name}` });
     });
   };
@@ -635,6 +701,18 @@ const ManageRental = () => {
 
           {/* Professional Floor Plan Designer */}
           <div className="space-y-6">
+            {/* Loading indicator */}
+            {!isCanvasReady && (
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <p className="text-blue-900 font-medium">Inicializando editor de planos...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
             {/* Toolbar */}
             <FloorPlanToolbar
               activeTool={activeTool}
