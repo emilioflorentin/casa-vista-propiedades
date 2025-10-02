@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Canvas as FabricCanvas, Rect, Circle, FabricText, Line, Path } from 'fabric';
+import { Canvas as FabricCanvas, Rect, Circle, Textbox, Line, Path } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -301,7 +301,7 @@ const ManageRental = () => {
       fabricCanvas.setActiveObject(circle);
       setSelectedObject(circle);
     } else if (tool === 'text') {
-      const text = new FabricText('Habitación', {
+      const text = new Textbox('Habitación', {
         left: 100 + Math.random() * 200,
         top: 100 + Math.random() * 200,
         fontSize: 16,
