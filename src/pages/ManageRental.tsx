@@ -133,15 +133,14 @@ const ManageRental = () => {
       height: 700,
       backgroundColor: 'transparent',
       selection: true,
-      renderOnAddRemove: false,
     });
 
-    // Setup event handlers ONLY
+    // Setup event handlers
     canvas.on('selection:created', (e) => setSelectedObject(e.selected?.[0]));
     canvas.on('selection:updated', (e) => setSelectedObject(e.selected?.[0]));
     canvas.on('selection:cleared', () => setSelectedObject(null));
 
-    // Debounced history - save less frequently
+    // Debounced history
     let historyTimeout: NodeJS.Timeout;
     const saveHistory = () => {
       clearTimeout(historyTimeout);
@@ -160,16 +159,19 @@ const ManageRental = () => {
       canvas.freeDrawingBrush.color = '#000000';
     }
 
-    setFabricCanvas(canvas);
-    setIsCanvasReady(true);
-    console.info('EDITOR: canvas ready');
-    canvas.renderOnAddRemove = true;
+    // Wait for canvas to be fully ready
+    requestAnimationFrame(() => {
+      canvas.renderAll();
+      setFabricCanvas(canvas);
+      setIsCanvasReady(true);
+      console.info('EDITOR: canvas ready');
+    });
 
     return () => {
       clearTimeout(historyTimeout);
       canvas.dispose();
     };
-  }, [canvasRef.current, fabricCanvas]);
+  }, []);
 
   // Load floor plan data
   useEffect(() => {
@@ -224,19 +226,18 @@ const ManageRental = () => {
 
   const handleToolClick = (tool: ToolType) => {
     if (!fabricCanvas || !isCanvasReady) {
-      toast({ title: 'Cargando...', description: 'El editor se está inicializando, espera un momento.', variant: 'destructive' });
+      toast({ title: 'Espera...', description: 'El editor se está inicializando.', variant: 'destructive' });
       return;
     }
 
     setActiveTool(tool);
-
     fabricCanvas.isDrawingMode = tool === 'eraser';
     fabricCanvas.selection = tool === 'select';
 
     if (tool === 'rectangle') {
       const rect = new Rect({
-        left: 100 + Math.random() * 200,
-        top: 100 + Math.random() * 200,
+        left: 150,
+        top: 150,
         fill: 'rgba(59, 130, 246, 0.3)',
         stroke: '#1e40af',
         strokeWidth: 2,
@@ -246,12 +247,14 @@ const ManageRental = () => {
         id: `room_${Date.now()}`
       });
       fabricCanvas.add(rect);
+      fabricCanvas.renderAll();
       fabricCanvas.setActiveObject(rect);
       setSelectedObject(rect);
+      console.info('Rectangle added to canvas');
     } else if (tool === 'circle') {
       const circle = new Circle({
-        left: 100 + Math.random() * 200,
-        top: 100 + Math.random() * 200,
+        left: 150,
+        top: 150,
         fill: 'rgba(16, 185, 129, 0.3)',
         stroke: '#065f46',
         strokeWidth: 2,
@@ -260,18 +263,20 @@ const ManageRental = () => {
         id: `area_${Date.now()}`
       });
       fabricCanvas.add(circle);
+      fabricCanvas.renderAll();
       fabricCanvas.setActiveObject(circle);
       setSelectedObject(circle);
     } else if (tool === 'text') {
       const text = new Textbox('Habitación', {
-        left: 100 + Math.random() * 200,
-        top: 100 + Math.random() * 200,
+        left: 150,
+        top: 150,
         fontSize: 16,
         fill: '#374151',
         selectable: true,
         id: `text_${Date.now()}`
       });
       fabricCanvas.add(text);
+      fabricCanvas.renderAll();
       fabricCanvas.setActiveObject(text);
       setSelectedObject(text);
     } else if (tool === 'line') {
@@ -282,13 +287,14 @@ const ManageRental = () => {
         id: `line_${Date.now()}`
       });
       fabricCanvas.add(line);
+      fabricCanvas.renderAll();
       fabricCanvas.setActiveObject(line);
       setSelectedObject(line);
     } else if (tool === 'arrow') {
       const arrowPath = 'M 0 0 L 80 0 M 70 -5 L 80 0 L 70 5';
       const arrow = new Path(arrowPath, {
-        left: 100 + Math.random() * 200,
-        top: 100 + Math.random() * 200,
+        left: 150,
+        top: 150,
         stroke: '#ef4444',
         strokeWidth: 2,
         fill: '',
@@ -296,11 +302,10 @@ const ManageRental = () => {
         id: `arrow_${Date.now()}`
       });
       fabricCanvas.add(arrow);
+      fabricCanvas.renderAll();
       fabricCanvas.setActiveObject(arrow);
       setSelectedObject(arrow);
     }
-
-    fabricCanvas.renderAll();
   };
 
   // Canvas controls
@@ -387,11 +392,12 @@ const ManageRental = () => {
 
   const handleLoadTemplate = (template: any) => {
     if (!fabricCanvas || !isCanvasReady) {
-      toast({ title: 'Cargando...', description: 'El editor se está inicializando.', variant: 'destructive' });
+      toast({ title: 'Espera...', description: 'El editor se está inicializando.', variant: 'destructive' });
       return;
     }
     
-    fabricCanvas.clear();
+    // Remove all objects instead of clear
+    fabricCanvas.getObjects().forEach((obj) => fabricCanvas.remove(obj));
     
     // Convert old text objects to textbox for Fabric v6
     const updatedData = {
@@ -405,12 +411,6 @@ const ManageRental = () => {
     };
     
     fabricCanvas.loadFromJSON(updatedData, () => {
-      fabricCanvas.getObjects().forEach(obj => {
-        if (obj.excludeFromExport) {
-          fabricCanvas.sendObjectToBack(obj);
-        }
-      });
-      
       fabricCanvas.renderAll();
       
       // Save to history
