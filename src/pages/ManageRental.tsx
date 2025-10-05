@@ -126,6 +126,8 @@ const ManageRental = () => {
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
+    console.info('EDITOR: initializing Fabric canvas');
+
     const canvas = new FabricCanvas(canvasRef.current, {
       width: 1000,
       height: 700,
@@ -135,8 +137,8 @@ const ManageRental = () => {
     });
 
     // Setup event handlers ONLY
-    canvas.on('selection:created', (e) => setSelectedObject(e.selected[0]));
-    canvas.on('selection:updated', (e) => setSelectedObject(e.selected[0]));
+    canvas.on('selection:created', (e) => setSelectedObject(e.selected?.[0]));
+    canvas.on('selection:updated', (e) => setSelectedObject(e.selected?.[0]));
     canvas.on('selection:cleared', () => setSelectedObject(null));
 
     // Debounced history - save less frequently
@@ -160,13 +162,14 @@ const ManageRental = () => {
 
     setFabricCanvas(canvas);
     setIsCanvasReady(true);
+    console.info('EDITOR: canvas ready');
     canvas.renderOnAddRemove = true;
 
     return () => {
       clearTimeout(historyTimeout);
       canvas.dispose();
     };
-  }, []);
+  }, [canvasRef.current, fabricCanvas]);
 
   // Load floor plan data
   useEffect(() => {
