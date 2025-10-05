@@ -129,103 +129,44 @@ const ManageRental = () => {
     const canvas = new FabricCanvas(canvasRef.current, {
       width: 1000,
       height: 700,
-      backgroundColor: '#ffffff',
+      backgroundColor: 'transparent',
       selection: true,
+      renderOnAddRemove: false,
     });
 
-    // Enable object caching for better performance
-    canvas.renderOnAddRemove = false; // Disable for faster initial load
-    canvas.enableRetinaScaling = true;
+    // Setup event handlers ONLY
+    canvas.on('selection:created', (e) => setSelectedObject(e.selected[0]));
+    canvas.on('selection:updated', (e) => setSelectedObject(e.selected[0]));
+    canvas.on('selection:cleared', () => setSelectedObject(null));
 
-    // Setup event handlers
-    canvas.on('selection:created', (e) => {
-      setSelectedObject(e.selected[0]);
-    });
-
-    canvas.on('selection:updated', (e) => {
-      setSelectedObject(e.selected[0]);
-    });
-
-    canvas.on('selection:cleared', () => {
-      setSelectedObject(null);
-    });
-
-    // Lazy history saving
-    const debouncedSaveHistory = () => {
-      setTimeout(() => {
+    // Debounced history - save less frequently
+    let historyTimeout: NodeJS.Timeout;
+    const saveHistory = () => {
+      clearTimeout(historyTimeout);
+      historyTimeout = setTimeout(() => {
         const state = JSON.stringify(canvas.toJSON());
-        setHistory(prev => {
-          const newHistory = prev.slice(0, historyStep + 1);
-          newHistory.push(state);
-          return newHistory.slice(-50);
-        });
+        setHistory(prev => [...prev.slice(0, historyStep + 1), state].slice(-50));
         setHistoryStep(prev => Math.min(prev + 1, 49));
-      }, 100);
+      }, 300);
     };
 
-    canvas.on('object:added', debouncedSaveHistory);
-    canvas.on('object:removed', debouncedSaveHistory);
-    canvas.on('object:modified', debouncedSaveHistory);
+    canvas.on('object:modified', saveHistory);
 
-    // Initialize freeDrawingBrush
+    // Initialize brush
     if (canvas.freeDrawingBrush) {
       canvas.freeDrawingBrush.width = 2;
       canvas.freeDrawingBrush.color = '#000000';
     }
 
     setFabricCanvas(canvas);
-    
-    // Mark canvas as ready
     setIsCanvasReady(true);
-    canvas.renderOnAddRemove = true; // Re-enable after setup
-    
-    toast({ 
-      title: 'Editor listo', 
-      description: 'Puedes comenzar a diseñar tu plano.' 
-    });
+    canvas.renderOnAddRemove = true;
 
     return () => {
+      clearTimeout(historyTimeout);
       canvas.dispose();
     };
   }, []);
-
-  // Add grid when needed
-  useEffect(() => {
-    if (!fabricCanvas || !isCanvasReady) return;
-
-    const addGrid = () => {
-      const gridObjects = [];
-      const gridSize = 20;
-      
-      for (let i = 0; i <= fabricCanvas.width! / gridSize; i++) {
-        gridObjects.push(new Line([i * gridSize, 0, i * gridSize, fabricCanvas.height!], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
-      
-      for (let i = 0; i <= fabricCanvas.height! / gridSize; i++) {
-        gridObjects.push(new Line([0, i * gridSize, fabricCanvas.width!, i * gridSize], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
-      
-      gridObjects.forEach(line => fabricCanvas.add(line));
-      gridObjects.forEach(obj => fabricCanvas.sendObjectToBack(obj));
-      fabricCanvas.renderAll();
-    };
-
-    addGrid();
-  }, [fabricCanvas, isCanvasReady]);
 
   // Load floor plan data
   useEffect(() => {
@@ -396,26 +337,15 @@ const ManageRental = () => {
 
   const handleToggleGrid = () => {
     setShowGrid(prev => !prev);
-    if (!fabricCanvas) return;
-
-    // Toggle grid visibility
-    fabricCanvas.getObjects().forEach(obj => {
-      if (obj.excludeFromExport) {
-        obj.set('visible', !showGrid);
-      }
-    });
-    fabricCanvas.renderAll();
   };
 
   const handleExportImage = () => {
     if (!fabricCanvas) return;
     
-    // Hide grid for export
-    fabricCanvas.getObjects().forEach(obj => {
-      if (obj.excludeFromExport) {
-        obj.set('visible', false);
-      }
-    });
+    // Set white background for export
+    const originalBg = fabricCanvas.backgroundColor;
+    fabricCanvas.backgroundColor = '#ffffff';
+    fabricCanvas.renderAll();
     
     const dataURL = fabricCanvas.toDataURL({
       format: 'png',
@@ -423,12 +353,8 @@ const ManageRental = () => {
       multiplier: 2
     });
     
-    // Restore grid visibility
-    fabricCanvas.getObjects().forEach(obj => {
-      if (obj.excludeFromExport) {
-        obj.set('visible', showGrid);
-      }
-    });
+    // Restore transparent background
+    fabricCanvas.backgroundColor = originalBg;
     fabricCanvas.renderAll();
     
     // Download image
@@ -476,28 +402,6 @@ const ManageRental = () => {
     };
     
     fabricCanvas.loadFromJSON(updatedData, () => {
-      // Re-add grid after loading template
-      const gridSize = 20;
-      for (let i = 0; i <= fabricCanvas.width! / gridSize; i++) {
-        fabricCanvas.add(new Line([i * gridSize, 0, i * gridSize, fabricCanvas.height!], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
-      for (let i = 0; i <= fabricCanvas.height! / gridSize; i++) {
-        fabricCanvas.add(new Line([0, i * gridSize, fabricCanvas.width!, i * gridSize], {
-          stroke: '#e5e7eb',
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          excludeFromExport: true,
-          visible: showGrid
-        }));
-      }
       fabricCanvas.getObjects().forEach(obj => {
         if (obj.excludeFromExport) {
           fabricCanvas.sendObjectToBack(obj);
@@ -735,10 +639,18 @@ const ManageRental = () => {
               <div className="xl:col-span-3">
                 <Card>
                   <CardContent className="p-0">
-                    <div className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-lg overflow-hidden relative">
+                    <div 
+                      className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-lg overflow-hidden relative"
+                      style={{
+                        backgroundImage: showGrid 
+                          ? 'linear-gradient(to right, #e5e7eb 1px, transparent 1px), linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)'
+                          : 'none',
+                        backgroundSize: showGrid ? '20px 20px' : 'auto'
+                      }}
+                    >
                       <canvas 
                         ref={canvasRef} 
-                        className="block border-0 bg-white shadow-inner"
+                        className="block border-0 bg-transparent shadow-inner"
                         style={{ maxWidth: '100%', height: 'auto' }}
                       />
                     </div>
