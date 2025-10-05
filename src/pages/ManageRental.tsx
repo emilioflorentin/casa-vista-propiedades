@@ -47,6 +47,7 @@ const ManageRental = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const initializedRef = useRef(false);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeTool, setActiveTool] = useState<ToolType>('select');
   const [property, setProperty] = useState<LocalProperty | null>(null);
@@ -124,16 +125,26 @@ const ManageRental = () => {
 
   // Initialize fabric canvas
   useEffect(() => {
-    if (!canvasRef.current || fabricCanvas) return;
+    if (initializedRef.current) return;
+    if (!canvasRef.current) return;
 
+    initializedRef.current = true;
     console.info('EDITOR: initializing Fabric canvas');
 
+    // Compute size from container to avoid heavy scaling
+    const parent = canvasRef.current.parentElement;
+    const width = Math.min(1200, parent?.clientWidth || 1000);
+    const height = 680;
+
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 1000,
-      height: 700,
+      width,
+      height,
       backgroundColor: 'transparent',
       selection: true,
     });
+
+    // Disable retina scaling for faster rendering
+    canvas.enableRetinaScaling = false;
 
     // Setup event handlers
     canvas.on('selection:created', (e) => setSelectedObject(e.selected?.[0]));
@@ -141,7 +152,7 @@ const ManageRental = () => {
     canvas.on('selection:cleared', () => setSelectedObject(null));
 
     // Debounced history
-    let historyTimeout: NodeJS.Timeout;
+    let historyTimeout: ReturnType<typeof setTimeout>;
     const saveHistory = () => {
       clearTimeout(historyTimeout);
       historyTimeout = setTimeout(() => {
@@ -159,17 +170,29 @@ const ManageRental = () => {
       canvas.freeDrawingBrush.color = '#000000';
     }
 
-    // Wait for canvas to be fully ready
     requestAnimationFrame(() => {
-      canvas.renderAll();
       setFabricCanvas(canvas);
       setIsCanvasReady(true);
-      console.info('EDITOR: canvas ready');
+      canvas.renderAll();
+      console.info('EDITOR: canvas ready', { width, height });
     });
 
+    const handleResize = () => {
+      const newWidth = Math.min(1200, canvasRef.current?.parentElement?.clientWidth || width);
+      if (newWidth && newWidth !== canvas.getWidth()) {
+        canvas.setDimensions({ width: newWidth, height });
+        canvas.renderAll();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
     return () => {
+      window.removeEventListener('resize', handleResize);
       clearTimeout(historyTimeout);
       canvas.dispose();
+      setFabricCanvas(null);
+      setIsCanvasReady(false);
+      initializedRef.current = false;
     };
   }, []);
 
