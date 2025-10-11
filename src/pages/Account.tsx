@@ -51,6 +51,19 @@ const Account = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Prefetch heavy editor library (Fabric) while the user is on Account
+  const prefetchFabricRef = useRef(false);
+  const prefetchFabric = () => {
+    if (prefetchFabricRef.current) return;
+    prefetchFabricRef.current = true;
+    import('fabric').then(() => console.info('Prefetch: Fabric loaded'));
+  };
+  useEffect(() => {
+    // Warm up during idle time for instant editor open
+    // @ts-ignore
+    const ric = (window as any).requestIdleCallback || ((cb: any) => setTimeout(cb, 1000));
+    ric(prefetchFabric);
+  }, []);
   // Profile form state
   const [profileData, setProfileData] = useState({
     full_name: '',
@@ -852,6 +865,7 @@ const Account = () => {
                           size="sm"
                           variant="outline"
                           className="w-full text-orange-600 hover:bg-orange-50 border-orange-200"
+                          onMouseEnter={prefetchFabric}
                           onClick={() => window.location.href = `/manage-rental/${property.id}`}
                         >
                           Gestionar Alquiler

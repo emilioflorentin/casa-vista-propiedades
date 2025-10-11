@@ -136,9 +136,12 @@ const ManageRental = () => {
     (async () => {
       try {
         console.info('EDITOR: loading Fabric library');
+        console.time('EDITOR: fabric import');
         const fabric = await import('fabric');
+        console.timeEnd('EDITOR: fabric import');
         fabricLibRef.current = fabric;
         console.info('EDITOR: initializing Fabric canvas');
+        console.time('EDITOR: canvas init');
 
         // Compute size from container to avoid heavy scaling
         const parent = canvasRef.current!.parentElement;
