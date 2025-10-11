@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Canvas as FabricCanvas, Rect, Circle, Textbox, Line, Path } from 'fabric';
+import type { Canvas as FabricCanvas } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -48,6 +48,7 @@ const ManageRental = () => {
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const initializedRef = useRef(false);
+  const fabricLibRef = useRef<any>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeTool, setActiveTool] = useState<ToolType>('select');
   const [property, setProperty] = useState<LocalProperty | null>(null);
@@ -129,70 +130,91 @@ const ManageRental = () => {
     if (!canvasRef.current) return;
 
     initializedRef.current = true;
-    console.info('EDITOR: initializing Fabric canvas');
 
-    // Compute size from container to avoid heavy scaling
-    const parent = canvasRef.current.parentElement;
-    const width = Math.min(1200, parent?.clientWidth || 1000);
-    const height = 680;
+    let cleanup: (() => void) | null = null;
 
-    const canvas = new FabricCanvas(canvasRef.current, {
-      width,
-      height,
-      backgroundColor: 'transparent',
-      selection: true,
-    });
+    (async () => {
+      try {
+        console.info('EDITOR: loading Fabric library');
+        const fabric = await import('fabric');
+        fabricLibRef.current = fabric;
+        console.info('EDITOR: initializing Fabric canvas');
 
-    // Disable retina scaling for faster rendering
-    canvas.enableRetinaScaling = false;
+        // Compute size from container to avoid heavy scaling
+        const parent = canvasRef.current!.parentElement;
+        const width = Math.min(1200, parent?.clientWidth || 1000);
+        const height = 680;
 
-    // Setup event handlers
-    canvas.on('selection:created', (e) => setSelectedObject(e.selected?.[0]));
-    canvas.on('selection:updated', (e) => setSelectedObject(e.selected?.[0]));
-    canvas.on('selection:cleared', () => setSelectedObject(null));
+        const { Canvas } = fabric;
+        const canvas = new Canvas(canvasRef.current!, {
+          width,
+          height,
+          backgroundColor: 'transparent',
+          selection: true,
+        });
 
-    // Debounced history
-    let historyTimeout: ReturnType<typeof setTimeout>;
-    const saveHistory = () => {
-      clearTimeout(historyTimeout);
-      historyTimeout = setTimeout(() => {
-        const state = JSON.stringify(canvas.toJSON());
-        setHistory(prev => [...prev.slice(0, historyStep + 1), state].slice(-50));
-        setHistoryStep(prev => Math.min(prev + 1, 49));
-      }, 300);
-    };
+        // Disable retina scaling for faster rendering
+        canvas.enableRetinaScaling = false;
 
-    canvas.on('object:modified', saveHistory);
+        // Setup event handlers
+        canvas.on('selection:created', (e: any) => setSelectedObject(e.selected?.[0]));
+        canvas.on('selection:updated', (e: any) => setSelectedObject(e.selected?.[0]));
+        canvas.on('selection:cleared', () => setSelectedObject(null));
 
-    // Initialize brush
-    if (canvas.freeDrawingBrush) {
-      canvas.freeDrawingBrush.width = 2;
-      canvas.freeDrawingBrush.color = '#000000';
-    }
+        // Debounced history
+        let historyTimeout: ReturnType<typeof setTimeout>;
+        const saveHistory = () => {
+          clearTimeout(historyTimeout);
+          historyTimeout = setTimeout(() => {
+            const state = JSON.stringify(canvas.toJSON());
+            setHistory(prev => [...prev.slice(0, historyStep + 1), state].slice(-50));
+            setHistoryStep(prev => Math.min(prev + 1, 49));
+          }, 300);
+        };
 
-    requestAnimationFrame(() => {
-      setFabricCanvas(canvas);
-      setIsCanvasReady(true);
-      canvas.renderAll();
-      console.info('EDITOR: canvas ready', { width, height });
-    });
+        canvas.on('object:modified', saveHistory);
 
-    const handleResize = () => {
-      const newWidth = Math.min(1200, canvasRef.current?.parentElement?.clientWidth || width);
-      if (newWidth && newWidth !== canvas.getWidth()) {
-        canvas.setDimensions({ width: newWidth, height });
-        canvas.renderAll();
+        // Initialize brush
+        if (canvas.freeDrawingBrush) {
+          canvas.freeDrawingBrush.width = 2;
+          canvas.freeDrawingBrush.color = '#000000';
+        }
+
+        requestAnimationFrame(() => {
+          setFabricCanvas(canvas as unknown as FabricCanvas);
+          setIsCanvasReady(true);
+          canvas.renderAll();
+          console.info('EDITOR: canvas ready', { width, height });
+        });
+
+        const handleResize = () => {
+          const newWidth = Math.min(1200, canvasRef.current?.parentElement?.clientWidth || width);
+          if (newWidth && newWidth !== canvas.getWidth()) {
+            canvas.setDimensions({ width: newWidth, height });
+            canvas.renderAll();
+          }
+        };
+        window.addEventListener('resize', handleResize);
+
+        cleanup = () => {
+          window.removeEventListener('resize', handleResize);
+          // @ts-ignore - historyTimeout exists
+          clearTimeout(historyTimeout);
+          canvas.dispose();
+          setFabricCanvas(null);
+          setIsCanvasReady(false);
+          initializedRef.current = false;
+        };
+      } catch (err) {
+        console.error('EDITOR: error loading Fabric', err);
+        setIsCanvasReady(false);
+        initializedRef.current = false;
+        toast({ title: 'Error', description: 'No se pudo cargar el editor. Reintenta.', variant: 'destructive' });
       }
-    };
-    window.addEventListener('resize', handleResize);
+    })();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(historyTimeout);
-      canvas.dispose();
-      setFabricCanvas(null);
-      setIsCanvasReady(false);
-      initializedRef.current = false;
+      cleanup?.();
     };
   }, []);
 
@@ -258,6 +280,7 @@ const ManageRental = () => {
     fabricCanvas.selection = tool === 'select';
 
     if (tool === 'rectangle') {
+      const { Rect } = fabricLibRef.current;
       const rect = new Rect({
         left: 150,
         top: 150,
@@ -275,6 +298,7 @@ const ManageRental = () => {
       setSelectedObject(rect);
       console.info('Rectangle added to canvas');
     } else if (tool === 'circle') {
+      const { Circle } = fabricLibRef.current;
       const circle = new Circle({
         left: 150,
         top: 150,
@@ -290,6 +314,7 @@ const ManageRental = () => {
       fabricCanvas.setActiveObject(circle);
       setSelectedObject(circle);
     } else if (tool === 'text') {
+      const { Textbox } = fabricLibRef.current;
       const text = new Textbox('Habitación', {
         left: 150,
         top: 150,
@@ -303,6 +328,7 @@ const ManageRental = () => {
       fabricCanvas.setActiveObject(text);
       setSelectedObject(text);
     } else if (tool === 'line') {
+      const { Line } = fabricLibRef.current;
       const line = new Line([100, 100, 200, 100], {
         stroke: '#6b7280',
         strokeWidth: 3,
@@ -315,6 +341,7 @@ const ManageRental = () => {
       setSelectedObject(line);
     } else if (tool === 'arrow') {
       const arrowPath = 'M 0 0 L 80 0 M 70 -5 L 80 0 L 70 5';
+      const { Path } = fabricLibRef.current;
       const arrow = new Path(arrowPath, {
         left: 150,
         top: 150,
