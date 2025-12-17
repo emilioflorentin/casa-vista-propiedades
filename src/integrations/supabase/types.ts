@@ -198,10 +198,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_property_reference: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_property_reference: { Args: never; Returns: string }
       get_complete_profile_info: {
         Args: { profile_user_id: string }
         Returns: {
@@ -234,10 +231,7 @@ export type Database = {
           user_type: string
         }[]
       }
-      update_profile_email: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      update_profile_email: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
