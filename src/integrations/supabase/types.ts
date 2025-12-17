@@ -147,10 +147,14 @@ export type Database = {
         Row: {
           created_at: string
           end_date: string | null
-          floor_plan_id: string
+          floor_plan_id: string | null
           id: string
+          property_id: string | null
           rent_amount: number | null
           room_id: string
+          room_name: string | null
+          room_size: number | null
+          room_type: string | null
           start_date: string | null
           tenant_email: string | null
           tenant_name: string | null
@@ -160,10 +164,14 @@ export type Database = {
         Insert: {
           created_at?: string
           end_date?: string | null
-          floor_plan_id: string
+          floor_plan_id?: string | null
           id?: string
+          property_id?: string | null
           rent_amount?: number | null
           room_id: string
+          room_name?: string | null
+          room_size?: number | null
+          room_type?: string | null
           start_date?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
@@ -173,10 +181,14 @@ export type Database = {
         Update: {
           created_at?: string
           end_date?: string | null
-          floor_plan_id?: string
+          floor_plan_id?: string | null
           id?: string
+          property_id?: string | null
           rent_amount?: number | null
           room_id?: string
+          room_name?: string | null
+          room_size?: number | null
+          room_type?: string | null
           start_date?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
