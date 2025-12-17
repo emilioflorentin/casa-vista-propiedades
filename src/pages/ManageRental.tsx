@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -29,12 +28,18 @@ interface Room {
   end_date?: string;
 }
 
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+
 const ManageRental = () => {
   const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+
   const [property, setProperty] = useState<LocalProperty | null>(null);
+  const [resolvedPropertyId, setResolvedPropertyId] = useState<string | null>(null);
+
   const [rooms, setRooms] = useState<Room[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
@@ -52,66 +57,176 @@ const ManageRental = () => {
   });
 
   useEffect(() => {
-    loadProperty();
-    loadRooms();
-  }, [propertyId, user]);
-
-  const loadProperty = async () => {
-    if (!propertyId || !user) return;
-
-    const userHash = await getUserHash();
-    if (userHash) {
-      const localProperties = getUserProperties(userHash);
-      const localProperty = localProperties.find(p => p.id === propertyId);
-      if (localProperty) {
-        setProperty(localProperty);
-        return;
+    const init = async () => {
+      if (!propertyId || !user) return;
+      const resolvedId = await resolveAndLoadProperty(propertyId);
+      if (resolvedId) {
+        await loadRooms(resolvedId);
+      } else {
+        setRooms([]);
       }
+    };
+
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertyId, user?.id]);
+
+  const resolveAndLoadProperty = async (rawPropertyId: string): Promise<string | null> => {
+    if (!user) return null;
+
+    // Case 1: Already a DB UUID
+    if (isUuid(rawPropertyId)) {
+      setResolvedPropertyId(rawPropertyId);
+
+      // Try local cache only for display (optional)
+      const userHash = await getUserHash();
+      if (userHash) {
+        const localProperties = getUserProperties(userHash);
+        const localProperty = localProperties.find(p => p.id === rawPropertyId);
+        if (localProperty) {
+          setProperty(localProperty);
+          return rawPropertyId;
+        }
+      }
+
+      // Fallback to DB
+      const { data: dbProperty } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', rawPropertyId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (dbProperty) {
+        const convertedProperty: LocalProperty = {
+          id: dbProperty.id,
+          userHash: '',
+          userId: dbProperty.user_id,
+          reference: dbProperty.reference,
+          title: dbProperty.title,
+          type: dbProperty.type,
+          price: dbProperty.price,
+          currency: dbProperty.currency,
+          operation: dbProperty.operation,
+          location: dbProperty.location,
+          bedrooms: dbProperty.bedrooms,
+          bathrooms: dbProperty.bathrooms,
+          area: dbProperty.area,
+          images: dbProperty.image ? [dbProperty.image] : [],
+          features: dbProperty.features || [],
+          description: dbProperty.description,
+          is_rented: dbProperty.is_rented,
+          created_at: dbProperty.created_at
+        };
+        setProperty(convertedProperty);
+      }
+
+      return rawPropertyId;
     }
 
-    const { data: dbProperty } = await supabase
+    // Case 2: Local property ID (Date.now string). We must sync it to DB to get a UUID.
+    const userHash = await getUserHash();
+    if (!userHash) return null;
+
+    const localProperties = getUserProperties(userHash);
+    const localProperty = localProperties.find(p => p.id === rawPropertyId);
+
+    if (!localProperty) {
+      toast({
+        title: 'Error',
+        description: 'No se encontró la propiedad para gestionar el alquiler.',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    setProperty(localProperty);
+
+    // 1) Try find existing DB property by (reference + user_id)
+    const { data: existing, error: findError } = await supabase
       .from('properties')
-      .select('*')
-      .eq('id', propertyId)
+      .select('id')
+      .eq('reference', localProperty.reference)
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (dbProperty) {
-      const convertedProperty: LocalProperty = {
-        id: dbProperty.id,
-        userHash: '',
-        userId: dbProperty.user_id,
-        reference: dbProperty.reference,
-        title: dbProperty.title,
-        type: dbProperty.type,
-        price: dbProperty.price,
-        currency: dbProperty.currency,
-        operation: dbProperty.operation,
-        location: dbProperty.location,
-        bedrooms: dbProperty.bedrooms,
-        bathrooms: dbProperty.bathrooms,
-        area: dbProperty.area,
-        images: dbProperty.image ? [dbProperty.image] : [],
-        features: dbProperty.features || [],
-        description: dbProperty.description,
-        is_rented: dbProperty.is_rented,
-        created_at: dbProperty.created_at
-      };
-      setProperty(convertedProperty);
+    if (findError) {
+      console.error('Error finding property in DB:', findError);
     }
+
+    if (existing?.id) {
+      setResolvedPropertyId(existing.id);
+      navigate(`/manage-rental/${existing.id}`, { replace: true });
+      return existing.id;
+    }
+
+    // 2) Create the DB property (minimal required fields)
+    toast({
+      title: 'Sincronizando…',
+      description: 'Preparando la propiedad para gestionar habitaciones.'
+    });
+
+    const insertPayload = {
+      user_id: user.id,
+      reference: localProperty.reference,
+      title: localProperty.title,
+      type: localProperty.type,
+      price: localProperty.price,
+      currency: localProperty.currency || 'EUR',
+      operation: localProperty.operation,
+      location: localProperty.location,
+      bedrooms: localProperty.bedrooms,
+      bathrooms: localProperty.bathrooms,
+      area: localProperty.area,
+      description: localProperty.description ?? null,
+      features: localProperty.features ?? null,
+      image: null,
+      is_rented: localProperty.is_rented ?? false
+    };
+
+    const { data: created, error: createError } = await supabase
+      .from('properties')
+      .insert(insertPayload)
+      .select('id')
+      .single();
+
+    if (createError) {
+      console.error('Error creating property in DB:', createError);
+      toast({
+        title: 'Error',
+        description: 'No se pudo sincronizar la propiedad. Intenta de nuevo.',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    setResolvedPropertyId(created.id);
+    navigate(`/manage-rental/${created.id}`, { replace: true });
+
+    toast({
+      title: 'Listo',
+      description: 'Propiedad sincronizada. Ya puedes crear habitaciones.'
+    });
+
+    return created.id;
   };
 
-  const loadRooms = async () => {
-    if (!propertyId || !user) return;
+  const loadRooms = async (propertyUuid: string) => {
+    if (!user || !propertyUuid) return;
 
     const { data, error } = await supabase
       .from('room_assignments')
       .select('*')
-      .eq('property_id', propertyId)
+      .eq('property_id', propertyUuid)
       .order('created_at', { ascending: true });
 
     if (error) {
       console.error('Error loading rooms:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudieron cargar las habitaciones',
+        variant: 'destructive'
+      });
       return;
     }
 
