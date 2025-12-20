@@ -324,7 +324,7 @@ const ManageRental = () => {
 
       setShowDialog(false);
       resetForm();
-      loadRooms();
+      if (resolvedPropertyId) loadRooms(resolvedPropertyId);
     } catch (error) {
       console.error('Error saving room:', error);
       toast({
@@ -352,7 +352,7 @@ const ManageRental = () => {
       });
 
       setDeleteRoomId(null);
-      loadRooms();
+      if (resolvedPropertyId) loadRooms(resolvedPropertyId);
     } catch (error) {
       console.error('Error deleting room:', error);
       toast({
