@@ -283,8 +283,24 @@ const ManageRental = () => {
       return;
     }
 
-    const roomData = {
-      property_id: propertyId!,
+    const propertyUuid = resolvedPropertyId;
+    if (!propertyUuid) {
+      toast({
+        title: 'Error',
+        description: 'No se pudo identificar la propiedad',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const createRoomId = () => {
+      const uuid = globalThis.crypto?.randomUUID?.();
+      if (uuid) return uuid;
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    };
+
+    const baseRoomData = {
+      property_id: propertyUuid,
       room_name: formData.room_name.trim(),
       room_type: formData.room_type,
       room_size: formData.room_size ? parseFloat(formData.room_size) : null,
@@ -296,11 +312,14 @@ const ManageRental = () => {
       end_date: formData.end_date || null
     };
 
+    const insertRoomData = { ...baseRoomData, room_id: createRoomId() };
+    const updateRoomData = baseRoomData;
+
     try {
       if (editingRoom) {
         const { error } = await supabase
           .from('room_assignments')
-          .update(roomData)
+          .update(updateRoomData)
           .eq('id', editingRoom.id);
 
         if (error) throw error;
@@ -312,7 +331,7 @@ const ManageRental = () => {
       } else {
         const { error } = await supabase
           .from('room_assignments')
-          .insert(roomData);
+          .insert(insertRoomData);
 
         if (error) throw error;
 
