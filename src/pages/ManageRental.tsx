@@ -10,8 +10,9 @@ import { RoomFormDialog } from '../components/RoomFormDialog';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Home, Users, Map, List } from 'lucide-react';
+import { ArrowLeft, Plus, Home, Users, Map, List, PenTool } from 'lucide-react';
 import FloorPlanGrid from '@/components/FloorPlanGrid';
+import FloorPlanEditor from '@/components/FloorPlanEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getUserProperties, LocalProperty } from '@/utils/localProperties';
 import { getUserHash } from '@/utils/userHash';
@@ -415,6 +416,29 @@ const ManageRental = () => {
     }
   }, [resolvedPropertyId]);
 
+  const [floorPlanData, setFloorPlanData] = useState<string | null>(null);
+
+  // Load saved floor plan editor data
+  useEffect(() => {
+    if (resolvedPropertyId) {
+      const saved = localStorage.getItem(`floor-plan-editor-${resolvedPropertyId}`);
+      if (saved) {
+        setFloorPlanData(saved);
+      }
+    }
+  }, [resolvedPropertyId]);
+
+  const handleSaveFloorPlanEditor = (data: string) => {
+    if (resolvedPropertyId) {
+      localStorage.setItem(`floor-plan-editor-${resolvedPropertyId}`, data);
+      setFloorPlanData(data);
+      toast({
+        title: 'Plano guardado',
+        description: 'El plano de la vivienda se ha guardado correctamente'
+      });
+    }
+  };
+
   const handleRoomClickFromFloorPlan = (floorPlanRoom: { id: string }) => {
     const room = rooms.find(r => r.id === floorPlanRoom.id);
     if (room) handleEditRoom(room);
@@ -517,17 +541,37 @@ const ManageRental = () => {
           </div>
 
           {/* Tabs for List and Floor Plan views */}
-          <Tabs defaultValue="floorplan" className="w-full">
+          <Tabs defaultValue="editor" className="w-full">
             <TabsList className="mb-4">
+              <TabsTrigger value="editor" className="gap-2">
+                <PenTool className="w-4 h-4" />
+                Editor Plano
+              </TabsTrigger>
               <TabsTrigger value="floorplan" className="gap-2">
                 <Map className="w-4 h-4" />
-                Vista Plano
+                Vista Tarjetas
               </TabsTrigger>
               <TabsTrigger value="list" className="gap-2">
                 <List className="w-4 h-4" />
                 Vista Lista
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="editor">
+              {resolvedPropertyId && (
+                <FloorPlanEditor
+                  rooms={rooms.map(r => ({
+                    id: r.id,
+                    room_name: r.room_name,
+                    room_type: r.room_type,
+                    tenant_name: r.tenant_name
+                  }))}
+                  propertyId={resolvedPropertyId}
+                  savedFloorPlan={floorPlanData}
+                  onSave={handleSaveFloorPlanEditor}
+                />
+              )}
+            </TabsContent>
 
             <TabsContent value="floorplan">
               <FloorPlanGrid
