@@ -10,7 +10,9 @@ import { RoomFormDialog } from '../components/RoomFormDialog';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Home, Users } from 'lucide-react';
+import { ArrowLeft, Plus, Home, Users, Map, List } from 'lucide-react';
+import FloorPlanGrid from '@/components/FloorPlanGrid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getUserProperties, LocalProperty } from '@/utils/localProperties';
 import { getUserHash } from '@/utils/userHash';
 
@@ -44,6 +46,7 @@ const ManageRental = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [deleteRoomId, setDeleteRoomId] = useState<string | null>(null);
+  const [roomPositions, setRoomPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [formData, setFormData] = useState({
     room_name: '',
     room_type: '',
@@ -386,6 +389,37 @@ const ManageRental = () => {
   const availableRooms = rooms.filter(r => !r.tenant_name);
   const totalRent = rooms.reduce((sum, r) => sum + (r.rent_amount || 0), 0);
 
+  const handleSaveLayout = (positions: Record<string, { x: number; y: number }>) => {
+    setRoomPositions(positions);
+    // Save to localStorage for persistence
+    if (resolvedPropertyId) {
+      localStorage.setItem(`floor-plan-${resolvedPropertyId}`, JSON.stringify(positions));
+    }
+    toast({
+      title: 'Disposición guardada',
+      description: 'El plano de la vivienda se ha guardado correctamente'
+    });
+  };
+
+  // Load saved positions on mount
+  useEffect(() => {
+    if (resolvedPropertyId) {
+      const saved = localStorage.getItem(`floor-plan-${resolvedPropertyId}`);
+      if (saved) {
+        try {
+          setRoomPositions(JSON.parse(saved));
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+  }, [resolvedPropertyId]);
+
+  const handleRoomClickFromFloorPlan = (floorPlanRoom: { id: string }) => {
+    const room = rooms.find(r => r.id === floorPlanRoom.id);
+    if (room) handleEditRoom(room);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -482,33 +516,65 @@ const ManageRental = () => {
             </Card>
           </div>
 
-          {/* Rooms Grid */}
-          {rooms.length === 0 ? (
-            <Card className="p-12">
-              <div className="text-center">
-                <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No hay habitaciones</h3>
-                <p className="text-muted-foreground mb-6">
-                  Comienza agregando las habitaciones de tu propiedad
-                </p>
-                <Button onClick={handleAddRoom}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Agregar Primera Habitación
-                </Button>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rooms.map((room) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  onEdit={() => handleEditRoom(room)}
-                  onDelete={() => setDeleteRoomId(room.id)}
-                />
-              ))}
-            </div>
-          )}
+          {/* Tabs for List and Floor Plan views */}
+          <Tabs defaultValue="floorplan" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="floorplan" className="gap-2">
+                <Map className="w-4 h-4" />
+                Vista Plano
+              </TabsTrigger>
+              <TabsTrigger value="list" className="gap-2">
+                <List className="w-4 h-4" />
+                Vista Lista
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="floorplan">
+              <FloorPlanGrid
+                rooms={rooms.map(r => ({
+                  id: r.id,
+                  room_id: r.id,
+                  room_name: r.room_name,
+                  room_type: r.room_type,
+                  room_size: r.room_size ?? null,
+                  tenant_name: r.tenant_name ?? null,
+                  rent_amount: r.rent_amount ?? null
+                }))}
+                savedPositions={roomPositions}
+                onSaveLayout={handleSaveLayout}
+                onRoomClick={handleRoomClickFromFloorPlan}
+              />
+            </TabsContent>
+
+            <TabsContent value="list">
+              {rooms.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center">
+                    <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">No hay habitaciones</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Comienza agregando las habitaciones de tu propiedad
+                    </p>
+                    <Button onClick={handleAddRoom}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Agregar Primera Habitación
+                    </Button>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {rooms.map((room) => (
+                    <RoomCard
+                      key={room.id}
+                      room={room}
+                      onEdit={() => handleEditRoom(room)}
+                      onDelete={() => setDeleteRoomId(room.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 
