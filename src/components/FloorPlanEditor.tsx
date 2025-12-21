@@ -467,36 +467,42 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
                     <Link2 className="w-4 h-4" />
                     Vincular habitación
                   </Label>
-                  <Select 
-                    value={linkedRoomId || (selectedObject as any).linkedRoomId || ''} 
-                    onValueChange={setLinkedRoomId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar habitación..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Sin vincular</SelectItem>
-                      {rooms.map(room => (
-                        <SelectItem key={room.id} value={room.id}>
-                          <div className="flex items-center gap-2">
-                            <span>{room.room_name}</span>
-                            {room.tenant_name && (
-                              <Badge variant="secondary" className="text-xs">
-                                Ocupada
-                              </Badge>
-                            )}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {rooms.length === 0 ? (
+                    <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                      No hay habitaciones creadas. Crea habitaciones en la pestaña "Vista Lista" primero.
+                    </p>
+                  ) : (
+                    <Select 
+                      value={linkedRoomId || (selectedObject as any).linkedRoomId || 'none'} 
+                      onValueChange={(val) => setLinkedRoomId(val === 'none' ? '' : val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar habitación..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sin vincular</SelectItem>
+                        {rooms.map(room => (
+                          <SelectItem key={room.id} value={room.id}>
+                            <div className="flex items-center gap-2">
+                              <span>{room.room_name}</span>
+                              {room.tenant_name && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Ocupada
+                                </Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
 
                 {(selectedObject as any).linkedRoomId && (
-                  <div className="p-3 bg-stone-50 rounded-lg">
-                    <p className="text-sm font-medium">{(selectedObject as any).roomName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {getRoomTypeLabel((selectedObject as any).roomType)}
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm font-medium text-green-800">{(selectedObject as any).roomName}</p>
+                    <p className="text-xs text-green-600">
+                      {getRoomTypeLabel((selectedObject as any).roomType)} - Vinculada ✓
                     </p>
                   </div>
                 )}
@@ -527,9 +533,20 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
                 </Button>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Selecciona un elemento para ver sus propiedades
-              </p>
+              <div className="text-center py-4 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Selecciona un elemento para ver sus propiedades
+                </p>
+                <div className="text-xs text-left bg-stone-50 p-3 rounded-lg space-y-2">
+                  <p className="font-medium text-stone-700">Cómo vincular habitaciones:</p>
+                  <ol className="list-decimal list-inside space-y-1 text-stone-600">
+                    <li>Selecciona la herramienta "Habitación"</li>
+                    <li>Haz clic en el plano para crear un rectángulo</li>
+                    <li>Selecciona el rectángulo creado</li>
+                    <li>Usa el selector "Vincular habitación" aquí</li>
+                  </ol>
+                </div>
+              </div>
             )}
 
             <Separator />
