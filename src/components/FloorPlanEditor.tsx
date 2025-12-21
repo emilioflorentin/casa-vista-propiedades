@@ -78,6 +78,9 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
   const [roomHeight, setRoomHeight] = useState(100);
   const { toast } = useToast();
 
+  // Track if floor plan has been loaded
+  const [floorPlanLoaded, setFloorPlanLoaded] = useState(false);
+
   // Initialize canvas
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -108,32 +111,35 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
 
     setFabricCanvas(canvas);
 
-    // Load saved floor plan with custom properties
-    if (savedFloorPlan) {
-      try {
-        const savedData = JSON.parse(savedFloorPlan);
-        canvas.loadFromJSON(savedData).then(() => {
-          // Restore custom properties from saved data
-          const objects = canvas.getObjects();
-          if (savedData.customProps) {
-            objects.forEach((obj, index) => {
-              const customProps = savedData.customProps[index];
-              if (customProps) {
-                Object.assign(obj, customProps);
-              }
-            });
-          }
-          canvas.renderAll();
-        });
-      } catch (e) {
-        console.error('Error loading floor plan:', e);
-      }
-    }
-
     return () => {
       canvas.dispose();
     };
   }, []);
+
+  // Load saved floor plan when canvas is ready and data is available
+  useEffect(() => {
+    if (!fabricCanvas || !savedFloorPlan || floorPlanLoaded) return;
+
+    try {
+      const savedData = JSON.parse(savedFloorPlan);
+      fabricCanvas.loadFromJSON(savedData).then(() => {
+        // Restore custom properties from saved data
+        const objects = fabricCanvas.getObjects();
+        if (savedData.customProps) {
+          objects.forEach((obj, index) => {
+            const customProps = savedData.customProps[index];
+            if (customProps) {
+              Object.assign(obj, customProps);
+            }
+          });
+        }
+        fabricCanvas.renderAll();
+        setFloorPlanLoaded(true);
+      });
+    } catch (e) {
+      console.error('Error loading floor plan:', e);
+    }
+  }, [fabricCanvas, savedFloorPlan, floorPlanLoaded]);
 
   // Draw grid
   useEffect(() => {
