@@ -187,9 +187,79 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
       (selectedObject as any).linkedRoomId = linkedRoomId;
       (selectedObject as any).roomName = room.room_name;
       
+      // Remove existing label for this room shape
+      const existingLabel = fabricCanvas.getObjects().find(
+        obj => (obj as any).isRoomLabel && (obj as any).parentRoomId === (selectedObject as any).id
+      );
+      if (existingLabel) {
+        fabricCanvas.remove(existingLabel);
+      }
+
+      // Add text label inside the room
+      const roomLeft = selectedObject.left || 0;
+      const roomTop = selectedObject.top || 0;
+      const roomWidth = (selectedObject as any).width * (selectedObject.scaleX || 1);
+      const roomHeight = (selectedObject as any).height * (selectedObject.scaleY || 1);
+      
+      const labelText = isOccupied 
+        ? `${room.room_name}\n👤 ${room.tenant_name}`
+        : `${room.room_name}\n(Disponible)`;
+      
+      const label = new IText(labelText, {
+        left: roomLeft + roomWidth / 2,
+        top: roomTop + roomHeight / 2,
+        fontSize: 11,
+        fill: colors.stroke,
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        selectable: false,
+        evented: false
+      });
+      
+      (label as any).isRoomLabel = true;
+      (label as any).parentRoomId = (selectedObject as any).id || `room-${Date.now()}`;
+      if (!(selectedObject as any).id) {
+        (selectedObject as any).id = (label as any).parentRoomId;
+      }
+      
+      fabricCanvas.add(label);
       fabricCanvas.renderAll();
     }
   }, [linkedRoomId, selectedObject, fabricCanvas, rooms]);
+
+  // Update label positions when objects move
+  useEffect(() => {
+    if (!fabricCanvas) return;
+
+    const handleObjectMoving = (e: any) => {
+      const movedObj = e.target;
+      if ((movedObj as any).objectType === 'room' && (movedObj as any).id) {
+        const label = fabricCanvas.getObjects().find(
+          obj => (obj as any).isRoomLabel && (obj as any).parentRoomId === (movedObj as any).id
+        );
+        if (label) {
+          const roomWidth = movedObj.width * (movedObj.scaleX || 1);
+          const roomHeight = movedObj.height * (movedObj.scaleY || 1);
+          label.set({
+            left: movedObj.left + roomWidth / 2,
+            top: movedObj.top + roomHeight / 2
+          });
+          fabricCanvas.renderAll();
+        }
+      }
+    };
+
+    fabricCanvas.on('object:moving', handleObjectMoving);
+    fabricCanvas.on('object:scaling', handleObjectMoving);
+
+    return () => {
+      fabricCanvas.off('object:moving', handleObjectMoving);
+      fabricCanvas.off('object:scaling', handleObjectMoving);
+    };
+  }, [fabricCanvas]);
 
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
     if (!fabricCanvas || activeTool === 'select') return;
