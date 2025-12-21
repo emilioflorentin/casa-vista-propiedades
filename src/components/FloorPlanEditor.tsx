@@ -108,10 +108,21 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
 
     setFabricCanvas(canvas);
 
-    // Load saved floor plan
+    // Load saved floor plan with custom properties
     if (savedFloorPlan) {
       try {
-        canvas.loadFromJSON(JSON.parse(savedFloorPlan)).then(() => {
+        const savedData = JSON.parse(savedFloorPlan);
+        canvas.loadFromJSON(savedData).then(() => {
+          // Restore custom properties from saved data
+          const objects = canvas.getObjects();
+          if (savedData.customProps) {
+            objects.forEach((obj, index) => {
+              const customProps = savedData.customProps[index];
+              if (customProps) {
+                Object.assign(obj, customProps);
+              }
+            });
+          }
           canvas.renderAll();
         });
       } catch (e) {
@@ -373,12 +384,27 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
     const gridLines = objects.filter(obj => (obj as any).isGridLine);
     gridLines.forEach(obj => fabricCanvas.remove(obj));
     
-    const json = JSON.stringify(fabricCanvas.toJSON());
+    // Get remaining objects after removing grid
+    const objectsToSave = fabricCanvas.getObjects();
     
-    // Restore grid lines
-    if (showGrid) {
-      // Grid will be redrawn by useEffect
-    }
+    // Save custom properties separately
+    const customProps = objectsToSave.map(obj => ({
+      objectType: (obj as any).objectType,
+      roomType: (obj as any).roomType,
+      linkedRoomId: (obj as any).linkedRoomId,
+      roomName: (obj as any).roomName,
+      id: (obj as any).id,
+      isRoomLabel: (obj as any).isRoomLabel,
+      parentRoomId: (obj as any).parentRoomId
+    }));
+    
+    const canvasJson = fabricCanvas.toJSON();
+    const dataToSave = {
+      ...canvasJson,
+      customProps
+    };
+    
+    const json = JSON.stringify(dataToSave);
     
     onSave(json);
     
