@@ -9,14 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// Removed static properties import - only using user properties now
 import MapComponent from "@/components/MapComponent";
+import EnergyCertificate from "@/components/EnergyCertificate";
+import MortgageSimulator from "@/components/MortgageSimulator";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getLocalProperties, updateLocalProperty } from "@/utils/localProperties";
 import { supabase } from "@/integrations/supabase/client";
 import { getUserHash } from "@/utils/userHash";
-
-// Removed static agent data - only using property owners now
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -679,6 +678,22 @@ const PropertyDetail = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Energy Certificate */}
+              <EnergyCertificate 
+                consumptionRating="D"
+                emissionsRating="E"
+                consumptionValue={156}
+                emissionsValue={32}
+              />
+
+              {/* Mortgage Simulator - Only for sale properties */}
+              {property.operation === 'sale' && (
+                <MortgageSimulator 
+                  propertyPrice={property.price}
+                  propertyLocation={property.location}
+                />
+              )}
 
               {/* Additional Information Section */}
               <div className="py-6 border-t border-stone-200">
