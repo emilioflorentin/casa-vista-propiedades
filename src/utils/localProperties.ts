@@ -18,6 +18,11 @@ export interface LocalProperty {
   description?: string;
   is_rented?: boolean; // Add rented status field
   created_at: string;
+  // Energy certificate fields
+  energyConsumptionRating?: string;
+  energyConsumptionValue?: number;
+  energyEmissionsRating?: string;
+  energyEmissionsValue?: number;
 }
 
 // Function to compress and resize images

@@ -6,10 +6,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Upload, X, Plus, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Plus, Image as ImageIcon, Zap, Leaf } from 'lucide-react';
 import { LocalProperty } from '@/utils/localProperties';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+
+const energyRatings = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 
 interface PropertyFormProps {
   propertyForm: {
@@ -28,6 +30,10 @@ interface PropertyFormProps {
     email: string;
     phone: string;
     useRegisteredPhone: boolean;
+    energyConsumptionRating: string;
+    energyConsumptionValue: string;
+    energyEmissionsRating: string;
+    energyEmissionsValue: string;
   };
   editingProperty: LocalProperty | null;
   isUploading: boolean;
@@ -289,6 +295,125 @@ export function PropertyForm({
               placeholder="Describe las características principales de tu propiedad..."
               rows={4}
             />
+          </div>
+
+          {/* Energy Certificate Section */}
+          <div className="space-y-4 pt-4 border-t border-stone-200">
+            <h3 className="text-lg font-medium text-stone-700 flex items-center gap-2">
+              <Zap className="h-5 w-5 text-amber-500" />
+              Certificado Energético *
+            </h3>
+            <p className="text-sm text-stone-500 -mt-2">
+              El certificado energético es obligatorio para publicar una vivienda
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Energy Consumption */}
+              <div className="space-y-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-amber-600" />
+                  <label className="text-sm font-medium text-stone-700">
+                    Consumo de energía
+                  </label>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-600">Calificación *</label>
+                  <Select 
+                    value={propertyForm.energyConsumptionRating} 
+                    onValueChange={(value) => handleSelectChange('energyConsumptionRating', value)}
+                  >
+                    <SelectTrigger className="border-amber-200">
+                      <SelectValue placeholder="Seleccionar letra" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {energyRatings.map((rating) => (
+                        <SelectItem key={rating} value={rating}>
+                          <span className={`font-semibold ${
+                            rating === 'A' ? 'text-green-600' :
+                            rating === 'B' ? 'text-lime-600' :
+                            rating === 'C' ? 'text-yellow-600' :
+                            rating === 'D' ? 'text-amber-600' :
+                            rating === 'E' ? 'text-orange-600' :
+                            rating === 'F' ? 'text-red-500' :
+                            'text-red-700'
+                          }`}>
+                            {rating}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-600">Valor (kWh/m² año) *</label>
+                  <Input
+                    name="energyConsumptionValue"
+                    type="number"
+                    value={propertyForm.energyConsumptionValue}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 125"
+                    required
+                    min="0"
+                    className="border-amber-200"
+                  />
+                </div>
+              </div>
+
+              {/* CO2 Emissions */}
+              <div className="space-y-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                <div className="flex items-center gap-2">
+                  <Leaf className="h-4 w-4 text-green-600" />
+                  <label className="text-sm font-medium text-stone-700">
+                    Emisiones CO₂
+                  </label>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-600">Calificación *</label>
+                  <Select 
+                    value={propertyForm.energyEmissionsRating} 
+                    onValueChange={(value) => handleSelectChange('energyEmissionsRating', value)}
+                  >
+                    <SelectTrigger className="border-green-200">
+                      <SelectValue placeholder="Seleccionar letra" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {energyRatings.map((rating) => (
+                        <SelectItem key={rating} value={rating}>
+                          <span className={`font-semibold ${
+                            rating === 'A' ? 'text-green-600' :
+                            rating === 'B' ? 'text-lime-600' :
+                            rating === 'C' ? 'text-yellow-600' :
+                            rating === 'D' ? 'text-amber-600' :
+                            rating === 'E' ? 'text-orange-600' :
+                            rating === 'F' ? 'text-red-500' :
+                            'text-red-700'
+                          }`}>
+                            {rating}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-600">Valor (kg CO₂/m² año) *</label>
+                  <Input
+                    name="energyEmissionsValue"
+                    type="number"
+                    value={propertyForm.energyEmissionsValue}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 28"
+                    required
+                    min="0"
+                    className="border-green-200"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Contact Information */}
