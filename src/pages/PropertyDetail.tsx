@@ -74,7 +74,11 @@ const PropertyDetail = () => {
             features: dbProperty.features || [],
             description: dbProperty.description,
             managedBy: 'database' as const,
-            user_id: dbProperty.user_id
+            user_id: dbProperty.user_id,
+            energyConsumptionRating: (dbProperty as any).energy_consumption_rating,
+            energyConsumptionValue: (dbProperty as any).energy_consumption_value,
+            energyEmissionsRating: (dbProperty as any).energy_emissions_rating,
+            energyEmissionsValue: (dbProperty as any).energy_emissions_value
           };
 
           // Get the property owner's profile directly from profiles table
@@ -129,7 +133,11 @@ const PropertyDetail = () => {
             image: localProperty.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
             features: localProperty.features || [],
             reference: localProperty.reference,
-            managedBy: 'local' as const
+            managedBy: 'local' as const,
+            energyConsumptionRating: localProperty.energyConsumptionRating,
+            energyConsumptionValue: localProperty.energyConsumptionValue,
+            energyEmissionsRating: localProperty.energyEmissionsRating,
+            energyEmissionsValue: localProperty.energyEmissionsValue
           };
 
           // DEBUG: Log local property data
@@ -681,10 +689,10 @@ const PropertyDetail = () => {
 
               {/* Energy Certificate */}
               <EnergyCertificate 
-                consumptionRating="D"
-                emissionsRating="E"
-                consumptionValue={156}
-                emissionsValue={32}
+                consumptionRating={property.energyConsumptionRating || "D"}
+                emissionsRating={property.energyEmissionsRating || "E"}
+                consumptionValue={property.energyConsumptionValue || 156}
+                emissionsValue={property.energyEmissionsValue || 32}
               />
 
               {/* Mortgage Simulator - Only for sale properties */}

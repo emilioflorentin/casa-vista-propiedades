@@ -34,27 +34,39 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
 
   // Calculate values
   const savingsPercentage = Math.round((savings / price) * 100);
-  const mortgageAmount = price - savings;
+  const mortgageAmount = Math.max(0, price - savings);
   
-  // Taxes and expenses (approximately 10-12% for second hand, 10-11% for new)
-  const taxRate = propertyStatus === 'new' ? 0.10 : 0.11;
+  // Taxes and expenses based on Spanish regulations
+  // New properties: 10% IVA + ~2-3% other expenses
+  // Second hand: 6-10% ITP (varies by region) + ~2-3% other expenses
+  const taxRate = propertyStatus === 'new' ? 0.12 : 0.11;
   const taxesAndExpenses = Math.round(price * taxRate);
   const totalCost = price + taxesAndExpenses;
   
-  // Calculate monthly payment using mortgage formula
-  const monthlyRate = interestRate / 100 / 12;
+  // Calculate monthly payment using French amortization formula (same as Idealista)
+  // M = P * [r(1+r)^n] / [(1+r)^n - 1]
+  const annualRate = interestRate / 100;
+  const monthlyRate = annualRate / 12;
   const totalMonths = years * 12;
-  const monthlyPayment = mortgageAmount > 0 && monthlyRate > 0
-    ? Math.round((mortgageAmount * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / 
-        (Math.pow(1 + monthlyRate, totalMonths) - 1))
-    : 0;
   
-  // Total interest
-  const totalInterest = (monthlyPayment * totalMonths) - mortgageAmount;
-  const totalWithMortgage = savings + mortgageAmount + totalInterest;
+  let monthlyPayment = 0;
+  if (mortgageAmount > 0) {
+    if (monthlyRate > 0) {
+      const factor = Math.pow(1 + monthlyRate, totalMonths);
+      monthlyPayment = Math.round(mortgageAmount * (monthlyRate * factor) / (factor - 1));
+    } else {
+      // 0% interest rate case
+      monthlyPayment = Math.round(mortgageAmount / totalMonths);
+    }
+  }
   
-  // Financing percentage
-  const financingPercentage = Math.round((mortgageAmount / price) * 100);
+  // Total interest paid over the life of the loan
+  const totalPayments = monthlyPayment * totalMonths;
+  const totalInterest = Math.max(0, totalPayments - mortgageAmount);
+  const totalWithMortgage = savings + mortgageAmount + totalInterest + taxesAndExpenses;
+  
+  // Financing percentage (LTV - Loan to Value)
+  const financingPercentage = price > 0 ? Math.round((mortgageAmount / price) * 100) : 0;
 
   // Reset when property price changes
   useEffect(() => {

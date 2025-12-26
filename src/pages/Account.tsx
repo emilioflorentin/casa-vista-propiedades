@@ -88,7 +88,11 @@ const Account = () => {
     images: [] as File[],
     email: '',
     phone: '',
-    useRegisteredPhone: false
+    useRegisteredPhone: false,
+    energyConsumptionRating: '',
+    energyConsumptionValue: '',
+    energyEmissionsRating: '',
+    energyEmissionsValue: ''
   });
 
   // Load user properties on mount and when user changes
@@ -211,7 +215,11 @@ const Account = () => {
       images: [],
       email: user?.email || '',
       phone: '',
-      useRegisteredPhone: false
+      useRegisteredPhone: false,
+      energyConsumptionRating: property.energyConsumptionRating || '',
+      energyConsumptionValue: property.energyConsumptionValue?.toString() || '',
+      energyEmissionsRating: property.energyEmissionsRating || '',
+      energyEmissionsValue: property.energyEmissionsValue?.toString() || ''
     });
     setShowPropertyForm(true);
   };
@@ -251,7 +259,11 @@ const Account = () => {
       images: [],
       email: user?.email || '',
       phone: '',
-      useRegisteredPhone: false
+      useRegisteredPhone: false,
+      energyConsumptionRating: '',
+      energyConsumptionValue: '',
+      energyEmissionsRating: '',
+      energyEmissionsValue: ''
     });
     setShowPropertyForm(true);
   };
@@ -263,6 +275,18 @@ const Account = () => {
     setIsUploading(true);
     
     try {
+      // Validate energy certificate fields
+      if (!propertyForm.energyConsumptionRating || !propertyForm.energyConsumptionValue ||
+          !propertyForm.energyEmissionsRating || !propertyForm.energyEmissionsValue) {
+        toast({
+          title: "Error",
+          description: "El certificado energético es obligatorio. Por favor, completa todos los campos.",
+          variant: "destructive"
+        });
+        setIsUploading(false);
+        return;
+      }
+
       const propertyData = {
         userHash,
         userId: user?.id, // Add userId for direct profile lookup
@@ -277,7 +301,11 @@ const Account = () => {
         bathrooms: parseInt(propertyForm.bathrooms),
         area: parseInt(propertyForm.area),
         description: propertyForm.description,
-        features: propertyForm.features
+        features: propertyForm.features,
+        energyConsumptionRating: propertyForm.energyConsumptionRating,
+        energyConsumptionValue: parseInt(propertyForm.energyConsumptionValue),
+        energyEmissionsRating: propertyForm.energyEmissionsRating,
+        energyEmissionsValue: parseInt(propertyForm.energyEmissionsValue)
       };
       
       if (editingProperty) {
@@ -317,7 +345,11 @@ const Account = () => {
         images: [],
         email: user?.email || '',
         phone: '',
-        useRegisteredPhone: false
+        useRegisteredPhone: false,
+        energyConsumptionRating: '',
+        energyConsumptionValue: '',
+        energyEmissionsRating: '',
+        energyEmissionsValue: ''
       });
     } catch (error) {
       console.error('Error saving property:', error);

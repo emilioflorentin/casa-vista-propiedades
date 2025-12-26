@@ -61,6 +61,10 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
+          energy_consumption_rating: string | null
+          energy_consumption_value: number | null
+          energy_emissions_rating: string | null
+          energy_emissions_value: number | null
           features: string[] | null
           id: string
           image: string | null
@@ -81,6 +85,10 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          energy_consumption_rating?: string | null
+          energy_consumption_value?: number | null
+          energy_emissions_rating?: string | null
+          energy_emissions_value?: number | null
           features?: string[] | null
           id?: string
           image?: string | null
@@ -101,6 +109,10 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          energy_consumption_rating?: string | null
+          energy_consumption_value?: number | null
+          energy_emissions_rating?: string | null
+          energy_emissions_value?: number | null
           features?: string[] | null
           id?: string
           image?: string | null
