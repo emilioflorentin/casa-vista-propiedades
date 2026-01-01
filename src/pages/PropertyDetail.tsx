@@ -515,7 +515,9 @@ const PropertyDetail = () => {
                 <img
                   src={images[currentImageIndex]}
                   alt={property.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-stone-100"
+                  loading="eager"
+                  decoding="async"
                 />
               </div>
               <div className="grid grid-cols-4 gap-2 mt-4">
@@ -530,7 +532,9 @@ const PropertyDetail = () => {
                     <img
                       src={image}
                       alt={t('property.view_number', { number: index + 1 })}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-stone-100"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </button>
                 ))}
