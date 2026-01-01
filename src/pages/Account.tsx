@@ -92,7 +92,8 @@ const Account = () => {
     energyConsumptionRating: '',
     energyConsumptionValue: '',
     energyEmissionsRating: '',
-    energyEmissionsValue: ''
+    energyEmissionsValue: '',
+    contactPhone: ''
   });
 
   // Load user properties on mount and when user changes
@@ -219,7 +220,8 @@ const Account = () => {
       energyConsumptionRating: property.energyConsumptionRating || '',
       energyConsumptionValue: property.energyConsumptionValue?.toString() || '',
       energyEmissionsRating: property.energyEmissionsRating || '',
-      energyEmissionsValue: property.energyEmissionsValue?.toString() || ''
+      energyEmissionsValue: property.energyEmissionsValue?.toString() || '',
+      contactPhone: property.contactPhone || ''
     });
     setShowPropertyForm(true);
   };
@@ -263,7 +265,8 @@ const Account = () => {
       energyConsumptionRating: '',
       energyConsumptionValue: '',
       energyEmissionsRating: '',
-      energyEmissionsValue: ''
+      energyEmissionsValue: '',
+      contactPhone: profileData.phone || ''
     });
     setShowPropertyForm(true);
   };
@@ -305,7 +308,8 @@ const Account = () => {
         energyConsumptionRating: propertyForm.energyConsumptionRating,
         energyConsumptionValue: parseInt(propertyForm.energyConsumptionValue),
         energyEmissionsRating: propertyForm.energyEmissionsRating,
-        energyEmissionsValue: parseInt(propertyForm.energyEmissionsValue)
+        energyEmissionsValue: parseInt(propertyForm.energyEmissionsValue),
+        contactPhone: propertyForm.contactPhone
       };
       
       if (editingProperty) {
@@ -349,7 +353,8 @@ const Account = () => {
         energyConsumptionRating: '',
         energyConsumptionValue: '',
         energyEmissionsRating: '',
-        energyEmissionsValue: ''
+        energyEmissionsValue: '',
+        contactPhone: ''
       });
     } catch (error) {
       console.error('Error saving property:', error);
