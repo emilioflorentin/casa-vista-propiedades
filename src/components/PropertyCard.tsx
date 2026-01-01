@@ -67,6 +67,9 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           src={property.image}
           alt={property.title}
           className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+          loading="lazy"
+          decoding="async"
+          style={{ imageRendering: 'auto' }}
         />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           <div className="flex gap-2">
