@@ -13,9 +13,8 @@ import MapComponent from "@/components/MapComponent";
 import EnergyCertificate from "@/components/EnergyCertificate";
 import MortgageSimulator from "@/components/MortgageSimulator";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getLocalProperties, updateLocalProperty } from "@/utils/localProperties";
+import { getLocalProperties } from "@/utils/localProperties";
 import { supabase } from "@/integrations/supabase/client";
-import { getUserHash } from "@/utils/userHash";
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -78,32 +77,20 @@ const PropertyDetail = () => {
             energyConsumptionRating: (dbProperty as any).energy_consumption_rating,
             energyConsumptionValue: (dbProperty as any).energy_consumption_value,
             energyEmissionsRating: (dbProperty as any).energy_emissions_rating,
-            energyEmissionsValue: (dbProperty as any).energy_emissions_value
+            energyEmissionsValue: (dbProperty as any).energy_emissions_value,
+            contactPhone: (dbProperty as any).contact_phone
           };
 
-          // Get the property owner's profile directly from profiles table
-          try {
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', dbProperty.user_id)
-              .maybeSingle();
-
-            if (!profileError && profile) {
-              agentInfo = {
-                name: profile.full_name || 'Propietario',
-                phone: profile.phone || 'No disponible',
-                email: profile.email || 'contacto@propietario.com',
-                image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                agency: profile.company_name || 'Propietario particular',
-                whatsapp: profile.phone || '+34600000000'
-              };
-              console.log('Found property owner profile:', profile);
-            } else {
-              console.log('No profile found for user_id:', dbProperty.user_id);
-            }
-          } catch (profileError) {
-            console.error('Error fetching property owner profile:', profileError);
+          // Use contact_phone from the property directly
+          if ((dbProperty as any).contact_phone) {
+            agentInfo = {
+              name: 'Propietario',
+              phone: (dbProperty as any).contact_phone,
+              email: '', // Email is now private
+              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+              agency: 'Propietario particular',
+              whatsapp: (dbProperty as any).contact_phone
+            };
           }
         }
       } catch (error) {
@@ -137,130 +124,21 @@ const PropertyDetail = () => {
             energyConsumptionRating: localProperty.energyConsumptionRating,
             energyConsumptionValue: localProperty.energyConsumptionValue,
             energyEmissionsRating: localProperty.energyEmissionsRating,
-            energyEmissionsValue: localProperty.energyEmissionsValue
+            energyEmissionsValue: localProperty.energyEmissionsValue,
+            contactPhone: localProperty.contactPhone
           };
 
-          // DEBUG: Log local property data
-          console.log('🔍 DEBUG - Local Property Data:', {
-            propertyId: localProperty.id,
-            userId: localProperty.userId,
-            userHash: localProperty.userHash,
-            hasUserId: !!localProperty.userId,
-            hasUserHash: !!localProperty.userHash
-          });
-
-          // Try to find the owner of this local property using the userId
-          if (localProperty.userId) {
-            console.log('🔍 DEBUG - Searching for profile with userId:', localProperty.userId);
-            try {
-              // Get the property owner's profile directly using the userId
-              const { data: profileData, error } = await supabase
-                .rpc('get_complete_profile_info', { profile_user_id: localProperty.userId })
-                .maybeSingle();
-              
-              const profile = profileData as {
-                id: string;
-                full_name: string;
-                user_type: string;
-                company_name: string;
-                phone: string;
-                email: string;
-                avatar_url: string;
-              } | null;
-
-              console.log('🔍 DEBUG - Profile query result:', { profile, error, hasProfile: !!profile });
-
-              if (!error && profile) {
-                console.log('🔍 DEBUG - Profile found:', {
-                  id: profile.id,
-                  full_name: profile.full_name,
-                  company_name: profile.company_name,
-                  email: profile.email
-                });
-
-                // Update email if missing
-                if (!profile.email) {
-                  try {
-                    await supabase.rpc('update_profile_email');
-                    const { data: updatedProfile } = await supabase
-                      .from('profiles')
-                      .select('*')
-                      .eq('id', profile.id)
-                      .maybeSingle();
-                    if (updatedProfile) {
-                      profile.email = updatedProfile.email;
-                    }
-                  } catch (updateError) {
-                    console.error('Error updating profile email:', updateError);
-                  }
-                }
-
-                agentInfo = {
-                  name: profile.full_name || 'Propietario',
-                  phone: profile.phone || 'No disponible',
-                  email: profile.email || 'contacto@propietario.com',
-                  image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                  agency: profile.company_name || 'Propietario particular',
-                  whatsapp: profile.phone || '+34600000000'
-                };
-                console.log('🔍 DEBUG - Agent info set from profile:', agentInfo);
-              } else {
-                console.log('🔍 DEBUG - No profile found or error occurred');
-              }
-            } catch (error) {
-              console.error('🔍 DEBUG - Error fetching local property owner profile:', error);
-            }
-          } else {
-            console.log('🔍 DEBUG - No userId found in local property, trying to find real owner');
-            // For older properties without userId, try to find the owner by checking if this property 
-            // exists in the database (which would mean it was published by an authenticated user)
-            try {
-              const { data: dbProperty, error } = await supabase
-                .from('properties')
-                .select('user_id')
-                .eq('reference', localProperty.reference)
-                .maybeSingle();
-
-              if (!error && dbProperty) {
-                console.log('🔍 DEBUG - Found property in database, fetching owner profile');
-                const { data: profileData, error: profileError } = await supabase
-                  .rpc('get_complete_profile_info', { profile_user_id: dbProperty.user_id })
-                  .maybeSingle();
-                
-                const profile = profileData as {
-                  id: string;
-                  full_name: string;
-                  user_type: string;
-                  company_name: string;
-                  phone: string;
-                  email: string;
-                  avatar_url: string;
-                } | null;
-
-                if (!profileError && profile) {
-                  console.log('🔍 DEBUG - Found real property owner:', profile.full_name);
-                  
-                  // Update local property with the real userId for future
-                  await updateLocalProperty(localProperty.id, { userId: dbProperty.user_id });
-
-                  agentInfo = {
-                    name: profile.full_name || 'Propietario',
-                    phone: profile.phone || 'No disponible',
-                    email: profile.email || 'contacto@propietario.com',
-                    image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                    agency: profile.company_name || 'Propietario particular',
-                    whatsapp: profile.phone || '+34600000000'
-                  };
-                }
-              } else {
-                console.log('🔍 DEBUG - Property not found in database, truly local-only property');
-              }
-            } catch (error) {
-              console.error('🔍 DEBUG - Error searching for property owner:', error);
-            }
+          // Use contact phone from the property directly
+          if (localProperty.contactPhone) {
+            agentInfo = {
+              name: 'Propietario',
+              phone: localProperty.contactPhone,
+              email: '', // Email is now private
+              image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+              agency: 'Propietario particular',
+              whatsapp: localProperty.contactPhone
+            };
           }
-
-          // Only set agentInfo if we found a real owner - no random/generic agents
         }
       }
       

@@ -23,6 +23,8 @@ export interface LocalProperty {
   energyConsumptionValue?: number;
   energyEmissionsRating?: string;
   energyEmissionsValue?: number;
+  // Contact phone for the property
+  contactPhone?: string;
 }
 
 // Function to compress and resize images
