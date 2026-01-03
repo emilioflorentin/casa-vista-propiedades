@@ -24,12 +24,32 @@ import {
   Trash2,
   Check
 } from 'lucide-react';
-import { getUserHash } from '../utils/userHash';
-import { getUserProperties, deleteLocalProperty, saveLocalProperty, updateLocalProperty } from '../utils/localProperties';
-import type { LocalProperty } from '../utils/localProperties';
 import { supabase } from '@/integrations/supabase/client';
-import { generatePropertyReference } from '../utils/localProperties';
 import { useToast } from '@/hooks/use-toast';
+
+// Property type for Supabase data
+interface PropertyData {
+  id: string;
+  reference: string;
+  title: string;
+  type: "apartment" | "house" | "loft" | "studio";
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image: string | null;
+  features: string[] | null;
+  description: string | null;
+  is_rented: boolean;
+  user_id: string;
+  energy_consumption_rating: string | null;
+  energy_consumption_value: number | null;
+  energy_emissions_rating: string | null;
+  energy_emissions_value: number | null;
+}
 
 const Account = () => {
   const { t } = useLanguage();
@@ -37,14 +57,8 @@ const Account = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [showPropertyForm, setShowPropertyForm] = useState(false);
-  const [editingProperty, setEditingProperty] = useState<LocalProperty | null>(null);
-  const [userProperties, setUserProperties] = useState<LocalProperty[]>([]);
-  
-  // Debug userProperties changes
-  useEffect(() => {
-    console.log('ACCOUNT: userProperties state changed:', userProperties.length, userProperties);
-  }, [userProperties]);
-  const [userHash, setUserHash] = useState<string>('');
+  const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null);
+  const [userProperties, setUserProperties] = useState<PropertyData[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -95,19 +109,59 @@ const Account = () => {
     energyEmissionsValue: ''
   });
 
-  // Load user properties on mount and when user changes
+  // Load user properties from Supabase
+  const loadUserProperties = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error('Error loading properties from Supabase:', error);
+        return;
+      }
+      
+      if (data) {
+        const formattedProperties: PropertyData[] = data.map(p => ({
+          id: p.id,
+          reference: p.reference,
+          title: p.title,
+          type: p.type as "apartment" | "house" | "loft" | "studio",
+          price: Number(p.price),
+          currency: p.currency,
+          operation: p.operation as "rent" | "sale",
+          location: p.location,
+          bedrooms: p.bedrooms,
+          bathrooms: p.bathrooms,
+          area: Number(p.area),
+          image: p.image,
+          features: p.features,
+          description: p.description,
+          is_rented: p.is_rented,
+          user_id: p.user_id,
+          energy_consumption_rating: p.energy_consumption_rating,
+          energy_consumption_value: p.energy_consumption_value,
+          energy_emissions_rating: p.energy_emissions_rating,
+          energy_emissions_value: p.energy_emissions_value
+        }));
+        console.log('ACCOUNT: properties loaded from Supabase:', formattedProperties.length);
+        setUserProperties(formattedProperties);
+      }
+    } catch (error) {
+      console.error('Error loading properties:', error);
+    }
+  };
+
+  // Load user data on mount and when user changes
   useEffect(() => {
     const loadUserData = async () => {
       console.log('ACCOUNT: loadUserData called, user:', user?.id);
       if (user) {
-        const hash = await getUserHash();
-        console.log('ACCOUNT: userHash obtained:', hash);
-        if (hash) {
-          setUserHash(hash);
-          const properties = getUserProperties(hash);
-          console.log('ACCOUNT: properties loaded from localStorage:', properties.length, properties);
-          setUserProperties(properties);
-        }
+        // Load properties from Supabase
+        await loadUserProperties();
 
         // Initialize email in property form
         setPropertyForm(prev => ({
@@ -148,57 +202,92 @@ const Account = () => {
     loadUserData();
   }, [user]);
 
-  // Debug user changes
-  useEffect(() => {
-    console.log('ACCOUNT: user changed:', user?.id, 'userHash:', userHash);
-  }, [user, userHash]);
-
   const handleSignOut = async () => {
     await signOut();
   };
 
-  const handleDeleteProperty = (propertyId: string) => {
-    if (userHash) {
-      deleteLocalProperty(propertyId);
-      setUserProperties(getUserProperties(userHash));
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      await loadUserProperties();
+      toast({
+        title: "Éxito",
+        description: "Propiedad eliminada correctamente",
+      });
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la propiedad",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleMarkAsRented = (propertyId: string) => {
-    if (userHash) {
-      // Find the property and update it
-      const properties = getUserProperties(userHash);
-      const property = properties.find(p => p.id === propertyId);
-      if (property) {
-        const updatedProperty = { ...property, is_rented: true };
-        updateLocalProperty(propertyId, updatedProperty, []);
-        setUserProperties(getUserProperties(userHash));
-        toast({
-          title: "Éxito",
-          description: "Propiedad marcada como alquilada",
-        });
-      }
+  const handleMarkAsRented = async (propertyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({ is_rented: true })
+        .eq('id', propertyId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      await loadUserProperties();
+      toast({
+        title: "Éxito",
+        description: "Propiedad marcada como alquilada",
+      });
+    } catch (error) {
+      console.error('Error updating property:', error);
+      toast({
+        title: "Error",
+        description: "Error al actualizar la propiedad",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleMarkAsAvailable = (propertyId: string) => {
-    if (userHash) {
-      // Find the property and update it
-      const properties = getUserProperties(userHash);
-      const property = properties.find(p => p.id === propertyId);
-      if (property) {
-        const updatedProperty = { ...property, is_rented: false };
-        updateLocalProperty(propertyId, updatedProperty, []);
-        setUserProperties(getUserProperties(userHash));
-        toast({
-          title: "Éxito",
-          description: "Propiedad marcada como disponible",
-        });
-      }
+  const handleMarkAsAvailable = async (propertyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({ is_rented: false })
+        .eq('id', propertyId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      await loadUserProperties();
+      toast({
+        title: "Éxito",
+        description: "Propiedad marcada como disponible",
+      });
+    } catch (error) {
+      console.error('Error updating property:', error);
+      toast({
+        title: "Error",
+        description: "Error al actualizar la propiedad",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleEditProperty = (property: LocalProperty) => {
+  const handleEditProperty = (property: PropertyData) => {
     setEditingProperty(property);
     setPropertyForm({
       title: property.title,
@@ -216,10 +305,10 @@ const Account = () => {
       email: user?.email || '',
       phone: '',
       useRegisteredPhone: false,
-      energyConsumptionRating: property.energyConsumptionRating || '',
-      energyConsumptionValue: property.energyConsumptionValue?.toString() || '',
-      energyEmissionsRating: property.energyEmissionsRating || '',
-      energyEmissionsValue: property.energyEmissionsValue?.toString() || ''
+      energyConsumptionRating: property.energy_consumption_rating || '',
+      energyConsumptionValue: property.energy_consumption_value?.toString() || '',
+      energyEmissionsRating: property.energy_emissions_rating || '',
+      energyEmissionsValue: property.energy_emissions_value?.toString() || ''
     });
     setShowPropertyForm(true);
   };
@@ -270,7 +359,7 @@ const Account = () => {
 
   const handlePropertySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userHash) return;
+    if (!user) return;
 
     setIsUploading(true);
     
@@ -287,10 +376,32 @@ const Account = () => {
         return;
       }
 
+      // Upload image to Supabase storage if provided
+      let imageUrl: string | null = editingProperty?.image || null;
+      
+      if (propertyForm.images && propertyForm.images.length > 0) {
+        const file = propertyForm.images[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, file, { upsert: true });
+        
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          throw new Error('Error al subir la imagen');
+        }
+        
+        const { data: urlData } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+        
+        imageUrl = urlData.publicUrl;
+      }
+
       const propertyData = {
-        userHash,
-        userId: user?.id, // Add userId for direct profile lookup
-        reference: editingProperty?.reference || generatePropertyReference(),
+        user_id: user.id,
         title: propertyForm.title,
         type: propertyForm.type,
         price: parseInt(propertyForm.price),
@@ -302,30 +413,43 @@ const Account = () => {
         area: parseInt(propertyForm.area),
         description: propertyForm.description,
         features: propertyForm.features,
-        energyConsumptionRating: propertyForm.energyConsumptionRating,
-        energyConsumptionValue: parseInt(propertyForm.energyConsumptionValue),
-        energyEmissionsRating: propertyForm.energyEmissionsRating,
-        energyEmissionsValue: parseInt(propertyForm.energyEmissionsValue)
+        image: imageUrl,
+        energy_consumption_rating: propertyForm.energyConsumptionRating,
+        energy_consumption_value: parseInt(propertyForm.energyConsumptionValue),
+        energy_emissions_rating: propertyForm.energyEmissionsRating,
+        energy_emissions_value: parseInt(propertyForm.energyEmissionsValue)
       };
       
       if (editingProperty) {
-        const success = await updateLocalProperty(editingProperty.id, propertyData, propertyForm.images);
-        if (!success) {
-          throw new Error('No se pudo actualizar la propiedad');
-        }
+        const { error } = await supabase
+          .from('properties')
+          .update(propertyData)
+          .eq('id', editingProperty.id)
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+        
         toast({
           title: "Éxito",
           description: "Propiedad actualizada correctamente",
         });
       } else {
-        await saveLocalProperty(propertyData, propertyForm.images);
+        const { error } = await supabase
+          .from('properties')
+          .insert({
+            ...propertyData,
+            reference: '' // Will be auto-generated by database trigger
+          });
+        
+        if (error) throw error;
+        
         toast({
           title: "Éxito",
           description: "Propiedad publicada correctamente",
         });
       }
       
-      setUserProperties(getUserProperties(userHash));
+      await loadUserProperties();
       setShowPropertyForm(false);
       setEditingProperty(null);
       
@@ -351,11 +475,11 @@ const Account = () => {
         energyEmissionsRating: '',
         energyEmissionsValue: ''
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving property:', error);
       toast({
         title: "Error",
-        description: "Error al guardar la propiedad: " + error.message,
+        description: "Error al guardar la propiedad: " + (error.message || 'Unknown error'),
         variant: "destructive"
       });
     } finally {
@@ -725,9 +849,9 @@ const Account = () => {
                 })().map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                     <div className="aspect-video bg-stone-200 relative">
-                      {property.images && property.images.length > 0 ? (
+                      {property.image ? (
                         <img 
-                          src={property.images[0]} 
+                          src={property.image} 
                           alt={property.title}
                           className="w-full h-full object-cover"
                         />
@@ -835,9 +959,9 @@ const Account = () => {
                 {userProperties.filter(property => property.is_rented).map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                     <div className="aspect-video bg-stone-200 relative">
-                      {property.images && property.images.length > 0 ? (
+                      {property.image ? (
                         <img 
-                          src={property.images[0]} 
+                          src={property.image} 
                           alt={property.title}
                           className="w-full h-full object-cover"
                         />

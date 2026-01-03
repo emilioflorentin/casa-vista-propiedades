@@ -7,9 +7,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, X, Plus, Image as ImageIcon, Zap, Leaf } from 'lucide-react';
-import { LocalProperty } from '@/utils/localProperties';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+
+// Generic property type for editing (works with both Supabase and local data)
+interface EditableProperty {
+  id: string;
+  reference: string;
+  title: string;
+  type: "apartment" | "house" | "loft" | "studio";
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image?: string | null;
+  features?: string[] | null;
+  description?: string | null;
+  is_rented?: boolean;
+}
 
 const energyRatings = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 
@@ -35,7 +53,7 @@ interface PropertyFormProps {
     energyEmissionsRating: string;
     energyEmissionsValue: string;
   };
-  editingProperty: LocalProperty | null;
+  editingProperty: EditableProperty | null;
   isUploading: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
