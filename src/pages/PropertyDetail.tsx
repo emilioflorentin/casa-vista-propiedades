@@ -765,7 +765,16 @@ const PropertyDetail = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
-                  <Button size="sm" className="bg-stone-600 hover:bg-stone-700">
+                  <Button 
+                    size="sm" 
+                    className="bg-stone-600 hover:bg-stone-700"
+                    onClick={() => {
+                      const phoneNumber = agent.phone?.replace(/\s/g, '') || '';
+                      if (phoneNumber && phoneNumber !== 'No disponible') {
+                        window.location.href = `tel:${phoneNumber}`;
+                      }
+                    }}
+                  >
                     <Phone className="h-4 w-4 mr-1" />
                     {t('property.call')}
                   </Button>
