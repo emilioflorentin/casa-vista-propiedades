@@ -1,4 +1,3 @@
-
 import { useFavorites } from "@/hooks/useFavorites";
 import { allProperties } from "@/data/properties";
 import PropertyCard from "@/components/PropertyCard";
@@ -18,24 +17,55 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getLocalProperties } from "@/utils/localProperties";
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Favorites = () => {
   const { favorites, clearAllFavorites } = useFavorites();
   const { t } = useLanguage();
-  const [localProperties, setLocalProperties] = useState<any[]>([]);
+  const [supabaseProperties, setSupabaseProperties] = useState<any[]>([]);
 
   useEffect(() => {
-    const props = getLocalProperties();
-    setLocalProperties(props.map(p => ({
-      ...p,
-      id: parseInt(p.id)
-    })));
+    const loadSupabaseProperties = async () => {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*');
+      
+      if (error) {
+        console.error('Error loading properties from Supabase:', error);
+        return;
+      }
+      
+      if (data) {
+        setSupabaseProperties(data.map(p => ({
+          id: p.id,
+          reference: p.reference,
+          title: p.title,
+          type: p.type,
+          price: Number(p.price),
+          currency: p.currency,
+          operation: p.operation,
+          location: p.location,
+          bedrooms: p.bedrooms,
+          bathrooms: p.bathrooms,
+          area: Number(p.area),
+          image: p.image,
+          features: p.features || [],
+          description: p.description,
+          isRented: p.is_rented,
+          energyCertificate: p.energy_consumption_rating ? {
+            consumption: { rating: p.energy_consumption_rating, value: p.energy_consumption_value },
+            emissions: { rating: p.energy_emissions_rating, value: p.energy_emissions_value }
+          } : undefined
+        })));
+      }
+    };
+    
+    loadSupabaseProperties();
   }, []);
 
-  // Combine all properties (static + local) and filter favorites
-  const allCombinedProperties = [...allProperties, ...localProperties];
+  // Combine all properties (static + supabase) and filter favorites
+  const allCombinedProperties = [...allProperties, ...supabaseProperties];
   const favoriteProperties = allCombinedProperties.filter(property => 
     favorites.includes(property.id)
   );
