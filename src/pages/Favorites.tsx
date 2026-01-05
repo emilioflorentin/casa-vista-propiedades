@@ -37,27 +37,40 @@ const Favorites = () => {
       }
       
       if (data) {
-        setSupabaseProperties(data.map(p => ({
-          id: p.id,
-          reference: p.reference,
-          title: p.title,
-          type: p.type,
-          price: Number(p.price),
-          currency: p.currency,
-          operation: p.operation,
-          location: p.location,
-          bedrooms: p.bedrooms,
-          bathrooms: p.bathrooms,
-          area: Number(p.area),
-          image: p.image,
-          features: p.features || [],
-          description: p.description,
-          isRented: p.is_rented,
-          energyCertificate: p.energy_consumption_rating ? {
-            consumption: { rating: p.energy_consumption_rating, value: p.energy_consumption_value },
-            emissions: { rating: p.energy_emissions_rating, value: p.energy_emissions_value }
-          } : undefined
-        })));
+        // IMPORTANT: Keep ID compatible with the rest of the app (Properties page converts UUID -> number)
+        setSupabaseProperties(
+          data.map((p) => ({
+            id: parseInt(String(p.id).slice(-8), 16),
+            reference: p.reference,
+            title: p.title,
+            type: p.type,
+            price: Number(p.price),
+            currency: p.currency,
+            operation: p.operation,
+            location: p.location,
+            bedrooms: p.bedrooms,
+            bathrooms: p.bathrooms,
+            area: Number(p.area),
+            image:
+              p.image ||
+              "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+            features: p.features || [],
+            description: p.description,
+            isRented: p.is_rented,
+            energyCertificate: p.energy_consumption_rating
+              ? {
+                  consumption: {
+                    rating: p.energy_consumption_rating,
+                    value: p.energy_consumption_value,
+                  },
+                  emissions: {
+                    rating: p.energy_emissions_rating,
+                    value: p.energy_emissions_value,
+                  },
+                }
+              : undefined,
+          }))
+        );
       }
     };
     
