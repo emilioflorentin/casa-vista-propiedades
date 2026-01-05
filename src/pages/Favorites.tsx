@@ -67,7 +67,7 @@ const Favorites = () => {
   // Combine all properties (static + supabase) and filter favorites
   const allCombinedProperties = [...allProperties, ...supabaseProperties];
   const favoriteProperties = allCombinedProperties.filter(property => 
-    favorites.includes(property.id)
+    favorites.some(fav => String(fav) === String(property.id))
   );
 
   const getFavoritesCountText = () => {

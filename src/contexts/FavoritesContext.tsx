@@ -4,17 +4,19 @@ import { useToast } from '@/hooks/use-toast';
 import { getUserId } from '@/utils/userIdentification';
 import Cookies from 'js-cookie';
 
+type PropertyId = number | string;
+
 interface FavoritesContextType {
-  favorites: number[];
-  toggleFavorite: (propertyId: number) => void;
-  isFavorite: (propertyId: number) => boolean;
+  favorites: PropertyId[];
+  toggleFavorite: (propertyId: PropertyId) => void;
+  isFavorite: (propertyId: PropertyId) => boolean;
   clearAllFavorites: () => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [favorites, setFavorites] = useState<PropertyId[]>([]);
   const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const { toast } = useToast();
 
@@ -75,7 +77,7 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('cookies-accepted', handleCookiesAccepted);
   }, []);
 
-  const toggleFavorite = (propertyId: number) => {
+  const toggleFavorite = (propertyId: PropertyId) => {
     console.log('FAVORITES: Toggle favorite called for property:', propertyId);
     console.log('FAVORITES: Current cookies accepted state:', cookiesAccepted);
     
@@ -96,9 +98,10 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     setFavorites(currentFavorites => {
       console.log('Current favorites before toggle:', currentFavorites);
       
-      const isCurrentlyFavorite = currentFavorites.includes(propertyId);
+      // Compare as strings to handle both number and string IDs
+      const isCurrentlyFavorite = currentFavorites.some(id => String(id) === String(propertyId));
       const newFavorites = isCurrentlyFavorite
-        ? currentFavorites.filter(id => id !== propertyId)
+        ? currentFavorites.filter(id => String(id) !== String(propertyId))
         : [...currentFavorites, propertyId];
       
       console.log('New favorites after toggle:', newFavorites);
@@ -137,8 +140,9 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const isFavorite = (propertyId: number) => {
-    const result = favorites.includes(propertyId);
+  const isFavorite = (propertyId: PropertyId) => {
+    // Compare as strings to handle both number and string IDs
+    const result = favorites.some(id => String(id) === String(propertyId));
     console.log(`Checking if property ${propertyId} is favorite:`, result, 'Current favorites:', favorites);
     return result;
   };
