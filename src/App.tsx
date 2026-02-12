@@ -18,6 +18,8 @@ import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import ManageRental from "./pages/ManageRental";
+import TenantIncidents from "./pages/TenantIncidents";
+import OwnerIncidents from "./pages/OwnerIncidents";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
               <Route path="/account" element={<Account />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/manage-rental/:propertyId" element={<ManageRental />} />
+              <Route path="/tenant-incidents" element={<TenantIncidents />} />
+              <Route path="/owner-incidents" element={<OwnerIncidents />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

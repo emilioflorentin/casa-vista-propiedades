@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      incidents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          images: string[] | null
+          property_id: string
+          status: string
+          tenant_access_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description: string
+          id?: string
+          images?: string[] | null
+          property_id: string
+          status?: string
+          tenant_access_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          images?: string[] | null
+          property_id?: string
+          status?: string
+          tenant_access_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_tenant_access_id_fkey"
+            columns: ["tenant_access_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_access"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -220,11 +274,68 @@ export type Database = {
           },
         ]
       }
+      tenant_access: {
+        Row: {
+          access_code: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          property_id: string
+          tenant_email: string | null
+          tenant_name: string
+          tenant_phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_code?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          property_id: string
+          tenant_email?: string | null
+          tenant_name: string
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          property_id?: string
+          tenant_email?: string | null
+          tenant_name?: string
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_access_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      create_incident: {
+        Args: {
+          p_access_code: string
+          p_category?: string
+          p_description: string
+          p_images?: string[]
+          p_title: string
+        }
+        Returns: string
+      }
       generate_property_reference: { Args: never; Returns: string }
       get_complete_profile_info: {
         Args: { profile_user_id: string }
@@ -258,7 +369,30 @@ export type Database = {
           user_type: string
         }[]
       }
+      get_tenant_incidents: {
+        Args: { p_access_code: string }
+        Returns: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          images: string[]
+          status: string
+          title: string
+          updated_at: string
+        }[]
+      }
       update_profile_email: { Args: never; Returns: undefined }
+      validate_tenant_access: {
+        Args: { p_access_code: string }
+        Returns: {
+          property_id: string
+          property_location: string
+          property_title: string
+          tenant_access_id: string
+          tenant_name: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
