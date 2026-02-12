@@ -499,6 +499,17 @@ const translations: Translations = {
       privacy_policy: 'Política de Privacidad',
       accept: 'Aceptar',
       reject: 'Rechazar'
+    },
+    tenant_section: {
+      title: '¿Eres inquilino?',
+      subtitle: 'Reporta incidencias de tu alquiler de forma rápida y sencilla. Solo necesitas el código de acceso que te proporcionó tu inmobiliaria.',
+      step1_title: 'Identifícate',
+      step1_desc: 'Introduce el código UUID que te entregaron al firmar tu contrato de alquiler.',
+      step2_title: 'Reporta incidencias',
+      step2_desc: 'Describe el problema y sube fotos para que tu propietario pueda gestionarlo rápidamente.',
+      step3_title: '¿Algo urgente?',
+      step3_desc: 'Usa nuestro enlace de WhatsApp para comunicarte directamente con tu inmobiliaria.',
+      cta: 'Acceder como inquilino'
     }
   },
   en: {
@@ -970,6 +981,17 @@ const translations: Translations = {
       privacy_policy: 'Privacy Policy',
       accept: 'Accept',
       reject: 'Reject'
+    },
+    tenant_section: {
+      title: 'Are you a tenant?',
+      subtitle: 'Report incidents in your rental quickly and easily. You only need the access code provided by your property manager.',
+      step1_title: 'Identify yourself',
+      step1_desc: 'Enter the UUID code given to you when you signed your rental contract.',
+      step2_title: 'Report incidents',
+      step2_desc: 'Describe the issue and upload photos so your landlord can handle it quickly.',
+      step3_title: 'Something urgent?',
+      step3_desc: 'Use our WhatsApp link to communicate directly with your property manager.',
+      cta: 'Access as tenant'
     }
   }
 };
