@@ -22,7 +22,8 @@ import {
   Home, 
   Edit2, 
   Trash2,
-  Check
+  Check,
+  Shield
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -663,10 +664,11 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
               <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
-              <TabsTrigger value="rented">Mis Propiedades Alquiladas</TabsTrigger>
+              <TabsTrigger value="rented">Alquiladas</TabsTrigger>
+              <TabsTrigger value="tenants">Inquilinos</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -1053,6 +1055,33 @@ const Account = () => {
                   </CardContent>
                 </Card>
               )}
+            </TabsContent>
+
+            <TabsContent value="tenants" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-stone-800">Gestión de Inquilinos</h2>
+                  <p className="text-stone-600">Genera códigos de acceso y gestiona incidencias de tus inquilinos</p>
+                </div>
+              </div>
+
+              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <CardContent className="p-8 text-center space-y-4">
+                  <Shield className="w-16 h-16 text-stone-400 mx-auto" />
+                  <h3 className="text-xl font-semibold text-stone-800">
+                    Panel de Incidencias
+                  </h3>
+                  <p className="text-stone-600 max-w-md mx-auto">
+                    Desde aquí puedes generar códigos UUID para tus inquilinos, ver las incidencias que reportan y gestionar su estado.
+                  </p>
+                  <Link to="/owner-incidents">
+                    <Button className="bg-stone-700 hover:bg-stone-600">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Ir al panel de incidencias
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
