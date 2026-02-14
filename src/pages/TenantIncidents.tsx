@@ -20,6 +20,7 @@ interface TenantInfo {
   tenant_name: string;
   property_title: string;
   property_location: string;
+  owner_phone?: string;
 }
 
 interface Incident {
@@ -89,7 +90,12 @@ const TenantIncidents = () => {
         return;
       }
       const info = (data as any[])[0];
-      setTenantInfo(info);
+      
+      // Fetch owner's phone number
+      const { data: ownerData } = await supabase.rpc("get_property_owner_contact", { property_id: info.property_id });
+      const ownerPhone = ownerData && (ownerData as any[]).length > 0 ? (ownerData as any[])[0].phone : null;
+      
+      setTenantInfo({ ...info, owner_phone: ownerPhone });
       await loadIncidents(accessCode.trim());
     } catch {
       toast({ title: "Error", variant: "destructive" });
@@ -176,7 +182,10 @@ const TenantIncidents = () => {
     }
   };
 
-  const whatsappNumber = "34958123456"; // Default agency number
+  const ownerPhone = tenantInfo?.owner_phone;
+  const formattedPhone = ownerPhone
+    ? (ownerPhone.startsWith("+") ? ownerPhone.replace(/\D/g, "") : `34${ownerPhone.replace(/\D/g, "")}`)
+    : null;
   const whatsappMessage = encodeURIComponent(
     language === "es"
       ? `Hola, soy inquilino de ${tenantInfo?.property_title || "una propiedad"}. Necesito reportar una incidencia urgente.`
@@ -243,16 +252,18 @@ const TenantIncidents = () => {
                       <Send className="h-4 w-4 mr-2" />
                       {language === "es" ? "Nueva incidencia" : "New incident"}
                     </Button>
-                    <a
-                      href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button variant="outline" className="border-green-500 text-green-700 hover:bg-green-50">
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        WhatsApp
-                      </Button>
-                    </a>
+                    {formattedPhone && (
+                      <a
+                        href={`https://wa.me/${formattedPhone}?text=${whatsappMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" className="border-green-500 text-green-700 hover:bg-green-50">
+                          <MessageCircle className="h-4 w-4 mr-2" />
+                          WhatsApp
+                        </Button>
+                      </a>
+                    )}
                   </div>
                 </div>
               </CardContent>
