@@ -42,6 +42,7 @@ const Favorites = () => {
         setSupabaseProperties(
           data.map((p) => ({
             id: parseInt(String(p.id).slice(-8), 16),
+            originalId: p.id,
             reference: p.reference,
             title: p.title,
             type: p.type,
@@ -81,6 +82,7 @@ const Favorites = () => {
   // Load local properties
   const localProperties = getLocalProperties().map(p => ({
     id: p.id,
+    originalId: p.id,
     reference: p.reference,
     title: p.title,
     type: p.type as any,

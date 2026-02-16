@@ -135,6 +135,7 @@ const Index = () => {
         // Convert and combine properties
         const convertedDbProperties = (dbProperties || []).map(prop => ({
           id: parseInt(prop.id.slice(-8), 16),
+          originalId: prop.id,
           reference: prop.reference,
           title: prop.title,
           type: prop.type,
@@ -154,6 +155,7 @@ const Index = () => {
 
         const convertedLocalProperties = localProperties.map(prop => ({
           id: parseInt(prop.id),
+          originalId: prop.id,
           reference: prop.reference,
           title: prop.title,
           type: prop.type,

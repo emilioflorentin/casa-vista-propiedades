@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Property {
   id: number;
+  originalId?: string;
   reference: string;
   title: string;
   type: string;
@@ -162,7 +163,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           <div className="text-xl font-bold text-gray-700">
             {formatPrice(property.price, property.operation)}
           </div>
-          <Link to={`/property/${property.id}`}>
+          <Link to={`/property/${property.originalId || property.id}`}>
             <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
               <Eye className="h-4 w-4 mr-1" />
               {t('properties.view_details')}

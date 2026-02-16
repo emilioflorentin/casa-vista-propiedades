@@ -132,7 +132,8 @@ const Properties = () => {
 
   // Convert DB properties to match static property format
   const convertedDbProperties = dbProperties.map(prop => ({
-    id: parseInt(prop.id.slice(-8), 16), // Convert UUID to number for compatibility
+    id: parseInt(prop.id.slice(-8), 16),
+    originalId: prop.id,
     reference: prop.reference,
     title: prop.title,
     type: prop.type,
@@ -152,7 +153,8 @@ const Properties = () => {
 
   // Convert local properties to match static property format
   const convertedLocalProperties = localProperties.map(prop => ({
-    id: parseInt(prop.id), // Convert string ID to number for compatibility
+    id: parseInt(prop.id),
+    originalId: prop.id,
     reference: prop.reference,
     title: prop.title,
     type: prop.type,
@@ -551,7 +553,7 @@ const Properties = () => {
                           {new Intl.NumberFormat('es-ES').format(property.price)}€
                           {property.operation === 'rent' && t('properties.per_month')}
                         </div>
-                        <Link to={`/property/${property.id}`}>
+                        <Link to={`/property/${(property as any).originalId || property.id}`}>
                           <Button className="bg-stone-600 hover:bg-stone-700">
                             <Eye className="h-4 w-4 mr-2" />
                             {t('properties.view_details')}
