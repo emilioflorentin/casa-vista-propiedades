@@ -26,7 +26,7 @@ export interface LocalProperty {
 }
 
 // Function to compress and resize images
-const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+const compressImage = (file: File, maxWidth: number = 1920, quality: number = 0.85): Promise<string> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
