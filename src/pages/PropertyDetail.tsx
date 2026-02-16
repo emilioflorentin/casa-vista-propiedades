@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, Send, Upload, FileText, CreditCard, Map } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Car, Wifi, Tv, Wind, Phone, Mail, Calendar, Send, Upload, FileText, CreditCard, Map, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,7 @@ const PropertyDetail = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [property, setProperty] = useState<any>(null);
   const [propertyAgent, setPropertyAgent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -511,11 +512,11 @@ const PropertyDetail = () => {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="relative mb-6">
-              <div className="aspect-video rounded-lg overflow-hidden">
+              <div className="aspect-video rounded-lg overflow-hidden cursor-pointer" onClick={() => setLightboxOpen(true)}>
                 <img
                   src={images[currentImageIndex]}
                   alt={property.title}
-                  className="w-full h-full object-contain bg-stone-100"
+                  className="w-full h-full object-contain bg-stone-100 transition-transform duration-300 hover:scale-105"
                   loading="eager"
                   decoding="async"
                 />
@@ -540,6 +541,66 @@ const PropertyDetail = () => {
                 ))}
               </div>
             </div>
+
+            {/* Lightbox Modal */}
+            {lightboxOpen && (
+              <div 
+                className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+                onClick={() => setLightboxOpen(false)}
+              >
+                <button
+                  className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
+                  onClick={() => setLightboxOpen(false)}
+                >
+                  <X className="h-8 w-8" />
+                </button>
+                
+                {images.length > 1 && (
+                  <>
+                    <button
+                      className="absolute left-4 text-white/80 hover:text-white z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+                      }}
+                    >
+                      <ChevronLeft className="h-10 w-10" />
+                    </button>
+                    <button
+                      className="absolute right-4 text-white/80 hover:text-white z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+                      }}
+                    >
+                      <ChevronRight className="h-10 w-10" />
+                    </button>
+                  </>
+                )}
+
+                <img
+                  src={images[currentImageIndex]}
+                  alt={property.title}
+                  className="max-w-[90vw] max-h-[90vh] object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
+
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                  {images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(index);
+                      }}
+                      className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                        currentImageIndex === index ? "bg-white" : "bg-white/40"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Property Info */}
             <div className="bg-white rounded-lg p-6 mb-6 h-fit">
