@@ -19,6 +19,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getLocalProperties } from "@/utils/localProperties";
 
 const Favorites = () => {
   const { favorites, clearAllFavorites } = useFavorites();
@@ -77,8 +78,26 @@ const Favorites = () => {
     loadSupabaseProperties();
   }, []);
 
-  // Combine all properties (static + supabase) and filter favorites
-  const allCombinedProperties = [...allProperties, ...supabaseProperties];
+  // Load local properties
+  const localProperties = getLocalProperties().map(p => ({
+    id: p.id,
+    reference: p.reference,
+    title: p.title,
+    type: p.type as any,
+    price: p.price,
+    currency: p.currency,
+    operation: p.operation as any,
+    location: p.location,
+    bedrooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    area: p.area,
+    image: p.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    features: p.features || [],
+    description: p.description,
+  }));
+
+  // Combine all properties (static + supabase + local) and filter favorites
+  const allCombinedProperties = [...allProperties, ...supabaseProperties, ...localProperties];
   const favoriteProperties = allCombinedProperties.filter(property => 
     favorites.some(fav => String(fav) === String(property.id))
   );
