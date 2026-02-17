@@ -21,6 +21,7 @@ interface TenantInfo {
   property_title: string;
   property_location: string;
   owner_phone?: string;
+  property_reference?: string;
 }
 
 interface Incident {
@@ -91,11 +92,14 @@ const TenantIncidents = () => {
       }
       const info = (data as any[])[0];
       
-      // Fetch owner's phone number
+      // Fetch owner's phone number and property reference
       const { data: ownerData } = await supabase.rpc("get_property_owner_contact", { property_id: info.property_id });
       const ownerPhone = ownerData && (ownerData as any[]).length > 0 ? (ownerData as any[])[0].phone : null;
       
-      setTenantInfo({ ...info, owner_phone: ownerPhone });
+      const { data: propData } = await supabase.from("properties").select("reference").eq("id", info.property_id).single();
+      const propertyReference = propData?.reference || null;
+      
+      setTenantInfo({ ...info, owner_phone: ownerPhone, property_reference: propertyReference });
       await loadIncidents(accessCode.trim());
     } catch {
       toast({ title: "Error", variant: "destructive" });
@@ -186,10 +190,11 @@ const TenantIncidents = () => {
   const formattedPhone = ownerPhone
     ? (ownerPhone.startsWith("+") ? ownerPhone.replace(/\D/g, "") : `34${ownerPhone.replace(/\D/g, "")}`)
     : null;
+  const propertyRef = tenantInfo?.property_reference;
   const whatsappMessage = encodeURIComponent(
     language === "es"
-      ? `Hola, soy inquilino de ${tenantInfo?.property_title || "una propiedad"}. Necesito reportar una incidencia urgente.`
-      : `Hello, I'm a tenant at ${tenantInfo?.property_title || "a property"}. I need to report an urgent incident.`
+      ? `Hola, soy inquilino de la vivienda${propertyRef ? ` con referencia ${propertyRef}` : ""}. Necesito reportar una incidencia urgente.`
+      : `Hello, I'm a tenant at property${propertyRef ? ` ref. ${propertyRef}` : ""}. I need to report an urgent incident.`
   );
 
   return (
