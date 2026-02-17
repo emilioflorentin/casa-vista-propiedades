@@ -115,7 +115,25 @@ const OwnerIncidents = () => {
         .single();
 
       if (error) throw error;
-      setTenantAccesses((prev) => [data as TenantAccess, ...prev]);
+      const created = data as TenantAccess;
+      setTenantAccesses((prev) => [created, ...prev]);
+
+      // Send access code via WhatsApp
+      const phone = newTenantPhone.trim();
+      const propTitle = getPropertyTitle(newTenantPropertyId);
+      const tenantLink = `${window.location.origin}/tenant-incidents?code=${created.access_code}`;
+      const waMessage = encodeURIComponent(
+        language === "es"
+          ? `Hola ${newTenantName.trim()}, te enviamos tu código de acceso para reportar incidencias en *${propTitle}*.\n\n🔑 *Código:* ${created.access_code}\n\n🔗 *Accede directamente aquí:*\n${tenantLink}\n\nGuarda este mensaje para futuras consultas.`
+          : `Hello ${newTenantName.trim()}, here is your access code to report incidents at *${propTitle}*.\n\n🔑 *Code:* ${created.access_code}\n\n🔗 *Access directly here:*\n${tenantLink}\n\nSave this message for future reference.`
+      );
+      if (phone) {
+        const formatted = phone.startsWith("+") ? phone.replace(/\D/g, "") : `34${phone.replace(/\D/g, "")}`;
+        window.open(`https://api.whatsapp.com/send?phone=${formatted}&text=${waMessage}`, '_blank');
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${waMessage}`, '_blank');
+      }
+
       setNewTenantName("");
       setNewTenantEmail("");
       setNewTenantPhone("");
@@ -123,7 +141,7 @@ const OwnerIncidents = () => {
       setDialogOpen(false);
       toast({
         title: language === "es" ? "Acceso creado" : "Access created",
-        description: language === "es" ? "El código de acceso ha sido generado." : "The access code has been generated.",
+        description: language === "es" ? "El código de acceso ha sido generado y se ha abierto WhatsApp." : "The access code has been generated and WhatsApp has been opened.",
       });
     } catch {
       toast({ title: "Error", variant: "destructive" });
