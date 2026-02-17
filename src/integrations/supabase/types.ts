@@ -326,6 +326,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_resolved_incidents: { Args: never; Returns: undefined }
       create_incident: {
         Args: {
           p_access_code: string
