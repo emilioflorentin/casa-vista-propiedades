@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Shield, Plus, Copy, CheckCircle, Clock, AlertTriangle, Trash2, Eye, ToggleLeft, ToggleRight } from "lucide-react";
+import { Shield, Plus, Copy, CheckCircle, Clock, AlertTriangle, Trash2, Eye, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +43,7 @@ interface Property {
   id: string;
   title: string;
   location: string;
+  reference: string;
 }
 
 const STATUS_OPTIONS = [
@@ -85,7 +86,7 @@ const OwnerIncidents = () => {
     const load = async () => {
       setLoading(true);
       const [propsRes, accessRes, incidentsRes] = await Promise.all([
-        supabase.from("properties").select("id, title, location").eq("user_id", user.id),
+        supabase.from("properties").select("id, title, location, reference").eq("user_id", user.id),
         supabase.from("tenant_access").select("*").order("created_at", { ascending: false }),
         supabase.from("incidents").select("*").order("created_at", { ascending: false }),
       ]);
@@ -172,6 +173,46 @@ const OwnerIncidents = () => {
 
   const getPropertyTitle = (propId: string) =>
     properties.find((p) => p.id === propId)?.title || "—";
+
+  const getPropertyReference = (propId: string) =>
+    properties.find((p) => p.id === propId)?.reference || "";
+
+  const shareToWhatsApp = (incident: Incident) => {
+    const cat = CATEGORIES[incident.category] || CATEGORIES.other;
+    const catName = language === "es" ? cat.label : cat.labelEn;
+    const statusLabel = STATUS_OPTIONS.find((s) => s.value === incident.status);
+    const statusName = language === "es" ? statusLabel?.label : statusLabel?.labelEn;
+    const propRef = getPropertyReference(incident.property_id);
+    const propTitle = getPropertyTitle(incident.property_id);
+    const tenantName = getTenantName(incident.tenant_access_id);
+    const date = new Date(incident.created_at).toLocaleDateString(language === "es" ? "es-ES" : "en-US");
+
+    let message = language === "es"
+      ? `🔧 *Incidencia en vivienda${propRef ? ` (Ref: ${propRef})` : ""}*\n\n`
+        + `📍 *Propiedad:* ${propTitle}\n`
+        + `👤 *Inquilino:* ${tenantName}\n`
+        + `📅 *Fecha:* ${date}\n`
+        + `📂 *Categoría:* ${catName}\n`
+        + `📊 *Estado:* ${statusName}\n\n`
+        + `📝 *Título:* ${incident.title}\n\n`
+        + `*Descripción:*\n${incident.description}`
+      : `🔧 *Property Incident${propRef ? ` (Ref: ${propRef})` : ""}*\n\n`
+        + `📍 *Property:* ${propTitle}\n`
+        + `👤 *Tenant:* ${tenantName}\n`
+        + `📅 *Date:* ${date}\n`
+        + `📂 *Category:* ${catName}\n`
+        + `📊 *Status:* ${statusName}\n\n`
+        + `📝 *Title:* ${incident.title}\n\n`
+        + `*Description:*\n${incident.description}`;
+
+    if (incident.images && incident.images.length > 0) {
+      message += language === "es" ? `\n\n📸 *Fotos:*\n` : `\n\n📸 *Photos:*\n`;
+      incident.images.forEach((img) => { message += `${img}\n`; });
+    }
+
+    const encoded = encodeURIComponent(message);
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+  };
 
   if (!user) {
     return (
@@ -372,6 +413,15 @@ const OwnerIncidents = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-green-500 text-green-700 hover:bg-green-50 w-40"
+                            onClick={() => shareToWhatsApp(incident)}
+                          >
+                            <Share2 className="h-4 w-4 mr-1" />
+                            {language === "es" ? "Enviar a profesional" : "Send to pro"}
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
