@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Shield, Plus, Copy, CheckCircle, Clock, AlertTriangle, Trash2, Eye, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
+import { Shield, Plus, Copy, CheckCircle, AlertTriangle, Trash2, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -162,6 +162,24 @@ const OwnerIncidents = () => {
     }
   };
 
+  const deleteTenantAccess = async (accessId: string) => {
+    const { error } = await supabase.from("tenant_access").delete().eq("id", accessId);
+    if (!error) {
+      setTenantAccesses((prev) => prev.filter((a) => a.id !== accessId));
+      toast({ title: language === "es" ? "Inquilino eliminado" : "Tenant deleted" });
+    }
+  };
+
+  const deleteAllTenantAccesses = async () => {
+    if (!properties.length) return;
+    const propertyIds = properties.map((p) => p.id);
+    const { error } = await supabase.from("tenant_access").delete().in("property_id", propertyIds);
+    if (!error) {
+      setTenantAccesses([]);
+      toast({ title: language === "es" ? "Todos los accesos eliminados" : "All accesses deleted" });
+    }
+  };
+
   const updateIncidentStatus = async (incidentId: string, newStatus: string) => {
     const { error } = await supabase
       .from("incidents")
@@ -312,11 +330,28 @@ const OwnerIncidents = () => {
 
         {/* Tenant Access Codes */}
         <section>
-          <h2 className="text-xl font-semibold text-stone-800 mb-4 flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            {language === "es" ? "Accesos de inquilinos" : "Tenant access codes"}
-            <span className="text-sm font-normal text-stone-500">({tenantAccesses.length})</span>
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-stone-800 flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              {language === "es" ? "Accesos de inquilinos" : "Tenant access codes"}
+              <span className="text-sm font-normal text-stone-500">({tenantAccesses.length})</span>
+            </h2>
+            {tenantAccesses.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+                onClick={() => {
+                  if (confirm(language === "es" ? "¿Eliminar todos los accesos de inquilinos?" : "Delete all tenant accesses?")) {
+                    deleteAllTenantAccesses();
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                {language === "es" ? "Eliminar todos" : "Delete all"}
+              </Button>
+            )}
+          </div>
           {tenantAccesses.length === 0 ? (
             <Card className="border-stone-200">
               <CardContent className="py-8 text-center text-stone-500">
@@ -330,13 +365,26 @@ const OwnerIncidents = () => {
                   <CardContent className="pt-6 space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-stone-800">{access.tenant_name}</h4>
-                      <button onClick={() => toggleAccessActive(access)} title={access.is_active ? "Desactivar" : "Activar"}>
-                        {access.is_active ? (
-                          <ToggleRight className="h-6 w-6 text-green-600" />
-                        ) : (
-                          <ToggleLeft className="h-6 w-6 text-stone-400" />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => toggleAccessActive(access)} title={access.is_active ? (language === "es" ? "Desactivar" : "Deactivate") : (language === "es" ? "Activar" : "Activate")}>
+                          {access.is_active ? (
+                            <ToggleRight className="h-6 w-6 text-green-600" />
+                          ) : (
+                            <ToggleLeft className="h-6 w-6 text-stone-400" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm(language === "es" ? `¿Eliminar el acceso de ${access.tenant_name}?` : `Delete access for ${access.tenant_name}?`)) {
+                              deleteTenantAccess(access.id);
+                            }
+                          }}
+                          title={language === "es" ? "Eliminar" : "Delete"}
+                          className="text-red-400 hover:text-red-600 ml-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                     <p className="text-sm text-stone-500">{getPropertyTitle(access.property_id)}</p>
                     <div className="flex items-center gap-2 bg-stone-50 rounded-lg p-2">
