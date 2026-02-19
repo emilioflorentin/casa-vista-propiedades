@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Shield, Plus, Copy, CheckCircle, AlertTriangle, Trash2, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -98,6 +98,15 @@ const OwnerIncidents = () => {
     load();
   }, [user]);
 
+  const getPropertyTitle = (propId: string) =>
+    properties.find((p) => p.id === propId)?.title || "—";
+
+  const getPropertyReference = (propId: string) =>
+    properties.find((p) => p.id === propId)?.reference || "";
+
+  const getTenantName = (accessId: string) =>
+    tenantAccesses.find((a) => a.id === accessId)?.tenant_name || "—";
+
   const createTenantAccess = async () => {
     if (!newTenantName.trim() || !newTenantPropertyId || !user) return;
     setIsCreating(true);
@@ -189,9 +198,7 @@ const OwnerIncidents = () => {
       setIncidents((prev) =>
         prev.map((i) => (i.id === incidentId ? { ...i, status: newStatus } : i))
       );
-      toast({
-        title: language === "es" ? "Estado actualizado" : "Status updated",
-      });
+      toast({ title: language === "es" ? "Estado actualizado" : "Status updated" });
     }
   };
 
@@ -199,19 +206,6 @@ const OwnerIncidents = () => {
     navigator.clipboard.writeText(code);
     toast({ title: language === "es" ? "Código copiado" : "Code copied" });
   };
-
-  const filteredIncidents = selectedProperty === "all"
-    ? incidents
-    : incidents.filter((i) => i.property_id === selectedProperty);
-
-  const getTenantName = (accessId: string) =>
-    tenantAccesses.find((a) => a.id === accessId)?.tenant_name || "—";
-
-  const getPropertyTitle = (propId: string) =>
-    properties.find((p) => p.id === propId)?.title || "—";
-
-  const getPropertyReference = (propId: string) =>
-    properties.find((p) => p.id === propId)?.reference || "";
 
   const shareToWhatsApp = (incident: Incident) => {
     const cat = CATEGORIES[incident.category] || CATEGORIES.other;
@@ -250,6 +244,15 @@ const OwnerIncidents = () => {
     window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
   };
 
+  // Filtered data — both sections respond to the same property filter
+  const filteredTenantAccesses = selectedProperty === "all"
+    ? tenantAccesses
+    : tenantAccesses.filter((a) => a.property_id === selectedProperty);
+
+  const filteredIncidents = selectedProperty === "all"
+    ? incidents
+    : incidents.filter((i) => i.property_id === selectedProperty);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -274,6 +277,8 @@ const OwnerIncidents = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-12 space-y-10">
+
+        {/* Header row: title + filter + new access button */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-stone-800">
@@ -283,49 +288,72 @@ const OwnerIncidents = () => {
               {language === "es" ? "Gestiona los accesos de tus inquilinos y sus incidencias" : "Manage your tenants' access and their incidents"}
             </p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-stone-600 hover:bg-stone-700">
-                <Plus className="h-4 w-4 mr-2" />
-                {language === "es" ? "Nuevo acceso inquilino" : "New tenant access"}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {language === "es" ? "Crear acceso para inquilino" : "Create tenant access"}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">{language === "es" ? "Propiedad" : "Property"} *</label>
-                  <Select value={newTenantPropertyId} onValueChange={setNewTenantPropertyId}>
-                    <SelectTrigger><SelectValue placeholder={language === "es" ? "Seleccionar propiedad" : "Select property"} /></SelectTrigger>
-                    <SelectContent>
-                      {properties.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">{language === "es" ? "Nombre del inquilino" : "Tenant name"} *</label>
-                  <Input value={newTenantName} onChange={(e) => setNewTenantName(e.target.value)} maxLength={100} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Email</label>
-                  <Input value={newTenantEmail} onChange={(e) => setNewTenantEmail(e.target.value)} type="email" maxLength={255} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">{language === "es" ? "Teléfono" : "Phone"}</label>
-                  <Input value={newTenantPhone} onChange={(e) => setNewTenantPhone(e.target.value)} maxLength={20} />
-                </div>
-                <Button onClick={createTenantAccess} disabled={!newTenantName.trim() || !newTenantPropertyId || isCreating} className="w-full bg-stone-600 hover:bg-stone-700">
-                  {isCreating ? "..." : language === "es" ? "Crear acceso" : "Create access"}
-                </Button>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {/* Global property filter */}
+            {properties.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-stone-500 whitespace-nowrap">
+                  {language === "es" ? "Filtrar por:" : "Filter by:"}
+                </span>
+                <Select value={selectedProperty} onValueChange={setSelectedProperty}>
+                  <SelectTrigger className="w-56">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{language === "es" ? "Todas las propiedades" : "All properties"}</SelectItem>
+                    {properties.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </DialogContent>
-          </Dialog>
+            )}
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-stone-600 hover:bg-stone-700 whitespace-nowrap">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {language === "es" ? "Nuevo acceso inquilino" : "New tenant access"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {language === "es" ? "Crear acceso para inquilino" : "Create tenant access"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">{language === "es" ? "Propiedad" : "Property"} *</label>
+                    <Select value={newTenantPropertyId} onValueChange={setNewTenantPropertyId}>
+                      <SelectTrigger><SelectValue placeholder={language === "es" ? "Seleccionar propiedad" : "Select property"} /></SelectTrigger>
+                      <SelectContent>
+                        {properties.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">{language === "es" ? "Nombre del inquilino" : "Tenant name"} *</label>
+                    <Input value={newTenantName} onChange={(e) => setNewTenantName(e.target.value)} maxLength={100} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Email</label>
+                    <Input value={newTenantEmail} onChange={(e) => setNewTenantEmail(e.target.value)} type="email" maxLength={255} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">{language === "es" ? "Teléfono" : "Phone"}</label>
+                    <Input value={newTenantPhone} onChange={(e) => setNewTenantPhone(e.target.value)} maxLength={20} />
+                  </div>
+                  <Button onClick={createTenantAccess} disabled={!newTenantName.trim() || !newTenantPropertyId || isCreating} className="w-full bg-stone-600 hover:bg-stone-700">
+                    {isCreating ? "..." : language === "es" ? "Crear acceso" : "Create access"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Tenant Access Codes */}
@@ -334,15 +362,15 @@ const OwnerIncidents = () => {
             <h2 className="text-xl font-semibold text-stone-800 flex items-center gap-2">
               <Shield className="h-5 w-5" />
               {language === "es" ? "Accesos de inquilinos" : "Tenant access codes"}
-              <span className="text-sm font-normal text-stone-500">({tenantAccesses.length})</span>
+              <span className="text-sm font-normal text-stone-500">({filteredTenantAccesses.length})</span>
             </h2>
-            {tenantAccesses.length > 0 && (
+            {filteredTenantAccesses.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 className="border-red-300 text-red-600 hover:bg-red-50"
                 onClick={() => {
-                  if (confirm(language === "es" ? "¿Eliminar todos los accesos de inquilinos?" : "Delete all tenant accesses?")) {
+                  if (confirm(language === "es" ? "¿Eliminar todos los accesos mostrados?" : "Delete all shown accesses?")) {
                     deleteAllTenantAccesses();
                   }
                 }}
@@ -352,21 +380,27 @@ const OwnerIncidents = () => {
               </Button>
             )}
           </div>
-          {tenantAccesses.length === 0 ? (
+
+          {filteredTenantAccesses.length === 0 ? (
             <Card className="border-stone-200">
               <CardContent className="py-8 text-center text-stone-500">
-                {language === "es" ? "No hay accesos creados. Crea uno para que tus inquilinos puedan reportar incidencias." : "No accesses created. Create one so your tenants can report incidents."}
+                {tenantAccesses.length === 0
+                  ? (language === "es" ? "No hay accesos creados. Crea uno para que tus inquilinos puedan reportar incidencias." : "No accesses created. Create one so your tenants can report incidents.")
+                  : (language === "es" ? "No hay inquilinos en esta propiedad." : "No tenants for this property.")}
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tenantAccesses.map((access) => (
+              {filteredTenantAccesses.map((access) => (
                 <Card key={access.id} className={`border-stone-200 ${!access.is_active ? "opacity-60" : ""}`}>
                   <CardContent className="pt-6 space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-stone-800">{access.tenant_name}</h4>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => toggleAccessActive(access)} title={access.is_active ? (language === "es" ? "Desactivar" : "Deactivate") : (language === "es" ? "Activar" : "Activate")}>
+                        <button
+                          onClick={() => toggleAccessActive(access)}
+                          title={access.is_active ? (language === "es" ? "Desactivar" : "Deactivate") : (language === "es" ? "Activar" : "Activate")}
+                        >
                           {access.is_active ? (
                             <ToggleRight className="h-6 w-6 text-green-600" />
                           ) : (
@@ -403,23 +437,12 @@ const OwnerIncidents = () => {
 
         {/* Incidents */}
         <section>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2 mb-4">
             <h2 className="text-xl font-semibold text-stone-800 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
               {language === "es" ? "Incidencias" : "Incidents"}
               <span className="text-sm font-normal text-stone-500">({filteredIncidents.length})</span>
             </h2>
-            <Select value={selectedProperty} onValueChange={setSelectedProperty}>
-              <SelectTrigger className="w-64">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{language === "es" ? "Todas las propiedades" : "All properties"}</SelectItem>
-                {properties.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {filteredIncidents.length === 0 ? (
