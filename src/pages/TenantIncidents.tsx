@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useSearchParams } from "react-router-dom";
 import { Shield, Send, Camera, MessageCircle, AlertTriangle, CheckCircle, Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ const TenantIncidents = () => {
   const [searchParams] = useSearchParams();
 
   const [accessCode, setAccessCode] = useState(searchParams.get("code") || "");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [isValidating, setIsValidating] = useState(false);
@@ -226,9 +228,23 @@ const TenantIncidents = () => {
                   placeholder={language === "es" ? "Código de acceso (UUID)" : "Access code (UUID)"}
                   className="text-center font-mono"
                 />
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="privacy-policy"
+                    checked={privacyAccepted}
+                    onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                  />
+                  <label htmlFor="privacy-policy" className="text-sm text-stone-600 leading-tight cursor-pointer">
+                    {language === "es" ? (
+                      <>He leído y acepto la <a href="/privacy-policy" target="_blank" className="underline text-stone-800 hover:text-stone-900">política de privacidad</a></>
+                    ) : (
+                      <>I have read and accept the <a href="/privacy-policy" target="_blank" className="underline text-stone-800 hover:text-stone-900">privacy policy</a></>
+                    )}
+                  </label>
+                </div>
                 <Button
                   onClick={validateCode}
-                  disabled={!accessCode.trim() || isValidating}
+                  disabled={!accessCode.trim() || isValidating || !privacyAccepted}
                   className="w-full bg-stone-600 hover:bg-stone-700"
                 >
                   {isValidating
