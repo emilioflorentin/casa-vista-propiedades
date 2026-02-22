@@ -1,5 +1,5 @@
 
-import { Award, Users, Clock, MapPin, Heart, Target } from "lucide-react";
+import { Award, Users, Clock, MapPin, Heart, Target, Wrench, HardHat } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -153,6 +153,34 @@ const About = () => {
                 <CardContent className="text-center">
                   <CardDescription className="text-gray-600">
                     {t('about.management_team.description')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="border-stone-200">
+                <CardHeader className="text-center">
+                  <div className="w-24 h-24 bg-stone-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Wrench className="h-12 w-12 text-stone-600" />
+                  </div>
+                  <CardTitle className="text-xl text-gray-800">{t('about.maintenance_team.title')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-gray-600">
+                    {t('about.maintenance_team.description')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="border-stone-200">
+                <CardHeader className="text-center">
+                  <div className="w-24 h-24 bg-stone-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <HardHat className="h-12 w-12 text-stone-600" />
+                  </div>
+                  <CardTitle className="text-xl text-gray-800">{t('about.renovation_team.title')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-gray-600">
+                    {t('about.renovation_team.description')}
                   </CardDescription>
                 </CardContent>
               </Card>

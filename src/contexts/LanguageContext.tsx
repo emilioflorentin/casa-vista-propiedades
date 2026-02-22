@@ -187,6 +187,14 @@ const translations: Translations = {
         title: 'Equipo de gestión',
         description: 'Expertos en gestión de propiedades que se encargan de mantener tus inversiones en perfectas condiciones.'
       },
+      maintenance_team: {
+        title: 'Mantenimiento y reparaciones',
+        description: 'Equipo técnico especializado en la resolución de incidencias, mantenimiento preventivo y reparaciones urgentes para garantizar el confort de los inquilinos.'
+      },
+      renovation_team: {
+        title: 'Obras y reformas',
+        description: 'Profesionales en reformas integrales, rehabilitación de viviendas y proyectos de obra nueva para revalorizar tu propiedad.'
+      },
       cta: {
         title: '¿Listo para encontrar tu hogar ideal?',
         description: 'Ponte en contacto con nosotros y descubre cómo podemos ayudarte',
@@ -681,6 +689,14 @@ const translations: Translations = {
       management_team: {
         title: 'Management team',
         description: 'Property management experts who take care of keeping your investments in perfect condition.'
+      },
+      maintenance_team: {
+        title: 'Maintenance & Repairs',
+        description: 'Technical team specialised in incident resolution, preventive maintenance and urgent repairs to ensure tenant comfort.'
+      },
+      renovation_team: {
+        title: 'Construction & Renovations',
+        description: 'Professionals in comprehensive renovations, housing rehabilitation and new construction projects to increase your property value.'
       },
       cta: {
         title: 'Ready to find your ideal home?',
