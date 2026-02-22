@@ -229,13 +229,13 @@ const translations: Translations = {
         feature3: 'Gestión de visitas y negociación',
         feature4: 'Contratos legales y seguros'
       },
-      legal: {
-        title: 'Asesoramiento legal',
-        description: 'Servicios legales especializados en inmobiliario',
-        feature1: 'Revisión de contratos de compraventa',
-        feature2: 'Gestión de hipotecas y financiación',
-        feature3: 'Asesoramiento fiscal inmobiliario',
-        feature4: 'Resolución de conflictos'
+      renovation: {
+        title: 'Obras y reformas',
+        description: 'Servicios integrales de construcción y rehabilitación de inmuebles',
+        feature1: 'Reformas integrales de viviendas',
+        feature2: 'Rehabilitación de edificios',
+        feature3: 'Proyectos de obra nueva',
+        feature4: 'Presupuestos personalizados sin compromiso'
       },
       support: {
         title: 'Soporte 24/7',
@@ -732,13 +732,13 @@ const translations: Translations = {
         feature3: 'Visit management and negotiation',
         feature4: 'Legal contracts and insurance'
       },
-      legal: {
-        title: 'Legal advice',
-        description: 'Specialized legal services in real estate',
-        feature1: 'Purchase agreement review',
-        feature2: 'Mortgage and financing management',
-        feature3: 'Real estate tax advice',
-        feature4: 'Conflict resolution'
+      renovation: {
+        title: 'Construction & Renovations',
+        description: 'Comprehensive construction and property rehabilitation services',
+        feature1: 'Full home renovations',
+        feature2: 'Building rehabilitation',
+        feature3: 'New construction projects',
+        feature4: 'Free personalized quotes'
       },
       support: {
         title: '24/7 Support',

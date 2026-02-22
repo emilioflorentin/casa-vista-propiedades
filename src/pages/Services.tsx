@@ -1,5 +1,5 @@
 
-import { Settings, Home, Key, Shield, Clock, Users, Wrench, FileText } from "lucide-react";
+import { Settings, Home, Key, Shield, Clock, Users, Wrench, HardHat } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,14 +32,14 @@ const Services = () => {
       ]
     },
     {
-      icon: Shield,
-      title: t('services.legal.title'),
-      description: t('services.legal.description'),
+      icon: HardHat,
+      title: t('services.renovation.title'),
+      description: t('services.renovation.description'),
       features: [
-        t('services.legal.feature1'),
-        t('services.legal.feature2'),
-        t('services.legal.feature3'),
-        t('services.legal.feature4')
+        t('services.renovation.feature1'),
+        t('services.renovation.feature2'),
+        t('services.renovation.feature3'),
+        t('services.renovation.feature4')
       ]
     },
     {
