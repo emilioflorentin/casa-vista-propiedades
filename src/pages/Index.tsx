@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight } from "lucide-react";
@@ -17,7 +16,12 @@ import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   const { t } = useLanguage();
-  const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number; radius: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    address: string;
+    lat: number;
+    lng: number;
+    radius: number;
+  } | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const [operation, setOperation] = useState("");
   const [managedBy, setManagedBy] = useState("");
@@ -28,20 +32,20 @@ const Index = () => {
 
   const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
     setSelectedLocation(location);
-    console.log('Selected location:', location);
-    
+    console.log("Selected location:", location);
+
     // Automatically trigger search when location is selected
     handleSearchWithLocation(location);
   };
 
   const handleSearchWithLocation = (location?: { address: string; lat: number; lng: number; radius: number }) => {
     const searchLocation = location || selectedLocation;
-    
-    console.log('Search params:', {
+
+    console.log("Search params:", {
       location: searchLocation,
       propertyType,
       operation,
-      managedBy
+      managedBy,
     });
 
     // Filter properties based on search criteria
@@ -49,45 +53,47 @@ const Index = () => {
 
     // Filter by property type if selected
     if (propertyType && propertyType !== "any") {
-      results = results.filter(property => property.type === propertyType);
+      results = results.filter((property) => property.type === propertyType);
     }
 
     // Filter by operation if selected
     if (operation && operation !== "any") {
-      results = results.filter(property => property.operation === operation);
+      results = results.filter((property) => property.operation === operation);
     }
 
     // Filter by management if selected
     if (managedBy && managedBy !== "any") {
-      results = results.filter(property => property.managedBy === managedBy);
+      results = results.filter((property) => property.managedBy === managedBy);
     }
 
     // Filter by location and radius if provided
     if (searchLocation) {
       const searchTerm = searchLocation.address.toLowerCase();
-      console.log('Filtering by location and radius:', searchTerm, searchLocation.radius);
-      
-      results = results.filter(property => {
+      console.log("Filtering by location and radius:", searchTerm, searchLocation.radius);
+
+      results = results.filter((property) => {
         const propertyLocation = property.location.toLowerCase();
-        
+
         // Get coordinates for the property location
         const propertyCoords = getCoordinatesFromLocation(property.location);
-        
+
         if (propertyCoords && searchLocation.lat && searchLocation.lng) {
           // Calculate distance between search location and property location
           const distance = calculateDistance(
             searchLocation.lat,
             searchLocation.lng,
             propertyCoords.lat,
-            propertyCoords.lng
+            propertyCoords.lng,
           );
-          
-          console.log(`Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${searchLocation.radius}m`);
-          
+
+          console.log(
+            `Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${searchLocation.radius}m`,
+          );
+
           // ONLY include properties within the specified radius
           return distance <= searchLocation.radius;
         }
-        
+
         // If coordinates are not available, exclude the property from radius search
         console.log(`No coordinates found for ${property.location}, excluding from radius search`);
         return false;
@@ -96,7 +102,7 @@ const Index = () => {
 
     setFilteredProperties(results);
     setShowingSearchResults(true);
-    console.log('Filtered results:', results.length, 'properties found');
+    console.log("Filtered results:", results.length, "properties found");
   };
 
   // The main search button now does the same as the location search
@@ -105,7 +111,7 @@ const Index = () => {
     if (selectedLocation) {
       handleSearchWithLocation();
     }
-    // If no location is selected but there might be text in the input, 
+    // If no location is selected but there might be text in the input,
     // let the LocationSearch component handle it through its own search
   };
 
@@ -124,16 +130,16 @@ const Index = () => {
       try {
         // Load database properties (only available ones)
         const { data: dbProperties, error } = await supabase
-          .from('properties')
-          .select('*')
-          .or('is_rented.is.null,is_rented.eq.false') // Only show available properties
-          .order('created_at', { ascending: false });
+          .from("properties")
+          .select("*")
+          .or("is_rented.is.null,is_rented.eq.false") // Only show available properties
+          .order("created_at", { ascending: false });
 
         // Load local properties (only available ones)
-        const localProperties = getLocalProperties().filter(prop => !prop.is_rented);
+        const localProperties = getLocalProperties().filter((prop) => !prop.is_rented);
 
         // Convert and combine properties
-        const convertedDbProperties = (dbProperties || []).map(prop => ({
+        const convertedDbProperties = (dbProperties || []).map((prop) => ({
           id: parseInt(prop.id.slice(-8), 16),
           originalId: prop.id,
           reference: prop.reference,
@@ -149,11 +155,11 @@ const Index = () => {
           image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
           features: prop.features || [],
           description: prop.description,
-          managedBy: 'other' as const,
-          user_id: prop.user_id
+          managedBy: "other" as const,
+          user_id: prop.user_id,
         }));
 
-        const convertedLocalProperties = localProperties.map(prop => ({
+        const convertedLocalProperties = localProperties.map((prop) => ({
           id: parseInt(prop.id),
           originalId: prop.id,
           reference: prop.reference,
@@ -169,15 +175,15 @@ const Index = () => {
           image: prop.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
           features: prop.features || [],
           description: prop.description,
-          managedBy: 'other' as const,
-          userHash: prop.userHash
+          managedBy: "other" as const,
+          userHash: prop.userHash,
         }));
 
         const combinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
         setAllUserProperties(combinedProperties);
         setFilteredProperties(combinedProperties.slice(0, 8)); // Show first 8 as featured
       } catch (error) {
-        console.error('Error loading properties:', error);
+        console.error("Error loading properties:", error);
       } finally {
         setLoading(false);
       }
@@ -196,69 +202,64 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            {t('hero.title')}
-            <span className="block text-stone-100">{t('hero.title_highlight')}</span>
+            {t("hero.title")}
+            <span className="block text-stone-100">{t("hero.title_highlight")}</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">
-            {t('hero.subtitle')}
-          </p>
-          
+          <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
+
           {/* Search Bar */}
           <div className="bg-white rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <LocationSearch
-                onLocationSelect={handleLocationSelect}
-                placeholder={t('search.location_placeholder')}
-              />
-              
+              <LocationSearch onLocationSelect={handleLocationSelect} placeholder={t("search.location_placeholder")} />
+
               <Select value={propertyType} onValueChange={setPropertyType}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder={t('search.property_type')} />
+                  <SelectValue placeholder={t("search.property_type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">{t('search.property_type_any')}</SelectItem>
-                  <SelectItem value="apartment">{t('search.property_type_apartment')}</SelectItem>
-                  <SelectItem value="house">{t('search.property_type_house')}</SelectItem>
-                  <SelectItem value="loft">{t('search.property_type_loft')}</SelectItem>
-                  <SelectItem value="studio">{t('search.property_type_studio')}</SelectItem>
+                  <SelectItem value="any">{t("search.property_type_any")}</SelectItem>
+                  <SelectItem value="apartment">{t("search.property_type_apartment")}</SelectItem>
+                  <SelectItem value="house">{t("search.property_type_house")}</SelectItem>
+                  <SelectItem value="loft">{t("search.property_type_loft")}</SelectItem>
+                  <SelectItem value="studio">{t("search.property_type_studio")}</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={operation} onValueChange={setOperation}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder={t('search.operation')} />
+                  <SelectValue placeholder={t("search.operation")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">{t('search.operation_any')}</SelectItem>
-                  <SelectItem value="rent">{t('search.operation_rent')}</SelectItem>
-                  <SelectItem value="sale">{t('search.operation_sale')}</SelectItem>
+                  <SelectItem value="any">{t("search.operation_any")}</SelectItem>
+                  <SelectItem value="rent">{t("search.operation_rent")}</SelectItem>
+                  <SelectItem value="sale">{t("search.operation_sale")}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
                 <SelectTrigger className="h-12 border-0 text-stone-700">
-                  <SelectValue placeholder={t('search.managed_by')} />
+                  <SelectValue placeholder={t("search.managed_by")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">{t('search.managed_by_any')}</SelectItem>
-                  <SelectItem value="nazari">{t('search.managed_by_nazari')}</SelectItem>
-                  <SelectItem value="other">{t('search.managed_by_other')}</SelectItem>
+                  <SelectItem value="any">{t("search.managed_by_any")}</SelectItem>
+                  <SelectItem value="nazari">{t("search.managed_by_nazari")}</SelectItem>
+                  <SelectItem value="other">{t("search.managed_by_other")}</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Button 
-                size="lg" 
+
+              <Button
+                size="lg"
                 className="h-12 bg-stone-600 hover:bg-stone-700 text-white font-semibold"
                 onClick={handleSearch}
               >
                 <Search className="mr-2 h-5 w-5" />
-                {t('search.search_btn')}
+                {t("search.search_btn")}
               </Button>
             </div>
           </div>
@@ -273,22 +274,24 @@ const Index = () => {
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home className="h-8 w-8 text-stone-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">{allUserProperties.length.toLocaleString('es-ES')}+</h3>
-              <p className="text-gray-600">{t('stats.properties')}</p>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">
+                {allUserProperties.length.toLocaleString("es-ES")}+
+              </h3>
+              <p className="text-gray-600">{t("stats.properties")}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Key className="h-8 w-8 text-stone-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">5,000+</h3>
-              <p className="text-gray-600">{t('stats.clients')}</p>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">190+</h3>
+              <p className="text-gray-600">{t("stats.clients")}</p>
             </div>
             <div className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
-              <p className="text-gray-600">{t('stats.success_rate')}</p>
+              <p className="text-gray-600">{t("stats.success_rate")}</p>
             </div>
           </div>
         </div>
@@ -299,25 +302,24 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              {showingSearchResults ? t('properties.search_results') : t('properties.featured')}
+              {showingSearchResults ? t("properties.search_results") : t("properties.featured")}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {showingSearchResults 
-                ? t('properties.search_results_desc').replace('{count}', filteredProperties.length.toString())
-                : t('properties.featured_desc')
-              }
+              {showingSearchResults
+                ? t("properties.search_results_desc").replace("{count}", filteredProperties.length.toString())
+                : t("properties.featured_desc")}
             </p>
             {showingSearchResults && (
-              <Button 
+              <Button
                 onClick={resetSearch}
-                variant="outline" 
+                variant="outline"
                 className="mt-4 hover:bg-stone-50 border-stone-300 text-stone-700"
               >
-                {t('properties.show_featured')}
+                {t("properties.show_featured")}
               </Button>
             )}
           </div>
-          
+
           {filteredProperties.length > 0 ? (
             <>
               {!showingSearchResults ? (
@@ -342,7 +344,10 @@ const Index = () => {
                 >
                   <CarouselContent className="-ml-2 md:-ml-4 transition-transform duration-700 ease-in-out">
                     {filteredProperties.map((property) => (
-                      <CarouselItem key={property.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105">
+                      <CarouselItem
+                        key={property.id}
+                        className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105"
+                      >
                         <PropertyCard property={property} />
                       </CarouselItem>
                     ))}
@@ -361,23 +366,18 @@ const Index = () => {
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-xl text-gray-600 mb-4">
-                {t('properties.no_results')}
-              </p>
-              <Button 
-                onClick={resetSearch}
-                className="bg-stone-600 hover:bg-stone-700 text-white"
-              >
-                {t('properties.view_all')}
+              <p className="text-xl text-gray-600 mb-4">{t("properties.no_results")}</p>
+              <Button onClick={resetSearch} className="bg-stone-600 hover:bg-stone-700 text-white">
+                {t("properties.view_all")}
               </Button>
             </div>
           )}
-          
+
           {!showingSearchResults && (
             <div className="text-center mt-12">
               <Link to="/properties">
                 <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
-                  {t('properties.view_all')}
+                  {t("properties.view_all")}
                 </Button>
               </Link>
             </div>
@@ -389,42 +389,38 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-br from-stone-600 to-stone-800 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              {t('tenant_section.title')}
-            </h2>
-            <p className="text-xl text-stone-200 max-w-2xl mx-auto">
-              {t('tenant_section.subtitle')}
-            </p>
+            <h2 className="text-4xl font-bold mb-4">{t("tenant_section.title")}</h2>
+            <p className="text-xl text-stone-200 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
             <div className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-stone-200" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('tenant_section.step1_title')}</h3>
-              <p className="text-stone-300 text-sm">{t('tenant_section.step1_desc')}</p>
+              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step1_title")}</h3>
+              <p className="text-stone-300 text-sm">{t("tenant_section.step1_desc")}</p>
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Camera className="h-8 w-8 text-stone-200" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('tenant_section.step2_title')}</h3>
-              <p className="text-stone-300 text-sm">{t('tenant_section.step2_desc')}</p>
+              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step2_title")}</h3>
+              <p className="text-stone-300 text-sm">{t("tenant_section.step2_desc")}</p>
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="h-8 w-8 text-stone-200" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t('tenant_section.step3_title')}</h3>
-              <p className="text-stone-300 text-sm">{t('tenant_section.step3_desc')}</p>
+              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step3_title")}</h3>
+              <p className="text-stone-300 text-sm">{t("tenant_section.step3_desc")}</p>
             </div>
           </div>
 
           <div className="text-center">
             <Link to="/tenant-incidents">
               <Button size="lg" className="bg-white text-stone-800 hover:bg-stone-100 font-semibold">
-                {t('tenant_section.cta')}
+                {t("tenant_section.cta")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
