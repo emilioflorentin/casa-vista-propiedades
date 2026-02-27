@@ -327,7 +327,7 @@ const translations: Translations = {
       rental_properties: "Propiedades en alquiler",
       sale_properties: "Propiedades en venta",
       free_valuation: "Valoración gratuita",
-      legal_advice: "Asesoramiento legal",
+      legal_advice: "Obras y reformas. Presupuestos sin compromiso",
       address: "Granada",
       phone: "+34 624 567 853",
       email: "info@nazarihomes.com",
