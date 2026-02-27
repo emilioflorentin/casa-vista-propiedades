@@ -134,7 +134,7 @@ const Contact = () => {
     }
 
     // Abre WhatsApp con un mensaje predefinido
-    const phoneNumber = "34650499177"; // Formato internacional sin +
+    const phoneNumber = "34624567853"; // Formato internacional sin +
     const message = encodeURIComponent(t("contact.whatsapp_message"));
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
