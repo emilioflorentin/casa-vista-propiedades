@@ -480,7 +480,7 @@ const translations: Translations = {
       title: "Política de Privacidad",
       subtitle: "Información sobre el tratamiento de datos personales",
       intro_p1:
-        "La presente Política de Privacidad establece los términos en que Inmobiliaria Granadal utiliza y protege la información que es proporcionada por sus usuarios al momento de utilizar su sitio web.",
+        "La presente Política de Privacidad establece los términos en que Nazarí Homes utiliza y protege la información que es proporcionada por sus usuarios al momento de utilizar su sitio web.",
       intro_p2:
         "Esta compañía está comprometida con la seguridad de los datos de sus usuarios. Cuando le pedimos llenar los campos de información personal con la cual usted pueda ser identificado, lo hacemos asegurando que sólo se empleará de acuerdo con los términos de este documento.",
       intro_p3:
@@ -489,8 +489,7 @@ const translations: Translations = {
       who_we_are_p1: "Nuestra dirección web es:",
       who_we_are_p1_cont:
         ". Somos una inmobiliaria especializada en la venta y alquiler de propiedades en Granada y sus alrededores.",
-      who_we_are_p2:
-        "Inmobiliaria Granadal es una empresa comprometida con brindar el mejor servicio a nuestros clientes en la búsqueda de su hogar ideal.",
+      who_we_are_p2: "Nazarí Homes es una empresa comprometida con brindar el mejor servicio a nuestros clientes.",
       who_we_are_p3:
         "Operamos bajo los más altos estándares de transparencia y profesionalidad en el sector inmobiliario.",
       limitations: "Limitaciones",
