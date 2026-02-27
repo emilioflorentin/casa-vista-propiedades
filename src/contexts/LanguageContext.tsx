@@ -513,7 +513,7 @@ const translations: Translations = {
         "De vez en cuando, también podemos utilizar tu información para contactarte para fines de investigación de mercado.",
       data_retention: "Retención de datos",
       data_retention_p1:
-        "Conservaremos tu información personal mientras mantengas una cuenta activa con nosotros o según sea necesario para brindarte nuestros servicios. Si deseas que eliminemos tu información, puedes contactarnos en",
+        "Conservaremos tu información personal mientras mantengas una cuenta activa con nosotros o según sea necesario para brindarte nuestros servicios. Si deseas que eliminemos tu información, puedes contactarnos en ",
       data_retention_p1_cont: " y procesaremos tu solicitud de acuerdo con las leyes aplicables.",
       data_retention_p2:
         "También podemos conservar y utilizar tu información según sea necesario para cumplir con nuestras obligaciones legales, resolver disputas y hacer cumplir nuestros acuerdos.",
@@ -528,7 +528,7 @@ const translations: Translations = {
         "También podemos divulgar tu información cuando creamos de buena fe que la divulgación es apropiada para cumplir con la ley, hacer cumplir las políticas de nuestro sitio o proteger nuestros derechos, propiedad o seguridad. Para cualquier consulta sobre el tratamiento de datos, contacta:",
       your_rights: "Tus derechos",
       your_rights_p1:
-        "Tienes derecho a solicitar información sobre los datos personales que tenemos sobre ti, así como a solicitar la corrección, actualización o eliminación de dichos datos. Puedes ejercer estos derechos contactándonos en",
+        "Tienes derecho a solicitar información sobre los datos personales que tenemos sobre ti, así como a solicitar la corrección, actualización o eliminación de dichos datos. Puedes ejercer estos derechos contactándonos en ",
       your_rights_li1: "Derecho de acceso: puedes solicitar copias de tus datos personales.",
       your_rights_li2:
         "Derecho de rectificación: puedes solicitar que corrijamos cualquier información que consideres inexacta.",
