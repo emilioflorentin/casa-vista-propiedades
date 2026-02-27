@@ -37,8 +37,8 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.who_we_are")}</h2>
             <p className="text-gray-700 mb-4">
               {t("privacy.who_we_are_p1")}
-              <a href="https://granahidal.es/" className="text-blue-600 hover:underline ml-1">
-                https://granahidal.es/
+              <a href="https://nazarihomes.com/" className="text-blue-600 hover:underline ml-1">
+                https://nazarihomes.com/
               </a>{" "}
               {t("privacy.who_we_are_p1_cont")}
             </p>
