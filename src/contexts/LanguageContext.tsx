@@ -153,9 +153,9 @@ const translations: Translations = {
       subtitle: "Conoce más sobre nuestra empresa y nuestro compromiso contigo",
       our_story: "Nuestra historia",
       story_p1:
-        "Nazarí Homes nació en 2009 con la visión de revolucionar el mercado inmobiliario en la Costa Tropical de Granada. Desde nuestros humildes comienzos, hemos crecido hasta convertirnos en una de las agencias inmobiliarias más respetadas y confiables de la región.",
+        "Nazarí Homes nació en 2023 con la visión de ofrecer un servicio innovador de gestión de propiedades sin coste para los propietarios. Desde nuestros humildes comienzos, hemos crecido hasta convertirnos en una de las agencias inmobiliarias más respetadas y confiables de la región.",
       story_p2:
-        "Nuestra pasión por las propiedades excepcionales y nuestro compromiso con el servicio al cliente nos han permitido ayudar a miles de familias a encontrar su hogar ideal. Cada propiedad que gestionamos es tratada con el mismo cuidado y atención que si fuera nuestra propia casa.",
+        "Nuestra pasión por las propiedades excepcionales y nuestro compromiso con el servicio al cliente nos han permitido ayudar a miles de familias. Cada propiedad que gestionamos es tratada con el mismo cuidado y atención que si fuera nuestra propia casa.",
       our_values: "Nuestros valores",
       values_desc: "Los principios que nos guían en cada transacción y relación",
       commitment: {
