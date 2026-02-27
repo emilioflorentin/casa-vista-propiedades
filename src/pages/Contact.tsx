@@ -207,19 +207,19 @@ const Contact = () => {
                 </div>
 
                 <button
-                  onClick={() => handlePhoneCall("958467433")}
+                  onClick={() => handlePhoneCall("671030927")}
                   className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
                 >
                   <Phone className="h-5 w-5" />
-                  <span className="font-medium">958 467 433</span>
+                  <span className="font-medium">671 030 927</span>
                 </button>
 
                 <button
-                  onClick={() => handlePhoneCall("650499177")}
+                  onClick={() => handlePhoneCall("624567853")}
                   className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
                 >
                   <Phone className="h-5 w-5" />
-                  <span className="font-medium">650 499 177</span>
+                  <span className="font-medium">624 567 853</span>
                 </button>
 
                 {/* Sección de WhatsApp */}
