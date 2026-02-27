@@ -207,7 +207,7 @@ const translations: Translations = {
         title: "¿Listo para encontrar tu hogar ideal?",
         description: "Ponte en contacto con nosotros y descubre cómo podemos ayudarte",
         contact: "Contáctanos",
-        address: "Calle Real 123, Motril, Granada",
+        address: "Granada",
       },
     },
     services: {
@@ -328,7 +328,7 @@ const translations: Translations = {
       sale_properties: "Propiedades en venta",
       free_valuation: "Valoración gratuita",
       legal_advice: "Asesoramiento legal",
-      address: "Calle Real 123, Motril, Granada",
+      address: "Granada",
       phone: "+34 624 567 853",
       email: "info@nazarihomes.com",
       aboutUs: "Acerca de nosotros",
@@ -754,7 +754,7 @@ const translations: Translations = {
         title: "Ready to find your ideal home?",
         description: "Contact us and discover how we can help you",
         contact: "Contact us",
-        address: "Calle Real 123, Motril, Granada",
+        address: "Granada",
       },
     },
     services: {
