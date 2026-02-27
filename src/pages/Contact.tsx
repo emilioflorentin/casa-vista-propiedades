@@ -233,7 +233,7 @@ const Contact = () => {
                     </svg>
                     <div className="text-left">
                       <p className="font-medium">{t("contact.whatsapp_text")}</p>
-                      <p className="text-sm text-green-600">650 499 177</p>
+                      <p className="text-sm text-green-600">624 567 853</p>
                     </div>
                   </button>
                 </div>
