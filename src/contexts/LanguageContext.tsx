@@ -538,7 +538,7 @@ const translations: Translations = {
         "Derecho a la portabilidad: puedes solicitar que transfiramos los datos que hemos recopilado a otra organización o directamente a ti.",
       policy_changes: "Cambios en la política",
       policy_changes_p1:
-        "Inmobiliaria Granadal se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.",
+        "Nazarí Homes se reserva el derecho de cambiar los términos de la presente Política de Privacidad en cualquier momento.",
       policy_changes_p2:
         "Te notificaremos sobre cualquier cambio publicando la nueva Política de Privacidad en esta página.",
       policy_changes_p3:
@@ -1010,7 +1010,7 @@ const translations: Translations = {
       title: "Privacy Policy",
       subtitle: "Information about personal data processing",
       intro_p1:
-        "This Privacy Policy establishes the terms in which Inmobiliaria Granadal uses and protects the information provided by its users when using its website.",
+        "This Privacy Policy establishes the terms in which Nazarí Homes uses and protects the information provided by its users when using its website.",
       intro_p2:
         "This company is committed to the security of its users' data. When we ask you to fill out personal information fields with which you can be identified, we do so ensuring that it will only be used in accordance with the terms of this document.",
       intro_p3:
@@ -1020,7 +1020,7 @@ const translations: Translations = {
       who_we_are_p1_cont:
         ". We are a real estate agency specialized in the sale and rental of properties in Granada and its surroundings.",
       who_we_are_p2:
-        "Inmobiliaria Granadal is a company committed to providing the best service to our clients in the search for their ideal home.",
+        "Nazarí Homes is a company committed to providing the best service to our clients in the search for their ideal home.",
       who_we_are_p3:
         "We operate under the highest standards of transparency and professionalism in the real estate sector.",
       limitations: "Limitations",
@@ -1065,8 +1065,7 @@ const translations: Translations = {
       your_rights_li4:
         "Right to portability: you can request that we transfer the data we have collected to another organization or directly to you.",
       policy_changes: "Policy changes",
-      policy_changes_p1:
-        "Inmobiliaria Granadal reserves the right to change the terms of this Privacy Policy at any time.",
+      policy_changes_p1: "Nazarí Homes reserves the right to change the terms of this Privacy Policy at any time.",
       policy_changes_p2: "We will notify you of any changes by posting the new Privacy Policy on this page.",
       policy_changes_p3:
         "We recommend reviewing this policy periodically to stay informed about how we protect your information.",
