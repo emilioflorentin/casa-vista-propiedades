@@ -48,7 +48,9 @@ interface Property {
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800" },
+  { value: "approval", label: "En aprobación", labelEn: "In Approval", color: "bg-purple-100 text-purple-800" },
   { value: "in_progress", label: "En progreso", labelEn: "In Progress", color: "bg-blue-100 text-blue-800" },
+  { value: "paused", label: "Pausada", labelEn: "Paused", color: "bg-orange-100 text-orange-800" },
   { value: "resolved", label: "Resuelto", labelEn: "Resolved", color: "bg-green-100 text-green-800" },
 ];
 
@@ -495,7 +497,14 @@ const OwnerIncidents = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {STATUS_OPTIONS.map((s) => (
+                              {STATUS_OPTIONS
+                                .filter((s) => {
+                                  // Owner can only set: pending, approval, in_progress
+                                  // Once multiservicios has it (in_progress/paused/resolved), owner sees status but can't change to paused/resolved
+                                  if (s.value === 'paused' || s.value === 'resolved') return false;
+                                  return true;
+                                })
+                                .map((s) => (
                                 <SelectItem key={s.value} value={s.value}>
                                   {language === "es" ? s.label : s.labelEn}
                                 </SelectItem>
