@@ -52,6 +52,7 @@ const STATUS_CONFIG: Record<string, { color: string; icon: typeof Clock; label: 
   in_progress: { color: "bg-blue-100 text-blue-800", icon: AlertTriangle, label: "En progreso", labelEn: "In Progress" },
   paused: { color: "bg-orange-100 text-orange-800", icon: Clock, label: "Pausada", labelEn: "Paused" },
   resolved: { color: "bg-green-100 text-green-800", icon: CheckCircle, label: "Resuelto", labelEn: "Resolved" },
+  rejected: { color: "bg-red-100 text-red-800", icon: AlertTriangle, label: "Rechazada", labelEn: "Rejected" },
 };
 
 const TenantIncidents = () => {

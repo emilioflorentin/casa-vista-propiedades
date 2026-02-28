@@ -52,6 +52,7 @@ const STATUS_OPTIONS = [
   { value: "in_progress", label: "En progreso", labelEn: "In Progress", color: "bg-blue-100 text-blue-800" },
   { value: "paused", label: "Pausada", labelEn: "Paused", color: "bg-orange-100 text-orange-800" },
   { value: "resolved", label: "Resuelto", labelEn: "Resolved", color: "bg-green-100 text-green-800" },
+  { value: "rejected", label: "Rechazada", labelEn: "Rejected", color: "bg-red-100 text-red-800" },
 ];
 
 const CATEGORIES: Record<string, { label: string; labelEn: string }> = {
@@ -499,8 +500,8 @@ const OwnerIncidents = () => {
                             <SelectContent>
                               {STATUS_OPTIONS
                                 .filter((s) => {
-                                  // Owner can only set: pending, approval, in_progress
-                                  // Once multiservicios has it (in_progress/paused/resolved), owner sees status but can't change to paused/resolved
+                                  // Owner can set: pending, approval, in_progress, rejected
+                                  // Once multiservicios has it (paused/resolved), owner can't change to those
                                   if (s.value === 'paused' || s.value === 'resolved') return false;
                                   return true;
                                 })
