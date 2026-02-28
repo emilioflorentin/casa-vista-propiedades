@@ -76,6 +76,7 @@ export type Database = {
       }
       incident_costs: {
         Row: {
+          charge_amount: number | null
           created_at: string
           id: string
           incident_id: string
@@ -86,6 +87,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          charge_amount?: number | null
           created_at?: string
           id?: string
           incident_id: string
@@ -96,6 +98,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          charge_amount?: number | null
           created_at?: string
           id?: string
           incident_id?: string
