@@ -464,6 +464,7 @@ const Account = () => {
         description: propertyForm.description,
         features: propertyForm.features,
         image: imageUrl,
+        contact_phone: propertyForm.phone || null,
         energy_consumption_rating: propertyForm.energyConsumptionRating,
         energy_consumption_value: parseInt(propertyForm.energyConsumptionValue),
         energy_emissions_rating: propertyForm.energyEmissionsRating,

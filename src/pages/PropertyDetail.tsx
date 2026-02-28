@@ -91,13 +91,14 @@ const PropertyDetail = () => {
               .maybeSingle();
 
             if (!profileError && profile) {
+              const contactPhone = (dbProperty as any).contact_phone || profile.phone;
               agentInfo = {
                 name: profile.full_name || 'Propietario',
-                phone: profile.phone || 'No disponible',
+                phone: contactPhone || 'No disponible',
                 email: profile.email || 'contacto@propietario.com',
                 image: profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                 agency: profile.company_name || 'Propietario particular',
-                whatsapp: profile.phone || '+34600000000'
+                whatsapp: contactPhone || '+34600000000'
               };
               console.log('Found property owner profile:', profile);
             } else {
@@ -363,6 +364,10 @@ const PropertyDetail = () => {
   const WHATSAPP_BUSINESS_NUMBER = agent.whatsapp ? cleanPhoneNumber(agent.whatsapp) : '34600000000';
 
   const getDescription = (property: any) => {
+    // Use the property's own description if available
+    if (property.description && property.description.trim()) {
+      return property.description;
+    }
     const typeDescriptions = {
       apartment: t('property.apartment_description'),
       house: t('property.house_description'), 
@@ -664,11 +669,13 @@ const PropertyDetail = () => {
                   <div className="font-semibold">{property.area}m²</div>
                   <div className="text-sm text-stone-600">{t('property.area_label')}</div>
                 </div>
+                {property.features?.some((f: string) => f.toLowerCase().includes('parking') || f.toLowerCase().includes('garaje') || f.toLowerCase().includes('aparcamiento')) && (
                 <div className="text-center">
                   <Car className="h-6 w-6 mx-auto text-stone-400 mb-2" />
-                  <div className="font-semibold">1</div>
+                  <div className="font-semibold">Sí</div>
                   <div className="text-sm text-stone-600">{t('property.parking')}</div>
                 </div>
+                )}
               </div>
 
               {/* Description */}
