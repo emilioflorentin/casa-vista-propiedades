@@ -339,7 +339,17 @@ const ServiceBoard = () => {
         .footer .brand { font-size: 10pt; color: #78716c; font-weight: 600; margin-bottom: 4px; }
         .signature { margin-top: 40px; display: flex; justify-content: space-between; }
         .signature-box { width: 45%; border-top: 1px solid #ccc; padding-top: 8px; font-size: 9pt; color: #999; }
-        @media print { body { padding: 0; } .page { max-width: none; } }
+        @media print { 
+          body { padding: 0; } 
+          .page { max-width: none; }
+          th { background: #78716c !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .chapter-row { background: #f0efed !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .chapter-subtotal td { background: #fafaf9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .totals-table .total-row td { background: #78716c !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .info-box { background: #f8f7f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .title-section { background: linear-gradient(135deg, #78716c 0%, #57534e 100%) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .notes-box { background: #fffbeb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
       </style></head><body>
       <div class="page">
         <div class="header">
@@ -417,7 +427,14 @@ const ServiceBoard = () => {
       </body></html>
     `);
     printWindow.document.close();
-    printWindow.print();
+    // Wait for logo image to load before printing
+    const logoImg = printWindow.document.querySelector('img');
+    if (logoImg && !logoImg.complete) {
+      logoImg.onload = () => printWindow.print();
+      logoImg.onerror = () => printWindow.print();
+    } else {
+      printWindow.print();
+    }
   };
 
   const resetBudget = () => {
