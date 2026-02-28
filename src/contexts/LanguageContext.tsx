@@ -62,8 +62,8 @@ const translations: Translations = {
     },
     hero: {
       title: "Encuentra tu hogar ideal",
-      title_highlight: "en la Costa Tropical",
-      subtitle: "Descubre las mejores propiedades en la Costa Tropical",
+      title_highlight: "en Granada",
+      subtitle: "Descubre las mejores propiedades en Granada y alrededores",
       searchPlaceholder: "¿Qué estás buscando?",
     },
     search: {
