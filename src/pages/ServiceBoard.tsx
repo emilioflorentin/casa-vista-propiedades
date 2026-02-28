@@ -245,20 +245,23 @@ const ServiceBoard = () => {
         }
       }
 
-      // Load incident costs
+      // Load incident costs (for both incidents and internal tasks)
       const { data: costsData } = await supabase
         .from('incident_costs')
         .select('*');
       if (costsData) {
         const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }> = {};
         costsData.forEach((c: any) => {
-          costsMap[c.incident_id] = {
-            repair_cost: Number(c.repair_cost) || 0,
-            materials_cost: Number(c.materials_cost) || 0,
-            notes: c.notes || '',
-            receipts: c.receipts || [],
-            charge_amount: Number(c.charge_amount) || 0,
-          };
+          const key = c.incident_id || c.internal_task_id;
+          if (key) {
+            costsMap[key] = {
+              repair_cost: Number(c.repair_cost) || 0,
+              materials_cost: Number(c.materials_cost) || 0,
+              notes: c.notes || '',
+              receipts: c.receipts || [],
+              charge_amount: Number(c.charge_amount) || 0,
+            };
+          }
         });
         setIncidentCosts(costsMap);
       }
@@ -277,8 +280,8 @@ const ServiceBoard = () => {
     }
   };
 
-  const loadCostForIncident = (incident: Incident) => {
-    const cost = incidentCosts[incident.id];
+  const loadCostForItem = (itemId: string) => {
+    const cost = incidentCosts[itemId];
     setCostRepair(cost?.repair_cost || 0);
     setCostMaterials(cost?.materials_cost || 0);
     setCostNotes(cost?.notes || '');
@@ -286,23 +289,24 @@ const ServiceBoard = () => {
     setCostCharge(cost?.charge_amount || 0);
   };
 
-  const saveCost = async (incidentId: string) => {
+  const saveCost = async (itemId: string, isInternal: boolean = false) => {
     setSavingCost(true);
     try {
-      const existing = incidentCosts[incidentId];
+      const existing = incidentCosts[itemId];
+      const idField = isInternal ? 'internal_task_id' : 'incident_id';
       if (existing) {
         await supabase
           .from('incident_costs')
           .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge })
-          .eq('incident_id', incidentId);
+          .eq(idField, itemId);
       } else {
         await supabase
           .from('incident_costs')
-          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge });
+          .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge });
       }
       setIncidentCosts(prev => ({
         ...prev,
-        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge }
+        [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge }
       }));
       toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
     } catch {
@@ -312,13 +316,13 @@ const ServiceBoard = () => {
     }
   };
 
-  const uploadReceipt = async (incidentId: string, files: FileList) => {
+  const uploadReceipt = async (itemId: string, files: FileList, isInternal: boolean = false) => {
     setUploadingReceipt(true);
     try {
       const newUrls: string[] = [];
       for (const file of Array.from(files)) {
         const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-        const filePath = `${incidentId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const filePath = `${itemId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error } = await supabase.storage.from('cost-receipts').upload(filePath, file, {
           contentType: file.type || 'application/octet-stream',
           cacheControl: '3600',
@@ -333,19 +337,19 @@ const ServiceBoard = () => {
       if (newUrls.length > 0) {
         const updatedReceipts = [...costReceipts, ...newUrls];
         setCostReceipts(updatedReceipts);
-        // Auto-save receipts
-        const existing = incidentCosts[incidentId];
+        const idField = isInternal ? 'internal_task_id' : 'incident_id';
+        const existing = incidentCosts[itemId];
         if (existing) {
           await supabase.from('incident_costs')
             .update({ receipts: updatedReceipts })
-            .eq('incident_id', incidentId);
+            .eq(idField, itemId);
         } else {
           await supabase.from('incident_costs')
-            .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts });
+            .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts });
         }
         setIncidentCosts(prev => ({
           ...prev,
-          [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts, charge_amount: costCharge }
+          [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts, charge_amount: costCharge }
         }));
         toast({ title: 'Subido', description: `${newUrls.length} archivo(s) adjuntado(s)` });
       }
@@ -356,17 +360,17 @@ const ServiceBoard = () => {
     }
   };
 
-  const removeReceipt = async (incidentId: string, url: string) => {
+  const removeReceipt = async (itemId: string, url: string, isInternal: boolean = false) => {
     const updatedReceipts = costReceipts.filter(r => r !== url);
     setCostReceipts(updatedReceipts);
+    const idField = isInternal ? 'internal_task_id' : 'incident_id';
     await supabase.from('incident_costs')
       .update({ receipts: updatedReceipts })
-      .eq('incident_id', incidentId);
+      .eq(idField, itemId);
     setIncidentCosts(prev => ({
       ...prev,
-      [incidentId]: { ...prev[incidentId], receipts: updatedReceipts }
+      [itemId]: { ...prev[itemId], receipts: updatedReceipts }
     }));
-    // Delete from storage
     const path = url.split('/cost-receipts/')[1];
     if (path) {
       await supabase.storage.from('cost-receipts').remove([decodeURIComponent(path)]);
@@ -421,6 +425,29 @@ const ServiceBoard = () => {
     }
   };
 
+  const saveInternalTaskToHistory = async (taskId: string) => {
+    try {
+      const task = internalTasks.find(t => t.id === taskId);
+      if (!task) return;
+      const costs = incidentCosts[taskId];
+
+      await supabase.from('incident_history').insert({
+        internal_task_id: taskId,
+        title: task.title,
+        description: task.description || null,
+        category: task.category,
+        is_internal_task: true,
+        repair_cost: costs?.repair_cost || 0,
+        materials_cost: costs?.materials_cost || 0,
+        charge_amount: costs?.charge_amount || 0,
+        receipts: costs?.receipts || [],
+        incident_created_at: task.created_at,
+      });
+    } catch (err) {
+      console.error('Error saving internal task to history:', err);
+    }
+  };
+
   const loadHistory = async () => {
     setLoadingHistory(true);
     try {
@@ -452,6 +479,7 @@ const ServiceBoard = () => {
     }
 
     const rows = historyData.map(h => ({
+      'Tipo': h.is_internal_task ? 'Tarea propia' : 'Incidencia',
       'Título': h.title,
       'Descripción': h.description || '',
       'Categoría': CATEGORY_LABELS[h.category] || h.category,
@@ -524,6 +552,9 @@ const ServiceBoard = () => {
       .update({ status: newStatus })
       .eq('id', taskId);
     if (!error) {
+      if (newStatus === 'resolved') {
+        await saveInternalTaskToHistory(taskId);
+      }
       setInternalTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
       toast({ title: 'Actualizado', description: `Estado cambiado a ${getStatusLabel(newStatus)}` });
       setSelectedInternalTask(null);
@@ -931,7 +962,7 @@ const ServiceBoard = () => {
         onDragStart={(e) => handleDragStart(e, incident.id, false)}
         onDragEnd={handleDragEnd}
         className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-stone-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
-        onClick={() => { setSelectedIncident(incident); loadCostForIncident(incident); }}
+        onClick={() => { setSelectedIncident(incident); loadCostForItem(incident.id); }}
       >
         <CardContent className="p-4 space-y-2">
           <div className="flex items-start justify-between">
@@ -984,7 +1015,7 @@ const ServiceBoard = () => {
         onDragStart={(e) => handleDragStart(e, task.id, true)}
         onDragEnd={handleDragEnd}
         className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-indigo-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
-        onClick={() => setSelectedInternalTask(task)}
+        onClick={() => { setSelectedInternalTask(task); loadCostForItem(task.id); }}
       >
         <CardContent className="p-4 space-y-2">
           <div className="flex items-start justify-between">
@@ -999,6 +1030,12 @@ const ServiceBoard = () => {
               {CATEGORY_LABELS[task.category] || task.category}
             </Badge>
           </div>
+          {incidentCosts[task.id] && (incidentCosts[task.id].repair_cost > 0 || incidentCosts[task.id].materials_cost > 0) && (
+            <div className="flex items-center text-xs text-blue-600 font-medium">
+              <Euro className="h-3 w-3 mr-1" />
+              <span>{(incidentCosts[task.id].repair_cost + incidentCosts[task.id].materials_cost).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            </div>
+          )}
           <div className="text-xs text-stone-400">{formatDate(task.created_at)}</div>
         </CardContent>
       </Card>
@@ -1328,7 +1365,12 @@ const ServiceBoard = () => {
                         <tbody>
                           {historyData.map(h => (
                             <tr key={h.id} className="border-b hover:bg-stone-50/50">
-                              <td className="p-3 font-medium">{h.title}</td>
+                              <td className="p-3 font-medium">
+                                {h.title}
+                                {h.is_internal_task && (
+                                  <Badge className="ml-2 text-xs bg-indigo-100 text-indigo-700 border-indigo-200">Propia</Badge>
+                                )}
+                              </td>
                               <td className="p-3 text-stone-500">{h.property_title || '-'}</td>
                               <td className="p-3 text-stone-500">{h.tenant_name || '-'}</td>
                               <td className="p-3">
@@ -2039,6 +2081,130 @@ const ServiceBoard = () => {
               <p className="text-xs text-stone-400">
                 Creado: {formatDate(selectedInternalTask.created_at)}
               </p>
+
+              {/* Costs section for internal tasks */}
+              <div className="bg-blue-50 rounded-lg p-3 space-y-3 border border-blue-200">
+                <h4 className="text-sm font-semibold text-blue-800 flex items-center gap-1">
+                  <Euro className="h-4 w-4" />
+                  Costes del servicio
+                </h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costRepair || ''}
+                      onChange={e => setCostRepair(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-blue-700">Materiales (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costMaterials || ''}
+                      onChange={e => setCostMaterials(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-green-700">Cobro cliente (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costCharge || ''}
+                      onChange={e => setCostCharge(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm border-green-200"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between items-center text-sm flex-wrap gap-2">
+                  <div className="flex gap-3">
+                    <span className="font-medium text-blue-800">Coste: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+                    {costCharge > 0 && (
+                      <span className={`font-medium ${(costCharge - costRepair - costMaterials) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                        Beneficio: {(costCharge - costRepair - costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </span>
+                    )}
+                  </div>
+                  <Button 
+                    size="sm" 
+                    onClick={() => saveCost(selectedInternalTask.id, true)}
+                    disabled={savingCost}
+                    className="h-7 text-xs"
+                  >
+                    <Save className="h-3 w-3 mr-1" />
+                    {savingCost ? 'Guardando...' : 'Guardar costes'}
+                  </Button>
+                </div>
+
+                {/* Receipts */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-blue-700">Justificantes (tickets, facturas, PDFs...)</Label>
+                  <div className="flex gap-2">
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,.pdf,.doc,.docx"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            uploadReceipt(selectedInternalTask.id, e.target.files, true);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <div className="flex items-center justify-center gap-2 border border-dashed border-blue-300 rounded-lg p-2 cursor-pointer hover:bg-blue-50 transition-colors text-xs text-blue-600">
+                        <Plus className="h-3 w-3" />
+                        {uploadingReceipt ? 'Subiendo...' : 'Adjuntar archivos'}
+                      </div>
+                    </label>
+                  </div>
+                  {costReceipts.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {costReceipts.map((url, idx) => {
+                        const isPdf = url.toLowerCase().includes('.pdf');
+                        const isDoc = url.toLowerCase().includes('.doc');
+                        return (
+                          <div key={idx} className="relative group">
+                            {isPdf || isDoc ? (
+                              <a 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                download
+                                className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200"
+                              >
+                                <FileText className="h-6 w-6 mr-1" />
+                                {isPdf ? 'PDF' : 'DOC'}
+                              </a>
+                            ) : (
+                              <a href={url} target="_blank" rel="noopener noreferrer">
+                                <img src={url} alt={`Justificante ${idx + 1}`} className="h-20 w-full object-cover rounded-lg border" />
+                              </a>
+                            )}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); removeReceipt(selectedInternalTask.id, url, true); }}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="flex flex-col gap-2 pt-2">
                 {selectedInternalTask.status === 'in_progress' && (

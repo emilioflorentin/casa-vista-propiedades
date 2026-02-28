@@ -79,7 +79,8 @@ export type Database = {
           charge_amount: number | null
           created_at: string
           id: string
-          incident_id: string
+          incident_id: string | null
+          internal_task_id: string | null
           materials_cost: number | null
           notes: string | null
           receipts: string[] | null
@@ -90,7 +91,8 @@ export type Database = {
           charge_amount?: number | null
           created_at?: string
           id?: string
-          incident_id: string
+          incident_id?: string | null
+          internal_task_id?: string | null
           materials_cost?: number | null
           notes?: string | null
           receipts?: string[] | null
@@ -101,7 +103,8 @@ export type Database = {
           charge_amount?: number | null
           created_at?: string
           id?: string
-          incident_id?: string
+          incident_id?: string | null
+          internal_task_id?: string | null
           materials_cost?: number | null
           notes?: string | null
           receipts?: string[] | null
@@ -116,6 +119,13 @@ export type Database = {
             referencedRelation: "incidents"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "incident_costs_internal_task_id_fkey"
+            columns: ["internal_task_id"]
+            isOneToOne: false
+            referencedRelation: "internal_tasks"
+            referencedColumns: ["id"]
+          },
         ]
       }
       incident_history: {
@@ -126,7 +136,9 @@ export type Database = {
           description: string | null
           id: string
           incident_created_at: string | null
-          incident_id: string
+          incident_id: string | null
+          internal_task_id: string | null
+          is_internal_task: boolean
           materials_cost: number | null
           profit: number | null
           property_location: string | null
@@ -146,7 +158,9 @@ export type Database = {
           description?: string | null
           id?: string
           incident_created_at?: string | null
-          incident_id: string
+          incident_id?: string | null
+          internal_task_id?: string | null
+          is_internal_task?: boolean
           materials_cost?: number | null
           profit?: number | null
           property_location?: string | null
@@ -166,7 +180,9 @@ export type Database = {
           description?: string | null
           id?: string
           incident_created_at?: string | null
-          incident_id?: string
+          incident_id?: string | null
+          internal_task_id?: string | null
+          is_internal_task?: boolean
           materials_cost?: number | null
           profit?: number | null
           property_location?: string | null
