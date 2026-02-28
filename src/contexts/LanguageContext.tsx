@@ -61,9 +61,9 @@ const translations: Translations = {
       back: "Volver",
     },
     hero: {
-      title: "Encuentra tu hogar ideal",
-      title_highlight: "en Granada",
-      subtitle: "Descubre las mejores propiedades en Granada y alrededores",
+      title: "Tu hogar ideal con",
+      title_highlight: "gestión integral",
+      subtitle: "Compra, vende o alquila con total tranquilidad. Nos encargamos de todo por ti",
       searchPlaceholder: "¿Qué estás buscando?",
     },
     search: {
