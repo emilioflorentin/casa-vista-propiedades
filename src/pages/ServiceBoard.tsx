@@ -33,7 +33,8 @@ import {
   FolderOpen,
   Edit3,
   History,
-  Filter
+  Filter,
+  AlertTriangle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -1047,10 +1048,27 @@ const ServiceBoard = () => {
             {/* HISTORIAL SECTION inside Mantenimiento */}
             <div className="mt-10 space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl font-semibold text-stone-700 flex items-center gap-2">
-                  <History className="h-5 w-5" />
-                  Historial de Servicios
-                </h2>
+                <div className="flex flex-col gap-1">
+                  <h2 className="text-xl font-semibold text-stone-700 flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Historial de Servicios
+                  </h2>
+                  <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1 w-fit">
+                    <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span>
+                      Este historial se reinicia automáticamente el 1 de enero. Exporta a Excel antes de esa fecha. 
+                      <span className="font-semibold ml-1">
+                        {(() => {
+                          const now = new Date();
+                          const nextJan1 = new Date(now.getFullYear() + (now.getMonth() === 0 && now.getDate() === 1 ? 0 : 1), 0, 1);
+                          const diffMs = nextJan1.getTime() - now.getTime();
+                          const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                          return `Quedan ${days} días`;
+                        })()}
+                      </span>
+                    </span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
                     <Button 
