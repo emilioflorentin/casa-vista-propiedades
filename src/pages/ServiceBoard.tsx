@@ -24,7 +24,10 @@ import {
   Plus,
   Trash2,
   Download,
-  Euro
+  Euro,
+  Ruler,
+  Calendar,
+  CreditCard
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -60,12 +63,26 @@ interface OwnerInfo {
   email: string;
 }
 
+type UnitType = 'm²' | 'ml' | 'ud' | 'h' | 'pa' | 'kg' | 'm³';
+
 interface BudgetItem {
   id: string;
+  chapter: string;
   description: string;
   quantity: number;
+  unit: UnitType;
   unitPrice: number;
 }
+
+const UNIT_OPTIONS: { value: UnitType; label: string }[] = [
+  { value: 'ud', label: 'ud (unidad)' },
+  { value: 'm²', label: 'm² (metro cuadrado)' },
+  { value: 'ml', label: 'ml (metro lineal)' },
+  { value: 'm³', label: 'm³ (metro cúbico)' },
+  { value: 'h', label: 'h (hora)' },
+  { value: 'pa', label: 'pa (partida alzada)' },
+  { value: 'kg', label: 'kg (kilogramo)' },
+];
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: '🔧 Fontanería',
@@ -93,11 +110,14 @@ const ServiceBoard = () => {
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
-    { id: '1', description: '', quantity: 1, unitPrice: 0 }
+    { id: '1', chapter: '', description: '', quantity: 1, unit: 'ud' as UnitType, unitPrice: 0 }
   ]);
-  const [budgetClient, setBudgetClient] = useState({ name: '', address: '', phone: '', email: '' });
+  const [budgetClient, setBudgetClient] = useState({ name: '', nif: '', address: '', phone: '', email: '' });
   const [budgetTitle, setBudgetTitle] = useState('');
   const [budgetNotes, setBudgetNotes] = useState('');
+  const [budgetValidityDays, setBudgetValidityDays] = useState(30);
+  const [budgetExecutionDays, setBudgetExecutionDays] = useState('');
+  const [budgetPaymentTerms, setBudgetPaymentTerms] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -207,7 +227,7 @@ const ServiceBoard = () => {
   // Budget functions
   const addBudgetItem = () => {
     setBudgetItems(prev => [...prev, { 
-      id: Date.now().toString(), description: '', quantity: 1, unitPrice: 0 
+      id: Date.now().toString(), chapter: '', description: '', quantity: 1, unit: 'ud' as UnitType, unitPrice: 0 
     }]);
   };
 
@@ -228,8 +248,34 @@ const ServiceBoard = () => {
   const total = subtotal + iva;
 
   const generateBudgetPDF = () => {
-    const budgetNumber = `PRE-${Date.now().toString().slice(-6)}`;
-    const today = new Date().toLocaleDateString('es-ES');
+    const budgetNumber = `PRE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+    const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+    const logoUrl = window.location.origin + '/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png';
+
+    // Group items by chapter
+    const chapters = new Map<string, BudgetItem[]>();
+    budgetItems.filter(i => i.description).forEach(item => {
+      const ch = item.chapter || 'Sin capítulo';
+      if (!chapters.has(ch)) chapters.set(ch, []);
+      chapters.get(ch)!.push(item);
+    });
+
+    const chapterRows = Array.from(chapters.entries()).map(([chapter, items]) => {
+      const chapterTotal = items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+      return `
+        <tr class="chapter-row"><td colspan="5"><strong>${chapter}</strong></td></tr>
+        ${items.map((item, idx) => `
+          <tr>
+            <td class="item-num">${idx + 1}</td>
+            <td>${item.description}</td>
+            <td class="center">${item.quantity.toLocaleString('es-ES', { minimumFractionDigits: 2 })} ${item.unit}</td>
+            <td class="right">${item.unitPrice.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+            <td class="right">${(item.quantity * item.unitPrice).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+          </tr>
+        `).join('')}
+        <tr class="chapter-subtotal"><td colspan="4" class="right">Subtotal ${chapter}</td><td class="right"><strong>${chapterTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</strong></td></tr>
+      `;
+    }).join('');
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
@@ -238,85 +284,127 @@ const ServiceBoard = () => {
       <!DOCTYPE html>
       <html><head><title>Presupuesto ${budgetNumber}</title>
       <style>
+        @page { margin: 15mm 20mm; size: A4; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; padding: 40px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 3px solid #78716c; padding-bottom: 20px; }
-        .logo { font-size: 24px; font-weight: bold; color: #78716c; }
-        .logo-sub { font-size: 12px; color: #999; }
-        .budget-info { text-align: right; }
-        .budget-info h2 { font-size: 20px; color: #78716c; margin-bottom: 8px; }
-        .budget-info p { font-size: 13px; color: #666; }
-        .section { margin-bottom: 24px; }
-        .section-title { font-size: 14px; font-weight: 600; color: #78716c; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .client-info { background: #f5f5f4; padding: 16px; border-radius: 8px; }
-        .client-info p { font-size: 13px; margin-bottom: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        th { background: #78716c; color: white; padding: 10px 12px; text-align: left; font-size: 13px; }
-        th:last-child, th:nth-child(3), th:nth-child(2) { text-align: right; }
-        td { padding: 10px 12px; border-bottom: 1px solid #e5e5e5; font-size: 13px; }
-        td:last-child, td:nth-child(3), td:nth-child(2) { text-align: right; }
-        .totals { margin-top: 16px; display: flex; justify-content: flex-end; }
-        .totals-table { width: 280px; }
-        .totals-table tr td { padding: 6px 12px; }
-        .totals-table .total-row { font-weight: bold; font-size: 16px; border-top: 2px solid #78716c; color: #78716c; }
-        .notes { background: #fafaf9; padding: 16px; border-radius: 8px; font-size: 13px; color: #666; white-space: pre-wrap; }
-        .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #999; border-top: 1px solid #e5e5e5; padding-top: 16px; }
-        @media print { body { padding: 20px; } }
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; }
+        .page { max-width: 210mm; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 3px solid #78716c; margin-bottom: 24px; }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo-section img { height: 60px; width: auto; }
+        .company-info { font-size: 9pt; color: #666; line-height: 1.6; }
+        .budget-badge { text-align: right; }
+        .budget-badge h1 { font-size: 22pt; color: #78716c; letter-spacing: 2px; margin-bottom: 4px; }
+        .budget-badge .meta { font-size: 10pt; color: #555; }
+        .budget-badge .meta strong { color: #333; }
+        .two-col { display: flex; gap: 24px; margin-bottom: 24px; }
+        .two-col > div { flex: 1; }
+        .info-box { background: #f8f7f6; border: 1px solid #e8e6e3; border-radius: 6px; padding: 16px; }
+        .info-box h3 { font-size: 9pt; text-transform: uppercase; letter-spacing: 1px; color: #78716c; margin-bottom: 10px; font-weight: 700; }
+        .info-box p { font-size: 10pt; margin-bottom: 3px; color: #444; }
+        .info-box p strong { color: #1a1a1a; }
+        .title-section { background: linear-gradient(135deg, #78716c 0%, #57534e 100%); color: white; padding: 14px 20px; border-radius: 6px; margin-bottom: 24px; }
+        .title-section h2 { font-size: 14pt; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        th { background: #78716c; color: white; padding: 8px 10px; text-align: left; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 7px 10px; border-bottom: 1px solid #eee; font-size: 10pt; vertical-align: top; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .item-num { width: 30px; text-align: center; color: #999; font-size: 9pt; }
+        .chapter-row { background: #f0efed; }
+        .chapter-row td { padding: 10px; font-size: 10pt; color: #57534e; border-bottom: 2px solid #d6d3d1; }
+        .chapter-subtotal td { background: #fafaf9; border-bottom: 2px solid #d6d3d1; font-size: 10pt; }
+        .totals-section { display: flex; justify-content: flex-end; margin-top: 16px; margin-bottom: 24px; }
+        .totals-table { width: 300px; border: 2px solid #78716c; border-radius: 6px; overflow: hidden; }
+        .totals-table td { padding: 8px 14px; font-size: 10pt; border-bottom: 1px solid #e5e5e5; }
+        .totals-table .label { color: #666; }
+        .totals-table .total-row td { background: #78716c; color: white; font-size: 13pt; font-weight: 700; border: none; }
+        .conditions { margin-top: 20px; }
+        .conditions h3 { font-size: 9pt; text-transform: uppercase; letter-spacing: 1px; color: #78716c; margin-bottom: 8px; font-weight: 700; }
+        .conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .condition-item { background: #f8f7f6; border: 1px solid #e8e6e3; border-radius: 4px; padding: 10px; }
+        .condition-item .label { font-size: 8pt; text-transform: uppercase; color: #999; letter-spacing: 0.5px; }
+        .condition-item .value { font-size: 10pt; font-weight: 600; color: #333; margin-top: 2px; }
+        .notes-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 14px; font-size: 10pt; color: #92400e; white-space: pre-wrap; }
+        .footer { margin-top: 30px; text-align: center; border-top: 2px solid #78716c; padding-top: 16px; }
+        .footer p { font-size: 9pt; color: #999; }
+        .footer .brand { font-size: 10pt; color: #78716c; font-weight: 600; margin-bottom: 4px; }
+        .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+        .signature-box { width: 45%; border-top: 1px solid #ccc; padding-top: 8px; font-size: 9pt; color: #999; }
+        @media print { body { padding: 0; } .page { max-width: none; } }
       </style></head><body>
+      <div class="page">
         <div class="header">
-          <div>
-            <div class="logo">NAZARÍ HOMES</div>
-            <div class="logo-sub">Gestión Integral para tu Tranquilidad</div>
+          <div class="logo-section">
+            <img src="${logoUrl}" alt="Nazarí Homes" />
+            <div class="company-info">
+              <strong style="font-size:11pt;color:#333;">Nazarí Homes</strong><br>
+              CIF: B-XXXXXXXX<br>
+              info@nazarihomes.com<br>
+              www.nazarihomes.com
+            </div>
           </div>
-          <div class="budget-info">
-            <h2>PRESUPUESTO</h2>
-            <p><strong>Nº:</strong> ${budgetNumber}</p>
-            <p><strong>Fecha:</strong> ${today}</p>
+          <div class="budget-badge">
+            <h1>PRESUPUESTO</h1>
+            <p class="meta"><strong>Nº:</strong> ${budgetNumber}</p>
+            <p class="meta"><strong>Fecha:</strong> ${today}</p>
           </div>
         </div>
 
-        ${budgetTitle ? `<div class="section"><h3 style="font-size:18px;color:#444;margin-bottom:16px;">${budgetTitle}</h3></div>` : ''}
-
-        <div class="section">
-          <div class="section-title">Datos del cliente</div>
-          <div class="client-info">
+        <div class="two-col">
+          <div class="info-box">
+            <h3>Datos del cliente</h3>
             ${budgetClient.name ? `<p><strong>${budgetClient.name}</strong></p>` : ''}
+            ${budgetClient.nif ? `<p>NIF/CIF: ${budgetClient.nif}</p>` : ''}
             ${budgetClient.address ? `<p>${budgetClient.address}</p>` : ''}
             ${budgetClient.phone ? `<p>Tel: ${budgetClient.phone}</p>` : ''}
             ${budgetClient.email ? `<p>Email: ${budgetClient.email}</p>` : ''}
           </div>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Detalle del presupuesto</div>
-          <table>
-            <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Total</th></tr></thead>
-            <tbody>
-              ${budgetItems.filter(i => i.description).map(item => `
-                <tr>
-                  <td>${item.description}</td>
-                  <td>${item.quantity}</td>
-                  <td>${item.unitPrice.toFixed(2)} €</td>
-                  <td>${(item.quantity * item.unitPrice).toFixed(2)} €</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <div class="totals">
-            <table class="totals-table">
-              <tr><td>Subtotal</td><td>${subtotal.toFixed(2)} €</td></tr>
-              <tr><td>IVA (21%)</td><td>${iva.toFixed(2)} €</td></tr>
-              <tr class="total-row"><td>TOTAL</td><td>${total.toFixed(2)} €</td></tr>
-            </table>
+          <div class="info-box">
+            <h3>Datos del presupuesto</h3>
+            <p><strong>Referencia:</strong> ${budgetNumber}</p>
+            <p><strong>Fecha emisión:</strong> ${today}</p>
+            <p><strong>Validez:</strong> ${budgetValidityDays} días</p>
+            ${budgetExecutionDays ? `<p><strong>Plazo ejecución:</strong> ${budgetExecutionDays}</p>` : ''}
           </div>
         </div>
 
-        ${budgetNotes ? `<div class="section"><div class="section-title">Observaciones</div><div class="notes">${budgetNotes}</div></div>` : ''}
+        ${budgetTitle ? `<div class="title-section"><h2>${budgetTitle}</h2></div>` : ''}
+
+        <table>
+          <thead><tr><th style="width:30px">Nº</th><th>Descripción</th><th class="center" style="width:100px">Medición</th><th class="right" style="width:100px">P. Unitario</th><th class="right" style="width:100px">Importe</th></tr></thead>
+          <tbody>${chapterRows}</tbody>
+        </table>
+
+        <div class="totals-section">
+          <table class="totals-table">
+            <tr><td class="label">Base imponible</td><td class="right">${subtotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
+            <tr><td class="label">IVA (21%)</td><td class="right">${iva.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
+            <tr class="total-row"><td>TOTAL</td><td class="right">${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
+          </table>
+        </div>
+
+        <div class="conditions">
+          <h3>Condiciones</h3>
+          <div class="conditions-grid">
+            <div class="condition-item"><div class="label">Validez</div><div class="value">${budgetValidityDays} días desde emisión</div></div>
+            ${budgetExecutionDays ? `<div class="condition-item"><div class="label">Plazo de ejecución</div><div class="value">${budgetExecutionDays}</div></div>` : ''}
+            ${budgetPaymentTerms ? `<div class="condition-item"><div class="label">Forma de pago</div><div class="value">${budgetPaymentTerms}</div></div>` : ''}
+            <div class="condition-item"><div class="label">IVA</div><div class="value">21% incluido en total</div></div>
+          </div>
+        </div>
+
+        ${budgetNotes ? `<div class="conditions"><h3>Observaciones</h3><div class="notes-box">${budgetNotes}</div></div>` : ''}
+
+        <div class="signature">
+          <div class="signature-box">Fdo. Nazarí Homes</div>
+          <div class="signature-box">Fdo. ${budgetClient.name || 'El cliente'}</div>
+        </div>
 
         <div class="footer">
-          <p>Nazarí Homes · info@nazarihomes.com · www.nazarihomes.com</p>
-          <p style="margin-top:4px;">Este presupuesto tiene una validez de 30 días desde su fecha de emisión.</p>
+          <p class="brand">Nazarí Homes · Gestión Integral para tu Tranquilidad</p>
+          <p>info@nazarihomes.com · www.nazarihomes.com</p>
         </div>
+      </div>
       </body></html>
     `);
     printWindow.document.close();
@@ -324,10 +412,13 @@ const ServiceBoard = () => {
   };
 
   const resetBudget = () => {
-    setBudgetItems([{ id: '1', description: '', quantity: 1, unitPrice: 0 }]);
-    setBudgetClient({ name: '', address: '', phone: '', email: '' });
+    setBudgetItems([{ id: '1', chapter: '', description: '', quantity: 1, unit: 'ud' as UnitType, unitPrice: 0 }]);
+    setBudgetClient({ name: '', nif: '', address: '', phone: '', email: '' });
     setBudgetTitle('');
     setBudgetNotes('');
+    setBudgetValidityDays(30);
+    setBudgetExecutionDays('');
+    setBudgetPaymentTerms('');
   };
 
   const IncidentCard = ({ incident }: { incident: Incident }) => {
@@ -506,9 +597,9 @@ const ServiceBoard = () => {
                     Datos del cliente
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label className="text-sm text-stone-600">Nombre</Label>
+                    <Label className="text-sm text-muted-foreground">Nombre / Razón social</Label>
                     <Input
                       value={budgetClient.name}
                       onChange={e => setBudgetClient(prev => ({ ...prev, name: e.target.value }))}
@@ -517,7 +608,16 @@ const ServiceBoard = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-stone-600">Dirección</Label>
+                    <Label className="text-sm text-muted-foreground">NIF / CIF</Label>
+                    <Input
+                      value={budgetClient.nif}
+                      onChange={e => setBudgetClient(prev => ({ ...prev, nif: e.target.value }))}
+                      placeholder="12345678A"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Dirección</Label>
                     <Input
                       value={budgetClient.address}
                       onChange={e => setBudgetClient(prev => ({ ...prev, address: e.target.value }))}
@@ -526,7 +626,7 @@ const ServiceBoard = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-stone-600">Teléfono</Label>
+                    <Label className="text-sm text-muted-foreground">Teléfono</Label>
                     <Input
                       value={budgetClient.phone}
                       onChange={e => setBudgetClient(prev => ({ ...prev, phone: e.target.value }))}
@@ -535,7 +635,7 @@ const ServiceBoard = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-stone-600">Email</Label>
+                    <Label className="text-sm text-muted-foreground">Email</Label>
                     <Input
                       value={budgetClient.email}
                       onChange={e => setBudgetClient(prev => ({ ...prev, email: e.target.value }))}
@@ -551,8 +651,8 @@ const ServiceBoard = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Euro className="h-4 w-4" />
-                      Partidas
+                      <Ruler className="h-4 w-4" />
+                      Partidas y mediciones
                     </CardTitle>
                     <Button variant="outline" size="sm" onClick={addBudgetItem} className="gap-1">
                       <Plus className="h-4 w-4" />
@@ -562,42 +662,65 @@ const ServiceBoard = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Header */}
-                  <div className="hidden md:grid grid-cols-12 gap-2 text-xs font-medium text-stone-500 px-1">
-                    <div className="col-span-6">Descripción</div>
-                    <div className="col-span-2">Cantidad</div>
-                    <div className="col-span-2">Precio unitario</div>
-                    <div className="col-span-1 text-right">Total</div>
+                  <div className="hidden md:grid grid-cols-24 gap-2 text-xs font-medium text-muted-foreground px-1">
+                    <div className="col-span-4">Capítulo</div>
+                    <div className="col-span-7">Descripción</div>
+                    <div className="col-span-3">Medición</div>
+                    <div className="col-span-3">Unidad</div>
+                    <div className="col-span-3">P. Unitario</div>
+                    <div className="col-span-3 text-right">Importe</div>
                     <div className="col-span-1"></div>
                   </div>
 
                   {budgetItems.map(item => (
-                    <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
-                      <div className="col-span-12 md:col-span-6">
+                    <div key={item.id} className="grid grid-cols-24 gap-2 items-center border-b border-border/50 pb-3">
+                      <div className="col-span-12 md:col-span-4">
+                        <Input
+                          value={item.chapter}
+                          onChange={e => updateBudgetItem(item.id, 'chapter', e.target.value)}
+                          placeholder="Ej. Albañilería"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="col-span-12 md:col-span-7">
                         <Input
                           value={item.description}
                           onChange={e => updateBudgetItem(item.id, 'description', e.target.value)}
                           placeholder="Descripción del trabajo"
                         />
                       </div>
-                      <div className="col-span-4 md:col-span-2">
+                      <div className="col-span-4 md:col-span-3">
                         <Input
                           type="number"
-                          min="1"
+                          min="0"
+                          step="0.01"
                           value={item.quantity}
                           onChange={e => updateBudgetItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
                         />
                       </div>
-                      <div className="col-span-4 md:col-span-2">
+                      <div className="col-span-4 md:col-span-3">
+                        <select
+                          value={item.unit}
+                          onChange={e => updateBudgetItem(item.id, 'unit', e.target.value)}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {UNIT_OPTIONS.map(u => (
+                            <option key={u.value} value={u.value}>{u.value}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-span-4 md:col-span-3">
                         <Input
                           type="number"
                           min="0"
                           step="0.01"
                           value={item.unitPrice || ''}
                           onChange={e => updateBudgetItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                          placeholder="0.00"
+                          placeholder="0.00 €"
                         />
                       </div>
-                      <div className="col-span-3 md:col-span-1 text-right text-sm font-medium text-stone-700">
+                      <div className="col-span-3 md:col-span-3 text-right text-sm font-medium">
                         {(item.quantity * item.unitPrice).toFixed(2)} €
                       </div>
                       <div className="col-span-1">
@@ -608,7 +731,7 @@ const ServiceBoard = () => {
                           disabled={budgetItems.length === 1}
                           className="p-1 h-8 w-8"
                         >
-                          <Trash2 className="h-4 w-4 text-stone-400" />
+                          <Trash2 className="h-4 w-4 text-muted-foreground" />
                         </Button>
                       </div>
                     </div>
@@ -617,17 +740,56 @@ const ServiceBoard = () => {
                   {/* Totals */}
                   <div className="border-t pt-4 mt-4 space-y-2">
                     <div className="flex justify-end gap-8 text-sm">
-                      <span className="text-stone-500">Subtotal</span>
-                      <span className="font-medium w-24 text-right">{subtotal.toFixed(2)} €</span>
+                      <span className="text-muted-foreground">Base imponible</span>
+                      <span className="font-medium w-28 text-right">{subtotal.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-end gap-8 text-sm">
-                      <span className="text-stone-500">IVA (21%)</span>
-                      <span className="font-medium w-24 text-right">{iva.toFixed(2)} €</span>
+                      <span className="text-muted-foreground">IVA (21%)</span>
+                      <span className="font-medium w-28 text-right">{iva.toFixed(2)} €</span>
                     </div>
-                    <div className="flex justify-end gap-8 text-lg font-bold text-stone-800">
+                    <div className="flex justify-end gap-8 text-lg font-bold">
                       <span>TOTAL</span>
-                      <span className="w-24 text-right">{total.toFixed(2)} €</span>
+                      <span className="w-28 text-right">{total.toFixed(2)} €</span>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Conditions */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Condiciones
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Validez (días)</Label>
+                    <Input
+                      type="number"
+                      value={budgetValidityDays}
+                      onChange={e => setBudgetValidityDays(parseInt(e.target.value) || 30)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Plazo de ejecución</Label>
+                    <Input
+                      value={budgetExecutionDays}
+                      onChange={e => setBudgetExecutionDays(e.target.value)}
+                      placeholder="Ej. 15 días laborables"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Forma de pago</Label>
+                    <Input
+                      value={budgetPaymentTerms}
+                      onChange={e => setBudgetPaymentTerms(e.target.value)}
+                      placeholder="Ej. 50% inicio, 50% final"
+                      className="mt-1"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -641,7 +803,7 @@ const ServiceBoard = () => {
                   <Textarea
                     value={budgetNotes}
                     onChange={e => setBudgetNotes(e.target.value)}
-                    placeholder="Condiciones, plazos de ejecución, garantías..."
+                    placeholder="Notas adicionales, garantías, exclusiones..."
                     rows={4}
                   />
                 </CardContent>
