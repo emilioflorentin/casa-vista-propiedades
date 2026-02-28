@@ -442,9 +442,18 @@ const Account = () => {
             continue;
           }
         }
+
+        const failedCount = propertyForm.images.length - uploadedUrls.length;
         
         if (uploadedUrls.length > 0) {
           imageUrl = uploadedUrls.join(',');
+          if (failedCount > 0) {
+            toast({
+              title: "Aviso",
+              description: `Se subieron ${uploadedUrls.length} de ${propertyForm.images.length} imágenes. ${failedCount} fallaron (posiblemente por tamaño o formato).`,
+              variant: "destructive"
+            });
+          }
         } else {
           throw new Error('Error al subir las imágenes');
         }
