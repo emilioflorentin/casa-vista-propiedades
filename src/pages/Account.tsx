@@ -385,30 +385,62 @@ const Account = () => {
         return;
       }
 
-      // Upload images to Supabase storage if provided
+      // Compress and upload images to Supabase storage if provided
       let imageUrl: string | null = editingProperty?.image || null;
       
       if (propertyForm.images && propertyForm.images.length > 0) {
         const uploadedUrls: string[] = [];
         
+        const compressImage = (file: File, maxWidth = 1920, quality = 0.82): Promise<Blob> => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const ratio = Math.min(maxWidth / img.width, 1);
+              canvas.width = img.width * ratio;
+              canvas.height = img.height * ratio;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob(
+                (blob) => blob ? resolve(blob) : reject(new Error('Compression failed')),
+                'image/jpeg',
+                quality
+              );
+              URL.revokeObjectURL(img.src);
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(file);
+          });
+        };
+
         for (const file of propertyForm.images) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${user.id}/${Date.now()}_${crypto.randomUUID()}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('property-images')
-            .upload(fileName, file, { upsert: true });
-          
-          if (uploadError) {
-            console.error('Error uploading image:', uploadError);
-            continue; // Skip failed uploads but continue with others
+          try {
+            const compressed = file.type.startsWith('image/') 
+              ? await compressImage(file) 
+              : file;
+            const fileName = `${user.id}/${Date.now()}_${crypto.randomUUID()}.jpg`;
+            
+            const { error: uploadError } = await supabase.storage
+              .from('property-images')
+              .upload(fileName, compressed, { 
+                contentType: 'image/jpeg',
+                upsert: true 
+              });
+            
+            if (uploadError) {
+              console.error('Error uploading image:', uploadError);
+              continue;
+            }
+            
+            const { data: urlData } = supabase.storage
+              .from('property-images')
+              .getPublicUrl(fileName);
+            
+            uploadedUrls.push(urlData.publicUrl);
+          } catch (err) {
+            console.error('Error compressing image:', err);
+            continue;
           }
-          
-          const { data: urlData } = supabase.storage
-            .from('property-images')
-            .getPublicUrl(fileName);
-          
-          uploadedUrls.push(urlData.publicUrl);
         }
         
         if (uploadedUrls.length > 0) {
