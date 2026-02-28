@@ -27,7 +27,10 @@ import {
   Euro,
   Ruler,
   Calendar,
-  CreditCard
+  CreditCard,
+  Save,
+  FolderOpen,
+  Edit3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -118,7 +121,10 @@ const ServiceBoard = () => {
   const [budgetValidityDays, setBudgetValidityDays] = useState(30);
   const [budgetExecutionDays, setBudgetExecutionDays] = useState('');
   const [budgetPaymentTerms, setBudgetPaymentTerms] = useState('');
-
+  const [savedBudgets, setSavedBudgets] = useState<any[]>([]);
+  const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
+  const [savingBudget, setSavingBudget] = useState(false);
+  const [loadingBudgets, setLoadingBudgets] = useState(false);
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -419,7 +425,98 @@ const ServiceBoard = () => {
     setBudgetValidityDays(30);
     setBudgetExecutionDays('');
     setBudgetPaymentTerms('');
+    setEditingBudgetId(null);
   };
+
+  const loadSavedBudgets = async () => {
+    setLoadingBudgets(true);
+    try {
+      const { data, error } = await supabase
+        .from('budgets')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      if (!error && data) setSavedBudgets(data);
+    } catch (e) {
+      console.error('Error loading budgets:', e);
+    } finally {
+      setLoadingBudgets(false);
+    }
+  };
+
+  const saveBudget = async () => {
+    if (!user) return;
+    setSavingBudget(true);
+    try {
+      const budgetData = {
+        user_id: user.id,
+        budget_number: editingBudgetId 
+          ? savedBudgets.find(b => b.id === editingBudgetId)?.budget_number 
+          : `PRE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`,
+        title: budgetTitle || null,
+        client_name: budgetClient.name || null,
+        client_nif: budgetClient.nif || null,
+        client_address: budgetClient.address || null,
+        client_phone: budgetClient.phone || null,
+        client_email: budgetClient.email || null,
+        items: budgetItems as any,
+        notes: budgetNotes || null,
+        validity_days: budgetValidityDays,
+        execution_days: budgetExecutionDays || null,
+        payment_terms: budgetPaymentTerms || null,
+        status: 'draft',
+      };
+
+      if (editingBudgetId) {
+        const { error } = await supabase.from('budgets').update(budgetData).eq('id', editingBudgetId);
+        if (error) throw error;
+        toast({ title: 'Guardado', description: 'Presupuesto actualizado correctamente' });
+      } else {
+        const { data, error } = await supabase.from('budgets').insert(budgetData).select('id').single();
+        if (error) throw error;
+        setEditingBudgetId(data.id);
+        toast({ title: 'Guardado', description: 'Borrador guardado correctamente' });
+      }
+      await loadSavedBudgets();
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message || 'No se pudo guardar', variant: 'destructive' });
+    } finally {
+      setSavingBudget(false);
+    }
+  };
+
+  const loadBudget = (budget: any) => {
+    setBudgetTitle(budget.title || '');
+    setBudgetClient({
+      name: budget.client_name || '',
+      nif: budget.client_nif || '',
+      address: budget.client_address || '',
+      phone: budget.client_phone || '',
+      email: budget.client_email || '',
+    });
+    setBudgetItems(budget.items?.length ? budget.items : [{ id: '1', chapter: '', description: '', quantity: 1, unit: 'ud' as UnitType, unitPrice: 0 }]);
+    setBudgetNotes(budget.notes || '');
+    setBudgetValidityDays(budget.validity_days || 30);
+    setBudgetExecutionDays(budget.execution_days || '');
+    setBudgetPaymentTerms(budget.payment_terms || '');
+    setEditingBudgetId(budget.id);
+    toast({ title: 'Cargado', description: `Presupuesto ${budget.budget_number} cargado` });
+  };
+
+  const deleteBudget = async (budgetId: string) => {
+    const { error } = await supabase.from('budgets').delete().eq('id', budgetId);
+    if (!error) {
+      toast({ title: 'Eliminado', description: 'Presupuesto eliminado' });
+      if (editingBudgetId === budgetId) resetBudget();
+      await loadSavedBudgets();
+    }
+  };
+
+  // Load saved budgets when switching to presupuestos tab
+  useEffect(() => {
+    if (activeTab === 'presupuestos' && user) {
+      loadSavedBudgets();
+    }
+  }, [activeTab, user]);
 
   const IncidentCard = ({ incident }: { incident: Incident }) => {
     const property = properties[incident.property_id];
@@ -562,14 +659,64 @@ const ServiceBoard = () => {
           {/* PRESUPUESTOS TAB */}
           <TabsContent value="presupuestos">
             <div className="max-w-4xl mx-auto space-y-6">
+              {/* Saved Budgets */}
+              {savedBudgets.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <FolderOpen className="h-4 w-4" />
+                      Presupuestos guardados
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {savedBudgets.map(b => (
+                        <div 
+                          key={b.id} 
+                          className={`border rounded-lg p-3 cursor-pointer transition-colors hover:border-primary/50 ${editingBudgetId === b.id ? 'border-primary bg-primary/5' : 'border-border'}`}
+                          onClick={() => loadBudget(b)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-sm truncate">{b.title || b.budget_number}</p>
+                              <p className="text-xs text-muted-foreground">{b.budget_number}</p>
+                              {b.client_name && <p className="text-xs text-muted-foreground mt-1">{b.client_name}</p>}
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {new Date(b.updated_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                              </p>
+                            </div>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 shrink-0" onClick={e => { e.stopPropagation(); deleteBudget(b.id); }}>
+                              <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-stone-700">Generador de Presupuestos</h2>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {editingBudgetId ? 'Editando presupuesto' : 'Nuevo presupuesto'}
+                  </h2>
+                  {editingBudgetId && (
+                    <p className="text-sm text-muted-foreground">
+                      {savedBudgets.find(b => b.id === editingBudgetId)?.budget_number}
+                    </p>
+                  )}
+                </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={resetBudget} className="gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    Limpiar
+                  <Button variant="outline" onClick={() => { resetBudget(); }} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Nuevo
                   </Button>
-                  <Button onClick={generateBudgetPDF} className="gap-2 bg-stone-700 hover:bg-stone-600 text-white">
+                  <Button variant="outline" onClick={saveBudget} disabled={savingBudget} className="gap-2">
+                    <Save className="h-4 w-4" />
+                    {savingBudget ? 'Guardando...' : 'Guardar'}
+                  </Button>
+                  <Button onClick={generateBudgetPDF} className="gap-2">
                     <Download className="h-4 w-4" />
                     Generar PDF
                   </Button>

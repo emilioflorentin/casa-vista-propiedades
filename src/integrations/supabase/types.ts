@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          budget_number: string
+          client_address: string | null
+          client_email: string | null
+          client_name: string | null
+          client_nif: string | null
+          client_phone: string | null
+          created_at: string
+          execution_days: string | null
+          id: string
+          items: Json
+          notes: string | null
+          payment_terms: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          validity_days: number | null
+        }
+        Insert: {
+          budget_number: string
+          client_address?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          client_nif?: string | null
+          client_phone?: string | null
+          created_at?: string
+          execution_days?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_terms?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          validity_days?: number | null
+        }
+        Update: {
+          budget_number?: string
+          client_address?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          client_nif?: string | null
+          client_phone?: string | null
+          created_at?: string
+          execution_days?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_terms?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          validity_days?: number | null
+        }
+        Relationships: []
+      }
       incidents: {
         Row: {
           category: string
