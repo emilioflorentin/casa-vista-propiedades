@@ -218,13 +218,17 @@ const ServiceBoard = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
+      case 'approval': return 'En aprobación';
       case 'in_progress': return 'En progreso';
+      case 'paused': return 'Pausada';
       case 'resolved': return 'Resuelto';
       default: return status;
     }
   };
 
+  const approvalIncidents = incidents.filter(i => i.status === 'approval');
   const inProgressIncidents = incidents.filter(i => i.status === 'in_progress');
+  const pausedIncidents = incidents.filter(i => i.status === 'paused');
   const resolvedIncidents = incidents.filter(i => i.status === 'resolved');
 
   const formatDate = (dateStr: string) => {
@@ -633,12 +637,32 @@ const ServiceBoard = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[60vh]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[60vh]">
+              {/* Approval Column - Read only for multiservicios */}
+              <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-200/50">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="h-5 w-5 text-purple-600" />
+                  <h3 className="font-bold text-stone-700 text-sm">En Aprobación</h3>
+                  <Badge className="bg-purple-100 text-purple-700 border-purple-200">
+                    {approvalIncidents.length}
+                  </Badge>
+                </div>
+                <div className="space-y-3">
+                  {approvalIncidents.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">Sin incidencias pendientes de aprobación</p>
+                  ) : (
+                    approvalIncidents.map(incident => (
+                      <IncidentCard key={incident.id} incident={incident} />
+                    ))
+                  )}
+                </div>
+              </div>
+
               {/* In Progress Column */}
               <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-200/50">
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                  <h3 className="font-bold text-stone-700">En Progreso</h3>
+                  <Wrench className="h-5 w-5 text-amber-600" />
+                  <h3 className="font-bold text-stone-700 text-sm">En Progreso</h3>
                   <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                     {inProgressIncidents.length}
                   </Badge>
@@ -654,11 +678,31 @@ const ServiceBoard = () => {
                 </div>
               </div>
 
+              {/* Paused Column */}
+              <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-200/50">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="h-5 w-5 text-orange-500" />
+                  <h3 className="font-bold text-stone-700 text-sm">Pausada</h3>
+                  <Badge className="bg-orange-100 text-orange-700 border-orange-200">
+                    {pausedIncidents.length}
+                  </Badge>
+                </div>
+                <div className="space-y-3">
+                  {pausedIncidents.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias pausadas</p>
+                  ) : (
+                    pausedIncidents.map(incident => (
+                      <IncidentCard key={incident.id} incident={incident} />
+                    ))
+                  )}
+                </div>
+              </div>
+
               {/* Resolved Column */}
               <div className="bg-green-50/50 rounded-xl p-4 border border-green-200/50">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <h3 className="font-bold text-stone-700">Resueltos</h3>
+                  <h3 className="font-bold text-stone-700 text-sm">Resueltos</h3>
                   <Badge className="bg-green-100 text-green-700 border-green-200">
                     {resolvedIncidents.length}
                   </Badge>
@@ -1063,19 +1107,57 @@ const ServiceBoard = () => {
                 Creado: {formatDate(selectedIncident.created_at)} · Actualizado: {formatDate(selectedIncident.updated_at)}
               </p>
 
-              <div className="flex gap-2 pt-2">
-                {selectedIncident.status === 'in_progress' && (
-                  <Button 
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => updateStatus(selectedIncident.id, 'resolved')}
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Marcar como resuelto
-                  </Button>
+              <div className="flex flex-col gap-2 pt-2">
+                {/* Approval status - read only for multiservicios */}
+                {selectedIncident.status === 'approval' && (
+                  <p className="text-sm text-purple-600 text-center py-2">
+                    ⏳ Pendiente de aprobación por el propietario
+                  </p>
                 )}
+                {/* In progress - can pause or resolve */}
+                {selectedIncident.status === 'in_progress' && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
+                      onClick={() => updateStatus(selectedIncident.id, 'paused')}
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      Pausar
+                    </Button>
+                    <Button 
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => updateStatus(selectedIncident.id, 'resolved')}
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Resolver
+                    </Button>
+                  </div>
+                )}
+                {/* Paused - can resume or resolve */}
+                {selectedIncident.status === 'paused' && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => updateStatus(selectedIncident.id, 'in_progress')}
+                    >
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Reanudar
+                    </Button>
+                    <Button 
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => updateStatus(selectedIncident.id, 'resolved')}
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Resolver
+                    </Button>
+                  </div>
+                )}
+                {/* Resolved - can reopen */}
                 {selectedIncident.status === 'resolved' && (
                   <Button variant="outline" className="flex-1" onClick={() => updateStatus(selectedIncident.id, 'in_progress')}>
-                    <Clock className="h-4 w-4 mr-2" />
+                    <Wrench className="h-4 w-4 mr-2" />
                     Reabrir
                   </Button>
                 )}
