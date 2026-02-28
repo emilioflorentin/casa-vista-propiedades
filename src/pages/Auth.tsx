@@ -221,11 +221,11 @@ const Auth = () => {
                         <button
                           type="button"
                           className={`p-3 rounded-lg border-2 transition-all ${
-                            userType === 'profesional'
+                            userType === 'empresa'
                               ? 'border-stone-700 bg-stone-50 text-stone-800'
                               : 'border-stone-200 hover:border-stone-300'
                           }`}
-                          onClick={() => setUserType('profesional')}
+                          onClick={() => setUserType('empresa')}
                         >
                           <div className="text-sm font-medium">Profesional</div>
                           <div className="text-xs text-stone-500 mt-1">Inmobiliaria</div>
@@ -233,7 +233,7 @@ const Auth = () => {
                       </div>
                     </div>
 
-                    {userType === 'profesional' && (
+                    {userType === 'empresa' && (
                       <div className="space-y-2">
                         <label htmlFor="companyName" className="text-sm font-medium text-stone-700">
                           Nombre de la empresa
@@ -244,7 +244,7 @@ const Auth = () => {
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           placeholder="Ej. Inmobiliaria López S.L."
-                          required={userType === 'profesional'}
+                          required={userType === 'empresa'}
                           className="h-12 border-stone-300"
                         />
                       </div>
