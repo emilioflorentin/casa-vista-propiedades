@@ -261,7 +261,9 @@ const ServiceBoard = () => {
   const total = subtotal + iva;
 
   const generateBudgetPDF = () => {
-    const budgetNumber = `PRE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+    const budgetNumber = editingBudgetId 
+      ? (savedBudgets.find(b => b.id === editingBudgetId)?.budget_number || 'PRE-BORRADOR')
+      : 'PRE-BORRADOR';
     const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
     const logoUrl = window.location.origin + '/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png';
 
@@ -471,11 +473,19 @@ const ServiceBoard = () => {
     if (!user) return;
     setSavingBudget(true);
     try {
+      let budgetNumber: string;
+      if (editingBudgetId) {
+        budgetNumber = savedBudgets.find(b => b.id === editingBudgetId)?.budget_number || '';
+      } else {
+        // Get sequential number from database
+        const { data: rpcData, error: rpcError } = await supabase.rpc('generate_budget_number');
+        if (rpcError) throw rpcError;
+        budgetNumber = rpcData as string;
+      }
+
       const budgetData = {
         user_id: user.id,
-        budget_number: editingBudgetId 
-          ? savedBudgets.find(b => b.id === editingBudgetId)?.budget_number 
-          : `PRE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`,
+        budget_number: budgetNumber,
         title: budgetTitle || null,
         client_name: budgetClient.name || null,
         client_nif: budgetClient.nif || null,

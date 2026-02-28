@@ -397,6 +397,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_budget_number: { Args: never; Returns: string }
       generate_property_reference: { Args: never; Returns: string }
       get_complete_profile_info: {
         Args: { profile_user_id: string }
