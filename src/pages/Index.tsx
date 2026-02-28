@@ -135,6 +135,17 @@ const Index = () => {
           .or("is_rented.is.null,is_rented.eq.false") // Only show available properties
           .order("created_at", { ascending: false });
 
+        // Load profiles to determine managedBy
+        const userIds = [...new Set((dbProperties || []).map(p => p.user_id))];
+        const profiles: Record<string, { email?: string | null }> = {};
+        if (userIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, email")
+            .in("id", userIds);
+          (profilesData || []).forEach(p => { profiles[p.id] = p; });
+        }
+
         // Load local properties (only available ones)
         const localProperties = getLocalProperties().filter((prop) => !prop.is_rented);
 
@@ -152,10 +163,10 @@ const Index = () => {
           bedrooms: prop.bedrooms,
           bathrooms: prop.bathrooms,
           area: prop.area,
-          image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+          image: prop.image ? prop.image.split(',')[0].trim() : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
           features: prop.features || [],
           description: prop.description,
-          managedBy: "other" as const,
+          managedBy: (profiles[prop.user_id]?.email?.endsWith('@nazarihomes.com') ? 'nazari' : 'other') as "nazari" | "other",
           user_id: prop.user_id,
         }));
 
