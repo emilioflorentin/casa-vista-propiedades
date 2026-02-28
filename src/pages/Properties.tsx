@@ -43,6 +43,7 @@ interface Profile {
   phone?: string;
   user_type?: string;
   company_name?: string;
+  email?: string;
 }
 
 const Properties = () => {
@@ -91,7 +92,7 @@ const Properties = () => {
             .order('created_at', { ascending: false }),
           supabase
             .from('profiles')
-            .select('id, full_name, phone, user_type, company_name')
+            .select('id, full_name, phone, user_type, company_name, email')
         ]);
 
         console.log('PROPERTIES: Database response:', propertiesResponse.data?.length || 0, 'properties');
@@ -147,7 +148,7 @@ const Properties = () => {
     image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
     features: prop.features || [],
     description: prop.description,
-    managedBy: (profiles[prop.user_id]?.user_type === 'empresa' ? 'other' : 'nazari') as "other" | "nazari",
+    managedBy: (profiles[prop.user_id]?.email?.endsWith('@nazarihomes.com') ? 'nazari' : 'other') as "other" | "nazari",
     userProfile: profiles[prop.user_id]
   }));
 
