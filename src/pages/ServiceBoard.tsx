@@ -268,7 +268,10 @@ const ServiceBoard = () => {
       for (const file of Array.from(files)) {
         const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
         const filePath = `${incidentId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage.from('cost-receipts').upload(filePath, file);
+        const { error } = await supabase.storage.from('cost-receipts').upload(filePath, file, {
+          contentType: file.type || 'application/octet-stream',
+          cacheControl: '3600',
+        });
         if (error) {
           console.error('Upload error:', error);
           continue;
