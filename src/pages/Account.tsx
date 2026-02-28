@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,14 @@ const Account = () => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Redirect multiservicios to their dedicated panel
+  useEffect(() => {
+    if (user?.email === 'multiservicios@nazarihomes.com') {
+      navigate('/service-board', { replace: true });
+    }
+  }, [user, navigate]);
   const [activeTab, setActiveTab] = useState('profile');
   const [showPropertyForm, setShowPropertyForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null);
