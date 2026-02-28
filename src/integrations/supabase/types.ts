@@ -115,6 +115,69 @@ export type Database = {
           },
         ]
       }
+      incident_history: {
+        Row: {
+          category: string
+          charge_amount: number | null
+          created_at: string
+          description: string | null
+          id: string
+          incident_created_at: string | null
+          incident_id: string
+          materials_cost: number | null
+          profit: number | null
+          property_location: string | null
+          property_title: string | null
+          receipts: string[] | null
+          repair_cost: number | null
+          resolved_at: string | null
+          tenant_name: string | null
+          tenant_phone: string | null
+          title: string
+          total_cost: number | null
+        }
+        Insert: {
+          category?: string
+          charge_amount?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          incident_created_at?: string | null
+          incident_id: string
+          materials_cost?: number | null
+          profit?: number | null
+          property_location?: string | null
+          property_title?: string | null
+          receipts?: string[] | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          tenant_name?: string | null
+          tenant_phone?: string | null
+          title: string
+          total_cost?: number | null
+        }
+        Update: {
+          category?: string
+          charge_amount?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          incident_created_at?: string | null
+          incident_id?: string
+          materials_cost?: number | null
+          profit?: number | null
+          property_location?: string | null
+          property_title?: string | null
+          receipts?: string[] | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          tenant_name?: string | null
+          tenant_phone?: string | null
+          title?: string
+          total_cost?: number | null
+        }
+        Relationships: []
+      }
       incidents: {
         Row: {
           category: string
