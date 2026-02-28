@@ -99,6 +99,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: '📋 Otros',
 };
 
+const DEFAULT_COMPANY_CIF = '24252878Z';
+
 const ServiceBoard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -110,6 +112,7 @@ const ServiceBoard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [activeTab, setActiveTab] = useState('mantenimiento');
+  const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
@@ -344,7 +347,7 @@ const ServiceBoard = () => {
             <img src="${logoUrl}" alt="Nazarí Homes" />
             <div class="company-info">
               <strong style="font-size:11pt;color:#333;">Nazarí Homes</strong><br>
-              CIF: B-XXXXXXXX<br>
+              CIF: ${companyCif}<br>
               info@nazarihomes.com<br>
               www.nazarihomes.com
             </div>
@@ -910,7 +913,16 @@ const ServiceBoard = () => {
                     Condiciones
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label className="text-sm text-muted-foreground">CIF empresa</Label>
+                    <Input
+                      value={companyCif}
+                      onChange={e => setCompanyCif(e.target.value)}
+                      placeholder="CIF de la empresa"
+                      className="mt-1"
+                    />
+                  </div>
                   <div>
                     <Label className="text-sm text-muted-foreground">Validez (días)</Label>
                     <Input
