@@ -82,11 +82,16 @@ const Contact = () => {
       formDataToSend.append("Email", formData.email);
       formDataToSend.append("Teléfono", formData.phone);
       formDataToSend.append("Mensaje", formData.message);
-      formDataToSend.append("h-captcha-response", hcaptchaValue);
+      formDataToSend.append("_captcha", "false");
+      formDataToSend.append("_subject", "Nuevo contacto desde nazarihomes.com");
+      formDataToSend.append("_template", "table");
 
-      // Usando el token hash de FormSubmit
-      const response = await fetch("https://formsubmit.co/8832813ceba0f7b74908663853554267", {
+      // Usando el endpoint AJAX de FormSubmit
+      const response = await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
         method: "POST",
+        headers: {
+          'Accept': 'application/json',
+        },
         body: formDataToSend,
       });
 
