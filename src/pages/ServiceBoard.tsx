@@ -1403,7 +1403,13 @@ const ServiceBoard = () => {
                         return (
                           <div key={idx} className="relative group">
                             {isPdf || isDoc ? (
-                              <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200">
+                              <a 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                download
+                                className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200"
+                              >
                                 <FileText className="h-6 w-6 mr-1" />
                                 {isPdf ? 'PDF' : 'DOC'}
                               </a>
