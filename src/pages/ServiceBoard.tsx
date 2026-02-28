@@ -161,10 +161,10 @@ const ServiceBoard = () => {
   }, [user, authLoading]);
 
   useEffect(() => {
-    if (activeTab === 'historial' && user) {
+    if (activeTab === 'mantenimiento' && user) {
       loadHistory();
     }
-  }, [historyPeriod]);
+  }, [historyPeriod, activeTab]);
 
   const loadData = async () => {
     setLoading(true);
@@ -900,8 +900,8 @@ const ServiceBoard = () => {
           <p className="text-stone-500 mt-1">Gestión de mantenimiento y presupuestos</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v === 'historial') loadHistory(); }} className="w-full">
-          <TabsList className="grid w-full max-w-lg grid-cols-3 mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
             <TabsTrigger value="mantenimiento" className="gap-2">
               <Wrench className="h-4 w-4" />
               Mantenimiento
@@ -909,10 +909,6 @@ const ServiceBoard = () => {
             <TabsTrigger value="presupuestos" className="gap-2">
               <FileText className="h-4 w-4" />
               Presupuestos
-            </TabsTrigger>
-            <TabsTrigger value="historial" className="gap-2">
-              <History className="h-4 w-4" />
-              Historial
             </TabsTrigger>
           </TabsList>
 
@@ -1046,6 +1042,140 @@ const ServiceBoard = () => {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* HISTORIAL SECTION inside Mantenimiento */}
+            <div className="mt-10 space-y-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <h2 className="text-xl font-semibold text-stone-700 flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Historial de Servicios
+                </h2>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
+                    <Button 
+                      variant={historyPeriod === 'week' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('week'); }}
+                      className="text-xs h-7"
+                    >
+                      Semana
+                    </Button>
+                    <Button 
+                      variant={historyPeriod === 'month' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('month'); }}
+                      className="text-xs h-7"
+                    >
+                      Mes
+                    </Button>
+                    <Button 
+                      variant={historyPeriod === 'all' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('all'); }}
+                      className="text-xs h-7"
+                    >
+                      Todo
+                    </Button>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={loadHistory} className="gap-1">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button onClick={exportHistoryToExcel} className="gap-2" size="sm">
+                    <Download className="h-4 w-4" />
+                    Exportar Excel
+                  </Button>
+                </div>
+              </div>
+
+              {historyData.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Tareas resueltas</p>
+                      <p className="text-2xl font-bold text-stone-800">{historyData.length}</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Coste total</p>
+                      <p className="text-2xl font-bold text-red-600">
+                        {historyData.reduce((s, h) => s + (Number(h.total_cost) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Cobrado total</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {historyData.reduce((s, h) => s + (Number(h.charge_amount) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Beneficio</p>
+                      <p className={`text-2xl font-bold ${historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {loadingHistory ? (
+                <div className="text-center py-8">
+                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-stone-400" />
+                  <p className="text-stone-500 mt-2">Cargando historial...</p>
+                </div>
+              ) : historyData.length === 0 ? (
+                <div className="text-center py-8 text-stone-500">
+                  <History className="h-10 w-10 mx-auto mb-3 text-stone-300" />
+                  <p>No hay registros en este periodo</p>
+                  <p className="text-xs mt-1">Los datos se guardan automáticamente al resolver una incidencia</p>
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b bg-stone-50">
+                            <th className="text-left p-3 font-medium text-stone-600">Título</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Propiedad</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Inquilino</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Categoría</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Coste</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {historyData.map(h => (
+                            <tr key={h.id} className="border-b hover:bg-stone-50/50">
+                              <td className="p-3 font-medium">{h.title}</td>
+                              <td className="p-3 text-stone-500">{h.property_title || '-'}</td>
+                              <td className="p-3 text-stone-500">{h.tenant_name || '-'}</td>
+                              <td className="p-3">
+                                <Badge variant="outline" className="text-xs">
+                                  {CATEGORY_LABELS[h.category] || h.category}
+                                </Badge>
+                              </td>
+                              <td className="p-3 text-right text-red-600">{(Number(h.total_cost) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+                              <td className="p-3 text-right text-blue-600">{(Number(h.charge_amount) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+                              <td className={`p-3 text-right font-medium ${(Number(h.profit) || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                              </td>
+                              <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </TabsContent>
 
@@ -1357,140 +1487,6 @@ const ServiceBoard = () => {
                   />
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
-
-          {/* HISTORIAL TAB */}
-          <TabsContent value="historial">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl font-semibold text-stone-700">Historial de Servicios</h2>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
-                    <Button 
-                      variant={historyPeriod === 'week' ? 'default' : 'ghost'} 
-                      size="sm" 
-                      onClick={() => { setHistoryPeriod('week'); }}
-                      className="text-xs h-7"
-                    >
-                      Semana
-                    </Button>
-                    <Button 
-                      variant={historyPeriod === 'month' ? 'default' : 'ghost'} 
-                      size="sm" 
-                      onClick={() => { setHistoryPeriod('month'); }}
-                      className="text-xs h-7"
-                    >
-                      Mes
-                    </Button>
-                    <Button 
-                      variant={historyPeriod === 'all' ? 'default' : 'ghost'} 
-                      size="sm" 
-                      onClick={() => { setHistoryPeriod('all'); }}
-                      className="text-xs h-7"
-                    >
-                      Todo
-                    </Button>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={loadHistory} className="gap-1">
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                  <Button onClick={exportHistoryToExcel} className="gap-2" size="sm">
-                    <Download className="h-4 w-4" />
-                    Exportar Excel
-                  </Button>
-                </div>
-              </div>
-
-              {/* Summary cards */}
-              {historyData.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground">Tareas resueltas</p>
-                      <p className="text-2xl font-bold text-stone-800">{historyData.length}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground">Coste total</p>
-                      <p className="text-2xl font-bold text-red-600">
-                        {historyData.reduce((s, h) => s + (Number(h.total_cost) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground">Cobrado total</p>
-                      <p className="text-2xl font-bold text-blue-600">
-                        {historyData.reduce((s, h) => s + (Number(h.charge_amount) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground">Beneficio</p>
-                      <p className={`text-2xl font-bold ${historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              {loadingHistory ? (
-                <div className="text-center py-12">
-                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-stone-400" />
-                  <p className="text-stone-500 mt-2">Cargando historial...</p>
-                </div>
-              ) : historyData.length === 0 ? (
-                <div className="text-center py-12 text-stone-500">
-                  <History className="h-12 w-12 mx-auto mb-4 text-stone-300" />
-                  <p>No hay registros en este periodo</p>
-                  <p className="text-xs mt-1">Los datos se guardan automáticamente al resolver una incidencia</p>
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b bg-stone-50">
-                            <th className="text-left p-3 font-medium text-stone-600">Título</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Propiedad</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Inquilino</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Categoría</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Coste</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {historyData.map(h => (
-                            <tr key={h.id} className="border-b hover:bg-stone-50/50">
-                              <td className="p-3 font-medium">{h.title}</td>
-                              <td className="p-3 text-stone-500">{h.property_title || '-'}</td>
-                              <td className="p-3 text-stone-500">{h.tenant_name || '-'}</td>
-                              <td className="p-3">
-                                <Badge variant="outline" className="text-xs">
-                                  {CATEGORY_LABELS[h.category] || h.category}
-                                </Badge>
-                              </td>
-                              <td className="p-3 text-right text-red-600">{(Number(h.total_cost) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
-                              <td className="p-3 text-right text-blue-600">{(Number(h.charge_amount) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
-                              <td className={`p-3 text-right font-medium ${(Number(h.profit) || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                              </td>
-                              <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </TabsContent>
         </Tabs>
