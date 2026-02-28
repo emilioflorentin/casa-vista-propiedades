@@ -221,6 +221,7 @@ const ServiceBoard = () => {
       case 'approval': return 'En aprobación';
       case 'in_progress': return 'En progreso';
       case 'paused': return 'Pausada';
+      case 'pending_payment': return 'Pendiente de pago';
       case 'resolved': return 'Resuelto';
       default: return status;
     }
@@ -229,6 +230,7 @@ const ServiceBoard = () => {
   const approvalIncidents = incidents.filter(i => i.status === 'approval');
   const inProgressIncidents = incidents.filter(i => i.status === 'in_progress');
   const pausedIncidents = incidents.filter(i => i.status === 'paused');
+  const pendingPaymentIncidents = incidents.filter(i => i.status === 'pending_payment');
   const resolvedIncidents = incidents.filter(i => i.status === 'resolved');
 
   const formatDate = (dateStr: string) => {
@@ -579,7 +581,7 @@ const ServiceBoard = () => {
     const incident = incidents.find(i => i.id === incidentId);
     if (!incident || incident.status === newStatus) return;
     // Multiservicios can only move to in_progress, paused, resolved
-    if (!['in_progress', 'paused', 'resolved'].includes(newStatus)) return;
+    if (!['in_progress', 'paused', 'pending_payment', 'resolved'].includes(newStatus)) return;
     await updateStatus(incidentId, newStatus);
   };
 
@@ -687,7 +689,7 @@ const ServiceBoard = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[60vh]">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-h-[60vh]">
               {/* Approval Column - No drop (only owners approve) */}
               <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-200/50">
                 <div className="flex items-center gap-2 mb-4">
@@ -758,7 +760,32 @@ const ServiceBoard = () => {
                 </div>
               </div>
 
-              {/* Resolved Column */}
+              {/* Pending Payment Column */}
+              <div 
+                className={`bg-blue-50/50 rounded-xl p-4 border transition-colors ${dragOverColumn === 'pending_payment' ? 'border-blue-400 bg-blue-100/50 ring-2 ring-blue-300/50' : 'border-blue-200/50'}`}
+                onDragOver={(e) => handleDragOver(e, 'pending_payment')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'pending_payment')}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <CreditCard className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-bold text-stone-700 text-sm">Pdte. Pago</h3>
+                  <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+                    {pendingPaymentIncidents.length}
+                  </Badge>
+                </div>
+                <div className="space-y-3">
+                  {pendingPaymentIncidents.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias pendientes de pago</p>
+                  ) : (
+                    pendingPaymentIncidents.map(incident => (
+                      <IncidentCard key={incident.id} incident={incident} />
+                    ))
+                  )}
+                </div>
+              </div>
+
+
               <div 
                 className={`bg-green-50/50 rounded-xl p-4 border transition-colors ${dragOverColumn === 'resolved' ? 'border-green-400 bg-green-100/50 ring-2 ring-green-300/50' : 'border-green-200/50'}`}
                 onDragOver={(e) => handleDragOver(e, 'resolved')}
@@ -1179,9 +1206,9 @@ const ServiceBoard = () => {
                     ⏳ Pendiente de aprobación por el propietario
                   </p>
                 )}
-                {/* In progress - can pause or resolve */}
+                {/* In progress - can pause, send to payment, or resolve */}
                 {selectedIncident.status === 'in_progress' && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button 
                       variant="outline"
                       className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
@@ -1189,6 +1216,14 @@ const ServiceBoard = () => {
                     >
                       <Clock className="h-4 w-4 mr-2" />
                       Pausar
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                      onClick={() => updateStatus(selectedIncident.id, 'pending_payment')}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Pdte. Pago
                     </Button>
                     <Button 
                       className="flex-1 bg-green-600 hover:bg-green-700 text-white"
@@ -1199,8 +1234,36 @@ const ServiceBoard = () => {
                     </Button>
                   </div>
                 )}
-                {/* Paused - can resume or resolve */}
+                {/* Paused - can resume, send to payment, or resolve */}
                 {selectedIncident.status === 'paused' && (
+                  <div className="flex gap-2 flex-wrap">
+                    <Button 
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => updateStatus(selectedIncident.id, 'in_progress')}
+                    >
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Reanudar
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                      onClick={() => updateStatus(selectedIncident.id, 'pending_payment')}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Pdte. Pago
+                    </Button>
+                    <Button 
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => updateStatus(selectedIncident.id, 'resolved')}
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Resolver
+                    </Button>
+                  </div>
+                )}
+                {/* Pending Payment - can resume or resolve */}
+                {selectedIncident.status === 'pending_payment' && (
                   <div className="flex gap-2">
                     <Button 
                       variant="outline"
