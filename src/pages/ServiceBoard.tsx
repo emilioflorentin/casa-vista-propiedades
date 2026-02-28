@@ -113,6 +113,13 @@ const ServiceBoard = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [activeTab, setActiveTab] = useState('mantenimiento');
   const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
+  
+  // Incident costs state
+  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string }>>({});
+  const [costRepair, setCostRepair] = useState(0);
+  const [costMaterials, setCostMaterials] = useState(0);
+  const [costNotes, setCostNotes] = useState('');
+  const [savingCost, setSavingCost] = useState(false);
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
@@ -194,10 +201,59 @@ const ServiceBoard = () => {
           setTenants(tenantsMap);
         }
       }
+
+      // Load incident costs
+      const { data: costsData } = await supabase
+        .from('incident_costs')
+        .select('*');
+      if (costsData) {
+        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string }> = {};
+        costsData.forEach((c: any) => {
+          costsMap[c.incident_id] = {
+            repair_cost: Number(c.repair_cost) || 0,
+            materials_cost: Number(c.materials_cost) || 0,
+            notes: c.notes || '',
+          };
+        });
+        setIncidentCosts(costsMap);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCostForIncident = (incident: Incident) => {
+    const cost = incidentCosts[incident.id];
+    setCostRepair(cost?.repair_cost || 0);
+    setCostMaterials(cost?.materials_cost || 0);
+    setCostNotes(cost?.notes || '');
+  };
+
+  const saveCost = async (incidentId: string) => {
+    setSavingCost(true);
+    try {
+      const existing = incidentCosts[incidentId];
+      if (existing) {
+        await supabase
+          .from('incident_costs')
+          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes })
+          .eq('incident_id', incidentId);
+      } else {
+        await supabase
+          .from('incident_costs')
+          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes });
+      }
+      setIncidentCosts(prev => ({
+        ...prev,
+        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes }
+      }));
+      toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
+    } catch {
+      toast({ title: 'Error', description: 'No se pudieron guardar los costes', variant: 'destructive' });
+    } finally {
+      setSavingCost(false);
     }
   };
 
@@ -602,7 +658,7 @@ const ServiceBoard = () => {
         onDragStart={(e) => handleDragStart(e, incident.id)}
         onDragEnd={handleDragEnd}
         className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-stone-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
-        onClick={() => setSelectedIncident(incident)}
+        onClick={() => { setSelectedIncident(incident); loadCostForIncident(incident); }}
       >
         <CardContent className="p-4 space-y-2">
           <div className="flex items-start justify-between">
@@ -633,6 +689,12 @@ const ServiceBoard = () => {
             <div className="flex items-center text-xs text-stone-400">
               <ImageIcon className="h-3 w-3 mr-1" />
               <span>{incident.images.length} foto(s)</span>
+            </div>
+          )}
+          {incidentCosts[incident.id] && (incidentCosts[incident.id].repair_cost > 0 || incidentCosts[incident.id].materials_cost > 0) && (
+            <div className="flex items-center text-xs text-blue-600 font-medium">
+              <Euro className="h-3 w-3 mr-1" />
+              <span>{(incidentCosts[incident.id].repair_cost + incidentCosts[incident.id].materials_cost).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
             </div>
           )}
           <div className="text-xs text-stone-400">{formatDate(incident.created_at)}</div>
@@ -1198,6 +1260,52 @@ const ServiceBoard = () => {
               <p className="text-xs text-stone-400">
                 Creado: {formatDate(selectedIncident.created_at)} · Actualizado: {formatDate(selectedIncident.updated_at)}
               </p>
+
+              {/* Costs section - only for multiservicios */}
+              <div className="bg-blue-50 rounded-lg p-3 space-y-3 border border-blue-200">
+                <h4 className="text-sm font-semibold text-blue-800 flex items-center gap-1">
+                  <Euro className="h-4 w-4" />
+                  Costes del servicio
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costRepair || ''}
+                      onChange={e => setCostRepair(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-blue-700">Materiales (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costMaterials || ''}
+                      onChange={e => setCostMaterials(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium text-blue-800">Total: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+                  <Button 
+                    size="sm" 
+                    onClick={() => saveCost(selectedIncident.id)}
+                    disabled={savingCost}
+                    className="h-7 text-xs"
+                  >
+                    <Save className="h-3 w-3 mr-1" />
+                    {savingCost ? 'Guardando...' : 'Guardar costes'}
+                  </Button>
+                </div>
+              </div>
 
               <div className="flex flex-col gap-2 pt-2">
                 {/* Approval status - read only for multiservicios */}

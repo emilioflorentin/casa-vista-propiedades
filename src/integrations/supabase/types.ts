@@ -74,6 +74,44 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_costs: {
+        Row: {
+          created_at: string
+          id: string
+          incident_id: string
+          materials_cost: number | null
+          notes: string | null
+          repair_cost: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          incident_id: string
+          materials_cost?: number | null
+          notes?: string | null
+          repair_cost?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          incident_id?: string
+          materials_cost?: number | null
+          notes?: string | null
+          repair_cost?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_costs_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: true
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incidents: {
         Row: {
           category: string
