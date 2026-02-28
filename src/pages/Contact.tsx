@@ -74,48 +74,54 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Preparar datos para Formsubmit
-      const formDataToSend = new FormData();
-      formDataToSend.append("Dirección del inmueble", formData.propertyAddress);
-      formDataToSend.append("Nombre", formData.name);
-      formDataToSend.append("Apellidos", formData.surname);
-      formDataToSend.append("Email", formData.email);
-      formDataToSend.append("Teléfono", formData.phone);
-      formDataToSend.append("Mensaje", formData.message);
-      formDataToSend.append("_captcha", "false");
-      formDataToSend.append("_subject", "Nuevo contacto desde nazarihomes.com");
-      formDataToSend.append("_template", "table");
-
-      // Usando el endpoint AJAX de FormSubmit
+      // Enviar usando JSON al endpoint AJAX de FormSubmit
       const response = await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
         method: "POST",
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: formDataToSend,
+        body: JSON.stringify({
+          "Dirección del inmueble": formData.propertyAddress,
+          "Nombre": formData.name,
+          "Apellidos": formData.surname,
+          "Email": formData.email,
+          "Teléfono": formData.phone,
+          "Mensaje": formData.message,
+          "_captcha": "false",
+          "_subject": "Nuevo contacto desde nazarihomes.com",
+          "_template": "table",
+        }),
       });
 
-      if (response.ok) {
-        toast({
-          title: t("contact.form_sent"),
-          description: t("contact.form_sent_desc"),
-        });
-
-        // Reset form
-        setFormData({
-          propertyAddress: "",
-          name: "",
-          surname: "",
-          email: "",
-          phone: "",
-          message: "",
-        });
-        setPrivacyAccepted(false);
-        hcaptchaRef.current?.resetCaptcha();
-        setIsCaptchaVerified(false);
-      } else {
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType?.includes("application/json")) {
+        const data = await response.json();
+        if (data.success === "false" || data.success === false) {
+          throw new Error(data.message || "Error al enviar el formulario");
+        }
+      } else if (!response.ok) {
         throw new Error("Error al enviar el formulario");
       }
+
+      toast({
+        title: t("contact.form_sent"),
+        description: t("contact.form_sent_desc"),
+      });
+
+      // Reset form
+      setFormData({
+        propertyAddress: "",
+        name: "",
+        surname: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+      setPrivacyAccepted(false);
+      hcaptchaRef.current?.resetCaptcha();
+      setIsCaptchaVerified(false);
     } catch (error) {
       console.error("Error sending form:", error);
       toast({
