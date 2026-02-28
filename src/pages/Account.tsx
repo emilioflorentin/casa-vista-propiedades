@@ -385,28 +385,37 @@ const Account = () => {
         return;
       }
 
-      // Upload image to Supabase storage if provided
+      // Upload images to Supabase storage if provided
       let imageUrl: string | null = editingProperty?.image || null;
       
       if (propertyForm.images && propertyForm.images.length > 0) {
-        const file = propertyForm.images[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        const uploadedUrls: string[] = [];
         
-        const { error: uploadError } = await supabase.storage
-          .from('property-images')
-          .upload(fileName, file, { upsert: true });
-        
-        if (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          throw new Error('Error al subir la imagen');
+        for (const file of propertyForm.images) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}_${crypto.randomUUID()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('property-images')
+            .upload(fileName, file, { upsert: true });
+          
+          if (uploadError) {
+            console.error('Error uploading image:', uploadError);
+            continue; // Skip failed uploads but continue with others
+          }
+          
+          const { data: urlData } = supabase.storage
+            .from('property-images')
+            .getPublicUrl(fileName);
+          
+          uploadedUrls.push(urlData.publicUrl);
         }
         
-        const { data: urlData } = supabase.storage
-          .from('property-images')
-          .getPublicUrl(fileName);
-        
-        imageUrl = urlData.publicUrl;
+        if (uploadedUrls.length > 0) {
+          imageUrl = uploadedUrls.join(',');
+        } else {
+          throw new Error('Error al subir las imágenes');
+        }
       }
 
       const propertyData = {
