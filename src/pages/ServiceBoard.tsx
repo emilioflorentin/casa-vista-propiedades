@@ -552,14 +552,54 @@ const ServiceBoard = () => {
     }
   }, [activeTab, user]);
 
+  const [draggedIncidentId, setDraggedIncidentId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, incidentId: string) => {
+    e.dataTransfer.setData('incidentId', incidentId);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedIncidentId(incidentId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, status: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverColumn(status);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverColumn(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault();
+    setDragOverColumn(null);
+    setDraggedIncidentId(null);
+    const incidentId = e.dataTransfer.getData('incidentId');
+    const incident = incidents.find(i => i.id === incidentId);
+    if (!incident || incident.status === newStatus) return;
+    // Multiservicios can only move to in_progress, paused, resolved
+    if (!['in_progress', 'paused', 'resolved'].includes(newStatus)) return;
+    await updateStatus(incidentId, newStatus);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIncidentId(null);
+    setDragOverColumn(null);
+  };
+
   const IncidentCard = ({ incident }: { incident: Incident }) => {
     const property = properties[incident.property_id];
     const tenant = tenants[incident.tenant_access_id];
     const owner = property ? owners[property.user_id] : null;
+    const isDragging = draggedIncidentId === incident.id;
 
     return (
       <Card 
-        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-stone-400"
+        draggable
+        onDragStart={(e) => handleDragStart(e, incident.id)}
+        onDragEnd={handleDragEnd}
+        className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-stone-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
         onClick={() => setSelectedIncident(incident)}
       >
         <CardContent className="p-4 space-y-2">
@@ -648,7 +688,7 @@ const ServiceBoard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[60vh]">
-              {/* Approval Column - Read only for multiservicios */}
+              {/* Approval Column - No drop (only owners approve) */}
               <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-200/50">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="h-5 w-5 text-purple-600" />
@@ -669,7 +709,12 @@ const ServiceBoard = () => {
               </div>
 
               {/* In Progress Column */}
-              <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-200/50">
+              <div 
+                className={`bg-amber-50/50 rounded-xl p-4 border transition-colors ${dragOverColumn === 'in_progress' ? 'border-amber-400 bg-amber-100/50 ring-2 ring-amber-300/50' : 'border-amber-200/50'}`}
+                onDragOver={(e) => handleDragOver(e, 'in_progress')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'in_progress')}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <Wrench className="h-5 w-5 text-amber-600" />
                   <h3 className="font-bold text-stone-700 text-sm">En Progreso</h3>
@@ -689,7 +734,12 @@ const ServiceBoard = () => {
               </div>
 
               {/* Paused Column */}
-              <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-200/50">
+              <div 
+                className={`bg-orange-50/50 rounded-xl p-4 border transition-colors ${dragOverColumn === 'paused' ? 'border-orange-400 bg-orange-100/50 ring-2 ring-orange-300/50' : 'border-orange-200/50'}`}
+                onDragOver={(e) => handleDragOver(e, 'paused')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'paused')}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="h-5 w-5 text-orange-500" />
                   <h3 className="font-bold text-stone-700 text-sm">Pausada</h3>
@@ -709,7 +759,12 @@ const ServiceBoard = () => {
               </div>
 
               {/* Resolved Column */}
-              <div className="bg-green-50/50 rounded-xl p-4 border border-green-200/50">
+              <div 
+                className={`bg-green-50/50 rounded-xl p-4 border transition-colors ${dragOverColumn === 'resolved' ? 'border-green-400 bg-green-100/50 ring-2 ring-green-300/50' : 'border-green-200/50'}`}
+                onDragOver={(e) => handleDragOver(e, 'resolved')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'resolved')}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
                   <h3 className="font-bold text-stone-700 text-sm">Resueltos</h3>
