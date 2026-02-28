@@ -49,7 +49,23 @@ interface Incident {
   updated_at: string;
   property_id: string;
   tenant_access_id: string;
+  _isInternal?: false;
 }
+
+interface InternalTask {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  images: string[] | null;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  _isInternal: true;
+}
+
+type BoardItem = Incident | InternalTask;
 
 interface PropertyInfo {
   id: string;
@@ -128,10 +144,19 @@ const ServiceBoard = () => {
   const [savingCost, setSavingCost] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
-  // History state
+   // History state
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyPeriod, setHistoryPeriod] = useState<'week' | 'month' | 'all'>('month');
+
+  // Internal tasks state
+  const [internalTasks, setInternalTasks] = useState<InternalTask[]>([]);
+  const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [newTaskCategory, setNewTaskCategory] = useState('other');
+  const [creatingTask, setCreatingTask] = useState(false);
+  const [selectedInternalTask, setSelectedInternalTask] = useState<InternalTask | null>(null);
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
@@ -236,6 +261,14 @@ const ServiceBoard = () => {
           };
         });
         setIncidentCosts(costsMap);
+      }
+      // Load internal tasks
+      const { data: tasksData } = await supabase
+        .from('internal_tasks')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      if (tasksData) {
+        setInternalTasks(tasksData.map((t: any) => ({ ...t, _isInternal: true as const })));
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -455,11 +488,66 @@ const ServiceBoard = () => {
     }
   };
 
+  // Internal task CRUD
+  const createInternalTask = async () => {
+    if (!newTaskTitle.trim() || !user) return;
+    setCreatingTask(true);
+    try {
+      const { data, error } = await supabase
+        .from('internal_tasks')
+        .insert({
+          title: newTaskTitle.trim(),
+          description: newTaskDescription.trim(),
+          category: newTaskCategory,
+          status: 'in_progress',
+          user_id: user.id,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      setInternalTasks(prev => [{ ...data, _isInternal: true as const }, ...prev]);
+      setNewTaskTitle('');
+      setNewTaskDescription('');
+      setNewTaskCategory('other');
+      setShowNewTaskDialog(false);
+      toast({ title: 'Tarea creada', description: 'Tu tarea interna ha sido creada' });
+    } catch {
+      toast({ title: 'Error', description: 'No se pudo crear la tarea', variant: 'destructive' });
+    } finally {
+      setCreatingTask(false);
+    }
+  };
+
+  const updateInternalTaskStatus = async (taskId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from('internal_tasks')
+      .update({ status: newStatus })
+      .eq('id', taskId);
+    if (!error) {
+      setInternalTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+      toast({ title: 'Actualizado', description: `Estado cambiado a ${getStatusLabel(newStatus)}` });
+      setSelectedInternalTask(null);
+    }
+  };
+
+  const deleteInternalTask = async (taskId: string) => {
+    const { error } = await supabase.from('internal_tasks').delete().eq('id', taskId);
+    if (!error) {
+      setInternalTasks(prev => prev.filter(t => t.id !== taskId));
+      setSelectedInternalTask(null);
+      toast({ title: 'Eliminada', description: 'Tarea eliminada' });
+    }
+  };
+
   const approvalIncidents = incidents.filter(i => i.status === 'approval');
   const inProgressIncidents = incidents.filter(i => i.status === 'in_progress');
+  const inProgressTasks = internalTasks.filter(t => t.status === 'in_progress');
   const pausedIncidents = incidents.filter(i => i.status === 'paused');
+  const pausedTasks = internalTasks.filter(t => t.status === 'paused');
   const pendingPaymentIncidents = incidents.filter(i => i.status === 'pending_payment');
+  const pendingPaymentTasks = internalTasks.filter(t => t.status === 'pending_payment');
   const resolvedIncidents = incidents.filter(i => i.status === 'resolved');
+  const resolvedTasks = internalTasks.filter(t => t.status === 'resolved');
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('es-ES', {
@@ -783,12 +871,15 @@ const ServiceBoard = () => {
   }, [activeTab, user]);
 
   const [draggedIncidentId, setDraggedIncidentId] = useState<string | null>(null);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
-  const handleDragStart = (e: React.DragEvent, incidentId: string) => {
-    e.dataTransfer.setData('incidentId', incidentId);
+  const handleDragStart = (e: React.DragEvent, id: string, isInternal: boolean = false) => {
+    e.dataTransfer.setData('itemId', id);
+    e.dataTransfer.setData('isInternal', isInternal ? 'true' : 'false');
     e.dataTransfer.effectAllowed = 'move';
-    setDraggedIncidentId(incidentId);
+    if (isInternal) setDraggedTaskId(id);
+    else setDraggedIncidentId(id);
   };
 
   const handleDragOver = (e: React.DragEvent, status: string) => {
@@ -805,16 +896,26 @@ const ServiceBoard = () => {
     e.preventDefault();
     setDragOverColumn(null);
     setDraggedIncidentId(null);
-    const incidentId = e.dataTransfer.getData('incidentId');
-    const incident = incidents.find(i => i.id === incidentId);
-    if (!incident || incident.status === newStatus) return;
-    // Multiservicios can only move to in_progress, paused, resolved
+    setDraggedTaskId(null);
+    const itemId = e.dataTransfer.getData('itemId');
+    const isInternal = e.dataTransfer.getData('isInternal') === 'true';
+    
     if (!['in_progress', 'paused', 'pending_payment', 'resolved'].includes(newStatus)) return;
-    await updateStatus(incidentId, newStatus);
+    
+    if (isInternal) {
+      const task = internalTasks.find(t => t.id === itemId);
+      if (!task || task.status === newStatus) return;
+      await updateInternalTaskStatus(itemId, newStatus);
+    } else {
+      const incident = incidents.find(i => i.id === itemId);
+      if (!incident || incident.status === newStatus) return;
+      await updateStatus(itemId, newStatus);
+    }
   };
 
   const handleDragEnd = () => {
     setDraggedIncidentId(null);
+    setDraggedTaskId(null);
     setDragOverColumn(null);
   };
 
@@ -827,7 +928,7 @@ const ServiceBoard = () => {
     return (
       <Card 
         draggable
-        onDragStart={(e) => handleDragStart(e, incident.id)}
+        onDragStart={(e) => handleDragStart(e, incident.id, false)}
         onDragEnd={handleDragEnd}
         className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-stone-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
         onClick={() => { setSelectedIncident(incident); loadCostForIncident(incident); }}
@@ -875,6 +976,35 @@ const ServiceBoard = () => {
     );
   };
 
+  const InternalTaskCard = ({ task }: { task: InternalTask }) => {
+    const isDragging = draggedTaskId === task.id;
+    return (
+      <Card 
+        draggable
+        onDragStart={(e) => handleDragStart(e, task.id, true)}
+        onDragEnd={handleDragEnd}
+        className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-indigo-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
+        onClick={() => setSelectedInternalTask(task)}
+      >
+        <CardContent className="p-4 space-y-2">
+          <div className="flex items-start justify-between">
+            <h4 className="font-semibold text-sm text-stone-800 line-clamp-1">{task.title}</h4>
+            <Badge className="text-xs shrink-0 ml-2 bg-indigo-100 text-indigo-700 border-indigo-200">
+              Propia
+            </Badge>
+          </div>
+          {task.description && <p className="text-xs text-stone-500 line-clamp-2">{task.description}</p>}
+          <div className="flex items-center text-xs text-stone-400 gap-2">
+            <Badge variant="outline" className="text-xs">
+              {CATEGORY_LABELS[task.category] || task.category}
+            </Badge>
+          </div>
+          <div className="text-xs text-stone-400">{formatDate(task.created_at)}</div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-stone-50">
@@ -915,12 +1045,18 @@ const ServiceBoard = () => {
 
           {/* MANTENIMIENTO TAB */}
           <TabsContent value="mantenimiento">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <h2 className="text-xl font-semibold text-stone-700">Panel de Mantenimiento</h2>
-              <Button variant="outline" onClick={loadData} className="gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Actualizar
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setShowNewTaskDialog(true)} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+                  <Plus className="h-4 w-4" />
+                  Nueva tarea
+                </Button>
+                <Button variant="outline" onClick={loadData} className="gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Actualizar
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-h-[60vh]">
@@ -955,16 +1091,21 @@ const ServiceBoard = () => {
                   <Wrench className="h-5 w-5 text-amber-600" />
                   <h3 className="font-bold text-stone-700 text-sm">En Progreso</h3>
                   <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                    {inProgressIncidents.length}
+                    {inProgressIncidents.length + inProgressTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
-                  {inProgressIncidents.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias en progreso</p>
+                  {inProgressIncidents.length === 0 && inProgressTasks.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas en progreso</p>
                   ) : (
-                    inProgressIncidents.map(incident => (
-                      <IncidentCard key={incident.id} incident={incident} />
-                    ))
+                    <>
+                      {inProgressIncidents.map(incident => (
+                        <IncidentCard key={incident.id} incident={incident} />
+                      ))}
+                      {inProgressTasks.map(task => (
+                        <InternalTaskCard key={task.id} task={task} />
+                      ))}
+                    </>
                   )}
                 </div>
               </div>
@@ -980,16 +1121,21 @@ const ServiceBoard = () => {
                   <Clock className="h-5 w-5 text-orange-500" />
                   <h3 className="font-bold text-stone-700 text-sm">Pausada</h3>
                   <Badge className="bg-orange-100 text-orange-700 border-orange-200">
-                    {pausedIncidents.length}
+                    {pausedIncidents.length + pausedTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
-                  {pausedIncidents.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias pausadas</p>
+                  {pausedIncidents.length === 0 && pausedTasks.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas pausadas</p>
                   ) : (
-                    pausedIncidents.map(incident => (
-                      <IncidentCard key={incident.id} incident={incident} />
-                    ))
+                    <>
+                      {pausedIncidents.map(incident => (
+                        <IncidentCard key={incident.id} incident={incident} />
+                      ))}
+                      {pausedTasks.map(task => (
+                        <InternalTaskCard key={task.id} task={task} />
+                      ))}
+                    </>
                   )}
                 </div>
               </div>
@@ -1005,16 +1151,21 @@ const ServiceBoard = () => {
                   <CreditCard className="h-5 w-5 text-blue-600" />
                   <h3 className="font-bold text-stone-700 text-sm">Pdte. Pago</h3>
                   <Badge className="bg-blue-100 text-blue-700 border-blue-200">
-                    {pendingPaymentIncidents.length}
+                    {pendingPaymentIncidents.length + pendingPaymentTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
-                  {pendingPaymentIncidents.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias pendientes de pago</p>
+                  {pendingPaymentIncidents.length === 0 && pendingPaymentTasks.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas pendientes de pago</p>
                   ) : (
-                    pendingPaymentIncidents.map(incident => (
-                      <IncidentCard key={incident.id} incident={incident} />
-                    ))
+                    <>
+                      {pendingPaymentIncidents.map(incident => (
+                        <IncidentCard key={incident.id} incident={incident} />
+                      ))}
+                      {pendingPaymentTasks.map(task => (
+                        <InternalTaskCard key={task.id} task={task} />
+                      ))}
+                    </>
                   )}
                 </div>
               </div>
@@ -1030,16 +1181,21 @@ const ServiceBoard = () => {
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
                   <h3 className="font-bold text-stone-700 text-sm">Resueltos</h3>
                   <Badge className="bg-green-100 text-green-700 border-green-200">
-                    {resolvedIncidents.length}
+                    {resolvedIncidents.length + resolvedTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
-                  {resolvedIncidents.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay incidencias resueltas</p>
+                  {resolvedIncidents.length === 0 && resolvedTasks.length === 0 ? (
+                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas resueltas</p>
                   ) : (
-                    resolvedIncidents.map(incident => (
-                      <IncidentCard key={incident.id} incident={incident} />
-                    ))
+                    <>
+                      {resolvedIncidents.map(incident => (
+                        <IncidentCard key={incident.id} incident={incident} />
+                      ))}
+                      {resolvedTasks.map(task => (
+                        <InternalTaskCard key={task.id} task={task} />
+                      ))}
+                    </>
                   )}
                 </div>
               </div>
@@ -1799,6 +1955,138 @@ const ServiceBoard = () => {
                   </Button>
                 )}
                 <Button variant="ghost" onClick={() => setSelectedIncident(null)}>Cerrar</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* New Internal Task Dialog */}
+      {showNewTaskDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowNewTaskDialog(false)}>
+          <Card className="max-w-md w-full" onClick={e => e.stopPropagation()}>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Nueva tarea propia
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm">Título *</Label>
+                <Input
+                  value={newTaskTitle}
+                  onChange={e => setNewTaskTitle(e.target.value)}
+                  placeholder="Ej: Revisar caldera edificio centro"
+                  maxLength={200}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Descripción</Label>
+                <Textarea
+                  value={newTaskDescription}
+                  onChange={e => setNewTaskDescription(e.target.value)}
+                  placeholder="Detalles de la tarea..."
+                  rows={3}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Categoría</Label>
+                <select
+                  value={newTaskCategory}
+                  onChange={e => setNewTaskCategory(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
+                >
+                  {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
+                    <option key={val} value={val}>{label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowNewTaskDialog(false)}>Cancelar</Button>
+                <Button
+                  onClick={createInternalTask}
+                  disabled={!newTaskTitle.trim() || creatingTask}
+                  className="bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {creatingTask ? 'Creando...' : 'Crear tarea'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Internal Task Detail Modal */}
+      {selectedInternalTask && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedInternalTask(null)}>
+          <Card className="max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-lg">{selectedInternalTask.title}</CardTitle>
+                <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">Tarea propia</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {selectedInternalTask.description && (
+                <p className="text-stone-600">{selectedInternalTask.description}</p>
+              )}
+              <Badge variant="outline">
+                {CATEGORY_LABELS[selectedInternalTask.category] || selectedInternalTask.category}
+              </Badge>
+              <p className="text-xs text-stone-400">
+                Creado: {formatDate(selectedInternalTask.created_at)}
+              </p>
+
+              <div className="flex flex-col gap-2 pt-2">
+                {selectedInternalTask.status === 'in_progress' && (
+                  <div className="flex gap-2 flex-wrap">
+                    <Button variant="outline" className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'paused')}>
+                      <Clock className="h-4 w-4 mr-2" /> Pausar
+                    </Button>
+                    <Button variant="outline" className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'pending_payment')}>
+                      <CreditCard className="h-4 w-4 mr-2" /> Pdte. Pago
+                    </Button>
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'resolved')}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" /> Resolver
+                    </Button>
+                  </div>
+                )}
+                {selectedInternalTask.status === 'paused' && (
+                  <div className="flex gap-2 flex-wrap">
+                    <Button variant="outline" className="flex-1" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'in_progress')}>
+                      <Wrench className="h-4 w-4 mr-2" /> Reanudar
+                    </Button>
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'resolved')}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" /> Resolver
+                    </Button>
+                  </div>
+                )}
+                {selectedInternalTask.status === 'pending_payment' && (
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'in_progress')}>
+                      <Wrench className="h-4 w-4 mr-2" /> Reanudar
+                    </Button>
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'resolved')}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" /> Resolver
+                    </Button>
+                  </div>
+                )}
+                {selectedInternalTask.status === 'resolved' && (
+                  <Button variant="outline" className="flex-1" onClick={() => updateInternalTaskStatus(selectedInternalTask.id, 'in_progress')}>
+                    <Wrench className="h-4 w-4 mr-2" /> Reabrir
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  className="border-red-300 text-red-600 hover:bg-red-50"
+                  onClick={() => { if (confirm('¿Eliminar esta tarea?')) deleteInternalTask(selectedInternalTask.id); }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" /> Eliminar tarea
+                </Button>
+                <Button variant="ghost" onClick={() => setSelectedInternalTask(null)}>Cerrar</Button>
               </div>
             </CardContent>
           </Card>
