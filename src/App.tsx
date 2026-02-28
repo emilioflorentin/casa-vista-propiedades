@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import ManageRental from "./pages/ManageRental";
 import TenantIncidents from "./pages/TenantIncidents";
 import OwnerIncidents from "./pages/OwnerIncidents";
+import ServiceBoard from "./pages/ServiceBoard";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/manage-rental/:propertyId" element={<ManageRental />} />
               <Route path="/tenant-incidents" element={<TenantIncidents />} />
               <Route path="/owner-incidents" element={<OwnerIncidents />} />
+              <Route path="/service-board" element={<ServiceBoard />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

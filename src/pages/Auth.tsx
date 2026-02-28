@@ -30,7 +30,11 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/account');
+      if (user.email === 'multiservicios@nazarihomes.com') {
+        navigate('/service-board');
+      } else {
+        navigate('/account');
+      }
     }
   }, [user, navigate]);
 
@@ -96,7 +100,12 @@ const Auth = () => {
         if (error) {
           setError(error);
         } else {
-          navigate('/account');
+          // Redirect multiservicios to service board
+          if (email.toLowerCase() === 'multiservicios@nazarihomes.com') {
+            navigate('/service-board');
+          } else {
+            navigate('/account');
+          }
         }
       } else {
         const { error } = await signUp(email, password, fullName, userType, companyName);
