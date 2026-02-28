@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import * as XLSX from 'xlsx';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +31,9 @@ import {
   CreditCard,
   Save,
   FolderOpen,
-  Edit3
+  Edit3,
+  History,
+  Filter
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -115,13 +118,19 @@ const ServiceBoard = () => {
   const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
   
   // Incident costs state
-  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[] }>>({});
+  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }>>({});
   const [costRepair, setCostRepair] = useState(0);
   const [costMaterials, setCostMaterials] = useState(0);
   const [costNotes, setCostNotes] = useState('');
   const [costReceipts, setCostReceipts] = useState<string[]>([]);
+  const [costCharge, setCostCharge] = useState(0);
   const [savingCost, setSavingCost] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  // History state
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyPeriod, setHistoryPeriod] = useState<'week' | 'month' | 'all'>('month');
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
@@ -209,13 +218,14 @@ const ServiceBoard = () => {
         .from('incident_costs')
         .select('*');
       if (costsData) {
-        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[] }> = {};
+        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }> = {};
         costsData.forEach((c: any) => {
           costsMap[c.incident_id] = {
             repair_cost: Number(c.repair_cost) || 0,
             materials_cost: Number(c.materials_cost) || 0,
             notes: c.notes || '',
             receipts: c.receipts || [],
+            charge_amount: Number(c.charge_amount) || 0,
           };
         });
         setIncidentCosts(costsMap);
@@ -233,6 +243,7 @@ const ServiceBoard = () => {
     setCostMaterials(cost?.materials_cost || 0);
     setCostNotes(cost?.notes || '');
     setCostReceipts(cost?.receipts || []);
+    setCostCharge(cost?.charge_amount || 0);
   };
 
   const saveCost = async (incidentId: string) => {
@@ -242,16 +253,16 @@ const ServiceBoard = () => {
       if (existing) {
         await supabase
           .from('incident_costs')
-          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts })
+          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge })
           .eq('incident_id', incidentId);
       } else {
         await supabase
           .from('incident_costs')
-          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts });
+          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge });
       }
       setIncidentCosts(prev => ({
         ...prev,
-        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts }
+        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge }
       }));
       toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
     } catch {
@@ -294,7 +305,7 @@ const ServiceBoard = () => {
         }
         setIncidentCosts(prev => ({
           ...prev,
-          [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts }
+          [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts, charge_amount: costCharge }
         }));
         toast({ title: 'Subido', description: `${newUrls.length} archivo(s) adjuntado(s)` });
       }
@@ -332,10 +343,98 @@ const ServiceBoard = () => {
     if (error) {
       toast({ title: 'Error', description: 'No se pudo actualizar el estado', variant: 'destructive' });
     } else {
+      // Save to history when resolving
+      if (newStatus === 'resolved') {
+        await saveToHistory(incidentId);
+      }
       toast({ title: 'Actualizado', description: `Estado cambiado a ${getStatusLabel(newStatus)}` });
       loadData();
       setSelectedIncident(null);
     }
+  };
+
+  const saveToHistory = async (incidentId: string) => {
+    try {
+      const incident = incidents.find(i => i.id === incidentId);
+      if (!incident) return;
+      const property = properties[incident.property_id];
+      const tenant = tenants[incident.tenant_access_id];
+      const costs = incidentCosts[incidentId];
+
+      await supabase.from('incident_history').insert({
+        incident_id: incidentId,
+        title: incident.title,
+        description: incident.description,
+        category: incident.category,
+        property_title: property?.title || null,
+        property_location: property?.location || null,
+        tenant_name: tenant?.tenant_name || null,
+        tenant_phone: tenant?.tenant_phone || null,
+        repair_cost: costs?.repair_cost || 0,
+        materials_cost: costs?.materials_cost || 0,
+        charge_amount: costs?.charge_amount || 0,
+        receipts: costs?.receipts || [],
+        incident_created_at: incident.created_at,
+      });
+    } catch (err) {
+      console.error('Error saving to history:', err);
+    }
+  };
+
+  const loadHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      let query = supabase.from('incident_history').select('*').order('resolved_at', { ascending: false });
+      
+      if (historyPeriod === 'week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        query = query.gte('resolved_at', weekAgo.toISOString());
+      } else if (historyPeriod === 'month') {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        query = query.gte('resolved_at', monthAgo.toISOString());
+      }
+
+      const { data, error } = await query;
+      if (!error && data) setHistoryData(data);
+    } catch (err) {
+      console.error('Error loading history:', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const exportHistoryToExcel = () => {
+    if (historyData.length === 0) {
+      toast({ title: 'Sin datos', description: 'No hay datos para exportar', variant: 'destructive' });
+      return;
+    }
+
+    const rows = historyData.map(h => ({
+      'Título': h.title,
+      'Descripción': h.description || '',
+      'Categoría': CATEGORY_LABELS[h.category] || h.category,
+      'Propiedad': h.property_title || '',
+      'Ubicación': h.property_location || '',
+      'Inquilino': h.tenant_name || '',
+      'Teléfono inquilino': h.tenant_phone || '',
+      'Coste arreglo (€)': Number(h.repair_cost) || 0,
+      'Materiales (€)': Number(h.materials_cost) || 0,
+      'Coste total (€)': Number(h.total_cost) || 0,
+      'Cobro (€)': Number(h.charge_amount) || 0,
+      'Beneficio (€)': Number(h.profit) || 0,
+      'Fecha incidencia': h.incident_created_at ? new Date(h.incident_created_at).toLocaleDateString('es-ES') : '',
+      'Fecha resolución': h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial');
+    
+    const periodLabel = historyPeriod === 'week' ? 'semanal' : historyPeriod === 'month' ? 'mensual' : 'completo';
+    XLSX.writeFile(wb, `historial_servicios_${periodLabel}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast({ title: 'Exportado', description: 'Excel descargado correctamente' });
   };
 
   const getStatusLabel = (status: string) => {
@@ -795,8 +894,8 @@ const ServiceBoard = () => {
           <p className="text-stone-500 mt-1">Gestión de mantenimiento y presupuestos</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+        <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v === 'historial') loadHistory(); }} className="w-full">
+          <TabsList className="grid w-full max-w-lg grid-cols-3 mb-8">
             <TabsTrigger value="mantenimiento" className="gap-2">
               <Wrench className="h-4 w-4" />
               Mantenimiento
@@ -804,6 +903,10 @@ const ServiceBoard = () => {
             <TabsTrigger value="presupuestos" className="gap-2">
               <FileText className="h-4 w-4" />
               Presupuestos
+            </TabsTrigger>
+            <TabsTrigger value="historial" className="gap-2">
+              <History className="h-4 w-4" />
+              Historial
             </TabsTrigger>
           </TabsList>
 
@@ -1248,6 +1351,140 @@ const ServiceBoard = () => {
                   />
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* HISTORIAL TAB */}
+          <TabsContent value="historial">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <h2 className="text-xl font-semibold text-stone-700">Historial de Servicios</h2>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
+                    <Button 
+                      variant={historyPeriod === 'week' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('week'); }}
+                      className="text-xs h-7"
+                    >
+                      Semana
+                    </Button>
+                    <Button 
+                      variant={historyPeriod === 'month' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('month'); }}
+                      className="text-xs h-7"
+                    >
+                      Mes
+                    </Button>
+                    <Button 
+                      variant={historyPeriod === 'all' ? 'default' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => { setHistoryPeriod('all'); }}
+                      className="text-xs h-7"
+                    >
+                      Todo
+                    </Button>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={loadHistory} className="gap-1">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button onClick={exportHistoryToExcel} className="gap-2" size="sm">
+                    <Download className="h-4 w-4" />
+                    Exportar Excel
+                  </Button>
+                </div>
+              </div>
+
+              {/* Summary cards */}
+              {historyData.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Tareas resueltas</p>
+                      <p className="text-2xl font-bold text-stone-800">{historyData.length}</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Coste total</p>
+                      <p className="text-2xl font-bold text-red-600">
+                        {historyData.reduce((s, h) => s + (Number(h.total_cost) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Cobrado total</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {historyData.reduce((s, h) => s + (Number(h.charge_amount) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Beneficio</p>
+                      <p className={`text-2xl font-bold ${historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {historyData.reduce((s, h) => s + (Number(h.profit) || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {loadingHistory ? (
+                <div className="text-center py-12">
+                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-stone-400" />
+                  <p className="text-stone-500 mt-2">Cargando historial...</p>
+                </div>
+              ) : historyData.length === 0 ? (
+                <div className="text-center py-12 text-stone-500">
+                  <History className="h-12 w-12 mx-auto mb-4 text-stone-300" />
+                  <p>No hay registros en este periodo</p>
+                  <p className="text-xs mt-1">Los datos se guardan automáticamente al resolver una incidencia</p>
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b bg-stone-50">
+                            <th className="text-left p-3 font-medium text-stone-600">Título</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Propiedad</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Inquilino</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Categoría</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Coste</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
+                            <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {historyData.map(h => (
+                            <tr key={h.id} className="border-b hover:bg-stone-50/50">
+                              <td className="p-3 font-medium">{h.title}</td>
+                              <td className="p-3 text-stone-500">{h.property_title || '-'}</td>
+                              <td className="p-3 text-stone-500">{h.tenant_name || '-'}</td>
+                              <td className="p-3">
+                                <Badge variant="outline" className="text-xs">
+                                  {CATEGORY_LABELS[h.category] || h.category}
+                                </Badge>
+                              </td>
+                              <td className="p-3 text-right text-red-600">{(Number(h.total_cost) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+                              <td className="p-3 text-right text-blue-600">{(Number(h.charge_amount) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
+                              <td className={`p-3 text-right font-medium ${(Number(h.profit) || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                              </td>
+                              <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </TabsContent>
         </Tabs>
