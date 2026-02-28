@@ -71,7 +71,7 @@ const PropertyDetail = () => {
             bedrooms: dbProperty.bedrooms,
             bathrooms: dbProperty.bathrooms,
             area: dbProperty.area,
-            image: dbProperty.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+            image: dbProperty.image ? dbProperty.image.split(',')[0].trim() : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
             features: dbProperty.features || [],
             description: dbProperty.description,
             managedBy: 'database' as const,
@@ -311,7 +311,12 @@ const PropertyDetail = () => {
       }
     }
     
-    // For static and database properties, use default images
+    // For database properties, check if image contains multiple URLs (comma-separated)
+    if (property.image && property.image.includes(',')) {
+      return property.image.split(',').map((url: string) => url.trim());
+    }
+    
+    // For static and database properties with single image, use default images
     return [
       property.image,
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",

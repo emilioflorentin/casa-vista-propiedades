@@ -145,7 +145,7 @@ const Properties = () => {
     bedrooms: prop.bedrooms,
     bathrooms: prop.bathrooms,
     area: prop.area,
-    image: prop.image || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+    image: prop.image ? prop.image.split(',')[0].trim() : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
     features: prop.features || [],
     description: prop.description,
     managedBy: (profiles[prop.user_id]?.email?.endsWith('@nazarihomes.com') ? 'nazari' : 'other') as "other" | "nazari",
