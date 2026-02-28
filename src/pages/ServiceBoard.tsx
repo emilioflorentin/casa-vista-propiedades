@@ -115,11 +115,13 @@ const ServiceBoard = () => {
   const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
   
   // Incident costs state
-  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string }>>({});
+  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[] }>>({});
   const [costRepair, setCostRepair] = useState(0);
   const [costMaterials, setCostMaterials] = useState(0);
   const [costNotes, setCostNotes] = useState('');
+  const [costReceipts, setCostReceipts] = useState<string[]>([]);
   const [savingCost, setSavingCost] = useState(false);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
   // Budget state
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
@@ -207,12 +209,13 @@ const ServiceBoard = () => {
         .from('incident_costs')
         .select('*');
       if (costsData) {
-        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string }> = {};
+        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[] }> = {};
         costsData.forEach((c: any) => {
           costsMap[c.incident_id] = {
             repair_cost: Number(c.repair_cost) || 0,
             materials_cost: Number(c.materials_cost) || 0,
             notes: c.notes || '',
+            receipts: c.receipts || [],
           };
         });
         setIncidentCosts(costsMap);
@@ -229,6 +232,7 @@ const ServiceBoard = () => {
     setCostRepair(cost?.repair_cost || 0);
     setCostMaterials(cost?.materials_cost || 0);
     setCostNotes(cost?.notes || '');
+    setCostReceipts(cost?.receipts || []);
   };
 
   const saveCost = async (incidentId: string) => {
@@ -238,16 +242,16 @@ const ServiceBoard = () => {
       if (existing) {
         await supabase
           .from('incident_costs')
-          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes })
+          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts })
           .eq('incident_id', incidentId);
       } else {
         await supabase
           .from('incident_costs')
-          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes });
+          .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts });
       }
       setIncidentCosts(prev => ({
         ...prev,
-        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes }
+        [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts }
       }));
       toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
     } catch {
@@ -255,6 +259,65 @@ const ServiceBoard = () => {
     } finally {
       setSavingCost(false);
     }
+  };
+
+  const uploadReceipt = async (incidentId: string, files: FileList) => {
+    setUploadingReceipt(true);
+    try {
+      const newUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const filePath = `${incidentId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from('cost-receipts').upload(filePath, file);
+        if (error) {
+          console.error('Upload error:', error);
+          continue;
+        }
+        const { data: urlData } = supabase.storage.from('cost-receipts').getPublicUrl(filePath);
+        newUrls.push(urlData.publicUrl);
+      }
+      if (newUrls.length > 0) {
+        const updatedReceipts = [...costReceipts, ...newUrls];
+        setCostReceipts(updatedReceipts);
+        // Auto-save receipts
+        const existing = incidentCosts[incidentId];
+        if (existing) {
+          await supabase.from('incident_costs')
+            .update({ receipts: updatedReceipts })
+            .eq('incident_id', incidentId);
+        } else {
+          await supabase.from('incident_costs')
+            .insert({ incident_id: incidentId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts });
+        }
+        setIncidentCosts(prev => ({
+          ...prev,
+          [incidentId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts }
+        }));
+        toast({ title: 'Subido', description: `${newUrls.length} archivo(s) adjuntado(s)` });
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Error al subir archivos', variant: 'destructive' });
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
+  const removeReceipt = async (incidentId: string, url: string) => {
+    const updatedReceipts = costReceipts.filter(r => r !== url);
+    setCostReceipts(updatedReceipts);
+    await supabase.from('incident_costs')
+      .update({ receipts: updatedReceipts })
+      .eq('incident_id', incidentId);
+    setIncidentCosts(prev => ({
+      ...prev,
+      [incidentId]: { ...prev[incidentId], receipts: updatedReceipts }
+    }));
+    // Delete from storage
+    const path = url.split('/cost-receipts/')[1];
+    if (path) {
+      await supabase.storage.from('cost-receipts').remove([decodeURIComponent(path)]);
+    }
+    toast({ title: 'Eliminado', description: 'Archivo eliminado' });
   };
 
   const updateStatus = async (incidentId: string, newStatus: string) => {
@@ -1304,6 +1367,59 @@ const ServiceBoard = () => {
                     <Save className="h-3 w-3 mr-1" />
                     {savingCost ? 'Guardando...' : 'Guardar costes'}
                   </Button>
+                </div>
+
+                {/* Receipts / Justificantes */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-blue-700">Justificantes (tickets, facturas, PDFs...)</Label>
+                  <div className="flex gap-2">
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,.pdf,.doc,.docx"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            uploadReceipt(selectedIncident.id, e.target.files);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <div className="flex items-center justify-center gap-2 border border-dashed border-blue-300 rounded-lg p-2 cursor-pointer hover:bg-blue-50 transition-colors text-xs text-blue-600">
+                        <Plus className="h-3 w-3" />
+                        {uploadingReceipt ? 'Subiendo...' : 'Adjuntar archivos'}
+                      </div>
+                    </label>
+                  </div>
+                  {costReceipts.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {costReceipts.map((url, idx) => {
+                        const isPdf = url.toLowerCase().includes('.pdf');
+                        const isDoc = url.toLowerCase().includes('.doc');
+                        return (
+                          <div key={idx} className="relative group">
+                            {isPdf || isDoc ? (
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200">
+                                <FileText className="h-6 w-6 mr-1" />
+                                {isPdf ? 'PDF' : 'DOC'}
+                              </a>
+                            ) : (
+                              <a href={url} target="_blank" rel="noopener noreferrer">
+                                <img src={url} alt={`Justificante ${idx + 1}`} className="h-20 w-full object-cover rounded-lg border" />
+                              </a>
+                            )}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); removeReceipt(selectedIncident.id, url); }}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 

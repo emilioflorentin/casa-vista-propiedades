@@ -81,6 +81,7 @@ export type Database = {
           incident_id: string
           materials_cost: number | null
           notes: string | null
+          receipts: string[] | null
           repair_cost: number | null
           updated_at: string
         }
@@ -90,6 +91,7 @@ export type Database = {
           incident_id: string
           materials_cost?: number | null
           notes?: string | null
+          receipts?: string[] | null
           repair_cost?: number | null
           updated_at?: string
         }
@@ -99,6 +101,7 @@ export type Database = {
           incident_id?: string
           materials_cost?: number | null
           notes?: string | null
+          receipts?: string[] | null
           repair_cost?: number | null
           updated_at?: string
         }
