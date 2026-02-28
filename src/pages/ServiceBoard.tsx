@@ -160,6 +160,12 @@ const ServiceBoard = () => {
     }
   }, [user, authLoading]);
 
+  useEffect(() => {
+    if (activeTab === 'historial' && user) {
+      loadHistory();
+    }
+  }, [historyPeriod]);
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -1570,7 +1576,7 @@ const ServiceBoard = () => {
                   <Euro className="h-4 w-4" />
                   Costes del servicio
                 </h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
                     <Input
@@ -1595,9 +1601,28 @@ const ServiceBoard = () => {
                       className="mt-1 h-8 text-sm"
                     />
                   </div>
+                  <div>
+                    <Label className="text-xs text-green-700">Cobro cliente (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={costCharge || ''}
+                      onChange={e => setCostCharge(Number(e.target.value))}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm border-green-200"
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-blue-800">Total: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+                <div className="flex justify-between items-center text-sm flex-wrap gap-2">
+                  <div className="flex gap-3">
+                    <span className="font-medium text-blue-800">Coste: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+                    {costCharge > 0 && (
+                      <span className={`font-medium ${(costCharge - costRepair - costMaterials) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                        Beneficio: {(costCharge - costRepair - costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+                      </span>
+                    )}
+                  </div>
                   <Button 
                     size="sm" 
                     onClick={() => saveCost(selectedIncident.id)}
