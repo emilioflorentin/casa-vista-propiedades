@@ -881,7 +881,7 @@ const translations: Translations = {
       contactUs: "Contact us",
       privacyPolicy: "Privacy policy",
       termsOfService: "Terms of service",
-      copyright: "Copyright © 2024 Nazarí Homes. All rights reserved.",
+      copyright: "Copyright © 2026 Nazarí Homes. All rights reserved.",
     },
     account: {
       login: "Sign In",
