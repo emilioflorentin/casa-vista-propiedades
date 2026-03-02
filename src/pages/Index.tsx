@@ -213,7 +213,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       <Header />
-
+      <main>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white">
         <div className="absolute inset-0 bg-black opacity-5"></div>
@@ -438,6 +438,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>
