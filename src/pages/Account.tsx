@@ -330,11 +330,13 @@ const Account = () => {
   };
 
   const handleShowNewPropertyForm = () => {
-    // Verificar límite para usuarios particulares
-    if (profileData.user_type === 'particular' && userProperties.length >= 3) {
+    // Verificar límite: usuarios sin dominio @nazarihomes.com tienen máximo 3 propiedades
+    const userEmail = user?.email || '';
+    const isNazariUser = userEmail.endsWith('@nazarihomes.com');
+    if (!isNazariUser && userProperties.length >= 3) {
       toast({
         title: "Límite alcanzado",
-        description: "Los usuarios particulares pueden publicar máximo 3 propiedades. Para publicaciones ilimitadas, cambia a cuenta profesional.",
+        description: "Puedes publicar máximo 3 propiedades. Para publicaciones ilimitadas, contacta con Nazari Homes.",
         variant: "destructive"
       });
       return;
@@ -863,12 +865,12 @@ const Account = () => {
                   <Button
                     onClick={handleShowNewPropertyForm}
                     className="bg-stone-700 hover:bg-stone-600"
-                    disabled={profileData.user_type === 'particular' && userProperties.length >= 3}
+                    disabled={!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Nueva Propiedad
                   </Button>
-                  {profileData.user_type === 'particular' && userProperties.length >= 3 && (
+                  {!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3 && (
                     <p className="text-xs text-stone-500 mt-1">
                       Límite de propiedades alcanzado
                     </p>
