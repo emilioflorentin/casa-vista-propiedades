@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Clock, 
   CheckCircle2, 
@@ -168,6 +169,8 @@ const ServiceBoard = () => {
   const [budgetValidityDays, setBudgetValidityDays] = useState(30);
   const [budgetExecutionDays, setBudgetExecutionDays] = useState('');
   const [budgetPaymentTerms, setBudgetPaymentTerms] = useState('');
+  const [budgetIncludeIva, setBudgetIncludeIva] = useState(true);
+  const [budgetIncludeHeader, setBudgetIncludeHeader] = useState(true);
   const [savedBudgets, setSavedBudgets] = useState<any[]>([]);
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [savingBudget, setSavingBudget] = useState(false);
@@ -606,7 +609,7 @@ const ServiceBoard = () => {
   };
 
   const subtotal = budgetItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-  const iva = subtotal * 0.21;
+  const iva = budgetIncludeIva ? subtotal * 0.21 : 0;
   const total = subtotal + iva;
 
   const generateBudgetPDF = () => {
@@ -708,6 +711,7 @@ const ServiceBoard = () => {
       </style></head><body>
       <div class="page">
         <div class="header">
+          ${budgetIncludeHeader ? `
           <div class="logo-section">
             <img src="${logoUrl}" alt="Nazarí Homes" />
             <div class="company-info">
@@ -716,7 +720,7 @@ const ServiceBoard = () => {
               info@nazarihomes.com<br>
               www.nazarihomes.com
             </div>
-          </div>
+          </div>` : `<div></div>`}
           <div class="budget-badge">
             <h1>PRESUPUESTO</h1>
             <p class="meta"><strong>Nº:</strong> ${budgetNumber}</p>
@@ -752,7 +756,7 @@ const ServiceBoard = () => {
         <div class="totals-section">
           <table class="totals-table">
             <tr><td class="label">Base imponible</td><td class="right">${subtotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
-            <tr><td class="label">IVA (21%)</td><td class="right">${iva.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
+            ${budgetIncludeIva ? `<tr><td class="label">IVA (21%)</td><td class="right">${iva.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>` : ''}
             <tr class="total-row"><td>TOTAL</td><td class="right">${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
           </table>
         </div>
@@ -763,7 +767,7 @@ const ServiceBoard = () => {
             <div class="condition-item"><div class="label">Validez</div><div class="value">${budgetValidityDays} días desde emisión</div></div>
             ${budgetExecutionDays ? `<div class="condition-item"><div class="label">Plazo de ejecución</div><div class="value">${budgetExecutionDays}</div></div>` : ''}
             ${budgetPaymentTerms ? `<div class="condition-item"><div class="label">Forma de pago</div><div class="value">${budgetPaymentTerms}</div></div>` : ''}
-            <div class="condition-item"><div class="label">IVA</div><div class="value">21% incluido en total</div></div>
+            <div class="condition-item"><div class="label">IVA</div><div class="value">${budgetIncludeIva ? '21% incluido en total' : 'No aplicado'}</div></div>
           </div>
         </div>
 
@@ -774,10 +778,10 @@ const ServiceBoard = () => {
           <div class="signature-box">Fdo. ${budgetClient.name || 'El cliente'}</div>
         </div>
 
-        <div class="footer">
+        ${budgetIncludeHeader ? `<div class="footer">
           <p class="brand">Nazarí Homes · Gestión Integral para tu Tranquilidad</p>
           <p>info@nazarihomes.com · www.nazarihomes.com</p>
-        </div>
+        </div>` : ''}
       </div>
       </body></html>
     `);
@@ -1685,6 +1689,26 @@ const ServiceBoard = () => {
                       placeholder="Ej. 50% inicio, 50% final"
                       className="mt-1"
                     />
+                  </div>
+                  <div className="flex items-center gap-2 pt-2">
+                    <Checkbox
+                      id="budget-include-iva"
+                      checked={budgetIncludeIva}
+                      onCheckedChange={(v) => setBudgetIncludeIva(v === true)}
+                    />
+                    <Label htmlFor="budget-include-iva" className="text-sm cursor-pointer">
+                      Incluir IVA (21%) en el presupuesto
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="budget-include-header"
+                      checked={budgetIncludeHeader}
+                      onCheckedChange={(v) => setBudgetIncludeHeader(v === true)}
+                    />
+                    <Label htmlFor="budget-include-header" className="text-sm cursor-pointer">
+                      Incluir cabecera con logo y datos de Nazarí Homes
+                    </Label>
                   </div>
                 </CardContent>
               </Card>
