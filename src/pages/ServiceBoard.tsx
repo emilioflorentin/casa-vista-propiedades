@@ -146,12 +146,11 @@ const ServiceBoard = () => {
   const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
   
   // Incident costs state
-  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }>>({});
-  const [costRepair, setCostRepair] = useState(0);
-  const [costMaterials, setCostMaterials] = useState(0);
+  type CostLine = { id: string; repair: number; materials: number; charge: number };
+  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number; lines: CostLine[] }>>({});
+  const [costLines, setCostLines] = useState<CostLine[]>([]);
   const [costNotes, setCostNotes] = useState('');
   const [costReceipts, setCostReceipts] = useState<string[]>([]);
-  const [costCharge, setCostCharge] = useState(0);
   const [savingCost, setSavingCost] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
