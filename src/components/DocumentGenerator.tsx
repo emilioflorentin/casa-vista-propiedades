@@ -184,31 +184,22 @@ const DocumentGenerator = () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 22;
 
-    // Logo top-left
+    // Logo centered (only branding element in header)
     if (logo) {
       try {
-        doc.addImage(logo, 'PNG', margin, 10, 22, 22);
+        const logoSize = 26;
+        doc.addImage(logo, 'PNG', (pageWidth - logoSize) / 2, 8, logoSize, logoSize);
       } catch {
         // ignore
       }
     }
 
-    // Brand block centered
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.setTextColor(60, 50, 35);
-    doc.text('NAZARÍ HOMES', pageWidth / 2, 19, { align: 'center' });
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(9);
-    doc.setTextColor(140, 120, 95);
-    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 25, { align: 'center' });
-
     // Decorative double line
     doc.setDrawColor(180, 160, 130);
     doc.setLineWidth(0.6);
-    doc.line(margin, 34, pageWidth - margin, 34);
+    doc.line(margin, 38, pageWidth - margin, 38);
     doc.setLineWidth(0.2);
-    doc.line(margin, 35.5, pageWidth - margin, 35.5);
+    doc.line(margin, 39.5, pageWidth - margin, 39.5);
     doc.setTextColor(0);
   };
 
