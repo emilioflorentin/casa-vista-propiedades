@@ -44,6 +44,66 @@ const loadLogoDataUrl = async (): Promise<string | null> => {
 };
 const getLogoRatio = () => cachedLogoRatio || 1;
 
+// Convert a number (integer euros) to Spanish words (uppercase). Supports up to millions.
+const numberToSpanishWords = (n: number): string => {
+  if (!isFinite(n) || n < 0) return '';
+  if (n === 0) return 'CERO';
+  const ones = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE', 'DIEZ',
+    'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE',
+    'VEINTE', 'VEINTIUNO', 'VEINTIDÓS', 'VEINTITRÉS', 'VEINTICUATRO', 'VEINTICINCO', 'VEINTISÉIS',
+    'VEINTISIETE', 'VEINTIOCHO', 'VEINTINUEVE'];
+  const tens = ['', '', '', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+  const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS',
+    'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+  const under1000 = (num: number): string => {
+    if (num === 100) return 'CIEN';
+    const h = Math.floor(num / 100);
+    const rest = num % 100;
+    let out = '';
+    if (h > 0) out += hundreds[h];
+    if (rest > 0) {
+      if (out) out += ' ';
+      if (rest < 30) out += ones[rest];
+      else {
+        const t = Math.floor(rest / 10);
+        const u = rest % 10;
+        out += tens[t] + (u > 0 ? ' Y ' + ones[u] : '');
+      }
+    }
+    return out;
+  };
+  const num = Math.floor(n);
+  if (num < 1000) return under1000(num);
+  if (num < 1_000_000) {
+    const thousands = Math.floor(num / 1000);
+    const rest = num % 1000;
+    const thouTxt = thousands === 1 ? 'MIL' : under1000(thousands).replace(/\bUNO\b$/, 'UN') + ' MIL';
+    return thouTxt + (rest > 0 ? ' ' + under1000(rest) : '');
+  }
+  const millions = Math.floor(num / 1_000_000);
+  const rest = num % 1_000_000;
+  const milTxt = millions === 1 ? 'UN MILLÓN' : under1000(millions) + ' MILLONES';
+  return milTxt + (rest > 0 ? ' ' + numberToSpanishWords(rest) : '');
+};
+
+const formatEuros = (raw: string): { letters: string; figures: string } => {
+  const n = Number(raw);
+  if (!raw || !isFinite(n) || n <= 0) return { letters: '', figures: '' };
+  const intPart = Math.floor(n);
+  const cents = Math.round((n - intPart) * 100);
+  const figures = `${n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`;
+  let letters = `${numberToSpanishWords(intPart)} EUROS`;
+  if (cents > 0) letters += ` CON ${numberToSpanishWords(cents)} CÉNTIMOS`;
+  return { letters, figures };
+};
+
+const formatDateEs = (iso: string): string => {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+};
+
 type DocKind = 'consent' | 'reservation';
 
 const SignaturePad = ({ label, onChange }: { label: string; onChange: (d: string | null) => void }) => {
