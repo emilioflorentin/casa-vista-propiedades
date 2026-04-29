@@ -49,6 +49,7 @@ const App = () => (
               <Route path="/owner-incidents" element={<OwnerIncidents />} />
               <Route path="/service-board" element={<ServiceBoard />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/r/:code" element={<ShortRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </FavoritesProvider>
