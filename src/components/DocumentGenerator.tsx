@@ -491,6 +491,38 @@ const DocumentGenerator = () => {
 
               <div>
                 <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Interesado
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="interestedName">Nombre completo</Label>
+                    <Input id="interestedName" value={interestedName} onChange={(e) => setInterestedName(e.target.value)} placeholder="Juan Pérez García" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="interestedDni">DNI / NIE</Label>
+                    <Input id="interestedDni" value={interestedDni} onChange={(e) => setInterestedDni(e.target.value)} placeholder="12345678A" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Avalista
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="guarantorName">Nombre completo</Label>
+                    <Input id="guarantorName" value={guarantorName} onChange={(e) => setGuarantorName(e.target.value)} placeholder="María López Ruiz" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="guarantorDni">DNI / NIE</Label>
+                    <Input id="guarantorDni" value={guarantorDni} onChange={(e) => setGuarantorDni(e.target.value)} placeholder="87654321B" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
                   Lugar y fecha de firma
                 </h3>
                 <div className="grid md:grid-cols-4 gap-4">
