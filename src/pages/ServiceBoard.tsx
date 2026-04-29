@@ -2325,6 +2325,37 @@ const ServiceBoard = () => {
       )}
 
       <Footer />
+
+      <AlertDialog open={!!deletingHistoryRow} onOpenChange={(open) => { if (!open) { setDeletingHistoryRow(null); setDeleteConfirmText(''); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" /> Eliminar registro del historial
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción es <strong>permanente</strong> y no se puede deshacer. Vas a eliminar:
+              <span className="block mt-2 font-medium text-stone-700">"{deletingHistoryRow?.title}"</span>
+              <span className="block mt-3">Para confirmar, escribe <strong>ELIMINAR</strong> en mayúsculas:</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="ELIMINAR"
+            autoFocus
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); deleteHistoryRow(); }}
+              disabled={deleteConfirmText.trim().toUpperCase() !== 'ELIMINAR'}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Eliminar definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
