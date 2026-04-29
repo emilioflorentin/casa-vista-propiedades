@@ -872,7 +872,6 @@ const PropertyDetail = () => {
                   />
                   <div>
                     <h3 className="font-semibold text-lg text-stone-800">{agent.name}</h3>
-                    <p className="text-stone-600">{t('property.real_estate_agent')}</p>
                     <p className="text-sm text-stone-500 font-medium">{agent.agency}</p>
                   </div>
                 </div>
