@@ -454,12 +454,16 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = () => {
-    const defaultMessage = whatsappMessage || t('property.whatsapp_default_message', {
+    const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+    const baseMessage = whatsappMessage || t('property.whatsapp_default_message', {
       title: property.title,
       reference: property.reference,
       location: property.location,
       price: formatPrice(property.price, property.operation)
     });
+    const defaultMessage = baseMessage.includes(propertyUrl)
+      ? baseMessage
+      : `${baseMessage}\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${propertyUrl}`;
     const encodedMessage = encodeURIComponent(defaultMessage);
     
     // Debug: Log the phone number and URL being generated
@@ -497,12 +501,14 @@ const PropertyDetail = () => {
     }
   };
 
-  // Updated quick messages with consistent "Ref:" format
+  // Updated quick messages with consistent "Ref:" format and direct property link
+  const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+  const linkSuffix = `\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${propertyUrl}`;
   const quickMessages = [
-    t('property.quick_message_visit', { title: property.title, reference: property.reference, location: property.location }),
-    t('property.quick_message_available', { reference: property.reference, price: formatPrice(property.price, property.operation) }),
-    t('property.quick_message_schedule', { reference: property.reference, location: property.location }),
-    t('property.quick_message_price_info', { price: formatPrice(property.price, property.operation), reference: property.reference })
+    t('property.quick_message_visit', { title: property.title, reference: property.reference, location: property.location }) + linkSuffix,
+    t('property.quick_message_available', { reference: property.reference, price: formatPrice(property.price, property.operation) }) + linkSuffix,
+    t('property.quick_message_schedule', { reference: property.reference, location: property.location }) + linkSuffix,
+    t('property.quick_message_price_info', { price: formatPrice(property.price, property.operation), reference: property.reference }) + linkSuffix,
   ];
 
   return (
