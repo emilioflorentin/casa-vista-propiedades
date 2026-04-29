@@ -507,8 +507,8 @@ const DocumentGenerator = () => {
     // Conditions
     const condText =
       `CONDICIONES: La reserva se aplicará a la fianza descontándose de la misma una vez formalizado el contrato. ` +
-      `(FECHA INICIO ALQUILER: ${formatDateEs(rentalStartDate) || '__/__/____'}, FECHA FINALIZACIÓN: ${formatDateEs(rentalEndDate) || '__/__/____'}). ` +
-      `Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva y en caso de impago de los honorarios correspondientes por prestación de servicios de NAZARÍ HOMES a la inmobiliaria la realización de la reserva (fianza).`;
+      `(FECHA INICIO ALQUILER: ${formatDateEs(rentalStartDate) || '__/__/____'}, FECHA FINALIZACIÓN: ${formatDateEs(rentalEndDate) || '__/__/____'}).\n` +
+      `    Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva o en caso de impago de los honorarios correspondientes por prestación de servicios G.I.A. (Gestión Integral del Alquiler) a la inmobiliaria interviniente. Los honorarios serán abonados el mismo día de realización de la reserva (fianza).`;
     const condLines = doc.splitTextToSize(condText, contentWidth);
     doc.text(condLines, margin, y);
     y += condLines.length * 5 + 4;
