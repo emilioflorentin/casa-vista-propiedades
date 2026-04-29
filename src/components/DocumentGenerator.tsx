@@ -472,7 +472,7 @@ const DocumentGenerator = () => {
 
     // Add a new page (with background + header) and reset y to topY
     const newPage = () => {
-      drawFooter(doc);
+      drawFooter(doc, true);
       doc.addPage();
       drawBackground(doc, logo);
       drawHeader(doc, logo);
@@ -665,7 +665,7 @@ const DocumentGenerator = () => {
     doc.text(tenantsText, margin + 20 + colW + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
-    drawFooter(doc);
+    drawFooter(doc, true);
 
     const filename = `reserva-alquiler-${(validTenants[0]?.name || 'arrendatario').replace(/\s+/g, '_')}.pdf`;
     doc.save(filename);
