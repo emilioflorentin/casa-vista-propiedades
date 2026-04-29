@@ -602,12 +602,14 @@ const DocumentGenerator = () => {
     doc.setTextColor(...INK);
     y += 14;
 
-    // Signature columns: PROPIEDAD | ARRENDATARIOS
+    // Signature columns: Propiedad | Arrendatarios
     const colW = (contentWidth - 20) / 2;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('PROPIEDAD:', margin, y);
-    doc.text('ARRENDATARIOS*:', margin + 20 + colW, y);
+    doc.setFontSize(8);
+    doc.setTextColor(120, 110, 95);
+    doc.text('P R O P I E D A D', margin, y);
+    doc.text('A R R E N D A T A R I O S', margin + 20 + colW, y);
+    doc.setTextColor(40, 35, 30);
     y += 4;
 
     // Nazarí signature on left
