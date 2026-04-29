@@ -274,7 +274,7 @@ const DocumentGenerator = () => {
     doc.setTextColor(0);
   };
 
-  const drawFooter = (doc: jsPDF) => {
+  const drawFooter = (doc: jsPDF, includeWeb: boolean = false) => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     doc.setDrawColor(180, 160, 130);
@@ -283,7 +283,10 @@ const DocumentGenerator = () => {
     doc.setFontSize(8);
     doc.setTextColor(120);
     doc.setFont('helvetica', 'normal');
-    doc.text('NAZARÍ HOMES · info@nazarihomes.com', pageWidth / 2, pageHeight - 10, { align: 'center' });
+    const footerText = includeWeb
+      ? 'NAZARÍ HOMES · info@nazarihomes.com · www.nazarihomes.com'
+      : 'NAZARÍ HOMES · info@nazarihomes.com';
+    doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
     doc.setTextColor(0);
   };
 
@@ -469,7 +472,7 @@ const DocumentGenerator = () => {
 
     // Add a new page (with background + header) and reset y to topY
     const newPage = () => {
-      drawFooter(doc);
+      drawFooter(doc, true);
       doc.addPage();
       drawBackground(doc, logo);
       drawHeader(doc, logo);
@@ -662,7 +665,7 @@ const DocumentGenerator = () => {
     doc.text(tenantsText, margin + 20 + colW + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
-    drawFooter(doc);
+    drawFooter(doc, true);
 
     const filename = `reserva-alquiler-${(validTenants[0]?.name || 'arrendatario').replace(/\s+/g, '_')}.pdf`;
     doc.save(filename);
