@@ -1154,6 +1154,12 @@ const Account = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
+              <TabsContent value="documents" className="space-y-6">
+                <DocumentGenerator />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>
