@@ -434,8 +434,17 @@ const DocumentGenerator = () => {
   };
 
   const generateReservationPdf = async () => {
-    if (!clientName.trim() || !clientDni.trim()) {
-      toast({ title: 'Faltan datos', description: 'Indica nombre y DNI/NIE del cliente.', variant: 'destructive' });
+    const validTenants = tenants.filter((t) => t.name.trim() && t.dni.trim());
+    if (validTenants.length === 0) {
+      toast({ title: 'Faltan datos', description: 'Añade al menos un arrendatario con nombre y DNI/NIE.', variant: 'destructive' });
+      return;
+    }
+    if (!propAddress.trim() || !propPostalCode.trim() || !propMunicipality.trim() || !propProvince.trim()) {
+      toast({ title: 'Faltan datos', description: 'Completa la dirección del inmueble.', variant: 'destructive' });
+      return;
+    }
+    if (!reservationAmountNum || !depositAmountNum || !monthlyRentNum) {
+      toast({ title: 'Faltan datos', description: 'Indica importe de reserva, fianza y precio del alquiler.', variant: 'destructive' });
       return;
     }
     if (!signature) {
@@ -452,64 +461,135 @@ const DocumentGenerator = () => {
     drawBackground(doc, logo);
     drawHeader(doc, logo);
 
-    let y = 46;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.text('DOCUMENTO DE RESERVA', margin, y);
-    y += 10;
+    const reservation = formatEuros(reservationAmountNum);
+    const deposit = formatEuros(depositAmountNum);
+    const rent = formatEuros(monthlyRentNum);
 
-    doc.setFont('helvetica', 'normal');
+    let y = 50;
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('RECIBO DE RESERVA DE ALQUILER — NAZARÍ HOMES', margin, y);
+    y += 8;
+
+    // Property
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
+    doc.text('INMUEBLE OBJETO DE RESERVA:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const propLine = `${propAddress.toUpperCase()}. CP: ${propPostalCode}. ${propMunicipality.toUpperCase()} (${propProvince.toUpperCase()}).`;
+    const propLines = doc.splitTextToSize(propLine, contentWidth - 60);
+    doc.text(propLines, margin + 60, y);
+    y += propLines.length * 5 + 4;
 
-    const amountTxt = reservationAmount ? `${Number(reservationAmount).toLocaleString('es-ES')} €` : '________ €';
-    const priceTxt = salePrice ? `${Number(salePrice).toLocaleString('es-ES')} €` : '________ €';
-
-    const body =
-      `D./Dña. ${clientName}, con DNI/NIE ${clientDni} (en adelante, "el Reservante"), manifiesta su ` +
-      `interés en reservar la propiedad identificada con referencia ${propertyRef || '________'}, ` +
-      `sita en ${propAddress || '________________'}, ${propPostalCode || ''} ${propMunicipality || ''} (${propProvince || ''}).\n\n` +
-      `A tal efecto entrega en este acto, en concepto de señal de reserva, la cantidad de ${amountTxt}, ` +
-      `que será descontada del precio total de la operación, fijado en ${priceTxt}.\n\n` +
-      `La presente reserva queda sujeta a la formalización del contrato definitivo entre las partes en el ` +
-      `plazo acordado. En caso de desistimiento por parte del Reservante, el importe entregado quedará en ` +
-      `poder de NAZARÍ HOMES en concepto de indemnización por gastos de gestión.` +
-      (extraNotes ? `\n\nObservaciones: ${extraNotes}` : '');
-
-    const lines = doc.splitTextToSize(body, contentWidth);
-    doc.text(lines, margin, y);
-    y += lines.length * 5 + 8;
-
+    // Tenants
     doc.setFont('helvetica', 'bold');
-    doc.text(`En ${signProvince || '________'} a ${day} de ${month} de ${year}.`, margin, y);
-    y += 14;
+    doc.text('EFECTÚAN LA RESERVA (ARRENDATARIOS*):', margin, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    validTenants.forEach((t) => {
+      doc.text(t.name.toUpperCase(), margin + 4, y);
+      doc.text(`DNI: ${t.dni.toUpperCase()}`, margin + contentWidth - 60, y);
+      y += 5.5;
+    });
+    y += 3;
 
+    // Reservation amount
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE LA RESERVA:', margin, y);
+    y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    const reservationLine = `Entregan la cantidad de ${reservation.letters} (${reservation.figures}).`;
+    const resLines = doc.splitTextToSize(reservationLine, contentWidth);
+    doc.text(resLines, margin, y);
+    y += resLines.length * 5 + 2;
+
+    // Conditions
+    const condText =
+      `CONDICIONES: La reserva se aplicará a la fianza descontándose de la misma una vez formalizado el contrato. ` +
+      `(FECHA INICIO ALQUILER: ${formatDateEs(rentalStartDate) || '__/__/____'}, FECHA FINALIZACIÓN: ${formatDateEs(rentalEndDate) || '__/__/____'}). ` +
+      `Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva y en caso de impago de los honorarios correspondientes por prestación de servicios de NAZARÍ HOMES a la inmobiliaria la realización de la reserva (fianza).`;
+    const condLines = doc.splitTextToSize(condText, contentWidth);
+    doc.text(condLines, margin, y);
+    y += condLines.length * 5 + 4;
+
+    // Contract sign date
+    doc.setFont('helvetica', 'bold');
+    doc.text('FECHA FIRMA DEL CONTRATO', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`(${formatDateEs(contractSignDate) || '__/__/____'}).`, margin + 60, y);
+    y += 6;
+
+    // Deposit
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE LA FIANZA:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${deposit.letters} (${deposit.figures}).`, margin + 50, y);
+    y += 6;
+
+    // Fees
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE HONORARIOS (G.I.A.):', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(feesText, margin + 65, y);
+    y += 6;
+
+    // Monthly rent
+    doc.setFont('helvetica', 'bold');
+    doc.text('PRECIO DEL ALQUILER:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const rentLine = `${rent.letters} MENSUALES (${rent.figures}).`;
+    const rentLines = doc.splitTextToSize(rentLine, contentWidth - 50);
+    doc.text(rentLines, margin + 50, y);
+    y += rentLines.length * 5 + 6;
+
+    // Sign place + date
+    doc.setFont('helvetica', 'bold');
+    doc.text(`EN ${(signProvince || propProvince).toUpperCase()} A ${day} DE ${month.toUpperCase()} DE ${year}`, pageWidth - margin, y, { align: 'right' });
+    y += 12;
+
+    // Signature columns: PROPIEDAD | ARRENDATARIOS
     const colW = (contentWidth - 20) / 2;
-    doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
-    doc.text('EL RESERVANTE', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('PROPIEDAD:', margin, y);
+    doc.text('ARRENDATARIOS*:', margin + 20 + colW, y);
     y += 4;
 
-    // Left side: NAZARÍ HOMES signature
+    // Nazarí signature on left
     try {
-      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
+      const sigW = Math.min(colW, 60);
+      const sigH = 26;
+      doc.addImage(signature, 'PNG', margin + (colW - sigW) / 2, y, sigW, sigH);
     } catch {
       // ignore
     }
-    y += 32;
+    y += 30;
+
     doc.setDrawColor(120);
+    doc.setLineWidth(0.3);
     doc.line(margin, y, margin + colW, y);
     doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
-    y += 5;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
+    y += 4;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
     doc.setTextColor(120);
     doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
-    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('Firma digital o manuscrita', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(60);
+    const tenantsText = validTenants.map((t) => `${t.name} — DNI: ${t.dni}`).join('\n');
+    doc.text(tenantsText, margin + 20 + colW + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
 
-    doc.save(`reserva-${propertyRef || 'propiedad'}-${clientName.replace(/\s+/g, '_')}.pdf`);
-    toast({ title: 'PDF generado', description: 'El documento se ha descargado correctamente.' });
+    const filename = `reserva-alquiler-${(validTenants[0]?.name || 'arrendatario').replace(/\s+/g, '_')}.pdf`;
+    doc.save(filename);
+    toast({ title: 'PDF generado', description: 'El recibo de reserva se ha descargado correctamente.' });
   };
 
   return (
