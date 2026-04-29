@@ -176,6 +176,22 @@ const TenantIncidents = () => {
         description: language === "es" ? "Tu incidencia ha sido enviada correctamente." : "Your incident has been submitted successfully.",
       });
 
+      // Notify owner via WhatsApp (manual send by tenant)
+      const ownerPhoneRaw = tenantInfo?.owner_phone;
+      if (ownerPhoneRaw) {
+        const ownerPhoneDigits = ownerPhoneRaw.startsWith("+")
+          ? ownerPhoneRaw.replace(/\D/g, "")
+          : `34${ownerPhoneRaw.replace(/\D/g, "")}`;
+        const ref = tenantInfo?.property_reference;
+        const catLabel = CATEGORIES.find((c) => c.value === category);
+        const catText = catLabel ? (language === "es" ? catLabel.label : catLabel.labelEn) : category;
+        const notifyMsg = language === "es"
+          ? `Hola, soy inquilino${ref ? ` de la propiedad ref. ${ref}` : ""}. He reportado una nueva incidencia:\n\n• Título: ${title.trim()}\n• Categoría: ${catText}\n• Descripción: ${description.trim()}\n\nPuedes verla en tu panel de incidencias.`
+          : `Hello, I'm a tenant${ref ? ` at property ref. ${ref}` : ""}. I have reported a new incident:\n\n• Title: ${title.trim()}\n• Category: ${catText}\n• Description: ${description.trim()}\n\nYou can view it in your incidents panel.`;
+        const waUrl = `https://api.whatsapp.com/send?phone=${ownerPhoneDigits}&text=${encodeURIComponent(notifyMsg)}`;
+        window.open(waUrl, "_blank");
+      }
+
       // Reset form
       setTitle("");
       setDescription("");
