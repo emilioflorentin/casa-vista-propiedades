@@ -727,11 +727,17 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className={`grid w-full ${(user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com') ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
               <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
               <TabsTrigger value="rented">Alquiladas</TabsTrigger>
               <TabsTrigger value="tenants">Inquilinos</TabsTrigger>
+              {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
+                <TabsTrigger value="documents">
+                  <FileSignature className="w-4 h-4 mr-1" />
+                  Generar documentación
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
