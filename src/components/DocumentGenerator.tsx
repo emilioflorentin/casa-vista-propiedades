@@ -163,36 +163,24 @@ const DocumentGenerator = () => {
     doc.setFillColor(253, 251, 247);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Vertical pale Spanish flag stripes on BOTH side edges (red - yellow - red), faint
+    // Vertical pale Spanish flag stripes on BOTH side edges (red - yellow - red)
+    // Red stripes use the same width as the yellow stripe.
     const drawSideFlag = (xLeft: number) => {
-      const stripeW = 4;
+      const stripeW = 1.6;
       const gap = 0.6;
       // outer red
       doc.setFillColor(247, 220, 222);
       doc.rect(xLeft, 0, stripeW, pageHeight, 'F');
-      // thin middle yellow
+      // middle yellow
       doc.setFillColor(252, 240, 205);
-      doc.rect(xLeft + stripeW + gap, 0, 1.6, pageHeight, 'F');
+      doc.rect(xLeft + stripeW + gap, 0, stripeW, pageHeight, 'F');
       // inner red
       doc.setFillColor(247, 220, 222);
-      doc.rect(xLeft + stripeW + gap + 1.6 + gap, 0, stripeW, pageHeight, 'F');
+      doc.rect(xLeft + (stripeW + gap) * 2, 0, stripeW, pageHeight, 'F');
     };
+    const flagBlockW = 1.6 * 3 + 0.6 * 2;
     drawSideFlag(4);
-    drawSideFlag(pageWidth - 4 - (4 + 0.6 + 1.6 + 0.6 + 4));
-
-    // Bottom-right corner emblem: small logo + tiny flag dot
-    if (logo) {
-      try {
-        const ratio = getLogoRatio();
-        const h = 22;
-        const w = h * ratio;
-        const x = pageWidth - 22 - w;
-        const y = pageHeight - 22 - h;
-        doc.addImage(logo, 'PNG', x, y, w, h);
-      } catch {
-        // ignore
-      }
-    }
+    drawSideFlag(pageWidth - 4 - flagBlockW);
   };
 
   const drawHeader = (doc: jsPDF, logo: string | null) => {
