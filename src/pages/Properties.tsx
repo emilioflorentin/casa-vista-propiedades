@@ -179,8 +179,11 @@ const Properties = () => {
   const allCombinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
 
   const filteredProperties = allCombinedProperties.filter((property) => {
-    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         property.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      property.title.toLowerCase().includes(q) ||
+      property.location.toLowerCase().includes(q) ||
+      (property.reference?.toLowerCase().includes(q) ?? false);
     const matchesType = propertyType === "all" || property.type === propertyType;
     const matchesOperation = operation === "all" || property.operation === operation;
     const matchesManagement = managedBy === "all" || property.managedBy === managedBy;
