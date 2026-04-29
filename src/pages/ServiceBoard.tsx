@@ -487,14 +487,6 @@ const ServiceBoard = () => {
     }
   };
 
-  const exportHistoryToExcel = () => {
-    void 0;
-  };
-
-  // placeholder to keep diff small — actual function below
-  const _exportPlaceholder = () => {
-  };
-
   const deleteHistoryRow = async () => {
     if (!deletingHistoryRow) return;
     if (deleteConfirmText.trim().toUpperCase() !== 'ELIMINAR') {
@@ -512,7 +504,7 @@ const ServiceBoard = () => {
     setDeleteConfirmText('');
   };
 
-  const exportHistoryToExcelReal = () => {
+  const exportHistoryToExcel = () => {
     if (historyData.length === 0) {
       toast({ title: 'Sin datos', description: 'No hay datos para exportar', variant: 'destructive' });
       return;
