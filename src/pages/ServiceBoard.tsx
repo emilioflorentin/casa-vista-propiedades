@@ -159,6 +159,8 @@ const ServiceBoard = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyPeriod, setHistoryPeriod] = useState<'week' | 'month' | 'all'>('month');
+  const [deletingHistoryRow, setDeletingHistoryRow] = useState<any | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Internal tasks state
   const [internalTasks, setInternalTasks] = useState<InternalTask[]>([]);
