@@ -914,9 +914,10 @@ const Account = () => {
                     <div className="aspect-video bg-stone-200 relative">
                       {property.image ? (
                         <img 
-                          src={property.image} 
+                          src={property.image.split(',')[0].trim()} 
                           alt={property.title}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -1024,9 +1025,10 @@ const Account = () => {
                     <div className="aspect-video bg-stone-200 relative">
                       {property.image ? (
                         <img 
-                          src={property.image} 
+                          src={property.image.split(',')[0].trim()} 
                           alt={property.title}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
