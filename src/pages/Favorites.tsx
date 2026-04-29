@@ -53,9 +53,9 @@ const Favorites = () => {
             bedrooms: p.bedrooms,
             bathrooms: p.bathrooms,
             area: Number(p.area),
-            image:
-              p.image ||
-              "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+            image: p.image
+              ? p.image.split(',')[0].trim()
+              : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
             features: p.features || [],
             description: p.description,
             isRented: p.is_rented,
