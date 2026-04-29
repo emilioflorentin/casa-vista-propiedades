@@ -466,94 +466,150 @@ const DocumentGenerator = () => {
 
     let y = 50;
 
-    // Title
+    // ===== Helpers (minimal style) =====
+    const INK = [40, 35, 30] as const;          // body text
+    const MUTED = [120, 110, 95] as const;      // labels / captions
+    const ACCENT = [180, 160, 130] as const;    // hairlines
+
+    const sectionLabel = (label: string) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      // Letter-spaced caption (manual tracking by adding hair spaces)
+      doc.text(label.toUpperCase().split('').join(' '), margin, y);
+      doc.setTextColor(...INK);
+      y += 3.5;
+      doc.setDrawColor(...ACCENT);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, margin + 18, y);
+      y += 4.5;
+    };
+
+    const bodyText = (text: string, opts: { width?: number; size?: number; bold?: boolean } = {}) => {
+      doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+      doc.setFontSize(opts.size ?? 10);
+      doc.setTextColor(...INK);
+      const lines = doc.splitTextToSize(text, opts.width ?? contentWidth);
+      doc.text(lines, margin, y);
+      y += lines.length * 5;
+    };
+
+    // Two-column row "label · value" used for amounts and dates
+    const fieldRow = (label: string, value: string) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...MUTED);
+      doc.text(label.toUpperCase(), margin, y);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      const lines = doc.splitTextToSize(value, contentWidth - 55);
+      doc.text(lines, margin + 55, y);
+      y += Math.max(lines.length * 5, 6);
+    };
+
+    // ===== Title =====
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...MUTED);
+    doc.text('RECIBO  ·  NAZARÍ HOMES', margin, y);
+    y += 5;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('RECIBO DE RESERVA DE ALQUILER — NAZARÍ HOMES', margin, y);
+    doc.setFontSize(15);
+    doc.setTextColor(...INK);
+    doc.text('Reserva de alquiler', margin, y);
+    y += 7;
+    doc.setDrawColor(...ACCENT);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
     y += 8;
 
-    // Property
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('INMUEBLE OBJETO DE RESERVA:', margin, y);
-    doc.setFont('helvetica', 'normal');
-    const propLine = `${propAddress.toUpperCase()}. CP: ${propPostalCode}. ${propMunicipality.toUpperCase()} (${propProvince.toUpperCase()}).`;
-    const propLines = doc.splitTextToSize(propLine, contentWidth - 60);
-    doc.text(propLines, margin + 60, y);
-    y += propLines.length * 5 + 4;
-
-    // Tenants
-    doc.setFont('helvetica', 'bold');
-    doc.text('EFECTÚAN LA RESERVA (ARRENDATARIOS*):', margin, y);
+    // ===== Property =====
+    sectionLabel('Inmueble');
+    bodyText(
+      `${propAddress}\n${propPostalCode} · ${propMunicipality} (${propProvince})`,
+      { size: 10.5 }
+    );
     y += 6;
+
+    // ===== Tenants =====
+    sectionLabel('Arrendatarios');
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...INK);
     validTenants.forEach((t) => {
-      doc.text(t.name.toUpperCase(), margin + 4, y);
-      doc.text(`DNI: ${t.dni.toUpperCase()}`, margin + contentWidth - 60, y);
-      y += 5.5;
+      doc.setFont('helvetica', 'bold');
+      doc.text(t.name, margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...MUTED);
+      doc.setFontSize(9);
+      doc.text(`DNI ${t.dni}`, pageWidth - margin, y, { align: 'right' });
+      doc.setTextColor(...INK);
+      doc.setFontSize(10);
+      y += 6;
     });
     y += 3;
 
-    // Reservation amount
-    doc.setFont('helvetica', 'bold');
-    doc.text('IMPORTE DE LA RESERVA:', margin, y);
-    y += 5.5;
-    doc.setFont('helvetica', 'normal');
-    const reservationLine = `Entregan la cantidad de ${reservation.letters} (${reservation.figures}).`;
-    const resLines = doc.splitTextToSize(reservationLine, contentWidth);
-    doc.text(resLines, margin, y);
-    y += resLines.length * 5 + 2;
-
-    // Conditions
-    const condText =
-      `CONDICIONES: La reserva se aplicará a la fianza descontándose de la misma una vez formalizado el contrato. ` +
-      `(FECHA INICIO ALQUILER: ${formatDateEs(rentalStartDate) || '__/__/____'}, FECHA FINALIZACIÓN: ${formatDateEs(rentalEndDate) || '__/__/____'}).\n` +
-      `    Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva o en caso de impago de los honorarios correspondientes por prestación de servicios G.I.A. (Gestión Integral del Alquiler) a la inmobiliaria interviniente. Los honorarios serán abonados el mismo día de realización de la reserva (fianza).`;
-    const condLines = doc.splitTextToSize(condText, contentWidth);
-    doc.text(condLines, margin, y);
-    y += condLines.length * 5 + 4;
-
-    // Contract sign date
-    doc.setFont('helvetica', 'bold');
-    doc.text('FECHA FIRMA DEL CONTRATO', margin, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`(${formatDateEs(contractSignDate) || '__/__/____'}).`, margin + 60, y);
-    y += 6;
-
-    // Deposit
-    doc.setFont('helvetica', 'bold');
-    doc.text('IMPORTE DE LA FIANZA:', margin, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${deposit.letters} (${deposit.figures}).`, margin + 50, y);
-    y += 6;
-
-    // Fees
-    doc.setFont('helvetica', 'bold');
-    doc.text('IMPORTE DE HONORARIOS (G.I.A.):', margin, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(feesText, margin + 65, y);
-    y += 6;
-
-    // Monthly rent
-    doc.setFont('helvetica', 'bold');
-    doc.text('PRECIO DEL ALQUILER:', margin, y);
-    doc.setFont('helvetica', 'normal');
-    const rentLine = `${rent.letters} MENSUALES (${rent.figures}).`;
-    const rentLines = doc.splitTextToSize(rentLine, contentWidth - 50);
-    doc.text(rentLines, margin + 50, y);
-    y += rentLines.length * 5 + 6;
-
-    // Sign place + date
-    doc.setFont('helvetica', 'bold');
-    doc.text(`EN ${(signProvince || propProvince).toUpperCase()} A ${day} DE ${month.toUpperCase()} DE ${year}`, pageWidth - margin, y, { align: 'right' });
-    y += 12;
-
-    // Signature columns: PROPIEDAD | ARRENDATARIOS
-    const colW = (contentWidth - 20) / 2;
+    // ===== Reservation amount =====
+    sectionLabel('Importe de la reserva');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('PROPIEDAD:', margin, y);
-    doc.text('ARRENDATARIOS*:', margin + 20 + colW, y);
+    doc.setTextColor(...INK);
+    doc.text(reservation.figures, margin, y);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    doc.text(`(${reservation.letters.toLowerCase()})`, margin + 35, y);
+    doc.setTextColor(...INK);
+    y += 8;
+
+    // ===== Conditions =====
+    sectionLabel('Condiciones');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...INK);
+    const condText =
+      `La reserva se aplicará a la fianza, descontándose de la misma una vez formalizado el contrato. ` +
+      `(Fecha inicio alquiler: ${formatDateEs(rentalStartDate) || '__/__/____'} · Fecha finalización: ${formatDateEs(rentalEndDate) || '__/__/____'}).\n\n` +
+      `Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva o en caso de impago de los honorarios correspondientes por prestación de servicios G.I.A. (Gestión Integral del Alquiler) a la inmobiliaria interviniente. Los honorarios serán abonados el mismo día de realización de la reserva (fianza).`;
+    const condLines = doc.splitTextToSize(condText, contentWidth);
+    doc.text(condLines, margin, y);
+    y += condLines.length * 4.7 + 8;
+
+    // ===== Summary fields =====
+    sectionLabel('Detalles del contrato');
+    fieldRow('Firma del contrato', formatDateEs(contractSignDate) || '__/__/____');
+    fieldRow('Importe de la fianza', `${deposit.figures}  ·  ${deposit.letters.toLowerCase()}`);
+    fieldRow('Honorarios (G.I.A.)', feesText);
+    fieldRow('Precio del alquiler', `${rent.figures} / mes  ·  ${rent.letters.toLowerCase()}`);
+
+    y += 6;
+    doc.setDrawColor(...ACCENT);
+    doc.setLineWidth(0.2);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // ===== Sign place + date =====
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...MUTED);
+    doc.text(
+      `En ${signProvince || propProvince}, a ${day} de ${month.toLowerCase()} de ${year}.`,
+      pageWidth - margin,
+      y,
+      { align: 'right' }
+    );
+    doc.setTextColor(...INK);
+    y += 14;
+
+    // Signature columns: Propiedad | Arrendatarios
+    const colW = (contentWidth - 20) / 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(120, 110, 95);
+    doc.text('P R O P I E D A D', margin, y);
+    doc.text('A R R E N D A T A R I O S', margin + 20 + colW, y);
+    doc.setTextColor(40, 35, 30);
     y += 4;
 
     // Nazarí signature on left
