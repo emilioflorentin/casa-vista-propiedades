@@ -9,6 +9,28 @@ import { Download, Eraser, FileText } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { useToast } from '@/hooks/use-toast';
 
+const LOGO_URL = '/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png';
+
+let cachedLogo: string | null = null;
+const loadLogoDataUrl = async (): Promise<string | null> => {
+  if (cachedLogo) return cachedLogo;
+  try {
+    const res = await fetch(LOGO_URL);
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        cachedLogo = reader.result as string;
+        resolve(cachedLogo);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+};
+
 type DocKind = 'consent' | 'reservation';
 
 const SignaturePad = ({ label, onChange }: { label: string; onChange: (d: string | null) => void }) => {
