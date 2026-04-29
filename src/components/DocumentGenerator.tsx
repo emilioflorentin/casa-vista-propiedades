@@ -9,6 +9,28 @@ import { Download, Eraser, FileText } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { useToast } from '@/hooks/use-toast';
 
+const LOGO_URL = '/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png';
+
+let cachedLogo: string | null = null;
+const loadLogoDataUrl = async (): Promise<string | null> => {
+  if (cachedLogo) return cachedLogo;
+  try {
+    const res = await fetch(LOGO_URL);
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        cachedLogo = reader.result as string;
+        resolve(cachedLogo);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+};
+
 type DocKind = 'consent' | 'reservation';
 
 const SignaturePad = ({ label, onChange }: { label: string; onChange: (d: string | null) => void }) => {
@@ -120,19 +142,69 @@ const DocumentGenerator = () => {
   const [salePrice, setSalePrice] = useState('');
   const [extraNotes, setExtraNotes] = useState('');
 
-  const drawHeader = (doc: jsPDF) => {
+  const drawBackground = (doc: jsPDF, logo: string | null) => {
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Cream paper background
+    doc.setFillColor(252, 250, 244);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    // Vertical Spanish flag stripe on the left edge (red-yellow-red)
+    const flagW = 6;
+    doc.setFillColor(198, 11, 30); // red top
+    doc.rect(0, 0, flagW, pageHeight / 4, 'F');
+    doc.setFillColor(255, 196, 0); // yellow middle (half height)
+    doc.rect(0, pageHeight / 4, flagW, pageHeight / 2, 'F');
+    doc.setFillColor(198, 11, 30); // red bottom
+    doc.rect(0, (pageHeight * 3) / 4, flagW, pageHeight / 4, 'F');
+
+    // Watermark logo (large, centered, very faint)
+    if (logo) {
+      const wmSize = 120;
+      try {
+        const gs = (doc as unknown as { GState: new (o: { opacity: number }) => unknown }).GState;
+        const setGState = (doc as unknown as { setGState: (s: unknown) => void }).setGState;
+        if (gs && setGState) {
+          setGState.call(doc, new gs({ opacity: 0.06 }));
+          doc.addImage(logo, 'PNG', (pageWidth - wmSize) / 2, (pageHeight - wmSize) / 2, wmSize, wmSize);
+          setGState.call(doc, new gs({ opacity: 1 }));
+        }
+      } catch {
+        // ignore watermark failures
+      }
+    }
+  };
+
+  const drawHeader = (doc: jsPDF, logo: string | null) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 22;
+
+    // Logo top-left
+    if (logo) {
+      try {
+        doc.addImage(logo, 'PNG', margin, 10, 22, 22);
+      } catch {
+        // ignore
+      }
+    }
+
+    // Brand block centered
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.setTextColor(60, 50, 35);
-    doc.text('NAZARÍ HOMES', pageWidth / 2, 18, { align: 'center' });
+    doc.text('NAZARÍ HOMES', pageWidth / 2, 19, { align: 'center' });
     doc.setFont('helvetica', 'italic');
-    doc.setFontSize(10);
-    doc.setTextColor(120, 110, 95);
-    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 24, { align: 'center' });
+    doc.setFontSize(9);
+    doc.setTextColor(140, 120, 95);
+    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 25, { align: 'center' });
+
+    // Decorative double line
     doc.setDrawColor(180, 160, 130);
     doc.setLineWidth(0.6);
-    doc.line(20, 28, pageWidth - 20, 28);
+    doc.line(margin, 34, pageWidth - margin, 34);
+    doc.setLineWidth(0.2);
+    doc.line(margin, 35.5, pageWidth - margin, 35.5);
     doc.setTextColor(0);
   };
 
@@ -149,7 +221,7 @@ const DocumentGenerator = () => {
     doc.setTextColor(0);
   };
 
-  const generateConsentPdf = () => {
+  const generateConsentPdf = async () => {
     if (!propAddress.trim() || !propPostalCode.trim() || !propMunicipality.trim() || !propProvince.trim()) {
       toast({ title: 'Faltan datos', description: 'Completa la dirección de la propiedad.', variant: 'destructive' });
       return;
@@ -159,7 +231,7 @@ const DocumentGenerator = () => {
       return;
     }
     if (!signature) {
-      toast({ title: 'Falta la firma', description: 'Dibuja la firma antes de generar el PDF.', variant: 'destructive' });
+      toast({ title: 'Falta la firma', description: 'Dibuja la firma de Nazarí Homes antes de generar el PDF.', variant: 'destructive' });
       return;
     }
 
@@ -168,9 +240,11 @@ const DocumentGenerator = () => {
     const margin = 22;
     const contentWidth = pageWidth - margin * 2;
 
-    drawHeader(doc);
+    const logo = await loadLogoDataUrl();
+    drawBackground(doc, logo);
+    drawHeader(doc, logo);
 
-    let y = 40;
+    let y = 46;
 
     // Title
     doc.setFont('helvetica', 'bold');
@@ -244,9 +318,9 @@ const DocumentGenerator = () => {
     doc.text('EL INTERESADO', margin + 20 + colW + colW / 2, y, { align: 'center' });
     y += 4;
 
-    // Right side: client signature
+    // Left side: NAZARÍ HOMES signature (drawn from canvas)
     try {
-      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
+      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
     } catch {
       // ignore
     }
@@ -256,6 +330,13 @@ const DocumentGenerator = () => {
     doc.setLineWidth(0.3);
     doc.line(margin, y, margin + colW, y);
     doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
+    y += 4;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
+    doc.text('Firma manuscrita del interesado', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setTextColor(0);
 
     drawFooter(doc);
 
@@ -263,13 +344,13 @@ const DocumentGenerator = () => {
     toast({ title: 'PDF generado', description: 'El consentimiento se ha descargado correctamente.' });
   };
 
-  const generateReservationPdf = () => {
+  const generateReservationPdf = async () => {
     if (!clientName.trim() || !clientDni.trim()) {
       toast({ title: 'Faltan datos', description: 'Indica nombre y DNI/NIE del cliente.', variant: 'destructive' });
       return;
     }
     if (!signature) {
-      toast({ title: 'Falta la firma', description: 'Dibuja la firma antes de generar el PDF.', variant: 'destructive' });
+      toast({ title: 'Falta la firma', description: 'Dibuja la firma de Nazarí Homes antes de generar el PDF.', variant: 'destructive' });
       return;
     }
 
@@ -278,9 +359,11 @@ const DocumentGenerator = () => {
     const margin = 22;
     const contentWidth = pageWidth - margin * 2;
 
-    drawHeader(doc);
+    const logo = await loadLogoDataUrl();
+    drawBackground(doc, logo);
+    drawHeader(doc, logo);
 
-    let y = 40;
+    let y = 46;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.text('DOCUMENTO DE RESERVA', margin, y);
@@ -316,8 +399,9 @@ const DocumentGenerator = () => {
     doc.text('EL RESERVANTE', margin + 20 + colW + colW / 2, y, { align: 'center' });
     y += 4;
 
+    // Left side: NAZARÍ HOMES signature
     try {
-      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
+      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
     } catch {
       // ignore
     }
@@ -328,7 +412,10 @@ const DocumentGenerator = () => {
     y += 5;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW, y);
+    doc.setTextColor(120);
+    doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
+    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setTextColor(0);
 
     drawFooter(doc);
 
@@ -401,7 +488,7 @@ const DocumentGenerator = () => {
                 </div>
               </div>
 
-              <SignaturePad label="Firma del interesado *" onChange={setSignature} />
+              <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
                 <Button onClick={generateConsentPdf} className="bg-stone-700 hover:bg-stone-600">
@@ -452,7 +539,7 @@ const DocumentGenerator = () => {
                 </div>
               </div>
 
-              <SignaturePad label="Firma del reservante *" onChange={setSignature} />
+              <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
                 <Button onClick={generateReservationPdf} className="bg-stone-700 hover:bg-stone-600">
