@@ -519,7 +519,7 @@ const ServiceBoard = () => {
       'Ubicación': h.property_location || '',
       'Inquilino': h.tenant_name || '',
       'Teléfono inquilino': h.tenant_phone || '',
-      'Coste arreglo (€)': Number(h.repair_cost) || 0,
+      'Traslado (€)': Number(h.repair_cost) || 0,
       'Materiales (€)': Number(h.materials_cost) || 0,
       'Coste total (€)': Number(h.total_cost) || 0,
       'Cobro (€)': Number(h.charge_amount) || 0,
@@ -1855,7 +1855,7 @@ const ServiceBoard = () => {
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
                     <Input
                       type="number"
                       min="0"
@@ -2155,7 +2155,7 @@ const ServiceBoard = () => {
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
                     <Input
                       type="number"
                       min="0"
