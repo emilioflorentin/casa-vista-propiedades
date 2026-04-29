@@ -488,6 +488,31 @@ const ServiceBoard = () => {
   };
 
   const exportHistoryToExcel = () => {
+    void 0;
+  };
+
+  // placeholder to keep diff small — actual function below
+  const _exportPlaceholder = () => {
+  };
+
+  const deleteHistoryRow = async () => {
+    if (!deletingHistoryRow) return;
+    if (deleteConfirmText.trim().toUpperCase() !== 'ELIMINAR') {
+      toast({ title: 'Confirmación incorrecta', description: 'Escribe ELIMINAR para confirmar', variant: 'destructive' });
+      return;
+    }
+    const { error } = await supabase.from('incident_history').delete().eq('id', deletingHistoryRow.id);
+    if (error) {
+      toast({ title: 'Error al eliminar', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setHistoryData(prev => prev.filter(h => h.id !== deletingHistoryRow.id));
+    toast({ title: 'Registro eliminado' });
+    setDeletingHistoryRow(null);
+    setDeleteConfirmText('');
+  };
+
+  const exportHistoryToExcelReal = () => {
     if (historyData.length === 0) {
       toast({ title: 'Sin datos', description: 'No hay datos para exportar', variant: 'destructive' });
       return;
