@@ -150,6 +150,11 @@ const DocumentGenerator = () => {
   // Reservation extra fields
   const [clientName, setClientName] = useState('');
   const [clientDni, setClientDni] = useState('');
+  // Consent: parties (interesado / avalista)
+  const [interestedName, setInterestedName] = useState('');
+  const [interestedDni, setInterestedDni] = useState('');
+  const [guarantorName, setGuarantorName] = useState('');
+  const [guarantorDni, setGuarantorDni] = useState('');
   const [propertyRef, setPropertyRef] = useState('');
   const [reservationAmount, setReservationAmount] = useState('');
   const [salePrice, setSalePrice] = useState('');
