@@ -1855,7 +1855,7 @@ const ServiceBoard = () => {
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
                     <Input
                       type="number"
                       min="0"
@@ -2155,7 +2155,7 @@ const ServiceBoard = () => {
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs text-blue-700">Coste arreglo (€)</Label>
+                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
                     <Input
                       type="number"
                       min="0"
