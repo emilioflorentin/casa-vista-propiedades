@@ -184,7 +184,7 @@ const TenantIncidents = () => {
           : `34${ownerPhoneRaw.replace(/\D/g, "")}`;
         const ref = tenantInfo?.property_reference;
         const catLabel = CATEGORIES.find((c) => c.value === category);
-        const catText = catLabel ? (language === "es" ? catLabel.label_es : catLabel.label_en) : category;
+        const catText = catLabel ? (language === "es" ? catLabel.label : catLabel.labelEn) : category;
         const notifyMsg = language === "es"
           ? `Hola, soy inquilino${ref ? ` de la propiedad ref. ${ref}` : ""}. He reportado una nueva incidencia:\n\n• Título: ${title.trim()}\n• Categoría: ${catText}\n• Descripción: ${description.trim()}\n\nPuedes verla en tu panel de incidencias.`
           : `Hello, I'm a tenant${ref ? ` at property ref. ${ref}` : ""}. I have reported a new incident:\n\n• Title: ${title.trim()}\n• Category: ${catText}\n• Description: ${description.trim()}\n\nYou can view it in your incidents panel.`;
