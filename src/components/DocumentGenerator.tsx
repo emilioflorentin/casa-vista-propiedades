@@ -221,7 +221,7 @@ const DocumentGenerator = () => {
     doc.setTextColor(0);
   };
 
-  const generateConsentPdf = () => {
+  const generateConsentPdf = async () => {
     if (!propAddress.trim() || !propPostalCode.trim() || !propMunicipality.trim() || !propProvince.trim()) {
       toast({ title: 'Faltan datos', description: 'Completa la dirección de la propiedad.', variant: 'destructive' });
       return;
@@ -231,7 +231,7 @@ const DocumentGenerator = () => {
       return;
     }
     if (!signature) {
-      toast({ title: 'Falta la firma', description: 'Dibuja la firma antes de generar el PDF.', variant: 'destructive' });
+      toast({ title: 'Falta la firma', description: 'Dibuja la firma de Nazarí Homes antes de generar el PDF.', variant: 'destructive' });
       return;
     }
 
@@ -240,9 +240,11 @@ const DocumentGenerator = () => {
     const margin = 22;
     const contentWidth = pageWidth - margin * 2;
 
-    drawHeader(doc);
+    const logo = await loadLogoDataUrl();
+    drawBackground(doc, logo);
+    drawHeader(doc, logo);
 
-    let y = 40;
+    let y = 46;
 
     // Title
     doc.setFont('helvetica', 'bold');
@@ -316,9 +318,9 @@ const DocumentGenerator = () => {
     doc.text('EL INTERESADO', margin + 20 + colW + colW / 2, y, { align: 'center' });
     y += 4;
 
-    // Right side: client signature
+    // Left side: NAZARÍ HOMES signature (drawn from canvas)
     try {
-      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
+      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
     } catch {
       // ignore
     }
@@ -328,6 +330,13 @@ const DocumentGenerator = () => {
     doc.setLineWidth(0.3);
     doc.line(margin, y, margin + colW, y);
     doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
+    y += 4;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
+    doc.text('Firma manuscrita del interesado', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setTextColor(0);
 
     drawFooter(doc);
 
@@ -335,13 +344,13 @@ const DocumentGenerator = () => {
     toast({ title: 'PDF generado', description: 'El consentimiento se ha descargado correctamente.' });
   };
 
-  const generateReservationPdf = () => {
+  const generateReservationPdf = async () => {
     if (!clientName.trim() || !clientDni.trim()) {
       toast({ title: 'Faltan datos', description: 'Indica nombre y DNI/NIE del cliente.', variant: 'destructive' });
       return;
     }
     if (!signature) {
-      toast({ title: 'Falta la firma', description: 'Dibuja la firma antes de generar el PDF.', variant: 'destructive' });
+      toast({ title: 'Falta la firma', description: 'Dibuja la firma de Nazarí Homes antes de generar el PDF.', variant: 'destructive' });
       return;
     }
 
@@ -350,9 +359,11 @@ const DocumentGenerator = () => {
     const margin = 22;
     const contentWidth = pageWidth - margin * 2;
 
-    drawHeader(doc);
+    const logo = await loadLogoDataUrl();
+    drawBackground(doc, logo);
+    drawHeader(doc, logo);
 
-    let y = 40;
+    let y = 46;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.text('DOCUMENTO DE RESERVA', margin, y);
@@ -388,8 +399,9 @@ const DocumentGenerator = () => {
     doc.text('EL RESERVANTE', margin + 20 + colW + colW / 2, y, { align: 'center' });
     y += 4;
 
+    // Left side: NAZARÍ HOMES signature
     try {
-      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
+      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
     } catch {
       // ignore
     }
@@ -400,7 +412,10 @@ const DocumentGenerator = () => {
     y += 5;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW, y);
+    doc.setTextColor(120);
+    doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
+    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setTextColor(0);
 
     drawFooter(doc);
 
