@@ -702,12 +702,86 @@ const PropertyDetail = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="border-stone-300 text-stone-600 hover:bg-stone-50">
-                    <Heart className="h-4 w-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-stone-300 text-stone-600 hover:bg-stone-50"
+                    onClick={() => {
+                      toggleFavorite(property.id);
+                      toast({
+                        title: isFavorite(property.id)
+                          ? "Eliminado de favoritos"
+                          : "Añadido a favoritos",
+                      });
+                    }}
+                    aria-label="Favorito"
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${isFavorite(property.id) ? "fill-red-500 text-red-500" : ""}`}
+                    />
                   </Button>
-                  <Button variant="outline" size="sm" className="border-stone-300 text-stone-600 hover:bg-stone-50">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-stone-300 text-stone-600 hover:bg-stone-50"
+                        aria-label="Compartir"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white z-50">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const text = `${property.title} - Ref ${property.reference}: ${displayLink}`;
+                          window.open(
+                            `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,
+                            "_blank"
+                          );
+                        }}
+                      >
+                        <Send className="h-4 w-4 mr-2" /> WhatsApp
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const subject = `${property.title} - Ref ${property.reference}`;
+                          const body = `${property.title}\n\n${displayLink}`;
+                          window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                        }}
+                      >
+                        <Mail className="h-4 w-4 mr-2" /> Correo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(displayLink);
+                            toast({
+                              title: "Enlace copiado",
+                              description: "Pégalo en tu historia o mensaje de Instagram",
+                            });
+                          } catch {
+                            toast({ title: "No se pudo copiar el enlace", variant: "destructive" });
+                          }
+                          window.open("https://www.instagram.com/", "_blank");
+                        }}
+                      >
+                        <Instagram className="h-4 w-4 mr-2" /> Instagram
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(displayLink);
+                            toast({ title: "Enlace copiado" });
+                          } catch {
+                            toast({ title: "No se pudo copiar el enlace", variant: "destructive" });
+                          }
+                        }}
+                      >
+                        <Copy className="h-4 w-4 mr-2" /> Copiar enlace
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
