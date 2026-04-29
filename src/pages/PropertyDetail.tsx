@@ -33,6 +33,7 @@ const PropertyDetail = () => {
     message: ""
   });
   const [whatsappMessage, setWhatsappMessage] = useState("");
+  const [shortUrl, setShortUrl] = useState<string>("");
   const [reservationData, setReservationData] = useState({
     fullName: "",
     email: "",
