@@ -125,6 +125,7 @@ const PropertyDetail = () => {
         if (localProperty) {
           foundProperty = {
             id: Number(localProperty.id),
+            originalId: localProperty.id,
             title: localProperty.title,
             price: localProperty.price,
             currency: localProperty.currency,
