@@ -11,12 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 type DocKind = 'consent' | 'reservation';
 
-interface SignaturePadProps {
-  label: string;
-  onChange: (dataUrl: string | null) => void;
-}
-
-const SignaturePad = ({ label, onChange }: SignaturePadProps) => {
+const SignaturePad = ({ label, onChange }: { label: string; onChange: (d: string | null) => void }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
   const lastRef = useRef<{ x: number; y: number } | null>(null);
@@ -47,7 +42,6 @@ const SignaturePad = ({ label, onChange }: SignaturePadProps) => {
     lastRef.current = getPos(e);
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
-
   const move = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!drawingRef.current) return;
     const ctx = canvasRef.current!.getContext('2d')!;
@@ -58,14 +52,11 @@ const SignaturePad = ({ label, onChange }: SignaturePadProps) => {
     ctx.stroke();
     lastRef.current = pos;
   };
-
   const end = () => {
     if (!drawingRef.current) return;
     drawingRef.current = false;
-    const canvas = canvasRef.current!;
-    onChange(canvas.toDataURL('image/png'));
+    onChange(canvasRef.current!.toDataURL('image/png'));
   };
-
   const clear = () => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
@@ -96,39 +87,183 @@ const SignaturePad = ({ label, onChange }: SignaturePadProps) => {
   );
 };
 
-const todayISO = () => new Date().toISOString().split('T')[0];
+const todayParts = () => {
+  const d = new Date();
+  return {
+    day: String(d.getDate()).padStart(2, '0'),
+    month: d.toLocaleDateString('es-ES', { month: 'long' }),
+    year: String(d.getFullYear()),
+  };
+};
 
 const DocumentGenerator = () => {
   const { toast } = useToast();
   const [kind, setKind] = useState<DocKind>('consent');
 
-  // Shared / Consent fields
-  const [clientName, setClientName] = useState('');
-  const [clientDni, setClientDni] = useState('');
-  const [place, setPlace] = useState('');
-  const [docDate, setDocDate] = useState(todayISO());
+  // Consent fields (matching [brackets] in the template)
+  const t0 = todayParts();
+  const [propAddress, setPropAddress] = useState('');
+  const [propPostalCode, setPropPostalCode] = useState('');
+  const [propMunicipality, setPropMunicipality] = useState('');
+  const [propProvince, setPropProvince] = useState('');
+  const [signProvince, setSignProvince] = useState('');
+  const [day, setDay] = useState(t0.day);
+  const [month, setMonth] = useState(t0.month);
+  const [year, setYear] = useState(t0.year);
   const [signature, setSignature] = useState<string | null>(null);
 
   // Reservation extra fields
+  const [clientName, setClientName] = useState('');
+  const [clientDni, setClientDni] = useState('');
   const [propertyRef, setPropertyRef] = useState('');
-  const [propertyAddress, setPropertyAddress] = useState('');
   const [reservationAmount, setReservationAmount] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [extraNotes, setExtraNotes] = useState('');
 
-  const formatDate = (iso: string) => {
-    if (!iso) return '';
-    const d = new Date(iso);
-    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+  const drawHeader = (doc: jsPDF) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(60, 50, 35);
+    doc.text('NAZARÍ HOMES', pageWidth / 2, 18, { align: 'center' });
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(120, 110, 95);
+    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 24, { align: 'center' });
+    doc.setDrawColor(180, 160, 130);
+    doc.setLineWidth(0.6);
+    doc.line(20, 28, pageWidth - 20, 28);
+    doc.setTextColor(0);
   };
 
-  const addWrapped = (doc: jsPDF, text: string, x: number, y: number, maxWidth: number, lineHeight = 6) => {
-    const lines = doc.splitTextToSize(text, maxWidth);
-    doc.text(lines, x, y);
-    return y + lines.length * lineHeight;
+  const drawFooter = (doc: jsPDF) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(180, 160, 130);
+    doc.setLineWidth(0.4);
+    doc.line(20, pageHeight - 15, pageWidth - 20, pageHeight - 15);
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.setFont('helvetica', 'normal');
+    doc.text('NAZARÍ HOMES · info@nazarihomes.com', pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.setTextColor(0);
   };
 
-  const generatePdf = () => {
+  const generateConsentPdf = () => {
+    if (!propAddress.trim() || !propPostalCode.trim() || !propMunicipality.trim() || !propProvince.trim()) {
+      toast({ title: 'Faltan datos', description: 'Completa la dirección de la propiedad.', variant: 'destructive' });
+      return;
+    }
+    if (!signProvince.trim() || !day || !month || !year) {
+      toast({ title: 'Faltan datos', description: 'Indica provincia y fecha de firma.', variant: 'destructive' });
+      return;
+    }
+    if (!signature) {
+      toast({ title: 'Falta la firma', description: 'Dibuja la firma antes de generar el PDF.', variant: 'destructive' });
+      return;
+    }
+
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 22;
+    const contentWidth = pageWidth - margin * 2;
+
+    drawHeader(doc);
+
+    let y = 40;
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('CLÁUSULA DE CONSENTIMIENTO EXPRESO DE CLIENTES ARRENDATARIOS', margin, y, { maxWidth: contentWidth });
+    y += 10;
+
+    // Property line (highlighted)
+    doc.setFillColor(248, 244, 235);
+    doc.setDrawColor(200, 180, 145);
+    const propLine = `${propAddress.toUpperCase()} | ${propPostalCode} | ${propMunicipality.toUpperCase()} | ${propProvince.toUpperCase()}`;
+    const propLines = doc.splitTextToSize(propLine, contentWidth - 6);
+    const boxH = propLines.length * 5.5 + 6;
+    doc.roundedRect(margin, y, contentWidth, boxH, 1.5, 1.5, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(60, 50, 35);
+    doc.text(propLines, margin + 3, y + 6);
+    doc.setTextColor(0);
+    y += boxH + 8;
+
+    // Intro paragraph
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const intro =
+      'En aras a dar cumplimiento al Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, ' +
+      'de 27 de abril de 2016, relativo a la protección de las personas físicas en lo que respecta al ' +
+      'tratamiento de datos personales y a la libre circulación de estos datos, y siguiendo las ' +
+      'Recomendaciones e Instrucciones emitidas por la Agencia Española de Protección de Datos (A.E.P.D.), ' +
+      'SE INFORMA:';
+    const introLines = doc.splitTextToSize(intro, contentWidth);
+    doc.text(introLines, margin, y);
+    y += introLines.length * 5 + 4;
+
+    // Bullet points
+    const bullets = [
+      'Los datos de carácter personal solicitados y facilitados por usted, son incorporados a un fichero de titularidad privada cuyo responsable y único destinatario es Nazarí Homes.',
+      'Solo serán solicitados aquellos datos estrictamente necesarios para prestar adecuadamente los servicios solicitados, pudiendo ser necesario recoger datos de contacto de terceros, tales como representantes legales, tutores, o personas a cargo designadas por los mismos.',
+      'Todos los datos recogidos cuentan con el compromiso de confidencialidad, con las medidas de seguridad establecidas legalmente, y bajo ningún concepto son cedidos o tratados por terceras personas, físicas o jurídicas, sin el previo consentimiento del cliente, tutor o representante legal, salvo en aquellos casos en los que fuere imprescindible para la correcta prestación del servicio.',
+      'Una vez finalizada la relación entre la empresa y el cliente los datos serán archivados y conservados durante un periodo MÍNIMO DE 5 AÑOS Y MÁXIMO DE 10 AÑOS.',
+      'Los datos que facilito serán incluidos en el Tratamiento denominado Clientes de Nazarí Homes, con la finalidad de gestión del servicio contratado, emisión de facturas, contacto y todas las gestiones relacionadas con los clientes, y manifiesto mi consentimiento. También se me ha informado de la posibilidad de ejercitar los derechos de acceso, rectificación, cancelación y oposición, indicándolo por escrito a Nazarí Homes a través de correo electrónico a info@nazarihomes.com.',
+      'Los datos personales podrán ser cedidos por Nazarí Homes a las entidades que prestan servicios a la misma.',
+    ];
+
+    for (const b of bullets) {
+      const lines = doc.splitTextToSize(b, contentWidth - 6);
+      doc.setFont('helvetica', 'bold');
+      doc.text('•', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(lines, margin + 4, y);
+      y += lines.length * 5 + 2.5;
+    }
+
+    y += 4;
+    doc.setDrawColor(200, 180, 145);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // Date line
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(`EN ${signProvince.toUpperCase()} A ${day} DE ${month.toUpperCase()} DE ${year}`, margin, y);
+    y += 14;
+
+    // Signature columns
+    const colW = (contentWidth - 20) / 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
+    doc.text('EL INTERESADO', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    y += 4;
+
+    // Right side: client signature
+    try {
+      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
+    } catch {
+      // ignore
+    }
+    y += 32;
+
+    doc.setDrawColor(120);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, margin + colW, y);
+    doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
+
+    drawFooter(doc);
+
+    doc.save(`consentimiento-datos-${propMunicipality.replace(/\s+/g, '_') || 'cliente'}.pdf`);
+    toast({ title: 'PDF generado', description: 'El consentimiento se ha descargado correctamente.' });
+  };
+
+  const generateReservationPdf = () => {
     if (!clientName.trim() || !clientDni.trim()) {
       toast({ title: 'Faltan datos', description: 'Indica nombre y DNI/NIE del cliente.', variant: 'destructive' });
       return;
@@ -140,102 +275,64 @@ const DocumentGenerator = () => {
 
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
+    const margin = 22;
     const contentWidth = pageWidth - margin * 2;
 
-    // Header
+    drawHeader(doc);
+
+    let y = 40;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text('NAZARÍ HOMES', margin, 20);
+    doc.setFontSize(13);
+    doc.text('DOCUMENTO DE RESERVA', margin, y);
+    y += 10;
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text('Gestión integral de propiedades', margin, 26);
-    doc.setDrawColor(180);
-    doc.line(margin, 30, pageWidth - margin, 30);
 
-    let y = 42;
+    const amountTxt = reservationAmount ? `${Number(reservationAmount).toLocaleString('es-ES')} €` : '________ €';
+    const priceTxt = salePrice ? `${Number(salePrice).toLocaleString('es-ES')} €` : '________ €';
 
-    if (kind === 'consent') {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.text('CONSENTIMIENTO DE TRATAMIENTO DE DATOS', margin, y);
-      y += 10;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
+    const body =
+      `D./Dña. ${clientName}, con DNI/NIE ${clientDni} (en adelante, "el Reservante"), manifiesta su ` +
+      `interés en reservar la propiedad identificada con referencia ${propertyRef || '________'}, ` +
+      `sita en ${propAddress || '________________'}, ${propPostalCode || ''} ${propMunicipality || ''} (${propProvince || ''}).\n\n` +
+      `A tal efecto entrega en este acto, en concepto de señal de reserva, la cantidad de ${amountTxt}, ` +
+      `que será descontada del precio total de la operación, fijado en ${priceTxt}.\n\n` +
+      `La presente reserva queda sujeta a la formalización del contrato definitivo entre las partes en el ` +
+      `plazo acordado. En caso de desistimiento por parte del Reservante, el importe entregado quedará en ` +
+      `poder de NAZARÍ HOMES en concepto de indemnización por gastos de gestión.` +
+      (extraNotes ? `\n\nObservaciones: ${extraNotes}` : '');
 
-      const body =
-        `D./Dña. ${clientName}, con DNI/NIE ${clientDni}, declara haber sido informado/a por NAZARÍ HOMES ` +
-        `sobre el tratamiento de sus datos personales conforme al Reglamento (UE) 2016/679 (RGPD) y a la ` +
-        `Ley Orgánica 3/2018, de Protección de Datos Personales y garantía de los derechos digitales.\n\n` +
-        `Mediante la firma del presente documento OTORGA SU CONSENTIMIENTO EXPRESO para que NAZARÍ HOMES ` +
-        `trate sus datos con las siguientes finalidades: gestión de la relación contractual, prestación de ` +
-        `servicios de intermediación inmobiliaria, gestión integral de la propiedad, comunicaciones ` +
-        `relativas al servicio y cumplimiento de las obligaciones legales aplicables.\n\n` +
-        `El interesado puede ejercitar en cualquier momento sus derechos de acceso, rectificación, supresión, ` +
-        `oposición, limitación del tratamiento y portabilidad dirigiendo una comunicación a info@nazarihomes.com.`;
+    const lines = doc.splitTextToSize(body, contentWidth);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 8;
 
-      y = addWrapped(doc, body, margin, y, contentWidth, 5.5);
-    } else {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.text('DOCUMENTO DE RESERVA', margin, y);
-      y += 10;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`En ${signProvince || '________'} a ${day} de ${month} de ${year}.`, margin, y);
+    y += 14;
 
-      const amountTxt = reservationAmount ? `${Number(reservationAmount).toLocaleString('es-ES')} €` : '________ €';
-      const priceTxt = salePrice ? `${Number(salePrice).toLocaleString('es-ES')} €` : '________ €';
+    const colW = (contentWidth - 20) / 2;
+    doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
+    doc.text('EL RESERVANTE', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    y += 4;
 
-      const body =
-        `D./Dña. ${clientName}, con DNI/NIE ${clientDni} (en adelante, "el Reservante"), manifiesta su ` +
-        `interés en reservar la propiedad identificada con referencia ${propertyRef || '________'}, ` +
-        `sita en ${propertyAddress || '________________'}.\n\n` +
-        `A tal efecto entrega en este acto, en concepto de señal de reserva, la cantidad de ${amountTxt}, ` +
-        `que será descontada del precio total de la operación, fijado en ${priceTxt}.\n\n` +
-        `La presente reserva queda sujeta a la formalización del contrato definitivo entre las partes en el ` +
-        `plazo acordado. En caso de desistimiento por parte del Reservante, el importe entregado quedará en ` +
-        `poder de NAZARÍ HOMES en concepto de indemnización por gastos de gestión.\n\n` +
-        (extraNotes ? `Observaciones: ${extraNotes}\n\n` : '');
-
-      y = addWrapped(doc, body, margin, y, contentWidth, 5.5);
-    }
-
-    y += 6;
-    doc.setFont('helvetica', 'italic');
-    doc.text(`En ${place || '________'}, a ${formatDate(docDate)}.`, margin, y);
-    y += 18;
-
-    // Signature
-    doc.setFont('helvetica', 'normal');
-    doc.text('Firma del cliente:', margin, y);
     try {
-      doc.addImage(signature, 'PNG', margin, y + 2, 70, 28);
+      doc.addImage(signature, 'PNG', margin + 20 + colW + (colW - 60) / 2, y, 60, 28);
     } catch {
       // ignore
     }
-    y += 34;
+    y += 32;
     doc.setDrawColor(120);
-    doc.line(margin, y, margin + 70, y);
+    doc.line(margin, y, margin + colW, y);
+    doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
     y += 5;
     doc.setFontSize(9);
-    doc.text(`${clientName} — ${clientDni}`, margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW, y);
 
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(120);
-    doc.text(
-      'NAZARÍ HOMES · info@nazarihomes.com',
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    drawFooter(doc);
 
-    const filename =
-      kind === 'consent'
-        ? `consentimiento-datos-${clientName.replace(/\s+/g, '_')}.pdf`
-        : `reserva-${propertyRef || 'propiedad'}-${clientName.replace(/\s+/g, '_')}.pdf`;
-    doc.save(filename);
-
+    doc.save(`reserva-${propertyRef || 'propiedad'}-${clientName.replace(/\s+/g, '_')}.pdf`);
     toast({ title: 'PDF generado', description: 'El documento se ha descargado correctamente.' });
   };
 
@@ -243,7 +340,7 @@ const DocumentGenerator = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-stone-800">Generar documentación</h2>
-        <p className="text-stone-600">Rellena los campos y descarga el PDF firmado.</p>
+        <p className="text-stone-600">Rellena los campos marcados y descarga el PDF firmado.</p>
       </div>
 
       <Tabs value={kind} onValueChange={(v) => setKind(v as DocKind)}>
@@ -252,36 +349,90 @@ const DocumentGenerator = () => {
           <TabsTrigger value="reservation">Reserva de contrato</TabsTrigger>
         </TabsList>
 
-        <Card className="mt-4 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6 space-y-5">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="clientName">Nombre completo *</Label>
-                <Input id="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan Pérez García" />
+        {/* CONSENT TAB */}
+        <TabsContent value="consent" className="mt-4">
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6 space-y-5">
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Dirección de la propiedad
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="propAddress">Dirección exacta *</Label>
+                    <Input id="propAddress" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="Calle Mayor, 12, 2ºB" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="propPostalCode">Código postal *</Label>
+                    <Input id="propPostalCode" value={propPostalCode} onChange={(e) => setPropPostalCode(e.target.value)} placeholder="18001" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="propMunicipality">Municipio *</Label>
+                    <Input id="propMunicipality" value={propMunicipality} onChange={(e) => setPropMunicipality(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="propProvince">Provincia *</Label>
+                    <Input id="propProvince" value={propProvince} onChange={(e) => setPropProvince(e.target.value)} />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="clientDni">DNI / NIE *</Label>
-                <Input id="clientDni" value={clientDni} onChange={(e) => setClientDni(e.target.value)} placeholder="12345678A" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="place">Lugar</Label>
-                <Input id="place" value={place} onChange={(e) => setPlace(e.target.value)} placeholder="Ciudad" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="docDate">Fecha</Label>
-                <Input id="docDate" type="date" value={docDate} onChange={(e) => setDocDate(e.target.value)} />
-              </div>
-            </div>
 
-            <TabsContent value="reservation" className="m-0 p-0 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Lugar y fecha de firma
+                </h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="signProvince">Provincia firma *</Label>
+                    <Input id="signProvince" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="day">Día *</Label>
+                    <Input id="day" value={day} onChange={(e) => setDay(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="month">Mes *</Label>
+                    <Input id="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="year">Año *</Label>
+                    <Input id="year" value={year} onChange={(e) => setYear(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              <SignaturePad label="Firma del interesado *" onChange={setSignature} />
+
+              <div className="flex justify-end pt-2">
+                <Button onClick={generateConsentPdf} className="bg-stone-700 hover:bg-stone-600">
+                  <Download className="w-4 h-4 mr-2" />
+                  Descargar PDF
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* RESERVATION TAB */}
+        <TabsContent value="reservation" className="mt-4">
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6 space-y-5">
               <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="clientName">Nombre completo *</Label>
+                  <Input id="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan Pérez García" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clientDni">DNI / NIE *</Label>
+                  <Input id="clientDni" value={clientDni} onChange={(e) => setClientDni(e.target.value)} placeholder="12345678A" />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="propRef">Referencia propiedad</Label>
                   <Input id="propRef" value={propertyRef} onChange={(e) => setPropertyRef(e.target.value)} placeholder="ABC12345" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="propAddr">Dirección propiedad</Label>
-                  <Input id="propAddr" value={propertyAddress} onChange={(e) => setPropertyAddress(e.target.value)} placeholder="Calle, nº, ciudad" />
+                  <Label htmlFor="propAddrR">Dirección propiedad</Label>
+                  <Input id="propAddrR" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="Calle, nº" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="resAmount">Importe reserva (€)</Label>
@@ -291,23 +442,27 @@ const DocumentGenerator = () => {
                   <Label htmlFor="salePrice">Precio total (€)</Label>
                   <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="180000" />
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="signProvinceR">Lugar de firma</Label>
+                  <Input id="signProvinceR" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="notes">Observaciones</Label>
+                  <Textarea id="notes" value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} rows={3} />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="notes">Observaciones</Label>
-                <Textarea id="notes" value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} rows={3} />
+
+              <SignaturePad label="Firma del reservante *" onChange={setSignature} />
+
+              <div className="flex justify-end pt-2">
+                <Button onClick={generateReservationPdf} className="bg-stone-700 hover:bg-stone-600">
+                  <Download className="w-4 h-4 mr-2" />
+                  Descargar PDF
+                </Button>
               </div>
-            </TabsContent>
-
-            <SignaturePad label="Firma del cliente *" onChange={setSignature} />
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button onClick={generatePdf} className="bg-stone-700 hover:bg-stone-600">
-                <Download className="w-4 h-4 mr-2" />
-                Descargar PDF
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       <div className="flex items-center gap-2 text-xs text-stone-500">
