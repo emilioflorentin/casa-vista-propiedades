@@ -1690,6 +1690,26 @@ const ServiceBoard = () => {
                       className="mt-1"
                     />
                   </div>
+                  <div className="flex items-center gap-2 pt-2">
+                    <Checkbox
+                      id="budget-include-iva"
+                      checked={budgetIncludeIva}
+                      onCheckedChange={(v) => setBudgetIncludeIva(v === true)}
+                    />
+                    <Label htmlFor="budget-include-iva" className="text-sm cursor-pointer">
+                      Incluir IVA (21%) en el presupuesto
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="budget-include-header"
+                      checked={budgetIncludeHeader}
+                      onCheckedChange={(v) => setBudgetIncludeHeader(v === true)}
+                    />
+                    <Label htmlFor="budget-include-header" className="text-sm cursor-pointer">
+                      Incluir cabecera con logo y datos de Nazarí Homes
+                    </Label>
+                  </div>
                 </CardContent>
               </Card>
 
