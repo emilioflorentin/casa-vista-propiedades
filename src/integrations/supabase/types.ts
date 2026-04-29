@@ -81,6 +81,7 @@ export type Database = {
           id: string
           incident_id: string | null
           internal_task_id: string | null
+          lines: Json
           materials_cost: number | null
           notes: string | null
           receipts: string[] | null
@@ -93,6 +94,7 @@ export type Database = {
           id?: string
           incident_id?: string | null
           internal_task_id?: string | null
+          lines?: Json
           materials_cost?: number | null
           notes?: string | null
           receipts?: string[] | null
@@ -105,6 +107,7 @@ export type Database = {
           id?: string
           incident_id?: string | null
           internal_task_id?: string | null
+          lines?: Json
           materials_cost?: number | null
           notes?: string | null
           receipts?: string[] | null

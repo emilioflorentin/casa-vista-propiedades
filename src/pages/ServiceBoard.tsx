@@ -146,12 +146,11 @@ const ServiceBoard = () => {
   const [companyCif, setCompanyCif] = useState(DEFAULT_COMPANY_CIF);
   
   // Incident costs state
-  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }>>({});
-  const [costRepair, setCostRepair] = useState(0);
-  const [costMaterials, setCostMaterials] = useState(0);
+  type CostLine = { id: string; repair: number; materials: number; charge: number };
+  const [incidentCosts, setIncidentCosts] = useState<Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number; lines: CostLine[] }>>({});
+  const [costLines, setCostLines] = useState<CostLine[]>([]);
   const [costNotes, setCostNotes] = useState('');
   const [costReceipts, setCostReceipts] = useState<string[]>([]);
-  const [costCharge, setCostCharge] = useState(0);
   const [savingCost, setSavingCost] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
@@ -265,16 +264,33 @@ const ServiceBoard = () => {
         .from('incident_costs')
         .select('*');
       if (costsData) {
-        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }> = {};
+        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number; lines: CostLine[] }> = {};
         costsData.forEach((c: any) => {
           const key = c.incident_id || c.internal_task_id;
           if (key) {
+            const rawLines = Array.isArray(c.lines) ? c.lines : [];
+            const lines: CostLine[] = rawLines.length > 0
+              ? rawLines.map((l: any, i: number) => ({
+                  id: l.id || `${Date.now()}-${i}`,
+                  repair: Number(l.repair) || 0,
+                  materials: Number(l.materials) || 0,
+                  charge: Number(l.charge) || 0,
+                }))
+              : ((Number(c.repair_cost) || Number(c.materials_cost) || Number(c.charge_amount))
+                  ? [{
+                      id: `${Date.now()}-legacy`,
+                      repair: Number(c.repair_cost) || 0,
+                      materials: Number(c.materials_cost) || 0,
+                      charge: Number(c.charge_amount) || 0,
+                    }]
+                  : []);
             costsMap[key] = {
               repair_cost: Number(c.repair_cost) || 0,
               materials_cost: Number(c.materials_cost) || 0,
               notes: c.notes || '',
               receipts: c.receipts || [],
               charge_amount: Number(c.charge_amount) || 0,
+              lines,
             };
           }
         });
@@ -295,33 +311,58 @@ const ServiceBoard = () => {
     }
   };
 
+  const sumLines = (lines: CostLine[]) => ({
+    repair: lines.reduce((s, l) => s + (Number(l.repair) || 0), 0),
+    materials: lines.reduce((s, l) => s + (Number(l.materials) || 0), 0),
+    charge: lines.reduce((s, l) => s + (Number(l.charge) || 0), 0),
+  });
+
   const loadCostForItem = (itemId: string) => {
     const cost = incidentCosts[itemId];
-    setCostRepair(cost?.repair_cost || 0);
-    setCostMaterials(cost?.materials_cost || 0);
+    setCostLines(cost?.lines && cost.lines.length > 0 ? cost.lines : []);
     setCostNotes(cost?.notes || '');
     setCostReceipts(cost?.receipts || []);
-    setCostCharge(cost?.charge_amount || 0);
+  };
+
+  const addCostLine = () => {
+    setCostLines(prev => [...prev, { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, repair: 0, materials: 0, charge: 0 }]);
+  };
+  const updateCostLine = (id: string, field: 'repair' | 'materials' | 'charge', value: number) => {
+    setCostLines(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
+  };
+  const removeCostLine = (id: string) => {
+    setCostLines(prev => prev.filter(l => l.id !== id));
   };
 
   const saveCost = async (itemId: string, isInternal: boolean = false) => {
     setSavingCost(true);
     try {
+      const totals = sumLines(costLines);
       const existing = incidentCosts[itemId];
       const idField = isInternal ? 'internal_task_id' : 'incident_id';
+      const payload = {
+        repair_cost: totals.repair,
+        materials_cost: totals.materials,
+        charge_amount: totals.charge,
+        notes: costNotes,
+        receipts: costReceipts,
+        lines: costLines as any,
+      };
       if (existing) {
-        await supabase
-          .from('incident_costs')
-          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge })
-          .eq(idField, itemId);
+        await supabase.from('incident_costs').update(payload).eq(idField, itemId);
       } else {
-        await supabase
-          .from('incident_costs')
-          .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge });
+        await supabase.from('incident_costs').insert({ [idField]: itemId, ...payload });
       }
       setIncidentCosts(prev => ({
         ...prev,
-        [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge }
+        [itemId]: {
+          repair_cost: totals.repair,
+          materials_cost: totals.materials,
+          charge_amount: totals.charge,
+          notes: costNotes,
+          receipts: costReceipts,
+          lines: costLines,
+        },
       }));
       toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
     } catch {
@@ -354,17 +395,18 @@ const ServiceBoard = () => {
         setCostReceipts(updatedReceipts);
         const idField = isInternal ? 'internal_task_id' : 'incident_id';
         const existing = incidentCosts[itemId];
+        const totals = sumLines(costLines);
         if (existing) {
           await supabase.from('incident_costs')
             .update({ receipts: updatedReceipts })
             .eq(idField, itemId);
         } else {
           await supabase.from('incident_costs')
-            .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts });
+            .insert({ [idField]: itemId, repair_cost: totals.repair, materials_cost: totals.materials, charge_amount: totals.charge, notes: costNotes, receipts: updatedReceipts, lines: costLines as any });
         }
         setIncidentCosts(prev => ({
           ...prev,
-          [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts, charge_amount: costCharge }
+          [itemId]: { repair_cost: totals.repair, materials_cost: totals.materials, charge_amount: totals.charge, notes: costNotes, receipts: updatedReceipts, lines: costLines }
         }));
         toast({ title: 'Subido', description: `${newUrls.length} archivo(s) adjuntado(s)` });
       }
@@ -1087,6 +1129,85 @@ const ServiceBoard = () => {
       </div>
     );
   }
+
+  const renderCostLinesEditor = (onSave: () => void) => {
+    const totals = sumLines(costLines);
+    const profit = totals.charge - totals.repair - totals.materials;
+    return (
+      <div className="space-y-2">
+        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 text-xs font-medium text-blue-700 px-1">
+          <span>Traslado (€)</span>
+          <span>Materiales (€)</span>
+          <span className="text-green-700">Cobro cliente (€)</span>
+          <span className="w-7" />
+        </div>
+        {costLines.length === 0 && (
+          <p className="text-xs text-stone-500 italic px-1">Sin líneas. Pulsa "+ Añadir fila" para empezar.</p>
+        )}
+        {costLines.map((line) => (
+          <div key={line.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.repair || ''}
+              onChange={(e) => updateCostLine(line.id, 'repair', Number(e.target.value))}
+              className="h-8 text-sm"
+            />
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.materials || ''}
+              onChange={(e) => updateCostLine(line.id, 'materials', Number(e.target.value))}
+              className="h-8 text-sm"
+            />
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.charge || ''}
+              onChange={(e) => updateCostLine(line.id, 'charge', Number(e.target.value))}
+              className="h-8 text-sm border-green-200"
+            />
+            <Button
+              type="button" variant="ghost" size="sm"
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+              onClick={() => removeCostLine(line.id)}
+              aria-label="Eliminar fila"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button" variant="outline" size="sm"
+          onClick={addCostLine}
+          className="h-7 text-xs border-blue-300 text-blue-700 hover:bg-blue-100"
+        >
+          <Plus className="h-3 w-3 mr-1" /> Añadir fila
+        </Button>
+
+        {costLines.length > 0 && (
+          <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center pt-2 mt-1 border-t border-blue-200 text-sm font-semibold">
+            <span className="text-blue-800">Total: {totals.repair.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="text-blue-800">Total: {totals.materials.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="text-green-700">Total: {totals.charge.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="w-7" />
+          </div>
+        )}
+
+        <div className="flex justify-between items-center text-sm flex-wrap gap-2 pt-1">
+          <div className="flex gap-3">
+            <span className="font-medium text-blue-800">Coste: {(totals.repair + totals.materials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            {totals.charge > 0 && (
+              <span className={`font-medium ${profit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                Beneficio: {profit.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+              </span>
+            )}
+          </div>
+          <Button size="sm" onClick={onSave} disabled={savingCost} className="h-7 text-xs">
+            <Save className="h-3 w-3 mr-1" />
+            {savingCost ? 'Guardando...' : 'Guardar costes'}
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -1853,63 +1974,7 @@ const ServiceBoard = () => {
                   <Euro className="h-4 w-4" />
                   Costes del servicio
                 </h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costRepair || ''}
-                      onChange={e => setCostRepair(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-blue-700">Materiales (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costMaterials || ''}
-                      onChange={e => setCostMaterials(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-green-700">Cobro cliente (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costCharge || ''}
-                      onChange={e => setCostCharge(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm border-green-200"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-sm flex-wrap gap-2">
-                  <div className="flex gap-3">
-                    <span className="font-medium text-blue-800">Coste: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
-                    {costCharge > 0 && (
-                      <span className={`font-medium ${(costCharge - costRepair - costMaterials) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                        Beneficio: {(costCharge - costRepair - costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </span>
-                    )}
-                  </div>
-                  <Button 
-                    size="sm" 
-                    onClick={() => saveCost(selectedIncident.id)}
-                    disabled={savingCost}
-                    className="h-7 text-xs"
-                  >
-                    <Save className="h-3 w-3 mr-1" />
-                    {savingCost ? 'Guardando...' : 'Guardar costes'}
-                  </Button>
-                </div>
+                {renderCostLinesEditor(() => saveCost(selectedIncident.id))}
 
                 {/* Receipts / Justificantes */}
                 <div className="space-y-2">
@@ -2153,63 +2218,7 @@ const ServiceBoard = () => {
                   <Euro className="h-4 w-4" />
                   Costes del servicio
                 </h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costRepair || ''}
-                      onChange={e => setCostRepair(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-blue-700">Materiales (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costMaterials || ''}
-                      onChange={e => setCostMaterials(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-green-700">Cobro cliente (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costCharge || ''}
-                      onChange={e => setCostCharge(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm border-green-200"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-sm flex-wrap gap-2">
-                  <div className="flex gap-3">
-                    <span className="font-medium text-blue-800">Coste: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
-                    {costCharge > 0 && (
-                      <span className={`font-medium ${(costCharge - costRepair - costMaterials) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                        Beneficio: {(costCharge - costRepair - costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </span>
-                    )}
-                  </div>
-                  <Button 
-                    size="sm" 
-                    onClick={() => saveCost(selectedInternalTask.id, true)}
-                    disabled={savingCost}
-                    className="h-7 text-xs"
-                  >
-                    <Save className="h-3 w-3 mr-1" />
-                    {savingCost ? 'Guardando...' : 'Guardar costes'}
-                  </Button>
-                </div>
+                {renderCostLinesEditor(() => saveCost(selectedInternalTask.id, true))}
 
                 {/* Receipts */}
                 <div className="space-y-2">
