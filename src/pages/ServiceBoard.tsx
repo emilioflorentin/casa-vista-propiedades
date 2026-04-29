@@ -311,33 +311,58 @@ const ServiceBoard = () => {
     }
   };
 
+  const sumLines = (lines: CostLine[]) => ({
+    repair: lines.reduce((s, l) => s + (Number(l.repair) || 0), 0),
+    materials: lines.reduce((s, l) => s + (Number(l.materials) || 0), 0),
+    charge: lines.reduce((s, l) => s + (Number(l.charge) || 0), 0),
+  });
+
   const loadCostForItem = (itemId: string) => {
     const cost = incidentCosts[itemId];
-    setCostRepair(cost?.repair_cost || 0);
-    setCostMaterials(cost?.materials_cost || 0);
+    setCostLines(cost?.lines && cost.lines.length > 0 ? cost.lines : []);
     setCostNotes(cost?.notes || '');
     setCostReceipts(cost?.receipts || []);
-    setCostCharge(cost?.charge_amount || 0);
+  };
+
+  const addCostLine = () => {
+    setCostLines(prev => [...prev, { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, repair: 0, materials: 0, charge: 0 }]);
+  };
+  const updateCostLine = (id: string, field: 'repair' | 'materials' | 'charge', value: number) => {
+    setCostLines(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
+  };
+  const removeCostLine = (id: string) => {
+    setCostLines(prev => prev.filter(l => l.id !== id));
   };
 
   const saveCost = async (itemId: string, isInternal: boolean = false) => {
     setSavingCost(true);
     try {
+      const totals = sumLines(costLines);
       const existing = incidentCosts[itemId];
       const idField = isInternal ? 'internal_task_id' : 'incident_id';
+      const payload = {
+        repair_cost: totals.repair,
+        materials_cost: totals.materials,
+        charge_amount: totals.charge,
+        notes: costNotes,
+        receipts: costReceipts,
+        lines: costLines as any,
+      };
       if (existing) {
-        await supabase
-          .from('incident_costs')
-          .update({ repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge })
-          .eq(idField, itemId);
+        await supabase.from('incident_costs').update(payload).eq(idField, itemId);
       } else {
-        await supabase
-          .from('incident_costs')
-          .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge });
+        await supabase.from('incident_costs').insert({ [idField]: itemId, ...payload });
       }
       setIncidentCosts(prev => ({
         ...prev,
-        [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: costReceipts, charge_amount: costCharge }
+        [itemId]: {
+          repair_cost: totals.repair,
+          materials_cost: totals.materials,
+          charge_amount: totals.charge,
+          notes: costNotes,
+          receipts: costReceipts,
+          lines: costLines,
+        },
       }));
       toast({ title: 'Guardado', description: 'Costes actualizados correctamente' });
     } catch {
@@ -370,17 +395,18 @@ const ServiceBoard = () => {
         setCostReceipts(updatedReceipts);
         const idField = isInternal ? 'internal_task_id' : 'incident_id';
         const existing = incidentCosts[itemId];
+        const totals = sumLines(costLines);
         if (existing) {
           await supabase.from('incident_costs')
             .update({ receipts: updatedReceipts })
             .eq(idField, itemId);
         } else {
           await supabase.from('incident_costs')
-            .insert({ [idField]: itemId, repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts });
+            .insert({ [idField]: itemId, repair_cost: totals.repair, materials_cost: totals.materials, charge_amount: totals.charge, notes: costNotes, receipts: updatedReceipts, lines: costLines as any });
         }
         setIncidentCosts(prev => ({
           ...prev,
-          [itemId]: { repair_cost: costRepair, materials_cost: costMaterials, notes: costNotes, receipts: updatedReceipts, charge_amount: costCharge }
+          [itemId]: { repair_cost: totals.repair, materials_cost: totals.materials, charge_amount: totals.charge, notes: costNotes, receipts: updatedReceipts, lines: costLines }
         }));
         toast({ title: 'Subido', description: `${newUrls.length} archivo(s) adjuntado(s)` });
       }
