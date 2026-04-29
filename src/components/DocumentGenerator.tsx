@@ -146,32 +146,36 @@ const DocumentGenerator = () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Cream paper background
-    doc.setFillColor(252, 250, 244);
+    // Soft warm paper background
+    doc.setFillColor(253, 251, 247);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Vertical Spanish flag stripe on the left edge (red-yellow-red)
-    const flagW = 6;
-    doc.setFillColor(198, 11, 30); // red top
-    doc.rect(0, 0, flagW, pageHeight / 4, 'F');
-    doc.setFillColor(255, 196, 0); // yellow middle (half height)
-    doc.rect(0, pageHeight / 4, flagW, pageHeight / 2, 'F');
-    doc.setFillColor(198, 11, 30); // red bottom
-    doc.rect(0, (pageHeight * 3) / 4, flagW, pageHeight / 4, 'F');
+    // Vertical pale Spanish flag stripes on BOTH side edges (red - yellow - red), faint
+    const drawSideFlag = (xLeft: number) => {
+      const stripeW = 4;
+      const gap = 0.6;
+      // outer red
+      doc.setFillColor(247, 220, 222);
+      doc.rect(xLeft, 0, stripeW, pageHeight, 'F');
+      // thin middle yellow
+      doc.setFillColor(252, 240, 205);
+      doc.rect(xLeft + stripeW + gap, 0, 1.6, pageHeight, 'F');
+      // inner red
+      doc.setFillColor(247, 220, 222);
+      doc.rect(xLeft + stripeW + gap + 1.6 + gap, 0, stripeW, pageHeight, 'F');
+    };
+    drawSideFlag(4);
+    drawSideFlag(pageWidth - 4 - (4 + 0.6 + 1.6 + 0.6 + 4));
 
-    // Watermark logo (large, centered, very faint)
+    // Bottom-right corner emblem: small logo + tiny flag dot
     if (logo) {
-      const wmSize = 120;
       try {
-        const gs = (doc as unknown as { GState: new (o: { opacity: number }) => unknown }).GState;
-        const setGState = (doc as unknown as { setGState: (s: unknown) => void }).setGState;
-        if (gs && setGState) {
-          setGState.call(doc, new gs({ opacity: 0.06 }));
-          doc.addImage(logo, 'PNG', (pageWidth - wmSize) / 2, (pageHeight - wmSize) / 2, wmSize, wmSize);
-          setGState.call(doc, new gs({ opacity: 1 }));
-        }
+        const size = 22;
+        const x = pageWidth - 22 - size;
+        const y = pageHeight - 22 - size;
+        doc.addImage(logo, 'PNG', x, y, size, size);
       } catch {
-        // ignore watermark failures
+        // ignore
       }
     }
   };
