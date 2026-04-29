@@ -488,7 +488,7 @@ const DocumentGenerator = () => {
                 </div>
               </div>
 
-              <SignaturePad label="Firma del interesado *" onChange={setSignature} />
+              <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
                 <Button onClick={generateConsentPdf} className="bg-stone-700 hover:bg-stone-600">
@@ -539,7 +539,7 @@ const DocumentGenerator = () => {
                 </div>
               </div>
 
-              <SignaturePad label="Firma del reservante *" onChange={setSignature} />
+              <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
                 <Button onClick={generateReservationPdf} className="bg-stone-700 hover:bg-stone-600">
