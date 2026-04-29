@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Clock, 
   CheckCircle2, 
@@ -168,6 +169,8 @@ const ServiceBoard = () => {
   const [budgetValidityDays, setBudgetValidityDays] = useState(30);
   const [budgetExecutionDays, setBudgetExecutionDays] = useState('');
   const [budgetPaymentTerms, setBudgetPaymentTerms] = useState('');
+  const [budgetIncludeIva, setBudgetIncludeIva] = useState(true);
+  const [budgetIncludeHeader, setBudgetIncludeHeader] = useState(true);
   const [savedBudgets, setSavedBudgets] = useState<any[]>([]);
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [savingBudget, setSavingBudget] = useState(false);
@@ -606,7 +609,7 @@ const ServiceBoard = () => {
   };
 
   const subtotal = budgetItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-  const iva = subtotal * 0.21;
+  const iva = budgetIncludeIva ? subtotal * 0.21 : 0;
   const total = subtotal + iva;
 
   const generateBudgetPDF = () => {
