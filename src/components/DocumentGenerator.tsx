@@ -12,12 +12,13 @@ import { useToast } from '@/hooks/use-toast';
 const LOGO_URL = '/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png';
 
 let cachedLogo: string | null = null;
+let cachedLogoRatio: number = 1; // width / height
 const loadLogoDataUrl = async (): Promise<string | null> => {
   if (cachedLogo) return cachedLogo;
   try {
     const res = await fetch(LOGO_URL);
     const blob = await res.blob();
-    return await new Promise<string>((resolve, reject) => {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         cachedLogo = reader.result as string;
@@ -26,10 +27,22 @@ const loadLogoDataUrl = async (): Promise<string | null> => {
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
+    // Determine native aspect ratio so the logo isn't stretched in the PDF
+    await new Promise<void>((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width && img.height) cachedLogoRatio = img.width / img.height;
+        resolve();
+      };
+      img.onerror = () => resolve();
+      img.src = dataUrl;
+    });
+    return dataUrl;
   } catch {
     return null;
   }
 };
+const getLogoRatio = () => cachedLogoRatio || 1;
 
 type DocKind = 'consent' | 'reservation';
 
