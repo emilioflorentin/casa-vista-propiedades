@@ -277,6 +277,27 @@ const PropertyDetail = () => {
     }
   }, [id]);
 
+  // Generate (or fetch) a short link for this property URL
+  useEffect(() => {
+    if (!property) return;
+    const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.rpc('get_or_create_short_link', {
+          p_target_url: propertyUrl,
+          p_property_id: null,
+        });
+        if (!cancelled && !error && data) {
+          setShortUrl(`${window.location.origin}/r/${data}`);
+        }
+      } catch (e) {
+        console.warn('Short link pre-generation failed', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [property]);
+
   // Show loading while fetching property data
   if (loading) {
     return (
