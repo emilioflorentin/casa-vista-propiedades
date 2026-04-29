@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { PropertyForm } from '../components/PropertyForm';
+import DocumentGenerator from '../components/DocumentGenerator';
 import { 
   User, 
   MapPin, 
@@ -23,7 +24,8 @@ import {
   Edit2, 
   Trash2,
   Check,
-  Shield
+  Shield,
+  FileSignature
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -725,11 +727,17 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className={`grid w-full ${(user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com') ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
               <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
               <TabsTrigger value="rented">Alquiladas</TabsTrigger>
               <TabsTrigger value="tenants">Inquilinos</TabsTrigger>
+              {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
+                <TabsTrigger value="documents">
+                  <FileSignature className="w-4 h-4 mr-1" />
+                  Generar documentación
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -1146,6 +1154,12 @@ const Account = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
+              <TabsContent value="documents" className="space-y-6">
+                <DocumentGenerator />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>
