@@ -142,19 +142,69 @@ const DocumentGenerator = () => {
   const [salePrice, setSalePrice] = useState('');
   const [extraNotes, setExtraNotes] = useState('');
 
-  const drawHeader = (doc: jsPDF) => {
+  const drawBackground = (doc: jsPDF, logo: string | null) => {
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Cream paper background
+    doc.setFillColor(252, 250, 244);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    // Vertical Spanish flag stripe on the left edge (red-yellow-red)
+    const flagW = 6;
+    doc.setFillColor(198, 11, 30); // red top
+    doc.rect(0, 0, flagW, pageHeight / 4, 'F');
+    doc.setFillColor(255, 196, 0); // yellow middle (half height)
+    doc.rect(0, pageHeight / 4, flagW, pageHeight / 2, 'F');
+    doc.setFillColor(198, 11, 30); // red bottom
+    doc.rect(0, (pageHeight * 3) / 4, flagW, pageHeight / 4, 'F');
+
+    // Watermark logo (large, centered, very faint)
+    if (logo) {
+      const wmSize = 120;
+      try {
+        const gs = (doc as unknown as { GState: new (o: { opacity: number }) => unknown }).GState;
+        const setGState = (doc as unknown as { setGState: (s: unknown) => void }).setGState;
+        if (gs && setGState) {
+          setGState.call(doc, new gs({ opacity: 0.06 }));
+          doc.addImage(logo, 'PNG', (pageWidth - wmSize) / 2, (pageHeight - wmSize) / 2, wmSize, wmSize);
+          setGState.call(doc, new gs({ opacity: 1 }));
+        }
+      } catch {
+        // ignore watermark failures
+      }
+    }
+  };
+
+  const drawHeader = (doc: jsPDF, logo: string | null) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 22;
+
+    // Logo top-left
+    if (logo) {
+      try {
+        doc.addImage(logo, 'PNG', margin, 10, 22, 22);
+      } catch {
+        // ignore
+      }
+    }
+
+    // Brand block centered
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.setTextColor(60, 50, 35);
-    doc.text('NAZARÍ HOMES', pageWidth / 2, 18, { align: 'center' });
+    doc.text('NAZARÍ HOMES', pageWidth / 2, 19, { align: 'center' });
     doc.setFont('helvetica', 'italic');
-    doc.setFontSize(10);
-    doc.setTextColor(120, 110, 95);
-    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 24, { align: 'center' });
+    doc.setFontSize(9);
+    doc.setTextColor(140, 120, 95);
+    doc.text('GESTIÓN INTEGRAL PARA TU TRANQUILIDAD', pageWidth / 2, 25, { align: 'center' });
+
+    // Decorative double line
     doc.setDrawColor(180, 160, 130);
     doc.setLineWidth(0.6);
-    doc.line(20, 28, pageWidth - 20, 28);
+    doc.line(margin, 34, pageWidth - margin, 34);
+    doc.setLineWidth(0.2);
+    doc.line(margin, 35.5, pageWidth - margin, 35.5);
     doc.setTextColor(0);
   };
 
