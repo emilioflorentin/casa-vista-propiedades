@@ -62,6 +62,7 @@ const PropertyDetail = () => {
         if (!error && dbProperty) {
           foundProperty = {
             id: parseInt(dbProperty.id.slice(-8), 16),
+            originalId: dbProperty.id,
             reference: dbProperty.reference,
             title: dbProperty.title,
             type: dbProperty.type,
@@ -124,6 +125,7 @@ const PropertyDetail = () => {
         if (localProperty) {
           foundProperty = {
             id: Number(localProperty.id),
+            originalId: localProperty.id,
             title: localProperty.title,
             price: localProperty.price,
             currency: localProperty.currency,
