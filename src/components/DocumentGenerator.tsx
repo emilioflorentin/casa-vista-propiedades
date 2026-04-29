@@ -540,6 +540,7 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Property =====
+    ensureSpace(20);
     sectionLabel('Inmueble');
     bodyText(
       `${propAddress}\n${propPostalCode} · ${propMunicipality} (${propProvince})`,
@@ -548,6 +549,7 @@ const DocumentGenerator = () => {
     y += 6;
 
     // ===== Tenants =====
+    ensureSpace(12 + validTenants.length * 6);
     sectionLabel('Arrendatarios');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
@@ -566,6 +568,7 @@ const DocumentGenerator = () => {
     y += 3;
 
     // ===== Reservation amount =====
+    ensureSpace(20);
     sectionLabel('Importe de la reserva');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -579,6 +582,7 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Conditions =====
+    ensureSpace(38);
     sectionLabel('Condiciones');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
@@ -592,6 +596,7 @@ const DocumentGenerator = () => {
     y += condLines.length * 4.7 + 8;
 
     // ===== Summary fields =====
+    ensureSpace(36);
     sectionLabel('Detalles del contrato');
     fieldRow('Firma del contrato', formatDateEs(contractSignDate) || '__/__/____');
     fieldRow('Importe de la fianza', `${deposit.figures}  ·  ${deposit.letters.toLowerCase()}`);
@@ -605,6 +610,8 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Sign place + date =====
+    // Signatures need ~ 50mm. If they don't fit, paginate before the date line.
+    ensureSpace(60);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
     doc.setTextColor(...MUTED);
