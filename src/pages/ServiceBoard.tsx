@@ -13,6 +13,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   Clock, 
   CheckCircle2, 
@@ -149,6 +159,8 @@ const ServiceBoard = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyPeriod, setHistoryPeriod] = useState<'week' | 'month' | 'all'>('month');
+  const [deletingHistoryRow, setDeletingHistoryRow] = useState<any | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Internal tasks state
   const [internalTasks, setInternalTasks] = useState<InternalTask[]>([]);
@@ -473,6 +485,23 @@ const ServiceBoard = () => {
     } finally {
       setLoadingHistory(false);
     }
+  };
+
+  const deleteHistoryRow = async () => {
+    if (!deletingHistoryRow) return;
+    if (deleteConfirmText.trim().toUpperCase() !== 'ELIMINAR') {
+      toast({ title: 'Confirmación incorrecta', description: 'Escribe ELIMINAR para confirmar', variant: 'destructive' });
+      return;
+    }
+    const { error } = await supabase.from('incident_history').delete().eq('id', deletingHistoryRow.id);
+    if (error) {
+      toast({ title: 'Error al eliminar', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setHistoryData(prev => prev.filter(h => h.id !== deletingHistoryRow.id));
+    toast({ title: 'Registro eliminado' });
+    setDeletingHistoryRow(null);
+    setDeleteConfirmText('');
   };
 
   const exportHistoryToExcel = () => {
@@ -1364,6 +1393,7 @@ const ServiceBoard = () => {
                             <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
                             <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
                             <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1388,6 +1418,17 @@ const ServiceBoard = () => {
                                 {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
                               </td>
                               <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
+                              <td className="p-3 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => { setDeletingHistoryRow(h); setDeleteConfirmText(''); }}
+                                  aria-label="Eliminar registro"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -2284,6 +2325,37 @@ const ServiceBoard = () => {
       )}
 
       <Footer />
+
+      <AlertDialog open={!!deletingHistoryRow} onOpenChange={(open) => { if (!open) { setDeletingHistoryRow(null); setDeleteConfirmText(''); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" /> Eliminar registro del historial
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción es <strong>permanente</strong> y no se puede deshacer. Vas a eliminar:
+              <span className="block mt-2 font-medium text-stone-700">"{deletingHistoryRow?.title}"</span>
+              <span className="block mt-3">Para confirmar, escribe <strong>ELIMINAR</strong> en mayúsculas:</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="ELIMINAR"
+            autoFocus
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); deleteHistoryRow(); }}
+              disabled={deleteConfirmText.trim().toUpperCase() !== 'ELIMINAR'}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Eliminar definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
