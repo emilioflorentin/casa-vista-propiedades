@@ -310,32 +310,41 @@ const DocumentGenerator = () => {
     doc.text(`EN ${signProvince.toUpperCase()} A ${day} DE ${month.toUpperCase()} DE ${year}`, margin, y);
     y += 14;
 
-    // Signature columns
-    const colW = (contentWidth - 20) / 2;
+    // Signature columns: 3 columns (Interesado | Avalista | Nazarí Homes)
+    const gap = 8;
+    const colW = (contentWidth - gap * 2) / 3;
+    const colX = [
+      margin,
+      margin + colW + gap,
+      margin + (colW + gap) * 2,
+    ];
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
-    doc.text('EL INTERESADO / AVALISTA', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('EL INTERESADO', colX[0] + colW / 2, y, { align: 'center' });
+    doc.text('EL AVALISTA', colX[1] + colW / 2, y, { align: 'center' });
+    doc.text('NAZARÍ HOMES', colX[2] + colW / 2, y, { align: 'center' });
     y += 4;
 
-    // Left side: NAZARÍ HOMES signature (drawn from canvas)
+    // Nazarí Homes signature image in the third column
     try {
-      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
+      const sigW = Math.min(colW, 55);
+      const sigH = 26;
+      doc.addImage(signature, 'PNG', colX[2] + (colW - sigW) / 2, y, sigW, sigH);
     } catch {
       // ignore
     }
-    y += 32;
+    y += 30;
 
     doc.setDrawColor(120);
     doc.setLineWidth(0.3);
-    doc.line(margin, y, margin + colW, y);
-    doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
+    colX.forEach((x) => doc.line(x, y, x + colW, y));
     y += 4;
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(120);
-    doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
-    doc.text('Firma manuscrita del interesado / avalista', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('Firma manuscrita', colX[0] + colW / 2, y, { align: 'center' });
+    doc.text('Firma manuscrita', colX[1] + colW / 2, y, { align: 'center' });
+    doc.text('Firma y sello', colX[2] + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
