@@ -462,7 +462,24 @@ const DocumentGenerator = () => {
     const deposit = formatEuros(depositAmountNum);
     const rent = formatEuros(monthlyRentNum);
 
-    let y = 50;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const topY = 36;       // start of content (below smaller header)
+    const bottomY = pageHeight - 22; // safe area above footer
+    let y = topY;
+
+    // Add a new page (with background + header) and reset y to topY
+    const newPage = () => {
+      drawFooter(doc);
+      doc.addPage();
+      drawBackground(doc, logo);
+      drawHeader(doc, logo);
+      y = topY;
+    };
+
+    // Ensure there is `needed` mm of vertical space; otherwise paginate
+    const ensureSpace = (needed: number) => {
+      if (y + needed > bottomY) newPage();
+    };
 
     // ===== Helpers (minimal style) =====
     const INK = [40, 35, 30] as const;          // body text
