@@ -493,6 +493,33 @@ export type Database = {
           },
         ]
       }
+      short_links: {
+        Row: {
+          click_count: number
+          code: string
+          created_at: string
+          id: string
+          property_id: string | null
+          target_url: string
+        }
+        Insert: {
+          click_count?: number
+          code: string
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          target_url: string
+        }
+        Update: {
+          click_count?: number
+          code?: string
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          target_url?: string
+        }
+        Relationships: []
+      }
       tenant_access: {
         Row: {
           access_code: string
@@ -569,6 +596,10 @@ export type Database = {
           phone: string
           user_type: string
         }[]
+      }
+      get_or_create_short_link: {
+        Args: { p_property_id?: string; p_target_url: string }
+        Returns: string
       }
       get_property_owner_contact: {
         Args: { property_id: string }
