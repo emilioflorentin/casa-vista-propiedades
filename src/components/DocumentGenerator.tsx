@@ -315,7 +315,7 @@ const DocumentGenerator = () => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
-    doc.text('EL INTERESADO', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('EL INTERESADO / AVALISTA', margin + 20 + colW + colW / 2, y, { align: 'center' });
     y += 4;
 
     // Left side: NAZARÍ HOMES signature (drawn from canvas)
@@ -335,7 +335,7 @@ const DocumentGenerator = () => {
     doc.setFontSize(8);
     doc.setTextColor(120);
     doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
-    doc.text('Firma manuscrita del interesado', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('Firma manuscrita del interesado / avalista', margin + 20 + colW + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
