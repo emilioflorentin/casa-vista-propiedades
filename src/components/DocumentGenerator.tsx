@@ -342,8 +342,8 @@ const DocumentGenerator = () => {
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(120);
-    doc.text('Firma manuscrita', colX[0] + colW / 2, y, { align: 'center' });
-    doc.text('Firma manuscrita', colX[1] + colW / 2, y, { align: 'center' });
+    doc.text('Firma digital o manuscrita', colX[0] + colW / 2, y, { align: 'center' });
+    doc.text('Firma digital o manuscrita', colX[1] + colW / 2, y, { align: 'center' });
     doc.text('Firma y sello', colX[2] + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
