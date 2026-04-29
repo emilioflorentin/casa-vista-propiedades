@@ -350,6 +350,17 @@ const DocumentGenerator = () => {
     doc.text('Firma digital o manuscrita', colX[0] + colW / 2, y, { align: 'center' });
     doc.text('Firma digital o manuscrita', colX[1] + colW / 2, y, { align: 'center' });
     doc.text('Firma y sello', colX[2] + colW / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(60);
+    const nameLine = (name: string, dni: string) => {
+      const n = name.trim() || '—';
+      const d = dni.trim() ? `DNI/NIE: ${dni.trim()}` : '';
+      return d ? `${n}\n${d}` : n;
+    };
+    doc.text(nameLine(interestedName, interestedDni), colX[0] + colW / 2, y, { align: 'center' });
+    doc.text(nameLine(guarantorName, guarantorDni), colX[1] + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
