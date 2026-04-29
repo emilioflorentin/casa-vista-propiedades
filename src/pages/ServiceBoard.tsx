@@ -711,6 +711,7 @@ const ServiceBoard = () => {
       </style></head><body>
       <div class="page">
         <div class="header">
+          ${budgetIncludeHeader ? `
           <div class="logo-section">
             <img src="${logoUrl}" alt="Nazarí Homes" />
             <div class="company-info">
@@ -719,7 +720,7 @@ const ServiceBoard = () => {
               info@nazarihomes.com<br>
               www.nazarihomes.com
             </div>
-          </div>
+          </div>` : `<div></div>`}
           <div class="budget-badge">
             <h1>PRESUPUESTO</h1>
             <p class="meta"><strong>Nº:</strong> ${budgetNumber}</p>
@@ -755,7 +756,7 @@ const ServiceBoard = () => {
         <div class="totals-section">
           <table class="totals-table">
             <tr><td class="label">Base imponible</td><td class="right">${subtotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
-            <tr><td class="label">IVA (21%)</td><td class="right">${iva.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
+            ${budgetIncludeIva ? `<tr><td class="label">IVA (21%)</td><td class="right">${iva.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>` : ''}
             <tr class="total-row"><td>TOTAL</td><td class="right">${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td></tr>
           </table>
         </div>
@@ -766,7 +767,7 @@ const ServiceBoard = () => {
             <div class="condition-item"><div class="label">Validez</div><div class="value">${budgetValidityDays} días desde emisión</div></div>
             ${budgetExecutionDays ? `<div class="condition-item"><div class="label">Plazo de ejecución</div><div class="value">${budgetExecutionDays}</div></div>` : ''}
             ${budgetPaymentTerms ? `<div class="condition-item"><div class="label">Forma de pago</div><div class="value">${budgetPaymentTerms}</div></div>` : ''}
-            <div class="condition-item"><div class="label">IVA</div><div class="value">21% incluido en total</div></div>
+            <div class="condition-item"><div class="label">IVA</div><div class="value">${budgetIncludeIva ? '21% incluido en total' : 'No aplicado'}</div></div>
           </div>
         </div>
 
@@ -777,10 +778,10 @@ const ServiceBoard = () => {
           <div class="signature-box">Fdo. ${budgetClient.name || 'El cliente'}</div>
         </div>
 
-        <div class="footer">
+        ${budgetIncludeHeader ? `<div class="footer">
           <p class="brand">Nazarí Homes · Gestión Integral para tu Tranquilidad</p>
           <p>info@nazarihomes.com · www.nazarihomes.com</p>
-        </div>
+        </div>` : ''}
       </div>
       </body></html>
     `);
