@@ -183,10 +183,12 @@ const DocumentGenerator = () => {
     // Bottom-right corner emblem: small logo + tiny flag dot
     if (logo) {
       try {
-        const size = 22;
-        const x = pageWidth - 22 - size;
-        const y = pageHeight - 22 - size;
-        doc.addImage(logo, 'PNG', x, y, size, size);
+        const ratio = getLogoRatio();
+        const h = 22;
+        const w = h * ratio;
+        const x = pageWidth - 22 - w;
+        const y = pageHeight - 22 - h;
+        doc.addImage(logo, 'PNG', x, y, w, h);
       } catch {
         // ignore
       }
@@ -200,8 +202,10 @@ const DocumentGenerator = () => {
     // Logo centered (only branding element in header)
     if (logo) {
       try {
-        const logoSize = 26;
-        doc.addImage(logo, 'PNG', (pageWidth - logoSize) / 2, 8, logoSize, logoSize);
+        const ratio = getLogoRatio();
+        const logoH = 26;
+        const logoW = logoH * ratio;
+        doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, 8, logoW, logoH);
       } catch {
         // ignore
       }
