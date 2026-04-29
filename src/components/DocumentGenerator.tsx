@@ -259,20 +259,18 @@ const DocumentGenerator = () => {
     if (logo) {
       try {
         const ratio = getLogoRatio();
-        const logoH = 26;
+        const logoH = 16;
         const logoW = logoH * ratio;
-        doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, 8, logoW, logoH);
+        doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, 6, logoW, logoH);
       } catch {
         // ignore
       }
     }
 
-    // Decorative double line
+    // Decorative single hairline below the logo
     doc.setDrawColor(180, 160, 130);
-    doc.setLineWidth(0.6);
-    doc.line(margin, 38, pageWidth - margin, 38);
     doc.setLineWidth(0.2);
-    doc.line(margin, 39.5, pageWidth - margin, 39.5);
+    doc.line(margin, 26, pageWidth - margin, 26);
     doc.setTextColor(0);
   };
 
@@ -464,7 +462,24 @@ const DocumentGenerator = () => {
     const deposit = formatEuros(depositAmountNum);
     const rent = formatEuros(monthlyRentNum);
 
-    let y = 50;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const topY = 36;       // start of content (below smaller header)
+    const bottomY = pageHeight - 22; // safe area above footer
+    let y = topY;
+
+    // Add a new page (with background + header) and reset y to topY
+    const newPage = () => {
+      drawFooter(doc);
+      doc.addPage();
+      drawBackground(doc, logo);
+      drawHeader(doc, logo);
+      y = topY;
+    };
+
+    // Ensure there is `needed` mm of vertical space; otherwise paginate
+    const ensureSpace = (needed: number) => {
+      if (y + needed > bottomY) newPage();
+    };
 
     // ===== Helpers (minimal style) =====
     const INK = [40, 35, 30] as const;          // body text
@@ -525,6 +540,7 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Property =====
+    ensureSpace(20);
     sectionLabel('Inmueble');
     bodyText(
       `${propAddress}\n${propPostalCode} · ${propMunicipality} (${propProvince})`,
@@ -533,6 +549,7 @@ const DocumentGenerator = () => {
     y += 6;
 
     // ===== Tenants =====
+    ensureSpace(12 + validTenants.length * 6);
     sectionLabel('Arrendatarios');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
@@ -551,6 +568,7 @@ const DocumentGenerator = () => {
     y += 3;
 
     // ===== Reservation amount =====
+    ensureSpace(20);
     sectionLabel('Importe de la reserva');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -564,6 +582,7 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Conditions =====
+    ensureSpace(38);
     sectionLabel('Condiciones');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
@@ -577,6 +596,7 @@ const DocumentGenerator = () => {
     y += condLines.length * 4.7 + 8;
 
     // ===== Summary fields =====
+    ensureSpace(36);
     sectionLabel('Detalles del contrato');
     fieldRow('Firma del contrato', formatDateEs(contractSignDate) || '__/__/____');
     fieldRow('Importe de la fianza', `${deposit.figures}  ·  ${deposit.letters.toLowerCase()}`);
@@ -590,6 +610,8 @@ const DocumentGenerator = () => {
     y += 8;
 
     // ===== Sign place + date =====
+    // Signatures need ~ 50mm. If they don't fit, paginate before the date line.
+    ensureSpace(60);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
     doc.setTextColor(...MUTED);
