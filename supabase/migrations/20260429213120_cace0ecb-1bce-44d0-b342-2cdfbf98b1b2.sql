@@ -1,0 +1,1 @@
+DELETE FROM public.short_links;
