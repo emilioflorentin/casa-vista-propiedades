@@ -280,7 +280,8 @@ const PropertyDetail = () => {
   // Generate (or fetch) a short link for this property URL
   useEffect(() => {
     if (!property) return;
-    const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+    const publicBase = 'https://www.nazarihomes.com';
+    const propertyUrl = `${publicBase}/property/${property.originalId || property.id}`;
     let cancelled = false;
     (async () => {
       try {
@@ -289,7 +290,7 @@ const PropertyDetail = () => {
           p_property_id: null,
         });
         if (!cancelled && !error && data) {
-          setShortUrl(`${window.location.origin}/r/${data}`);
+          setShortUrl(`${publicBase}/r/${data}`);
         }
       } catch (e) {
         console.warn('Short link pre-generation failed', e);
