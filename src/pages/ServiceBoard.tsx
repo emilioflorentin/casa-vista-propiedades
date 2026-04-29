@@ -2139,63 +2139,7 @@ const ServiceBoard = () => {
                   <Euro className="h-4 w-4" />
                   Costes del servicio
                 </h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <Label className="text-xs text-blue-700">Traslado (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costRepair || ''}
-                      onChange={e => setCostRepair(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-blue-700">Materiales (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costMaterials || ''}
-                      onChange={e => setCostMaterials(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-green-700">Cobro cliente (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={costCharge || ''}
-                      onChange={e => setCostCharge(Number(e.target.value))}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm border-green-200"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-sm flex-wrap gap-2">
-                  <div className="flex gap-3">
-                    <span className="font-medium text-blue-800">Coste: {(costRepair + costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
-                    {costCharge > 0 && (
-                      <span className={`font-medium ${(costCharge - costRepair - costMaterials) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                        Beneficio: {(costCharge - costRepair - costMaterials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                      </span>
-                    )}
-                  </div>
-                  <Button 
-                    size="sm" 
-                    onClick={() => saveCost(selectedInternalTask.id, true)}
-                    disabled={savingCost}
-                    className="h-7 text-xs"
-                  >
-                    <Save className="h-3 w-3 mr-1" />
-                    {savingCost ? 'Guardando...' : 'Guardar costes'}
-                  </Button>
-                </div>
+                {renderCostLinesEditor(() => saveCost(selectedInternalTask.id, true))}
 
                 {/* Receipts */}
                 <div className="space-y-2">
