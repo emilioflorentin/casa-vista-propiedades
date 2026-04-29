@@ -29,6 +29,8 @@ const PropertyDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const { toast } = useToast();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [property, setProperty] = useState<any>(null);
