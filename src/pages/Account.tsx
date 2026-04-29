@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { PropertyForm } from '../components/PropertyForm';
+import DocumentGenerator from '../components/DocumentGenerator';
 import { 
   User, 
   MapPin, 
@@ -23,7 +24,8 @@ import {
   Edit2, 
   Trash2,
   Check,
-  Shield
+  Shield,
+  FileSignature
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
