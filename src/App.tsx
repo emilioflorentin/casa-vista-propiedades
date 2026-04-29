@@ -21,6 +21,7 @@ import ManageRental from "./pages/ManageRental";
 import TenantIncidents from "./pages/TenantIncidents";
 import OwnerIncidents from "./pages/OwnerIncidents";
 import ServiceBoard from "./pages/ServiceBoard";
+import ShortRedirect from "./pages/ShortRedirect";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/owner-incidents" element={<OwnerIncidents />} />
               <Route path="/service-board" element={<ServiceBoard />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/r/:code" element={<ShortRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </FavoritesProvider>
