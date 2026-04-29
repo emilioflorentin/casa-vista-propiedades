@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Download, Eraser, FileText } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { useToast } from '@/hooks/use-toast';
@@ -43,6 +42,66 @@ const loadLogoDataUrl = async (): Promise<string | null> => {
   }
 };
 const getLogoRatio = () => cachedLogoRatio || 1;
+
+// Convert a number (integer euros) to Spanish words (uppercase). Supports up to millions.
+const numberToSpanishWords = (n: number): string => {
+  if (!isFinite(n) || n < 0) return '';
+  if (n === 0) return 'CERO';
+  const ones = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE', 'DIEZ',
+    'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE',
+    'VEINTE', 'VEINTIUNO', 'VEINTIDÓS', 'VEINTITRÉS', 'VEINTICUATRO', 'VEINTICINCO', 'VEINTISÉIS',
+    'VEINTISIETE', 'VEINTIOCHO', 'VEINTINUEVE'];
+  const tens = ['', '', '', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+  const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS',
+    'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+  const under1000 = (num: number): string => {
+    if (num === 100) return 'CIEN';
+    const h = Math.floor(num / 100);
+    const rest = num % 100;
+    let out = '';
+    if (h > 0) out += hundreds[h];
+    if (rest > 0) {
+      if (out) out += ' ';
+      if (rest < 30) out += ones[rest];
+      else {
+        const t = Math.floor(rest / 10);
+        const u = rest % 10;
+        out += tens[t] + (u > 0 ? ' Y ' + ones[u] : '');
+      }
+    }
+    return out;
+  };
+  const num = Math.floor(n);
+  if (num < 1000) return under1000(num);
+  if (num < 1_000_000) {
+    const thousands = Math.floor(num / 1000);
+    const rest = num % 1000;
+    const thouTxt = thousands === 1 ? 'MIL' : under1000(thousands).replace(/\bUNO\b$/, 'UN') + ' MIL';
+    return thouTxt + (rest > 0 ? ' ' + under1000(rest) : '');
+  }
+  const millions = Math.floor(num / 1_000_000);
+  const rest = num % 1_000_000;
+  const milTxt = millions === 1 ? 'UN MILLÓN' : under1000(millions) + ' MILLONES';
+  return milTxt + (rest > 0 ? ' ' + numberToSpanishWords(rest) : '');
+};
+
+const formatEuros = (raw: string): { letters: string; figures: string } => {
+  const n = Number(raw);
+  if (!raw || !isFinite(n) || n <= 0) return { letters: '', figures: '' };
+  const intPart = Math.floor(n);
+  const cents = Math.round((n - intPart) * 100);
+  const figures = `${n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`;
+  let letters = `${numberToSpanishWords(intPart)} EUROS`;
+  if (cents > 0) letters += ` CON ${numberToSpanishWords(cents)} CÉNTIMOS`;
+  return { letters, figures };
+};
+
+const formatDateEs = (iso: string): string => {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+};
 
 type DocKind = 'consent' | 'reservation';
 
@@ -147,18 +206,22 @@ const DocumentGenerator = () => {
   const [year, setYear] = useState(t0.year);
   const [signature, setSignature] = useState<string | null>(null);
 
-  // Reservation extra fields
-  const [clientName, setClientName] = useState('');
-  const [clientDni, setClientDni] = useState('');
+  // Reservation: rental receipt fields (RECIBO DE RESERVA DE ALQUILER)
+  const [tenants, setTenants] = useState<Array<{ name: string; dni: string }>>([
+    { name: '', dni: '' },
+  ]);
+  const [reservationAmountNum, setReservationAmountNum] = useState('');
+  const [rentalStartDate, setRentalStartDate] = useState('');
+  const [rentalEndDate, setRentalEndDate] = useState('');
+  const [contractSignDate, setContractSignDate] = useState('');
+  const [depositAmountNum, setDepositAmountNum] = useState('');
+  const [feesText, setFeesText] = useState('1 MENSUALIDAD + 21% I.V.A');
+  const [monthlyRentNum, setMonthlyRentNum] = useState('');
   // Consent: parties (interesado / avalista)
   const [interestedName, setInterestedName] = useState('');
   const [interestedDni, setInterestedDni] = useState('');
   const [guarantorName, setGuarantorName] = useState('');
   const [guarantorDni, setGuarantorDni] = useState('');
-  const [propertyRef, setPropertyRef] = useState('');
-  const [reservationAmount, setReservationAmount] = useState('');
-  const [salePrice, setSalePrice] = useState('');
-  const [extraNotes, setExtraNotes] = useState('');
 
   const drawBackground = (doc: jsPDF, logo: string | null) => {
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -370,8 +433,17 @@ const DocumentGenerator = () => {
   };
 
   const generateReservationPdf = async () => {
-    if (!clientName.trim() || !clientDni.trim()) {
-      toast({ title: 'Faltan datos', description: 'Indica nombre y DNI/NIE del cliente.', variant: 'destructive' });
+    const validTenants = tenants.filter((t) => t.name.trim() && t.dni.trim());
+    if (validTenants.length === 0) {
+      toast({ title: 'Faltan datos', description: 'Añade al menos un arrendatario con nombre y DNI/NIE.', variant: 'destructive' });
+      return;
+    }
+    if (!propAddress.trim() || !propPostalCode.trim() || !propMunicipality.trim() || !propProvince.trim()) {
+      toast({ title: 'Faltan datos', description: 'Completa la dirección del inmueble.', variant: 'destructive' });
+      return;
+    }
+    if (!reservationAmountNum || !depositAmountNum || !monthlyRentNum) {
+      toast({ title: 'Faltan datos', description: 'Indica importe de reserva, fianza y precio del alquiler.', variant: 'destructive' });
       return;
     }
     if (!signature) {
@@ -388,64 +460,135 @@ const DocumentGenerator = () => {
     drawBackground(doc, logo);
     drawHeader(doc, logo);
 
-    let y = 46;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.text('DOCUMENTO DE RESERVA', margin, y);
-    y += 10;
+    const reservation = formatEuros(reservationAmountNum);
+    const deposit = formatEuros(depositAmountNum);
+    const rent = formatEuros(monthlyRentNum);
 
-    doc.setFont('helvetica', 'normal');
+    let y = 50;
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('RECIBO DE RESERVA DE ALQUILER — NAZARÍ HOMES', margin, y);
+    y += 8;
+
+    // Property
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
+    doc.text('INMUEBLE OBJETO DE RESERVA:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const propLine = `${propAddress.toUpperCase()}. CP: ${propPostalCode}. ${propMunicipality.toUpperCase()} (${propProvince.toUpperCase()}).`;
+    const propLines = doc.splitTextToSize(propLine, contentWidth - 60);
+    doc.text(propLines, margin + 60, y);
+    y += propLines.length * 5 + 4;
 
-    const amountTxt = reservationAmount ? `${Number(reservationAmount).toLocaleString('es-ES')} €` : '________ €';
-    const priceTxt = salePrice ? `${Number(salePrice).toLocaleString('es-ES')} €` : '________ €';
-
-    const body =
-      `D./Dña. ${clientName}, con DNI/NIE ${clientDni} (en adelante, "el Reservante"), manifiesta su ` +
-      `interés en reservar la propiedad identificada con referencia ${propertyRef || '________'}, ` +
-      `sita en ${propAddress || '________________'}, ${propPostalCode || ''} ${propMunicipality || ''} (${propProvince || ''}).\n\n` +
-      `A tal efecto entrega en este acto, en concepto de señal de reserva, la cantidad de ${amountTxt}, ` +
-      `que será descontada del precio total de la operación, fijado en ${priceTxt}.\n\n` +
-      `La presente reserva queda sujeta a la formalización del contrato definitivo entre las partes en el ` +
-      `plazo acordado. En caso de desistimiento por parte del Reservante, el importe entregado quedará en ` +
-      `poder de NAZARÍ HOMES en concepto de indemnización por gastos de gestión.` +
-      (extraNotes ? `\n\nObservaciones: ${extraNotes}` : '');
-
-    const lines = doc.splitTextToSize(body, contentWidth);
-    doc.text(lines, margin, y);
-    y += lines.length * 5 + 8;
-
+    // Tenants
     doc.setFont('helvetica', 'bold');
-    doc.text(`En ${signProvince || '________'} a ${day} de ${month} de ${year}.`, margin, y);
-    y += 14;
+    doc.text('EFECTÚAN LA RESERVA (ARRENDATARIOS*):', margin, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    validTenants.forEach((t) => {
+      doc.text(t.name.toUpperCase(), margin + 4, y);
+      doc.text(`DNI: ${t.dni.toUpperCase()}`, margin + contentWidth - 60, y);
+      y += 5.5;
+    });
+    y += 3;
 
+    // Reservation amount
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE LA RESERVA:', margin, y);
+    y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    const reservationLine = `Entregan la cantidad de ${reservation.letters} (${reservation.figures}).`;
+    const resLines = doc.splitTextToSize(reservationLine, contentWidth);
+    doc.text(resLines, margin, y);
+    y += resLines.length * 5 + 2;
+
+    // Conditions
+    const condText =
+      `CONDICIONES: La reserva se aplicará a la fianza descontándose de la misma una vez formalizado el contrato. ` +
+      `(FECHA INICIO ALQUILER: ${formatDateEs(rentalStartDate) || '__/__/____'}, FECHA FINALIZACIÓN: ${formatDateEs(rentalEndDate) || '__/__/____'}). ` +
+      `Se perderá la reserva en caso de no formalización del contrato por causa imputable a la parte que efectúa la reserva y en caso de impago de los honorarios correspondientes por prestación de servicios de NAZARÍ HOMES a la inmobiliaria la realización de la reserva (fianza).`;
+    const condLines = doc.splitTextToSize(condText, contentWidth);
+    doc.text(condLines, margin, y);
+    y += condLines.length * 5 + 4;
+
+    // Contract sign date
+    doc.setFont('helvetica', 'bold');
+    doc.text('FECHA FIRMA DEL CONTRATO', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`(${formatDateEs(contractSignDate) || '__/__/____'}).`, margin + 60, y);
+    y += 6;
+
+    // Deposit
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE LA FIANZA:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${deposit.letters} (${deposit.figures}).`, margin + 50, y);
+    y += 6;
+
+    // Fees
+    doc.setFont('helvetica', 'bold');
+    doc.text('IMPORTE DE HONORARIOS (G.I.A.):', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(feesText, margin + 65, y);
+    y += 6;
+
+    // Monthly rent
+    doc.setFont('helvetica', 'bold');
+    doc.text('PRECIO DEL ALQUILER:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const rentLine = `${rent.letters} MENSUALES (${rent.figures}).`;
+    const rentLines = doc.splitTextToSize(rentLine, contentWidth - 50);
+    doc.text(rentLines, margin + 50, y);
+    y += rentLines.length * 5 + 6;
+
+    // Sign place + date
+    doc.setFont('helvetica', 'bold');
+    doc.text(`EN ${(signProvince || propProvince).toUpperCase()} A ${day} DE ${month.toUpperCase()} DE ${year}`, pageWidth - margin, y, { align: 'right' });
+    y += 12;
+
+    // Signature columns: PROPIEDAD | ARRENDATARIOS
     const colW = (contentWidth - 20) / 2;
-    doc.text('NAZARÍ HOMES', margin + colW / 2, y, { align: 'center' });
-    doc.text('EL RESERVANTE', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('PROPIEDAD:', margin, y);
+    doc.text('ARRENDATARIOS*:', margin + 20 + colW, y);
     y += 4;
 
-    // Left side: NAZARÍ HOMES signature
+    // Nazarí signature on left
     try {
-      doc.addImage(signature, 'PNG', margin + (colW - 60) / 2, y, 60, 28);
+      const sigW = Math.min(colW, 60);
+      const sigH = 26;
+      doc.addImage(signature, 'PNG', margin + (colW - sigW) / 2, y, sigW, sigH);
     } catch {
       // ignore
     }
-    y += 32;
+    y += 30;
+
     doc.setDrawColor(120);
+    doc.setLineWidth(0.3);
     doc.line(margin, y, margin + colW, y);
     doc.line(margin + 20 + colW, y, margin + 20 + colW * 2, y);
-    y += 5;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
+    y += 4;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
     doc.setTextColor(120);
     doc.text('Firma y sello', margin + colW / 2, y, { align: 'center' });
-    doc.text(`${clientName} — ${clientDni}`, margin + 20 + colW + colW / 2, y, { align: 'center' });
+    doc.text('Firma digital o manuscrita', margin + 20 + colW + colW / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(60);
+    const tenantsText = validTenants.map((t) => `${t.name} — DNI: ${t.dni}`).join('\n');
+    doc.text(tenantsText, margin + 20 + colW + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
 
-    doc.save(`reserva-${propertyRef || 'propiedad'}-${clientName.replace(/\s+/g, '_')}.pdf`);
-    toast({ title: 'PDF generado', description: 'El documento se ha descargado correctamente.' });
+    const filename = `reserva-alquiler-${(validTenants[0]?.name || 'arrendatario').replace(/\s+/g, '_')}.pdf`;
+    doc.save(filename);
+    toast({ title: 'PDF generado', description: 'El recibo de reserva se ha descargado correctamente.' });
   };
 
   return (
@@ -561,38 +704,141 @@ const DocumentGenerator = () => {
         <TabsContent value="reservation" className="mt-4">
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="p-6 space-y-5">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="clientName">Nombre completo *</Label>
-                  <Input id="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan Pérez García" />
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Inmueble objeto de reserva
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rPropAddress">Dirección exacta *</Label>
+                    <Input id="rPropAddress" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="C/ Doctor Buenaventura Carreras Nº5, Portal Nº3, 3ºB" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rPropPostalCode">Código postal *</Label>
+                    <Input id="rPropPostalCode" value={propPostalCode} onChange={(e) => setPropPostalCode(e.target.value)} placeholder="18004" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rPropMunicipality">Municipio *</Label>
+                    <Input id="rPropMunicipality" value={propMunicipality} onChange={(e) => setPropMunicipality(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rPropProvince">Provincia *</Label>
+                    <Input id="rPropProvince" value={propProvince} onChange={(e) => setPropProvince(e.target.value)} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="clientDni">DNI / NIE *</Label>
-                  <Input id="clientDni" value={clientDni} onChange={(e) => setClientDni(e.target.value)} placeholder="12345678A" />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wide">
+                    Arrendatarios
+                  </h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTenants((prev) => [...prev, { name: '', dni: '' }])}
+                  >
+                    + Añadir arrendatario
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="propRef">Referencia propiedad</Label>
-                  <Input id="propRef" value={propertyRef} onChange={(e) => setPropertyRef(e.target.value)} placeholder="ABC12345" />
+                <div className="space-y-3">
+                  {tenants.map((t, idx) => (
+                    <div key={idx} className="grid md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                      <div className="space-y-2">
+                        <Label htmlFor={`tName-${idx}`}>Nombre completo {idx === 0 ? '*' : ''}</Label>
+                        <Input
+                          id={`tName-${idx}`}
+                          value={t.name}
+                          onChange={(e) =>
+                            setTenants((prev) => prev.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))
+                          }
+                          placeholder="Sra. Surya Ganesha Gaston Jiménez"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`tDni-${idx}`}>DNI / NIE {idx === 0 ? '*' : ''}</Label>
+                        <Input
+                          id={`tDni-${idx}`}
+                          value={t.dni}
+                          onChange={(e) =>
+                            setTenants((prev) => prev.map((x, i) => (i === idx ? { ...x, dni: e.target.value } : x)))
+                          }
+                          placeholder="73518870-Z"
+                        />
+                      </div>
+                      {tenants.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setTenants((prev) => prev.filter((_, i) => i !== idx))}
+                        >
+                          Quitar
+                        </Button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="propAddrR">Dirección propiedad</Label>
-                  <Input id="propAddrR" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="Calle, nº" />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Importes y condiciones
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="resAmt">Importe de la reserva (€) *</Label>
+                    <Input id="resAmt" type="number" step="0.01" value={reservationAmountNum} onChange={(e) => setReservationAmountNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="depositAmt">Importe de la fianza (€) *</Label>
+                    <Input id="depositAmt" type="number" step="0.01" value={depositAmountNum} onChange={(e) => setDepositAmountNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rentAmt">Precio del alquiler mensual (€) *</Label>
+                    <Input id="rentAmt" type="number" step="0.01" value={monthlyRentNum} onChange={(e) => setMonthlyRentNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="feesText">Honorarios (G.I.A.)</Label>
+                    <Input id="feesText" value={feesText} onChange={(e) => setFeesText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rStart">Fecha inicio alquiler</Label>
+                    <Input id="rStart" type="date" value={rentalStartDate} onChange={(e) => setRentalStartDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rEnd">Fecha finalización alquiler</Label>
+                    <Input id="rEnd" type="date" value={rentalEndDate} onChange={(e) => setRentalEndDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rContractDate">Fecha firma del contrato</Label>
+                    <Input id="rContractDate" type="date" value={contractSignDate} onChange={(e) => setContractSignDate(e.target.value)} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="resAmount">Importe reserva (€)</Label>
-                  <Input id="resAmount" type="number" value={reservationAmount} onChange={(e) => setReservationAmount(e.target.value)} placeholder="3000" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="salePrice">Precio total (€)</Label>
-                  <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="180000" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="signProvinceR">Lugar de firma</Label>
-                  <Input id="signProvinceR" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="notes">Observaciones</Label>
-                  <Textarea id="notes" value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} rows={3} />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Lugar y fecha de firma
+                </h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rSignProvince">Lugar de firma</Label>
+                    <Input id="rSignProvince" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} placeholder="Granada" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rDay">Día</Label>
+                    <Input id="rDay" value={day} onChange={(e) => setDay(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rMonth">Mes</Label>
+                    <Input id="rMonth" value={month} onChange={(e) => setMonth(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-4">
+                    <Label htmlFor="rYear">Año</Label>
+                    <Input id="rYear" value={year} onChange={(e) => setYear(e.target.value)} />
+                  </div>
                 </div>
               </div>
 
