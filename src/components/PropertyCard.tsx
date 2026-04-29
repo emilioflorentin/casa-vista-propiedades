@@ -122,9 +122,11 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
 
       <CardContent className="p-5 flex flex-col flex-1">
         <div className="mb-3">
-          <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
-            {property.title}
-          </h3>
+          <Link to={`/property/${property.originalId || property.id}`}>
+            <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1 hover:text-stone-600 transition-colors cursor-pointer">
+              {property.title}
+            </h3>
+          </Link>
           <div className="flex items-center text-gray-500 text-sm">
             <MapPin className="h-4 w-4 mr-1" />
             {property.location}
