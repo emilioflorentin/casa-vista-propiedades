@@ -454,17 +454,30 @@ const PropertyDetail = () => {
     navigate(-1); // Goes back to the previous page in history
   };
 
-  const handleWhatsAppChat = () => {
+  const handleWhatsAppChat = async () => {
     const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+    let linkUrl = shortUrl;
+    if (!linkUrl) {
+      try {
+        const { data } = await supabase.rpc('get_or_create_short_link', {
+          p_target_url: propertyUrl,
+          p_property_id: null,
+        });
+        if (data) linkUrl = `${window.location.origin}/r/${data}`;
+      } catch (e) {
+        console.warn('Short link generation failed, using full URL', e);
+      }
+    }
+    const finalLink = linkUrl || propertyUrl;
     const baseMessage = whatsappMessage || t('property.whatsapp_default_message', {
       title: property.title,
       reference: property.reference,
       location: property.location,
       price: formatPrice(property.price, property.operation)
     });
-    const defaultMessage = baseMessage.includes(propertyUrl)
+    const defaultMessage = (baseMessage.includes(propertyUrl) || baseMessage.includes(finalLink))
       ? baseMessage
-      : `${baseMessage}\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${propertyUrl}`;
+      : `${baseMessage}\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${finalLink}`;
     const encodedMessage = encodeURIComponent(defaultMessage);
     
     // Debug: Log the phone number and URL being generated
@@ -504,7 +517,8 @@ const PropertyDetail = () => {
 
   // Updated quick messages with consistent "Ref:" format and direct property link
   const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
-  const linkSuffix = `\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${propertyUrl}`;
+  const displayLink = shortUrl || propertyUrl;
+  const linkSuffix = `\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${displayLink}`;
   const quickMessages = [
     t('property.quick_message_visit', { title: property.title, reference: property.reference, location: property.location }) + linkSuffix,
     t('property.quick_message_available', { reference: property.reference, price: formatPrice(property.price, property.operation) }) + linkSuffix,
