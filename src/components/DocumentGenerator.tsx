@@ -150,6 +150,11 @@ const DocumentGenerator = () => {
   // Reservation extra fields
   const [clientName, setClientName] = useState('');
   const [clientDni, setClientDni] = useState('');
+  // Consent: parties (interesado / avalista)
+  const [interestedName, setInterestedName] = useState('');
+  const [interestedDni, setInterestedDni] = useState('');
+  const [guarantorName, setGuarantorName] = useState('');
+  const [guarantorDni, setGuarantorDni] = useState('');
   const [propertyRef, setPropertyRef] = useState('');
   const [reservationAmount, setReservationAmount] = useState('');
   const [salePrice, setSalePrice] = useState('');
@@ -345,6 +350,17 @@ const DocumentGenerator = () => {
     doc.text('Firma digital o manuscrita', colX[0] + colW / 2, y, { align: 'center' });
     doc.text('Firma digital o manuscrita', colX[1] + colW / 2, y, { align: 'center' });
     doc.text('Firma y sello', colX[2] + colW / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(60);
+    const nameLine = (name: string, dni: string) => {
+      const n = name.trim() || '—';
+      const d = dni.trim() ? `DNI/NIE: ${dni.trim()}` : '';
+      return d ? `${n}\n${d}` : n;
+    };
+    doc.text(nameLine(interestedName, interestedDni), colX[0] + colW / 2, y, { align: 'center' });
+    doc.text(nameLine(guarantorName, guarantorDni), colX[1] + colW / 2, y, { align: 'center' });
     doc.setTextColor(0);
 
     drawFooter(doc);
@@ -469,6 +485,38 @@ const DocumentGenerator = () => {
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="propProvince">Provincia *</Label>
                     <Input id="propProvince" value={propProvince} onChange={(e) => setPropProvince(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Interesado
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="interestedName">Nombre completo</Label>
+                    <Input id="interestedName" value={interestedName} onChange={(e) => setInterestedName(e.target.value)} placeholder="Juan Pérez García" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="interestedDni">DNI / NIE</Label>
+                    <Input id="interestedDni" value={interestedDni} onChange={(e) => setInterestedDni(e.target.value)} placeholder="12345678A" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Avalista
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="guarantorName">Nombre completo</Label>
+                    <Input id="guarantorName" value={guarantorName} onChange={(e) => setGuarantorName(e.target.value)} placeholder="María López Ruiz" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="guarantorDni">DNI / NIE</Label>
+                    <Input id="guarantorDni" value={guarantorDni} onChange={(e) => setGuarantorDni(e.target.value)} placeholder="87654321B" />
                   </div>
                 </div>
               </div>
