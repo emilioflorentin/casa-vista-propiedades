@@ -259,20 +259,18 @@ const DocumentGenerator = () => {
     if (logo) {
       try {
         const ratio = getLogoRatio();
-        const logoH = 26;
+        const logoH = 16;
         const logoW = logoH * ratio;
-        doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, 8, logoW, logoH);
+        doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, 6, logoW, logoH);
       } catch {
         // ignore
       }
     }
 
-    // Decorative double line
+    // Decorative single hairline below the logo
     doc.setDrawColor(180, 160, 130);
-    doc.setLineWidth(0.6);
-    doc.line(margin, 38, pageWidth - margin, 38);
     doc.setLineWidth(0.2);
-    doc.line(margin, 39.5, pageWidth - margin, 39.5);
+    doc.line(margin, 26, pageWidth - margin, 26);
     doc.setTextColor(0);
   };
 
