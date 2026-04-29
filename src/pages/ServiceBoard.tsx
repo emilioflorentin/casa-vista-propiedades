@@ -1393,6 +1393,7 @@ const ServiceBoard = () => {
                             <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
                             <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
                             <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
+                            <th className="text-right p-3 font-medium text-stone-600">Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1417,6 +1418,17 @@ const ServiceBoard = () => {
                                 {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
                               </td>
                               <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
+                              <td className="p-3 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => { setDeletingHistoryRow(h); setDeleteConfirmText(''); }}
+                                  aria-label="Eliminar registro"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
