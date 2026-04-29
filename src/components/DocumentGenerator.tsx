@@ -147,18 +147,22 @@ const DocumentGenerator = () => {
   const [year, setYear] = useState(t0.year);
   const [signature, setSignature] = useState<string | null>(null);
 
-  // Reservation extra fields
-  const [clientName, setClientName] = useState('');
-  const [clientDni, setClientDni] = useState('');
+  // Reservation: rental receipt fields (RECIBO DE RESERVA DE ALQUILER)
+  const [tenants, setTenants] = useState<Array<{ name: string; dni: string }>>([
+    { name: '', dni: '' },
+  ]);
+  const [reservationAmountNum, setReservationAmountNum] = useState('');
+  const [rentalStartDate, setRentalStartDate] = useState('');
+  const [rentalEndDate, setRentalEndDate] = useState('');
+  const [contractSignDate, setContractSignDate] = useState('');
+  const [depositAmountNum, setDepositAmountNum] = useState('');
+  const [feesText, setFeesText] = useState('1 MENSUALIDAD + 21% I.V.A');
+  const [monthlyRentNum, setMonthlyRentNum] = useState('');
   // Consent: parties (interesado / avalista)
   const [interestedName, setInterestedName] = useState('');
   const [interestedDni, setInterestedDni] = useState('');
   const [guarantorName, setGuarantorName] = useState('');
   const [guarantorDni, setGuarantorDni] = useState('');
-  const [propertyRef, setPropertyRef] = useState('');
-  const [reservationAmount, setReservationAmount] = useState('');
-  const [salePrice, setSalePrice] = useState('');
-  const [extraNotes, setExtraNotes] = useState('');
 
   const drawBackground = (doc: jsPDF, logo: string | null) => {
     const pageWidth = doc.internal.pageSize.getWidth();
