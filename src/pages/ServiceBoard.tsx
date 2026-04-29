@@ -1130,6 +1130,85 @@ const ServiceBoard = () => {
     );
   }
 
+  const renderCostLinesEditor = (onSave: () => void) => {
+    const totals = sumLines(costLines);
+    const profit = totals.charge - totals.repair - totals.materials;
+    return (
+      <div className="space-y-2">
+        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 text-xs font-medium text-blue-700 px-1">
+          <span>Traslado (€)</span>
+          <span>Materiales (€)</span>
+          <span className="text-green-700">Cobro cliente (€)</span>
+          <span className="w-7" />
+        </div>
+        {costLines.length === 0 && (
+          <p className="text-xs text-stone-500 italic px-1">Sin líneas. Pulsa "+ Añadir fila" para empezar.</p>
+        )}
+        {costLines.map((line) => (
+          <div key={line.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.repair || ''}
+              onChange={(e) => updateCostLine(line.id, 'repair', Number(e.target.value))}
+              className="h-8 text-sm"
+            />
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.materials || ''}
+              onChange={(e) => updateCostLine(line.id, 'materials', Number(e.target.value))}
+              className="h-8 text-sm"
+            />
+            <Input
+              type="number" min="0" step="0.01" placeholder="0.00"
+              value={line.charge || ''}
+              onChange={(e) => updateCostLine(line.id, 'charge', Number(e.target.value))}
+              className="h-8 text-sm border-green-200"
+            />
+            <Button
+              type="button" variant="ghost" size="sm"
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+              onClick={() => removeCostLine(line.id)}
+              aria-label="Eliminar fila"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button" variant="outline" size="sm"
+          onClick={addCostLine}
+          className="h-7 text-xs border-blue-300 text-blue-700 hover:bg-blue-100"
+        >
+          <Plus className="h-3 w-3 mr-1" /> Añadir fila
+        </Button>
+
+        {costLines.length > 0 && (
+          <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center pt-2 mt-1 border-t border-blue-200 text-sm font-semibold">
+            <span className="text-blue-800">Total: {totals.repair.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="text-blue-800">Total: {totals.materials.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="text-green-700">Total: {totals.charge.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            <span className="w-7" />
+          </div>
+        )}
+
+        <div className="flex justify-between items-center text-sm flex-wrap gap-2 pt-1">
+          <div className="flex gap-3">
+            <span className="font-medium text-blue-800">Coste: {(totals.repair + totals.materials).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
+            {totals.charge > 0 && (
+              <span className={`font-medium ${profit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                Beneficio: {profit.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+              </span>
+            )}
+          </div>
+          <Button size="sm" onClick={onSave} disabled={savingCost} className="h-7 text-xs">
+            <Save className="h-3 w-3 mr-1" />
+            {savingCost ? 'Guardando...' : 'Guardar costes'}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
