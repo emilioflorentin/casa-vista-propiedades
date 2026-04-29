@@ -264,16 +264,33 @@ const ServiceBoard = () => {
         .from('incident_costs')
         .select('*');
       if (costsData) {
-        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number }> = {};
+        const costsMap: Record<string, { repair_cost: number; materials_cost: number; notes: string; receipts: string[]; charge_amount: number; lines: CostLine[] }> = {};
         costsData.forEach((c: any) => {
           const key = c.incident_id || c.internal_task_id;
           if (key) {
+            const rawLines = Array.isArray(c.lines) ? c.lines : [];
+            const lines: CostLine[] = rawLines.length > 0
+              ? rawLines.map((l: any, i: number) => ({
+                  id: l.id || `${Date.now()}-${i}`,
+                  repair: Number(l.repair) || 0,
+                  materials: Number(l.materials) || 0,
+                  charge: Number(l.charge) || 0,
+                }))
+              : ((Number(c.repair_cost) || Number(c.materials_cost) || Number(c.charge_amount))
+                  ? [{
+                      id: `${Date.now()}-legacy`,
+                      repair: Number(c.repair_cost) || 0,
+                      materials: Number(c.materials_cost) || 0,
+                      charge: Number(c.charge_amount) || 0,
+                    }]
+                  : []);
             costsMap[key] = {
               repair_cost: Number(c.repair_cost) || 0,
               materials_cost: Number(c.materials_cost) || 0,
               notes: c.notes || '',
               receipts: c.receipts || [],
               charge_amount: Number(c.charge_amount) || 0,
+              lines,
             };
           }
         });
