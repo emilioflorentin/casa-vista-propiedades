@@ -705,38 +705,141 @@ const DocumentGenerator = () => {
         <TabsContent value="reservation" className="mt-4">
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="p-6 space-y-5">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="clientName">Nombre completo *</Label>
-                  <Input id="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan Pérez García" />
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Inmueble objeto de reserva
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rPropAddress">Dirección exacta *</Label>
+                    <Input id="rPropAddress" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="C/ Doctor Buenaventura Carreras Nº5, Portal Nº3, 3ºB" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rPropPostalCode">Código postal *</Label>
+                    <Input id="rPropPostalCode" value={propPostalCode} onChange={(e) => setPropPostalCode(e.target.value)} placeholder="18004" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rPropMunicipality">Municipio *</Label>
+                    <Input id="rPropMunicipality" value={propMunicipality} onChange={(e) => setPropMunicipality(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rPropProvince">Provincia *</Label>
+                    <Input id="rPropProvince" value={propProvince} onChange={(e) => setPropProvince(e.target.value)} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="clientDni">DNI / NIE *</Label>
-                  <Input id="clientDni" value={clientDni} onChange={(e) => setClientDni(e.target.value)} placeholder="12345678A" />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wide">
+                    Arrendatarios
+                  </h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTenants((prev) => [...prev, { name: '', dni: '' }])}
+                  >
+                    + Añadir arrendatario
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="propRef">Referencia propiedad</Label>
-                  <Input id="propRef" value={propertyRef} onChange={(e) => setPropertyRef(e.target.value)} placeholder="ABC12345" />
+                <div className="space-y-3">
+                  {tenants.map((t, idx) => (
+                    <div key={idx} className="grid md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                      <div className="space-y-2">
+                        <Label htmlFor={`tName-${idx}`}>Nombre completo {idx === 0 ? '*' : ''}</Label>
+                        <Input
+                          id={`tName-${idx}`}
+                          value={t.name}
+                          onChange={(e) =>
+                            setTenants((prev) => prev.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))
+                          }
+                          placeholder="Sra. Surya Ganesha Gaston Jiménez"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`tDni-${idx}`}>DNI / NIE {idx === 0 ? '*' : ''}</Label>
+                        <Input
+                          id={`tDni-${idx}`}
+                          value={t.dni}
+                          onChange={(e) =>
+                            setTenants((prev) => prev.map((x, i) => (i === idx ? { ...x, dni: e.target.value } : x)))
+                          }
+                          placeholder="73518870-Z"
+                        />
+                      </div>
+                      {tenants.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setTenants((prev) => prev.filter((_, i) => i !== idx))}
+                        >
+                          Quitar
+                        </Button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="propAddrR">Dirección propiedad</Label>
-                  <Input id="propAddrR" value={propAddress} onChange={(e) => setPropAddress(e.target.value)} placeholder="Calle, nº" />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Importes y condiciones
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="resAmt">Importe de la reserva (€) *</Label>
+                    <Input id="resAmt" type="number" step="0.01" value={reservationAmountNum} onChange={(e) => setReservationAmountNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="depositAmt">Importe de la fianza (€) *</Label>
+                    <Input id="depositAmt" type="number" step="0.01" value={depositAmountNum} onChange={(e) => setDepositAmountNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rentAmt">Precio del alquiler mensual (€) *</Label>
+                    <Input id="rentAmt" type="number" step="0.01" value={monthlyRentNum} onChange={(e) => setMonthlyRentNum(e.target.value)} placeholder="1250" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="feesText">Honorarios (G.I.A.)</Label>
+                    <Input id="feesText" value={feesText} onChange={(e) => setFeesText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rStart">Fecha inicio alquiler</Label>
+                    <Input id="rStart" type="date" value={rentalStartDate} onChange={(e) => setRentalStartDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rEnd">Fecha finalización alquiler</Label>
+                    <Input id="rEnd" type="date" value={rentalEndDate} onChange={(e) => setRentalEndDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rContractDate">Fecha firma del contrato</Label>
+                    <Input id="rContractDate" type="date" value={contractSignDate} onChange={(e) => setContractSignDate(e.target.value)} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="resAmount">Importe reserva (€)</Label>
-                  <Input id="resAmount" type="number" value={reservationAmount} onChange={(e) => setReservationAmount(e.target.value)} placeholder="3000" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="salePrice">Precio total (€)</Label>
-                  <Input id="salePrice" type="number" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="180000" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="signProvinceR">Lugar de firma</Label>
-                  <Input id="signProvinceR" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="notes">Observaciones</Label>
-                  <Textarea id="notes" value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} rows={3} />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                  Lugar y fecha de firma
+                </h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="rSignProvince">Lugar de firma</Label>
+                    <Input id="rSignProvince" value={signProvince} onChange={(e) => setSignProvince(e.target.value)} placeholder="Granada" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rDay">Día</Label>
+                    <Input id="rDay" value={day} onChange={(e) => setDay(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rMonth">Mes</Label>
+                    <Input id="rMonth" value={month} onChange={(e) => setMonth(e.target.value)} />
+                  </div>
+                  <div className="space-y-2 md:col-span-4">
+                    <Label htmlFor="rYear">Año</Label>
+                    <Input id="rYear" value={year} onChange={(e) => setYear(e.target.value)} />
+                  </div>
                 </div>
               </div>
 
