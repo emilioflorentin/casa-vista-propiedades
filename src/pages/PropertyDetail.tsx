@@ -477,7 +477,8 @@ const PropertyDetail = () => {
   };
 
   const handleWhatsAppChat = async () => {
-    const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+    const publicBase = 'https://www.nazarihomes.com';
+    const propertyUrl = `${publicBase}/property/${property.originalId || property.id}`;
     let linkUrl = shortUrl;
     if (!linkUrl) {
       try {
@@ -485,7 +486,7 @@ const PropertyDetail = () => {
           p_target_url: propertyUrl,
           p_property_id: null,
         });
-        if (data) linkUrl = `${window.location.origin}/r/${data}`;
+        if (data) linkUrl = `${publicBase}/r/${data}`;
       } catch (e) {
         console.warn('Short link generation failed, using full URL', e);
       }
@@ -537,10 +538,11 @@ const PropertyDetail = () => {
     }
   };
 
-  // Updated quick messages with consistent "Ref:" format and direct property link
-  const propertyUrl = `${window.location.origin}/property/${property.originalId || property.id}`;
+  // Updated quick messages with consistent "Ref:" format and short property link
+  const publicBase = 'https://www.nazarihomes.com';
+  const propertyUrl = `${publicBase}/property/${property.originalId || property.id}`;
   const displayLink = shortUrl || propertyUrl;
-  const linkSuffix = `\n\n🔗 Ver propiedad (Ref: ${property.reference}): ${displayLink}`;
+  const linkSuffix = `\n\n🔗 Ref ${property.reference}: ${displayLink}`;
   const quickMessages = [
     t('property.quick_message_visit', { title: property.title, reference: property.reference, location: property.location }) + linkSuffix,
     t('property.quick_message_available', { reference: property.reference, price: formatPrice(property.price, property.operation) }) + linkSuffix,
