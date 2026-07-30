@@ -22,6 +22,11 @@ import TenantIncidents from "./pages/TenantIncidents";
 import OwnerIncidents from "./pages/OwnerIncidents";
 import ServiceBoard from "./pages/ServiceBoard";
 import ShortRedirect from "./pages/ShortRedirect";
+import RoomieFinder from "./pages/RoomieFinder";
+import RoomieListingDetail from "./pages/RoomieListingDetail";
+import RoomiePublish from "./pages/RoomiePublish";
+import RoomieProfile from "./pages/RoomieProfile";
+import RoomieMatches from "./pages/RoomieMatches";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -49,6 +54,11 @@ const App = () => (
               <Route path="/tenant-incidents" element={<TenantIncidents />} />
               <Route path="/owner-incidents" element={<OwnerIncidents />} />
               <Route path="/service-board" element={<ServiceBoard />} />
+              <Route path="/roomie-finder" element={<RoomieFinder />} />
+              <Route path="/roomie-finder/publicar" element={<RoomiePublish />} />
+              <Route path="/roomie-finder/mi-perfil" element={<RoomieProfile />} />
+              <Route path="/roomie-finder/matches" element={<RoomieMatches />} />
+              <Route path="/roomie-finder/:id" element={<RoomieListingDetail />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/r/:code" element={<ShortRedirect />} />
               <Route path="*" element={<NotFound />} />
