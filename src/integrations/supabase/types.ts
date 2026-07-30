@@ -496,6 +496,301 @@ export type Database = {
           },
         ]
       }
+      roomie_likes: {
+        Row: {
+          created_at: string
+          direction: string
+          id: string
+          listing_id: string
+          owner_id: string
+          seeker_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          id?: string
+          listing_id: string
+          owner_id: string
+          seeker_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          id?: string
+          listing_id?: string
+          owner_id?: string
+          seeker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roomie_likes_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "roomie_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roomie_listings: {
+        Row: {
+          address: string
+          atmosphere: string
+          available_from: string
+          bathrooms: number
+          bills_estimate: number
+          bills_included: boolean
+          cleanliness: string
+          contact_phone: string
+          created_at: string
+          deposit_amount: number
+          flatmates_age_range: string
+          flatmates_count: number
+          flatmates_gender_mix: string
+          flatmates_occupation: string
+          flatmates_schedule: string
+          guests_policy: string
+          has_pets: boolean
+          home_images: string[]
+          id: string
+          includes_community: boolean
+          includes_electricity: boolean
+          includes_gas: boolean
+          includes_internet: boolean
+          includes_water: boolean
+          is_active: boolean
+          languages: string[]
+          municipality: string
+          pets_allowed: boolean
+          pref_age_max: number | null
+          pref_age_min: number | null
+          pref_gender: string | null
+          pref_min_stay_months: number | null
+          pref_occupation: string | null
+          pref_pets: string | null
+          pref_smoker: string | null
+          property_type: string
+          province: string
+          rent_amount: number
+          room_area: number
+          room_exterior: boolean
+          room_furnished: boolean
+          room_images: string[]
+          room_private_bath: boolean
+          smokers: boolean
+          social_level: string
+          title: string
+          total_area: number
+          total_rooms: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          atmosphere?: string
+          available_from?: string
+          bathrooms?: number
+          bills_estimate?: number
+          bills_included?: boolean
+          cleanliness?: string
+          contact_phone?: string
+          created_at?: string
+          deposit_amount?: number
+          flatmates_age_range?: string
+          flatmates_count?: number
+          flatmates_gender_mix?: string
+          flatmates_occupation?: string
+          flatmates_schedule?: string
+          guests_policy?: string
+          has_pets?: boolean
+          home_images?: string[]
+          id?: string
+          includes_community?: boolean
+          includes_electricity?: boolean
+          includes_gas?: boolean
+          includes_internet?: boolean
+          includes_water?: boolean
+          is_active?: boolean
+          languages?: string[]
+          municipality: string
+          pets_allowed?: boolean
+          pref_age_max?: number | null
+          pref_age_min?: number | null
+          pref_gender?: string | null
+          pref_min_stay_months?: number | null
+          pref_occupation?: string | null
+          pref_pets?: string | null
+          pref_smoker?: string | null
+          property_type?: string
+          province: string
+          rent_amount?: number
+          room_area?: number
+          room_exterior?: boolean
+          room_furnished?: boolean
+          room_images?: string[]
+          room_private_bath?: boolean
+          smokers?: boolean
+          social_level?: string
+          title: string
+          total_area?: number
+          total_rooms?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          atmosphere?: string
+          available_from?: string
+          bathrooms?: number
+          bills_estimate?: number
+          bills_included?: boolean
+          cleanliness?: string
+          contact_phone?: string
+          created_at?: string
+          deposit_amount?: number
+          flatmates_age_range?: string
+          flatmates_count?: number
+          flatmates_gender_mix?: string
+          flatmates_occupation?: string
+          flatmates_schedule?: string
+          guests_policy?: string
+          has_pets?: boolean
+          home_images?: string[]
+          id?: string
+          includes_community?: boolean
+          includes_electricity?: boolean
+          includes_gas?: boolean
+          includes_internet?: boolean
+          includes_water?: boolean
+          is_active?: boolean
+          languages?: string[]
+          municipality?: string
+          pets_allowed?: boolean
+          pref_age_max?: number | null
+          pref_age_min?: number | null
+          pref_gender?: string | null
+          pref_min_stay_months?: number | null
+          pref_occupation?: string | null
+          pref_pets?: string | null
+          pref_smoker?: string | null
+          property_type?: string
+          province?: string
+          rent_amount?: number
+          room_area?: number
+          room_exterior?: boolean
+          room_furnished?: boolean
+          room_images?: string[]
+          room_private_bath?: boolean
+          smokers?: boolean
+          social_level?: string
+          title?: string
+          total_area?: number
+          total_rooms?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      roomie_matches: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          owner_id: string
+          seeker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          owner_id: string
+          seeker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          owner_id?: string
+          seeker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roomie_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "roomie_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roomie_profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          bio: string
+          budget_max: number | null
+          cleanliness: string
+          created_at: string
+          desired_area: string
+          full_name: string
+          gender: string
+          has_pets: boolean
+          id: string
+          languages: string[]
+          move_in_date: string | null
+          occupation: string
+          phone: string
+          schedule: string
+          smoker: boolean
+          social_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string
+          budget_max?: number | null
+          cleanliness?: string
+          created_at?: string
+          desired_area?: string
+          full_name: string
+          gender?: string
+          has_pets?: boolean
+          id?: string
+          languages?: string[]
+          move_in_date?: string | null
+          occupation?: string
+          phone?: string
+          schedule?: string
+          smoker?: boolean
+          social_level?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string
+          budget_max?: number | null
+          cleanliness?: string
+          created_at?: string
+          desired_area?: string
+          full_name?: string
+          gender?: string
+          has_pets?: boolean
+          id?: string
+          languages?: string[]
+          move_in_date?: string | null
+          occupation?: string
+          phone?: string
+          schedule?: string
+          smoker?: boolean
+          social_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       short_links: {
         Row: {
           click_count: number
@@ -622,6 +917,36 @@ export type Database = {
           full_name: string
           id: string
           user_type: string
+        }[]
+      }
+      get_roomie_applicants: {
+        Args: { p_listing_id: string }
+        Returns: {
+          age: number
+          avatar_url: string
+          bio: string
+          budget_max: number
+          cleanliness: string
+          desired_area: string
+          full_name: string
+          gender: string
+          has_pets: boolean
+          is_matched: boolean
+          languages: string[]
+          liked_at: string
+          move_in_date: string
+          occupation: string
+          schedule: string
+          smoker: boolean
+          social_level: string
+          user_id: string
+        }[]
+      }
+      get_roomie_match_contact: {
+        Args: { p_listing_id: string; p_seeker_id: string }
+        Returns: {
+          counterpart_name: string
+          counterpart_phone: string
         }[]
       }
       get_tenant_incidents: {
