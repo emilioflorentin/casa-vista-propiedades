@@ -49,6 +49,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/roomie-finder" className="text-gray-300 hover:text-white transition-colors">
+                  Roomie Finder
+                </Link>
+              </li>
+              <li>
                 <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                   {t('nav.contact')}
                 </Link>

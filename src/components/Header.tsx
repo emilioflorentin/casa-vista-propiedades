@@ -41,6 +41,9 @@ const Header = () => {
             <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               {t('nav.properties')}
             </Link>
+            <Link to="/roomie-finder" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+              Roomie Finder
+            </Link>
             <Link to="/services" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               {t('nav.services')}
             </Link>
@@ -193,6 +196,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.properties')}
+              </Link>
+              <Link 
+                to="/roomie-finder" 
+                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Roomie Finder
               </Link>
               <Link 
                 to="/services" 
