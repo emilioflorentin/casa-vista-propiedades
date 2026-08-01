@@ -316,7 +316,7 @@ const Index = () => {
       {/* Properties Section */}
       <section className="py-20 bg-stone-25">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <Reveal className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
               {showingSearchResults ? t("properties.search_results") : t("properties.featured")}
             </h2>
@@ -334,7 +334,7 @@ const Index = () => {
                 {t("properties.show_featured")}
               </Button>
             )}
-          </div>
+          </Reveal>
 
           {filteredProperties.length > 0 ? (
             <>
@@ -390,13 +390,13 @@ const Index = () => {
           )}
 
           {!showingSearchResults && (
-            <div className="text-center mt-12">
+            <Reveal className="text-center mt-12">
               <Link to="/properties">
                 <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
                   {t("properties.view_all")}
                 </Button>
               </Link>
-            </div>
+            </Reveal>
           )}
         </div>
       </section>
