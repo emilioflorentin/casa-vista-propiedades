@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/roomie/RoomieHeader';
 import Footer from '@/components/roomie/RoomieFooter';
@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Heart, Plus, UserRound, Sparkles } from 'lucide-react';
 import { RoomieListingCard, type RoomieListing } from '@/components/roomie/RoomieListingCard';
 import { RoomieSwipeDeck } from '@/components/roomie/RoomieSwipeDeck';
+import RoomieIntro from '@/components/roomie/RoomieIntro';
 
 const RoomieFinder = () => {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ const RoomieFinder = () => {
   const [loading, setLoading] = useState(true);
   const [seen, setSeen] = useState<string[]>([]);
   const [hasProfile, setHasProfile] = useState(false);
+  const exploreRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -103,9 +105,11 @@ const RoomieFinder = () => {
     <div className="min-h-screen bg-stone-50">
       <Header />
       <main className="container mx-auto px-6 py-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <RoomieIntro onStart={() => exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
+
+        <div ref={exploreRef} className="scroll-mt-24 pt-6 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-stone-800">Roomie Finder</h1>
+            <h2 className="text-3xl md:text-4xl font-bold text-stone-800">Explora habitaciones</h2>
             <p className="text-muted-foreground mt-2 max-w-2xl">
               Encuentra compañero de piso con perfiles de convivencia reales, gastos claros y fotos de la vivienda y de la habitación libre.
             </p>
