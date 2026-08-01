@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import LocationSearch from "@/components/LocationSearch";
+import Reveal from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
