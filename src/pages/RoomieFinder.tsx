@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/components/roomie/RoomieHeader';
+import Footer from '@/components/roomie/RoomieFooter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -110,7 +110,7 @@ const RoomieFinder = () => {
               Encuentra compañero de piso con perfiles de convivencia reales, gastos claros y fotos de la vivienda y de la habitación libre.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 md:hidden">
             <Link to="/roomie-finder/publicar">
               <Button className="bg-stone-700 hover:bg-stone-800"><Plus className="w-4 h-4 mr-2" />Publicar habitación</Button>
             </Link>
