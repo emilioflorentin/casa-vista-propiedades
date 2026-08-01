@@ -218,14 +218,18 @@ const Index = () => {
       <section className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            {t("hero.title")}
-            <span className="block text-stone-100">{t("hero.title_highlight")}</span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
+          <Reveal variant="fade">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              {t("hero.title")}
+              <span className="block text-stone-100">{t("hero.title_highlight")}</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={150}>
+            <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
+          </Reveal>
 
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
+          <Reveal delay={280} variant="scale" className="bg-white rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <LocationSearch onLocationSelect={handleLocationSelect} placeholder={t("search.location_placeholder")} />
 
@@ -273,7 +277,7 @@ const Index = () => {
                 {t("search.search_btn")}
               </Button>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -281,7 +285,7 @@ const Index = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
+            <Reveal className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home className="h-8 w-8 text-stone-600" />
               </div>
@@ -289,21 +293,21 @@ const Index = () => {
                 {allUserProperties.length.toLocaleString("es-ES")}+
               </h3>
               <p className="text-gray-600">{t("stats.properties")}</p>
-            </div>
-            <div className="p-6">
+            </Reveal>
+            <Reveal delay={120} className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Key className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">190+</h3>
               <p className="text-gray-600">{t("stats.clients")}</p>
-            </div>
-            <div className="p-6">
+            </Reveal>
+            <Reveal delay={240} className="p-6">
               <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-8 w-8 text-stone-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
               <p className="text-gray-600">{t("stats.success_rate")}</p>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
