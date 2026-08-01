@@ -110,7 +110,7 @@ const RoomieFinder = () => {
               Encuentra compañero de piso con perfiles de convivencia reales, gastos claros y fotos de la vivienda y de la habitación libre.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 md:hidden">
             <Link to="/roomie-finder/publicar">
               <Button className="bg-stone-700 hover:bg-stone-800"><Plus className="w-4 h-4 mr-2" />Publicar habitación</Button>
             </Link>
