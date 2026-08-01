@@ -404,43 +404,43 @@ const Index = () => {
       {/* Tenant Section */}
       <section className="py-20 bg-gradient-to-br from-stone-600 to-stone-800 text-white">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center mb-12">
+          <Reveal className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">{t("tenant_section.title")}</h2>
             <p className="text-xl text-stone-200 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
-            <div className="text-center p-6">
+            <Reveal className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-stone-200" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step1_title")}</h3>
               <p className="text-stone-300 text-sm">{t("tenant_section.step1_desc")}</p>
-            </div>
-            <div className="text-center p-6">
+            </Reveal>
+            <Reveal delay={120} className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Camera className="h-8 w-8 text-stone-200" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step2_title")}</h3>
               <p className="text-stone-300 text-sm">{t("tenant_section.step2_desc")}</p>
-            </div>
-            <div className="text-center p-6">
+            </Reveal>
+            <Reveal delay={240} className="text-center p-6">
               <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="h-8 w-8 text-stone-200" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step3_title")}</h3>
               <p className="text-stone-300 text-sm">{t("tenant_section.step3_desc")}</p>
-            </div>
+            </Reveal>
           </div>
 
-          <div className="text-center">
+          <Reveal delay={120} className="text-center">
             <Link to="/tenant-incidents">
               <Button size="lg" className="bg-white text-stone-800 hover:bg-stone-100 font-semibold">
                 {t("tenant_section.cta")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
       </main>
