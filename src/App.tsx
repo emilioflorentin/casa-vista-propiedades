@@ -28,6 +28,7 @@ import RoomiePublish from "./pages/RoomiePublish";
 import RoomieProfile from "./pages/RoomieProfile";
 import RoomieMatches from "./pages/RoomieMatches";
 import CookieBanner from "./components/CookieBanner";
+import NativeBootstrap from "./native/NativeBootstrap";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <CookieBanner />
+            <NativeBootstrap />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/properties" element={<Properties />} />
