@@ -72,7 +72,7 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
       <div className="absolute -top-24 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl" />
 
       <Reveal>
-        <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="mx-auto h-20 md:h-28 w-auto object-contain" />
+        <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="mx-auto h-24 md:h-36 w-auto object-contain" />
       </Reveal>
       <Reveal delay={120}>
         <h1 className="mt-6 text-3xl md:text-5xl font-bold text-stone-800 max-w-3xl mx-auto leading-tight">
