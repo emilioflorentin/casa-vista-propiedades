@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Heart, MessageCircle, X } from 'lucide-react';
 import { formatMoney, openRoomieWhatsApp, SOCIAL_LEVELS, OCCUPATIONS, SCHEDULES, CLEANLINESS } from '@/utils/roomie';
 import type { RoomieListing } from '@/components/roomie/RoomieListingCard';
+import ListingStatsPanel from '@/components/stats/ListingStatsPanel';
 
 interface Applicant {
   user_id: string; full_name: string; age: number | null; gender: string; occupation: string;
@@ -95,6 +96,7 @@ const RoomieMatches = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="received">Interesados en mi habitación</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
+            <TabsTrigger value="stats">Estadísticas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="received" className="space-y-6">
@@ -163,6 +165,27 @@ const RoomieMatches = () => {
                 </Card>
               );
             })}
+          </TabsContent>
+
+          <TabsContent value="stats">
+            <ListingStatsPanel
+              entityType="roomie_listing"
+              emptyMessage="Todavía no has publicado ninguna habitación."
+              items={myListings.map((l) => ({
+                id: l.id,
+                title: l.title,
+                subtitle: `${l.address}, ${l.municipality} · ${formatMoney(l.rent_amount)}/mes`,
+                image: l.room_images?.[0] || l.home_images?.[0] || null,
+                extra: [
+                  { label: 'Likes recibidos', value: (applicants[l.id] || []).length, icon: 'like' as const },
+                  {
+                    label: 'Matches',
+                    value: matches.filter((m) => m.listing_id === l.id).length,
+                    icon: 'match' as const,
+                  },
+                ],
+              }))}
+            />
           </TabsContent>
         </Tabs>
       </main>
