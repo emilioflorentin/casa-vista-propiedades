@@ -290,6 +290,36 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_events: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          event_type: string
+          id: string
+          owner_id: string | null
+          visitor_hash: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          event_type: string
+          id?: string
+          owner_id?: string | null
+          visitor_hash?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          event_type?: string
+          id?: string
+          owner_id?: string | null
+          visitor_hash?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -893,6 +923,25 @@ export type Database = {
           id: string
           phone: string
           user_type: string
+        }[]
+      }
+      get_listing_daily_views: {
+        Args: { p_days?: number; p_entity_id: string; p_entity_type: string }
+        Returns: {
+          day: string
+          views: number
+        }[]
+      }
+      get_listing_stats: {
+        Args: { p_entity_type: string }
+        Returns: {
+          entity_id: string
+          favorites: number
+          impressions: number
+          unique_visitors: number
+          views: number
+          views_30d: number
+          views_7d: number
         }[]
       }
       get_or_create_short_link: {
