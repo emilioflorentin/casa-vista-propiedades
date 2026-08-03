@@ -19,7 +19,7 @@ const RoomieHeader = () => {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
       <div className="container mx-auto px-6 h-20 flex items-center justify-between gap-4">
         <Link to="/roomie-finder" className="flex items-center shrink-0">
-          <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="h-14 md:h-16 w-auto object-contain" />
+          <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="h-16 md:h-20 w-auto object-contain" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
