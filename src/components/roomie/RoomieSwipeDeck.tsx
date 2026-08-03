@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, X, MapPin, Info } from 'lucide-react';
 import { formatMoney, includedBills, SOCIAL_LEVELS, CLEANLINESS, SCHEDULES } from '@/utils/roomie';
 import type { RoomieListing } from './RoomieListingCard';
+import { trackListingEvent } from '@/utils/analyticsEvents';
 
 interface Props {
   listings: RoomieListing[];
@@ -18,6 +19,10 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
   const startX = useRef(0);
   const current = listings[0];
   const next = listings[1];
+
+  useEffect(() => {
+    if (current) trackListingEvent('roomie_listing', current.id, 'impression', current.user_id);
+  }, [current?.id]);
 
   if (!current) return null;
 
