@@ -25,6 +25,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { trackListingEvent } from "@/utils/analyticsEvents";
+
 const PropertyDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -713,7 +715,7 @@ const PropertyDetail = () => {
                     size="sm"
                     className="border-stone-300 text-stone-600 hover:bg-stone-50"
                     onClick={() => {
-                      toggleFavorite(property.id);
+                      toggleFavorite(property.id, { entityType: "property", entityId: property.originalId || property.id, ownerId: property.user_id });
                       toast({
                         title: isFavorite(property.id)
                           ? "Eliminado de favoritos"

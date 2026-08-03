@@ -7,6 +7,7 @@ import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trackListingEvent } from "@/utils/analyticsEvents";
 
 interface Property {
   id: number;
@@ -56,7 +57,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(property.id);
+    toggleFavorite(property.id, { entityType: "property", entityId: property.originalId || property.id });
   };
 
   const isPropertyFavorite = isFavorite(property.id);
