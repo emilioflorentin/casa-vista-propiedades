@@ -1,74 +1,44 @@
-## Roomie Finder
+## Métricas para quien publica (Nazarí Homes + Roomie Finder)
 
-Nueva sección para encontrar compañeros de piso, con anuncios de habitación y un sistema de swipe con match mutuo. Contacto por WhatsApp solo cuando hay match.
+Panel de estadísticas para el propietario/anunciante: cuántas veces se ha visto su anuncio, cuánta gente lo ha guardado en favoritos, y en Roomie Finder también los likes y matches.
 
-### Cómo funciona
+### Qué verá el usuario
 
-1. **Anunciante** (tiene piso y una habitación libre): crea el anuncio desde su cuenta.
-2. **Buscador**: crea un perfil de roomie (quién es, horarios, hábitos).
-3. **Swipe**: el buscador pasa tarjetas de anuncios; el anunciante ve los perfiles a los que ha gustado su anuncio y decide.
-4. **Match**: si ambos dan like, se desbloquea el botón de WhatsApp.
+**Nazarí Homes — en /account, pestaña "Estadísticas"**
+- Tarjeta por cada propiedad publicada con:
+  - Visitas totales al detalle del anuncio
+  - Visitantes únicos (aproximado, por dispositivo)
+  - Veces guardado en favoritos (y guardados activos actuales)
+  - Visitas de los últimos 7 y 30 días
+- Gráfica simple de visitas por día (últimos 30 días)
+- Totales agregados arriba: visitas totales de todos sus anuncios y guardados totales
 
-Los anuncios se pueden **ver sin cuenta** (listado + detalle). Para publicar, dar like o hacer match hace falta iniciar sesión.
+**Roomie Finder — en /roomie-finder/matches (nueva pestaña "Estadísticas") **
+- Por cada anuncio de habitación: visitas al detalle, veces mostrado en el swipe, likes recibidos, matches y ratio de like
+- Misma gráfica de visitas por día
 
-### Campos del anuncio (obligatorios salvo indicado)
-
-**Vivienda**
-- Título, dirección/zona, municipio, provincia
-- Tipo de vivienda, habitaciones totales, baños, m² totales
-- Fotos de la vivienda completa (mínimo 3)
-
-**Habitación libre**
-- m² de la habitación, si tiene baño privado, amueblada, ventana exterior
-- Fotos de la habitación (mínimo 2)
-- Fecha de disponibilidad
-
-**Gastos** (obligatorio, tal como pediste)
-- Alquiler mensual de la habitación
-- Fianza
-- Gastos incluidos o no: agua, luz, gas, internet, comunidad
-- Importe estimado de gastos mensuales si no van incluidos
-
-**Convivencia — quién vive en la vivienda**
-- Número de convivientes actuales, rango de edad, mezcla de géneros
-- Ocupación de los convivientes: trabajan / estudian / ambos
-- Horarios predominantes: mañana, tarde, noche, turnos
-- Nivel de socialización: muy sociable / equilibrado / tranquilo y reservado
-- Fumadores sí/no, mascotas sí/no, se admiten mascotas sí/no
-- Limpieza: relajada / normal / muy ordenada
-- Se admiten visitas/parejas: sí / puntualmente / no
-- Idiomas hablados en casa
-- Descripción libre del ambiente de la casa
-
-**Preferencias del compañero buscado** (opcional pero recomendado)
-- Rango de edad, género preferido (o indiferente), estudiante/trabajador, fumador sí/no, mascotas sí/no, estancia mínima
-
-### Perfil del buscador
-
-Mismo esquema de convivencia para que el match tenga sentido: nombre, edad, género, ocupación (trabaja/estudia), horarios, socialización, fumador, mascotas, limpieza, idiomas, presupuesto máximo, zona deseada, fecha de entrada, bio corta y foto. Teléfono para el WhatsApp tras el match.
-
-### Pantallas
-
-- `/roomie-finder` — Descubrir: pila de tarjetas con swipe (foto habitación, precio, gastos, zona, badges de convivencia). Botones descartar / me gusta. Vista alternativa en cuadrícula con filtros de precio, zona, gastos incluidos, fumadores y mascotas.
-- `/roomie-finder/:id` — Detalle del anuncio: galería vivienda + galería habitación, desglose de gastos, ficha de convivencia, preferencias.
-- `/roomie-finder/publicar` — Formulario del anuncio por pasos (Vivienda → Habitación → Gastos → Convivencia → Preferencias → Fotos), con validación de mínimos de fotos.
-- `/roomie-finder/mi-perfil` — Perfil de buscador.
-- `/roomie-finder/matches` — Likes recibidos (para el anunciante, con aceptar/descartar) y matches confirmados con botón de WhatsApp.
-- Enlace en el Header y en el Footer.
+### Privacidad
+Se muestran números agregados, nunca quién concretamente ha visto o guardado un anuncio (salvo lo que ya existe hoy: los perfiles que dan like en Roomie Finder, que ya se ven en la pantalla de matches).
 
 ### Notas técnicas
 
-- **Base de datos** (Supabase, nuevas tablas con RLS y GRANTs):
-  - `roomie_listings` — anuncio: vivienda, habitación, gastos (columnas numéricas + booleanos de incluidos), convivencia, preferencias, arrays de URLs de fotos, `user_id`, `is_active`. Lectura pública de anuncios activos; escritura solo del dueño.
-  - `roomie_profiles` — perfil de buscador, 1 por usuario. Lectura solo por el propio usuario y por dueños de anuncios que hayan recibido su like (mediante función security definer, para no exponer teléfonos).
-  - `roomie_likes` — quién da like a qué (`listing_id`, `user_id`, `direction`: buscador→anuncio o anunciante→buscador). Único por par.
-  - `roomie_matches` — creado por trigger cuando existen los dos likes; desbloquea el contacto.
-  - Los teléfonos solo se devuelven vía función security definer que comprueba que exista match.
-- **Fotos**: nuevo bucket público `roomie-images`, con la misma compresión cliente ya usada en el proyecto (1920px, JPEG 82%).
-- **Swipe**: gestos táctiles con `framer-motion` (drag + umbral) y botones para escritorio.
-- **WhatsApp**: mismo patrón que incidencias (`api.whatsapp.com/send`, prefijo +34 automático) con mensaje prerrellenado referenciando el anuncio.
-- **SEO**: título y meta propios en la sección, listado indexable.
+Base de datos (nuevas tablas con RLS y GRANTs):
+- `listing_events` — tabla única de eventos: `entity_type` ('property' | 'roomie_listing'), `entity_id`, `owner_id`, `event_type` ('view' | 'impression' | 'favorite_add' | 'favorite_remove'), `visitor_hash` (hash anónimo ya usado por `src/utils/userIdentification.ts`), `created_at`.
+  - Inserción permitida a `anon` y `authenticated` (solo INSERT, sin lectura directa).
+  - Lectura solo por el dueño, a través de funciones agregadas.
+- Funciones security definer:
+  - `get_listing_stats(p_entity_type, p_owner)` — devuelve totales por anuncio (vistas, únicos, guardados, likes, matches).
+  - `get_listing_daily_views(p_entity_type, p_entity_id, p_days)` — serie diaria para la gráfica; valida que el llamante sea el dueño.
+- Índices por `(entity_type, entity_id, created_at)` y `(owner_id)`.
 
-### Fuera de alcance en esta primera versión
+Instrumentación en el frontend:
+- `src/pages/PropertyDetail.tsx` y `src/pages/RoomieListingDetail.tsx`: registrar un evento `view` al montar, con anti-duplicado por sesión (una vista por anuncio cada 30 min usando sessionStorage).
+- `src/contexts/FavoritesContext.tsx`: los favoritos son locales (cookies); al alternar un favorito se enviará además un evento `favorite_add` / `favorite_remove` para poder contarlos. Solo se registra si el usuario ha aceptado cookies, como ahora.
+- `src/components/roomie/RoomieSwipeDeck.tsx`: registrar `impression` cuando una tarjeta se muestra en la pila.
+- Nuevo helper `src/utils/analyticsEvents.ts` con la función de registro (fire-and-forget, sin bloquear la UI).
 
-Chat interno, notificaciones por email/push, verificación de identidad y pagos.
+Interfaz:
+- Nuevo componente `src/components/stats/ListingStatsPanel.tsx` reutilizable por ambas secciones, con los estilos de cada una (Nazarí Homes en tonos stone/amber, Roomie Finder con su paleta azul/dorado).
+- Gráfica con `recharts` (ya disponible en el proyecto vía shadcn chart).
+
+Datos previos: las métricas empiezan a contar desde el despliegue; no hay histórico anterior.
