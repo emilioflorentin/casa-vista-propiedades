@@ -56,7 +56,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(property.id);
+    toggleFavorite(property.id, { entityType: "property", entityId: property.originalId || property.id });
   };
 
   const isPropertyFavorite = isFavorite(property.id);

@@ -3,12 +3,19 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useToast } from '@/hooks/use-toast';
 import { getUserId } from '@/utils/userIdentification';
 import Cookies from 'js-cookie';
+import { trackListingEvent, type EntityType } from '@/utils/analyticsEvents';
 
 type PropertyId = number | string;
 
+interface FavoriteMeta {
+  entityType?: EntityType;
+  entityId?: string | number | null;
+  ownerId?: string | null;
+}
+
 interface FavoritesContextType {
   favorites: PropertyId[];
-  toggleFavorite: (propertyId: PropertyId) => void;
+  toggleFavorite: (propertyId: PropertyId, meta?: FavoriteMeta) => void;
   isFavorite: (propertyId: PropertyId) => boolean;
   clearAllFavorites: () => void;
 }
@@ -77,7 +84,7 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('cookies-accepted', handleCookiesAccepted);
   }, []);
 
-  const toggleFavorite = (propertyId: PropertyId) => {
+  const toggleFavorite = (propertyId: PropertyId, meta?: FavoriteMeta) => {
     console.log('FAVORITES: Toggle favorite called for property:', propertyId);
     console.log('FAVORITES: Current cookies accepted state:', cookiesAccepted);
     
@@ -105,6 +112,15 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
         : [...currentFavorites, propertyId];
       
       console.log('New favorites after toggle:', newFavorites);
+
+      // Anonymous analytics event so the owner can see how many people saved the listing
+      trackListingEvent(
+        meta?.entityType || 'property',
+        meta?.entityId || propertyId,
+        isCurrentlyFavorite ? 'favorite_remove' : 'favorite_add',
+        meta?.ownerId,
+        { dedupe: false }
+      );
       
       // Save to cookies with user ID
       const userId = getUserId();

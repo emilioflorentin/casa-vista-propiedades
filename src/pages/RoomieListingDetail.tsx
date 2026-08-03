@@ -14,6 +14,7 @@ import {
   formatMoney, includedBills, SOCIAL_LEVELS, CLEANLINESS, SCHEDULES,
   OCCUPATIONS, GUESTS_POLICY, GENDER_MIX, GENDERS, PROPERTY_TYPES,
 } from '@/utils/roomie';
+import { trackListingEvent } from '@/utils/analyticsEvents';
 
 const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex justify-between gap-4 py-1.5 border-b border-stone-100 last:border-0 text-sm">
@@ -45,7 +46,10 @@ const RoomieListingDetail = () => {
       if (!id) return;
       const { data } = await supabase.from('roomie_listings').select('*').eq('id', id).maybeSingle();
       setListing((data as RoomieListing) || null);
-      if (data) document.title = `${data.title} | Roomie Finder — Nazarí Homes`;
+      if (data) {
+        document.title = `${data.title} | Roomie Finder — Nazarí Homes`;
+        trackListingEvent('roomie_listing', data.id, 'view', data.user_id);
+      }
       if (user && id) {
         const { data: like } = await supabase
           .from('roomie_likes').select('id')

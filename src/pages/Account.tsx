@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ListingStatsPanel from '@/components/stats/ListingStatsPanel';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -727,11 +728,12 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className={`grid w-full ${(user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com') ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            <TabsList className={`grid w-full ${(user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com') ? 'grid-cols-6' : 'grid-cols-5'}`}>
               <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
               <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
               <TabsTrigger value="rented">Alquiladas</TabsTrigger>
               <TabsTrigger value="tenants">Inquilinos</TabsTrigger>
+              <TabsTrigger value="stats">Estadísticas</TabsTrigger>
               {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
                 <TabsTrigger value="documents">
                   <FileSignature className="w-4 h-4 mr-1" />
@@ -739,6 +741,20 @@ const Account = () => {
                 </TabsTrigger>
               )}
             </TabsList>
+
+            <TabsContent value="stats" className="space-y-6">
+              <ListingStatsPanel
+                entityType="property"
+                accentClass="text-stone-600"
+                emptyMessage="Todavía no tienes propiedades publicadas."
+                items={userProperties.map((p: any) => ({
+                  id: String(p.id),
+                  title: p.title,
+                  subtitle: `Ref: ${p.reference} · ${p.location}`,
+                  image: (p.image || '').split(',')[0]?.trim() || null,
+                }))}
+              />
+            </TabsContent>
 
             <TabsContent value="profile" className="space-y-6">
               <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
