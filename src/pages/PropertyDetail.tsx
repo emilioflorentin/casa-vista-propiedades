@@ -289,6 +289,12 @@ const PropertyDetail = () => {
     }
   }, [id]);
 
+  // Track a view for the owner's stats (anonymous, deduplicated per session)
+  useEffect(() => {
+    if (!property) return;
+    trackListingEvent('property', property.originalId || property.id, 'view', property.user_id);
+  }, [property]);
+
   // Generate (or fetch) a short link for this property URL
   useEffect(() => {
     if (!property) return;
