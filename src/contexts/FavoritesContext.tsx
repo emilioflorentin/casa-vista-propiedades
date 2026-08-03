@@ -9,7 +9,7 @@ type PropertyId = number | string;
 
 interface FavoriteMeta {
   entityType?: EntityType;
-  entityId?: string | null;
+  entityId?: string | number | null;
   ownerId?: string | null;
 }
 
