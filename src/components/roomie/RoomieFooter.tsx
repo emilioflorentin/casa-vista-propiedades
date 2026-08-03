@@ -5,7 +5,7 @@ const RoomieFooter = () => (
   <footer className="border-t border-stone-200 bg-white mt-16">
     <div className="container mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div className="space-y-2 max-w-sm">
-        <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="h-12 w-auto object-contain" />
+        <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="h-14 md:h-16 w-auto object-contain" />
         <p className="text-sm text-muted-foreground">
           Encuentra compañero de piso con perfiles de convivencia reales y gastos claros.
         </p>
