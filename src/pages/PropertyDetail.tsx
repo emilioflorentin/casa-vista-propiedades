@@ -868,36 +868,12 @@ const PropertyDetail = () => {
                         <span className="text-stone-700">{feature}</span>
                       </div>
                     ))}
-                    {/* Add more sample features to fill the space */}
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.elevator')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.balcony')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.heating')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.terrace')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.built_in_wardrobes')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                      <span className="text-stone-700">{t('property.equipped_kitchen')}</span>
-                    </div>
                   </div>
                 </div>
               )}
 
               {/* Amenities/Services */}
+              {amenities.length > 0 && (
               <div className="py-6 border-t border-stone-200">
                 <h2 className="text-xl font-semibold mb-6 text-stone-800">{t('property.services')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -909,6 +885,7 @@ const PropertyDetail = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Energy Certificate */}
               <EnergyCertificate 
