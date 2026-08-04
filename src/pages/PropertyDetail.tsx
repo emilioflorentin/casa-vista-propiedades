@@ -422,12 +422,17 @@ const PropertyDetail = () => {
     return typeDescriptions[property.type as keyof typeof typeDescriptions] || t('property.default_description');
   };
 
+  const hasFeature = (...keywords: string[]) =>
+    (property?.features || []).some((f: string) =>
+      keywords.some((k) => f.toLowerCase().includes(k))
+    );
+
   const amenities = [
-    { icon: Wifi, label: t('property.wifi') },
-    { icon: Wind, label: t('property.air_conditioning') }, 
-    { icon: Tv, label: t('property.tv') },
-    { icon: Car, label: t('property.parking') }
-  ];
+    { icon: Wifi, label: t('property.wifi'), match: ['wifi', 'internet', 'fibra'] },
+    { icon: Wind, label: t('property.air_conditioning'), match: ['aire', 'climatiz', 'air condition'] },
+    { icon: Tv, label: t('property.tv'), match: ['tv', 'televis'] },
+    { icon: Car, label: t('property.parking'), match: ['parking', 'garaje', 'aparcamiento'] },
+  ].filter((a) => hasFeature(...a.match));
 
   const formatPrice = (price: number, operation: string) => {
     const formattedPrice = new Intl.NumberFormat('es-ES').format(price);
