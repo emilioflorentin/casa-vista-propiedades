@@ -40,7 +40,22 @@ export const Scene5CTA: React.FC<{ format: "vertical" | "square" }> = ({ format 
       <div
         style={{
           marginTop: isVertical ? 60 : 50,
-fontFamily: OSWALD,
+          fontFamily: OSWALD,
+          fontSize: isVertical ? 78 : 64,
+          lineHeight: 1.05,
+          color: "#0f2647",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          maxWidth: 900,
+          opacity: line1,
+          transform: `translateY(${y(line1)}px)`,
+        }}
+      >
+        Encuentra tu
+      </div>
+      <div
+        style={{
+          fontFamily: OSWALD,
           fontSize: isVertical ? 86 : 70,
           lineHeight: 1.05,
           color: "#c9a227",
@@ -61,7 +76,21 @@ fontFamily: OSWALD,
           color: "#ffffff",
           padding: isVertical ? "24px 48px" : "20px 40px",
           borderRadius: 999,
-fontFamily: INTER,
+          fontFamily: INTER,
+          fontSize: isVertical ? 32 : 26,
+          fontWeight: 700,
+          opacity: url,
+          transform: `scale(${scale(url)})`,
+          boxShadow: "0 16px 40px rgba(15,38,71,0.25)",
+        }}
+      >
+        nazarihomes.com/roomie-finder
+      </div>
+
+      <div
+        style={{
+          marginTop: isVertical ? 34 : 28,
+          fontFamily: INTER,
           fontSize: isVertical ? 24 : 20,
           color: "#78716c",
           opacity: url,
