@@ -1,6 +1,7 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring } from "remotion";
+import { TransitionSeries, springTiming } from "@remotion/transitions";
+import { fade } from "@remotion/transitions/fade";
 import { INTER } from "./theme";
-import { TransitionSeries, fade } from "@remotion/transitions";
 import { PersistentBackground } from "./components/PersistentBackground";
 import { Scene1Hook } from "./scenes/Scene1Hook";
 import { Scene2Problem } from "./scenes/Scene2Problem";
@@ -20,19 +21,31 @@ export const MainVideo: React.FC<{ format?: "vertical" | "square" }> = ({ format
         <TransitionSeries.Sequence durationInFrames={100}>
           <Scene1Hook format={format} />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade({})} timing={{ type: "from-end", durationInFrames: 20 }} />
+        <TransitionSeries.Transition
+          presentation={fade({})}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 20 })}
+        />
         <TransitionSeries.Sequence durationInFrames={130}>
           <Scene2Problem format={format} />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade({})} timing={{ type: "from-end", durationInFrames: 20 }} />
+        <TransitionSeries.Transition
+          presentation={fade({})}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 20 })}
+        />
         <TransitionSeries.Sequence durationInFrames={180}>
           <Scene3Solution format={format} />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade({})} timing={{ type: "from-end", durationInFrames: 20 }} />
+        <TransitionSeries.Transition
+          presentation={fade({})}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 20 })}
+        />
         <TransitionSeries.Sequence durationInFrames={160}>
           <Scene4Steps format={format} />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade({})} timing={{ type: "from-end", durationInFrames: 20 }} />
+        <TransitionSeries.Transition
+          presentation={fade({})}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 20 })}
+        />
         <TransitionSeries.Sequence durationInFrames={140}>
           <Scene5CTA format={format} />
         </TransitionSeries.Sequence>
