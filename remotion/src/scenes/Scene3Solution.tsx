@@ -1,4 +1,5 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
+import { OSWALD, INTER } from "../theme";
 
 const SWIPE_CARDS = [
   { rent: "320€", zone: "Granada Centro", color: "#0f2647", textColor: "#ffffff" },
