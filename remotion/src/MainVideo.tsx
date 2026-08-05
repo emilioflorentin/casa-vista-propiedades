@@ -1,4 +1,4 @@
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring } from "remotion";
 import { INTER } from "./theme";
 import { TransitionSeries, fade } from "@remotion/transitions";
 import { PersistentBackground } from "./components/PersistentBackground";
