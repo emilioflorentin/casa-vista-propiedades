@@ -29,7 +29,7 @@ export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ for
     >
       <div
         style={{
-          fontFamily: "'Oswald', sans-serif",
+fontFamily: OSWALD,
           fontSize: isVertical ? 64 : 52,
           lineHeight: 1.1,
           color: "#0f2647",
