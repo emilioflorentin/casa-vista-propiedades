@@ -1,4 +1,5 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
+import { OSWALD, INTER } from "../theme";
 
 const PROBLEMS = [
   { text: "Grupos de WhatsApp saturados", icon: "💬" },
