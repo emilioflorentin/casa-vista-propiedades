@@ -74,7 +74,7 @@ fontFamily: OSWALD,
               <span style={{ fontSize: isVertical ? 44 : 36 }}>{p.icon}</span>
               <span
                 style={{
-                  fontFamily: "'Inter', sans-serif",
+fontFamily: INTER,
                   fontSize: isVertical ? 28 : 24,
                   fontWeight: 600,
                   color: "#44403c",
