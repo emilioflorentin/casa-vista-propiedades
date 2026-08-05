@@ -28,7 +28,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
     >
       <div
         style={{
-          fontFamily: "'Oswald', sans-serif",
+fontFamily: OSWALD,
           fontSize: isVertical ? 72 : 58,
           lineHeight: 1.05,
           color: "#0f2647",
