@@ -61,21 +61,7 @@ fontFamily: OSWALD,
           color: "#ffffff",
           padding: isVertical ? "24px 48px" : "20px 40px",
           borderRadius: 999,
-          fontFamily: "'Inter', sans-serif",
-          fontSize: isVertical ? 32 : 26,
-          fontWeight: 700,
-          opacity: url,
-          transform: `scale(${scale(url)})`,
-          boxShadow: "0 16px 40px rgba(15,38,71,0.25)",
-        }}
-      >
-        nazarihomes.com/roomie-finder
-      </div>
-
-      <div
-        style={{
-          marginTop: isVertical ? 34 : 28,
-          fontFamily: "'Inter', sans-serif",
+fontFamily: INTER,
           fontSize: isVertical ? 24 : 20,
           color: "#78716c",
           opacity: url,
