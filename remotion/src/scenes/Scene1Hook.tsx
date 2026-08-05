@@ -1,6 +1,5 @@
-import { useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
-import { AbsoluteFill } from "remotion";
-import { staticFile } from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill, staticFile } from "remotion";
+import { OSWALD, INTER } from "../theme";
 
 export const Scene1Hook: React.FC<{ format: "vertical" | "square" }> = ({ format }) => {
   const frame = useCurrentFrame();
