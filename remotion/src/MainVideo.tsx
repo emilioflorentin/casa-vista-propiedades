@@ -1,4 +1,5 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
+import { AbsoluteFill } from "remotion";
+import { INTER } from "./theme";
 import { TransitionSeries, fade } from "@remotion/transitions";
 import { PersistentBackground } from "./components/PersistentBackground";
 import { Scene1Hook } from "./scenes/Scene1Hook";
