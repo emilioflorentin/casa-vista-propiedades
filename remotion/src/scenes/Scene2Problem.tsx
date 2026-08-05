@@ -1,6 +1,5 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
 import { OSWALD, INTER } from "../theme";
-import { OSWALD, INTER } from "../theme";
 
 const PROBLEMS = [
   { text: "Grupos de WhatsApp saturados", icon: "💬" },
@@ -11,7 +10,7 @@ const PROBLEMS = [
 
 export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ format }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
   const isVertical = format === "vertical";
 
   const title = spring({ frame: frame - 5, fps, config: { damping: 18, stiffness: 120 } });
@@ -29,7 +28,7 @@ export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ for
     >
       <div
         style={{
-fontFamily: OSWALD,
+          fontFamily: OSWALD,
           fontSize: isVertical ? 64 : 52,
           lineHeight: 1.1,
           color: "#0f2647",
@@ -74,7 +73,7 @@ fontFamily: OSWALD,
               <span style={{ fontSize: isVertical ? 44 : 36 }}>{p.icon}</span>
               <span
                 style={{
-fontFamily: INTER,
+                  fontFamily: INTER,
                   fontSize: isVertical ? 28 : 24,
                   fontWeight: 600,
                   color: "#44403c",
