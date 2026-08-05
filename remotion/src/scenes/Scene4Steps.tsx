@@ -39,7 +39,7 @@ fontFamily: OSWALD,
                 </div>
                 <div
                   style={{
-                    fontFamily: "'Inter', sans-serif",
+fontFamily: INTER,
                     fontSize: isVertical ? 22 : 18,
                     color: "#57534e",
                     marginTop: 4,
