@@ -3,7 +3,7 @@ import { OSWALD, INTER } from "../theme";
 
 export const Scene1Hook: React.FC<{ format: "vertical" | "square" }> = ({ format }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
 
   const s1 = spring({ frame, fps, config: { damping: 18, stiffness: 120 } });
   const s2 = spring({ frame: frame - 12, fps, config: { damping: 18, stiffness: 120 } });
@@ -42,7 +42,23 @@ export const Scene1Hook: React.FC<{ format: "vertical" | "square" }> = ({ format
 
       <div
         style={{
-fontFamily: OSWALD,
+          fontFamily: OSWALD,
+          fontSize: isVertical ? 92 : 76,
+          lineHeight: 1.05,
+          color: "#0f2647",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: -1,
+          opacity: s2,
+          transform: `translateY(${y(s2)}px)`,
+        }}
+      >
+        ¿Buscas
+      </div>
+
+      <div
+        style={{
+          fontFamily: OSWALD,
           fontSize: isVertical ? 92 : 76,
           lineHeight: 1.05,
           color: "#c9a227",
@@ -59,7 +75,7 @@ fontFamily: OSWALD,
       <div
         style={{
           marginTop: isVertical ? 40 : 32,
-fontFamily: INTER,
+          fontFamily: INTER,
           fontSize: isVertical ? 32 : 28,
           color: "#44403c",
           maxWidth: isVertical ? 720 : 680,
