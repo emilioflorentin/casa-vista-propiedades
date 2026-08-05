@@ -14,7 +14,7 @@ export const MainVideo: React.FC<{ format?: "vertical" | "square" }> = ({ format
   const intro = spring({ frame, fps, config: { damping: 20, stiffness: 120 } });
 
   return (
-    <AbsoluteFill style={{ background: "#f5f5f4", fontFamily: "'Inter', sans-serif" }}>
+    <AbsoluteFill style={{ background: "#f5f5f4", fontFamily: INTER }}>
       <PersistentBackground format={format} />
       <TransitionSeries>
         <TransitionSeries.Sequence durationInFrames={100}>
