@@ -40,22 +40,7 @@ export const Scene5CTA: React.FC<{ format: "vertical" | "square" }> = ({ format 
       <div
         style={{
           marginTop: isVertical ? 60 : 50,
-          fontFamily: "'Oswald', sans-serif",
-          fontSize: isVertical ? 78 : 64,
-          lineHeight: 1.05,
-          color: "#0f2647",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          maxWidth: 900,
-          opacity: line1,
-          transform: `translateY(${y(line1)}px)`,
-        }}
-      >
-        Encuentra tu
-      </div>
-      <div
-        style={{
-          fontFamily: "'Oswald', sans-serif",
+fontFamily: OSWALD,
           fontSize: isVertical ? 86 : 70,
           lineHeight: 1.05,
           color: "#c9a227",
