@@ -1,4 +1,5 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
+import { OSWALD, INTER } from "../theme";
 
 const STEPS = [
   { emoji: "🏠", title: "Publica", desc: "Fotos de vivienda y habitación + gastos reales" },
