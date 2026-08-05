@@ -42,22 +42,7 @@ export const Scene1Hook: React.FC<{ format: "vertical" | "square" }> = ({ format
 
       <div
         style={{
-          fontFamily: "'Oswald', sans-serif",
-          fontSize: isVertical ? 84 : 72,
-          lineHeight: 1.05,
-          color: "#0f2647",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: -1,
-          opacity: s2,
-          transform: `translateY(${y(s2)}px)`,
-        }}
-      >
-        ¿Buscando
-      </div>
-      <div
-        style={{
-          fontFamily: "'Oswald', sans-serif",
+fontFamily: OSWALD,
           fontSize: isVertical ? 92 : 76,
           lineHeight: 1.05,
           color: "#c9a227",
