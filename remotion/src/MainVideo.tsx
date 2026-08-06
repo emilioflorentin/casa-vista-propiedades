@@ -1,4 +1,4 @@
-import { AbsoluteFill, Audio, staticFile } from "remotion";
+import { AbsoluteFill, Audio, staticFile, useVideoConfig } from "remotion";
 import { TransitionSeries, springTiming, linearTiming } from "@remotion/transitions";
 import { slide } from "@remotion/transitions/slide";
 import { wipe } from "@remotion/transitions/wipe";
@@ -12,6 +12,7 @@ import { Scene4Steps } from "./scenes/Scene4Steps";
 import { Scene5CTA } from "./scenes/Scene5CTA";
 
 export const MainVideo: React.FC<{ format?: "vertical" | "square" }> = ({ format = "vertical" }) => {
+  const { width, height } = useVideoConfig();
   return (
     <AbsoluteFill style={{ background: "#0a1830", fontFamily: INTER }}>
       <Audio src={staticFile("audio/roomie-track.m4a")} volume={0.85} />
@@ -35,7 +36,7 @@ export const MainVideo: React.FC<{ format?: "vertical" | "square" }> = ({ format
           <Scene3Solution format={format} />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
-          presentation={clockWipe({ width: 1080, height: 1920 })}
+          presentation={clockWipe({ width, height })}
           timing={linearTiming({ durationInFrames: 20 })}
         />
         <TransitionSeries.Sequence durationInFrames={180}>
