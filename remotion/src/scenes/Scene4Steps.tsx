@@ -1,11 +1,12 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
 import { OSWALD, INTER, beat } from "../theme";
+import { Icon } from "../components/Icon";
 
 const STEPS = [
-  { emoji: "🏠", title: "Publica", desc: "Fotos de la vivienda y de la habitación + gastos reales" },
-  { emoji: "👤", title: "Perfil", desc: "Horarios, limpieza, mascotas y estilo de vida" },
-  { emoji: "💚", title: "Desliza", desc: "Me gusta a la derecha, paso a la izquierda" },
-  { emoji: "💬", title: "Match", desc: "WhatsApp solo si ambos queréis" },
+  { emoji: "home", title: "Publica", desc: "Fotos de la vivienda y de la habitación + gastos reales" },
+  { emoji: "user", title: "Perfil", desc: "Horarios, limpieza, mascotas y estilo de vida" },
+  { emoji: "heart", title: "Desliza", desc: "Me gusta a la derecha, paso a la izquierda" },
+  { emoji: "chat", title: "Match", desc: "WhatsApp solo si ambos queréis" },
 ];
 
 export const Scene4Steps: React.FC<{ format: "vertical" | "square" }> = ({ format }) => {
@@ -82,11 +83,10 @@ export const Scene4Steps: React.FC<{ format: "vertical" | "square" }> = ({ forma
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: isVertical ? 40 : 32,
                   transform: `scale(${1 + b * 0.07})`,
                 }}
               >
-                {step.emoji}
+                <Icon name={step.emoji} size={isVertical ? 40 : 32} />
               </div>
               <div>
                 <div

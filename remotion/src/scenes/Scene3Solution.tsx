@@ -1,5 +1,6 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
 import { OSWALD, INTER, beat, beatScale } from "../theme";
+import { Icon } from "../components/Icon";
 
 const SWIPE_CARDS = [
   { rent: "410€", zone: "Realejo", gastos: "Gastos incluidos", bg: "linear-gradient(160deg,#1c3f74,#0d2245)", accent: "#e3c45a" },
@@ -72,7 +73,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
         {SWIPE_CARDS.map((card, i) => {
           const idx = SWIPE_CARDS.length - 1 - i; // top card swipes first
           const appear = spring({ frame: frame - (28 + i * 6), fps, config: { damping: 15, stiffness: 160 } });
-          const swipeStart = 62 + idx * 34;
+          const swipeStart = idx === 0 ? 100000 : 66 + (idx - 1) * 40;
           const p = interpolate(frame, [swipeStart, swipeStart + 22], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -149,7 +150,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
                   opacity: 0.85,
                 }}
               >
-                ✓ {card.gastos}
+                {card.gastos}
               </div>
 
               {/* LIKE / NOPE stamp */}
@@ -185,7 +186,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
           opacity: interpolate(frame, [40, 55], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
         }}
       >
-        {["✕", "♥"].map((ic, i) => (
+        {["cross", "heart"].map((ic, i) => (
           <div
             key={ic}
             style={{
@@ -198,11 +199,10 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: isVertical ? 44 : 34,
               transform: `scale(${1 + (i === 1 ? b * 0.14 : 0)})`,
             }}
           >
-            {ic}
+            <Icon name={ic} size={isVertical ? 44 : 34} color={i === 0 ? "#ffffff" : "#0f2647"} strokeWidth={2.2} />
           </div>
         ))}
       </div>

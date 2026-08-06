@@ -1,11 +1,12 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
 import { OSWALD, INTER, beat } from "../theme";
+import { Icon } from "../components/Icon";
 
 const PROBLEMS = [
-  { text: "Grupos de WhatsApp saturados", icon: "💬" },
-  { text: "Fotos que no se corresponden", icon: "📸" },
-  { text: "Gastos ocultos al llegar", icon: "💸" },
-  { text: "Compañeros incompatibles", icon: "🤷" },
+  { text: "Grupos de WhatsApp saturados", icon: "chat" },
+  { text: "Fotos que no se corresponden", icon: "camera" },
+  { text: "Gastos ocultos al llegar", icon: "money" },
+  { text: "Compañeros incompatibles", icon: "users" },
 ];
 
 export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ format }) => {
@@ -88,8 +89,8 @@ export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ for
                 transform: `translateX(${interpolate(s, [0, 1], [i % 2 === 0 ? -110 : 110, 0])}px) translateY(${float}px) rotate(${interpolate(s, [0, 1], [i % 2 === 0 ? -4 : 4, 0])}deg)`,
               }}
             >
-              <span style={{ fontSize: isVertical ? 46 : 38, transform: `scale(${1 + b * 0.08})`, display: "inline-block" }}>
-                {p.icon}
+              <span style={{ transform: `scale(${1 + b * 0.08})`, display: "inline-flex" }}>
+                <Icon name={p.icon} size={isVertical ? 46 : 38} />
               </span>
               <span
                 style={{
