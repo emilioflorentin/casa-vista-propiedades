@@ -82,6 +82,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
           const x = interpolate(p, [0, 1], [0, 900 * dir]);
           const rot = interpolate(p, [0, 1], [0, 26 * dir]);
           const depth = i * 1;
+          const idle = idx === 0 ? Math.sin(frame * 0.05) * 2.2 : 0;
           const stamp = interpolate(frame, [swipeStart - 6, swipeStart + 2], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -103,7 +104,7 @@ export const Scene3Solution: React.FC<{ format: "vertical" | "square" }> = ({ fo
                 justifyContent: "center",
                 color: card.accent,
                 opacity: appear * (1 - p),
-                transform: `translate(${x}px, ${-depth * 16}px) rotate(${rot + interpolate(appear, [0, 1], [dir * 8, depth * -2])}deg) scale(${interpolate(appear, [0, 1], [0.75, 1 - depth * 0.04])})`,
+                transform: `translate(${x}px, ${-depth * 16}px) rotate(${rot + idle + interpolate(appear, [0, 1], [dir * 8, depth * -2])}deg) scale(${interpolate(appear, [0, 1], [0.75, 1 - depth * 0.04])})`,
                 zIndex: 10 - i,
                 overflow: "hidden",
               }}
