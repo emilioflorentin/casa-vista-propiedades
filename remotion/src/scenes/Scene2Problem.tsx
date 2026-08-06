@@ -1,5 +1,5 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring, AbsoluteFill } from "remotion";
-import { OSWALD, INTER } from "../theme";
+import { OSWALD, INTER, beat } from "../theme";
 
 const PROBLEMS = [
   { text: "Grupos de WhatsApp saturados", icon: "💬" },
@@ -13,70 +13,90 @@ export const Scene2Problem: React.FC<{ format: "vertical" | "square" }> = ({ for
   const { fps } = useVideoConfig();
   const isVertical = format === "vertical";
 
-  const title = spring({ frame: frame - 5, fps, config: { damping: 18, stiffness: 120 } });
+  const title = spring({ frame: frame - 3, fps, config: { damping: 14, stiffness: 190 } });
 
   return (
     <AbsoluteFill
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: isVertical ? "flex-start" : "center",
         justifyContent: "center",
-        padding: isVertical ? 60 : 80,
-        textAlign: "center",
+        padding: isVertical ? "60px 56px" : 80,
+        textAlign: "left",
       }}
     >
       <div
         style={{
-          fontFamily: OSWALD,
-          fontSize: isVertical ? 64 : 52,
-          lineHeight: 1.1,
-          color: "#0f2647",
+          fontFamily: INTER,
+          fontSize: isVertical ? 24 : 20,
           fontWeight: 700,
+          letterSpacing: 6,
           textTransform: "uppercase",
-          maxWidth: 900,
-          opacity: title,
-          transform: `translateY(${interpolate(title, [0, 1], [30, 0])}px)`,
+          color: "#e3c45a",
+          opacity: interpolate(frame, [0, 12], [0, 1], { extrapolateRight: "clamp" }),
+          marginBottom: 18,
         }}
       >
-        Encontrar piso compartido es un desastre
+        El problema
       </div>
 
       <div
         style={{
-          marginTop: isVertical ? 50 : 40,
+          fontFamily: OSWALD,
+          fontSize: isVertical ? 72 : 56,
+          lineHeight: 1.02,
+          color: "#ffffff",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          maxWidth: 900,
+          opacity: title,
+          transform: `translateX(${interpolate(title, [0, 1], [-70, 0])}px)`,
+          textShadow: "0 14px 40px rgba(0,0,0,0.45)",
+        }}
+      >
+        Buscar piso compartido es un <span style={{ color: "#e3c45a" }}>desastre</span>
+      </div>
+
+      <div
+        style={{
+          marginTop: isVertical ? 54 : 42,
           display: "grid",
           gridTemplateColumns: isVertical ? "1fr" : "1fr 1fr",
-          gap: isVertical ? 24 : 20,
+          gap: isVertical ? 20 : 18,
           width: "100%",
-          maxWidth: isVertical ? 720 : 900,
+          maxWidth: isVertical ? 900 : 940,
         }}
       >
         {PROBLEMS.map((p, i) => {
-          const s = spring({ frame: frame - (22 + i * 10), fps, config: { damping: 16, stiffness: 140 } });
+          const s = spring({ frame: frame - (20 + i * 8), fps, config: { damping: 14, stiffness: 200 } });
+          const b = beat(frame, i * 4);
+          const float = Math.sin((frame + i * 20) * 0.05) * 5;
           return (
             <div
               key={p.text}
               style={{
-                background: "#ffffff",
-                borderRadius: 20,
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                borderRadius: 22,
                 padding: isVertical ? 24 : 20,
-                boxShadow: "0 10px 30px rgba(15,38,71,0.08)",
+                boxShadow: `0 18px 45px rgba(0,0,0,${0.28 + b * 0.08})`,
                 display: "flex",
                 alignItems: "center",
-                gap: 16,
-                textAlign: "left",
+                gap: 18,
                 opacity: s,
-                transform: `translateX(${interpolate(s, [0, 1], [-60, 0])}px)`,
+                transform: `translateX(${interpolate(s, [0, 1], [i % 2 === 0 ? -110 : 110, 0])}px) translateY(${float}px) rotate(${interpolate(s, [0, 1], [i % 2 === 0 ? -4 : 4, 0])}deg)`,
               }}
             >
-              <span style={{ fontSize: isVertical ? 44 : 36 }}>{p.icon}</span>
+              <span style={{ fontSize: isVertical ? 46 : 38, transform: `scale(${1 + b * 0.08})`, display: "inline-block" }}>
+                {p.icon}
+              </span>
               <span
                 style={{
                   fontFamily: INTER,
-                  fontSize: isVertical ? 28 : 24,
+                  fontSize: isVertical ? 30 : 24,
                   fontWeight: 600,
-                  color: "#44403c",
+                  color: "rgba(255,255,255,0.92)",
                 }}
               >
                 {p.text}
