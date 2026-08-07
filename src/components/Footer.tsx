@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center">
+            <Link to="/inicio" className="flex items-center">
               <img 
                 src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
                 alt="Nazarí Homes" 
@@ -39,7 +39,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.quick_links')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/inicio" className="text-gray-300 hover:text-white transition-colors">
                   {t('nav.home')}
                 </Link>
               </li>
