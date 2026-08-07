@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import LandingGateway from "./pages/LandingGateway";
 import Index from "./pages/Index";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
@@ -43,7 +44,8 @@ const App = () => (
             <CookieBanner />
             <NativeBootstrap />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<LandingGateway />} />
+              <Route path="/inicio" element={<Index />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/property/:id" element={<PropertyDetail />} />
               <Route path="/favorites" element={<Favorites />} />
