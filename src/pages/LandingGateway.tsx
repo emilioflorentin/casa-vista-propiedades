@@ -77,13 +77,13 @@ const LandingGateway = () => {
                   Encontrar compañero de piso
                 </h2>
                 <p className="text-muted-foreground mb-8 leading-relaxed">
-                  Habitaiones reales, gastos claros y perfiles de convivencia. Desliza, haz match y habla solo con quien encaja contigo.
+                  Habitaciones reales, gastos claros y perfiles de convivencia. Desliza, haz match y habla solo con quien encaja contigo.
                 </p>
                 <div className="flex items-center gap-3 mb-6">
                   <img
                     src={roomieLogo}
                     alt="Roomie Finder"
-                    className="h-8 w-auto object-contain"
+                    className="h-12 w-auto object-contain"
                   />
                   <span className="text-sm text-stone-500">by Nazarí Homes</span>
                 </div>
