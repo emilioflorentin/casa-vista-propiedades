@@ -25,7 +25,7 @@ const Header = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/inicio" className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
               alt="Nazarí Homes" 
@@ -35,10 +35,10 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
-              {t('nav.home')}
-            </Link>
-            <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/inicio" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+               {t('nav.home')}
+             </Link>
+             <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
               {t('nav.properties')}
             </Link>
             <Link to="/roomie-finder" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
@@ -184,7 +184,7 @@ const Header = () => {
           <div className="md:hidden py-4 border-t border-stone-200">
             <nav className="flex flex-col space-y-4">
               <Link 
-                to="/" 
+                to="/inicio" 
                 className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
