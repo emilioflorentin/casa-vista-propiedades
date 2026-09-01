@@ -47,14 +47,9 @@ const RoomieFinder = () => {
       if (error) toast.error('No se pudieron cargar los anuncios');
       setListings((data as RoomieListing[]) || []);
 
-      if (user) {
-        const [{ data: likes }, { data: profile }] = await Promise.all([
-          supabase.from('roomie_likes').select('listing_id').eq('seeker_id', user.id).eq('direction', 'seeker'),
-          supabase.from('roomie_profiles').select('id').eq('user_id', user.id).maybeSingle(),
-        ]);
-        setSeen((likes || []).map((l: { listing_id: string }) => l.listing_id));
-        setHasProfile(!!profile);
-      }
+      const [profile, likes] = await Promise.all([fetchSeeker(), fetchSeekerLikes()]);
+      setHasProfile(!!profile);
+      setSeen(likes.map((l) => l.listing_id));
       setLoading(false);
     };
     load();
@@ -78,28 +73,22 @@ const RoomieFinder = () => {
   );
 
   const handleLike = async (listing: RoomieListing) => {
-    if (!user) {
-      toast.info('Inicia sesión para dar "me gusta"');
-      navigate('/auth');
-      return;
-    }
     if (!hasProfile) {
-      toast.info('Crea tu perfil de roomie para que el anunciante pueda conocerte');
+      toast.info('Rellena tu ficha básica (sin registro) para dar "me gusta"');
       navigate('/roomie-finder/mi-perfil');
       return;
     }
     setSeen((s) => [...s, listing.id]);
-    const { error } = await supabase.from('roomie_likes').insert({
-      listing_id: listing.id,
-      seeker_id: user.id,
-      owner_id: listing.user_id,
-      direction: 'seeker',
-    });
-    if (error && !error.message.includes('duplicate')) toast.error('No se pudo registrar tu "me gusta"');
-    else toast.success('¡Me gusta enviado! Te avisaremos si hay match.');
+    try {
+      await seekerLike(listing.id);
+      toast.success('¡Me gusta enviado! Te avisaremos si hay match.');
+    } catch {
+      toast.error('No se pudo registrar tu "me gusta"');
+    }
   };
 
   const handleSkip = (listing: RoomieListing) => setSeen((s) => [...s, listing.id]);
+
 
   return (
     <div className="min-h-screen bg-stone-50">
