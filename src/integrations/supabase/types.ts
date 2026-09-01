@@ -330,6 +330,7 @@ export type Database = {
           id: string
           location: string | null
           phone: string | null
+          platform: string
           updated_at: string
           user_type: string | null
         }
@@ -342,6 +343,7 @@ export type Database = {
           id: string
           location?: string | null
           phone?: string | null
+          platform?: string
           updated_at?: string
           user_type?: string | null
         }
@@ -354,6 +356,7 @@ export type Database = {
           id?: string
           location?: string | null
           phone?: string | null
+          platform?: string
           updated_at?: string
           user_type?: string | null
         }
@@ -559,6 +562,13 @@ export type Database = {
             referencedRelation: "roomie_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "roomie_likes_seeker_fk"
+            columns: ["seeker_id"]
+            isOneToOne: false
+            referencedRelation: "roomie_seekers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       roomie_listings: {
@@ -750,9 +760,16 @@ export type Database = {
             referencedRelation: "roomie_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "roomie_matches_seeker_fk"
+            columns: ["seeker_id"]
+            isOneToOne: false
+            referencedRelation: "roomie_seekers"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      roomie_profiles: {
+      roomie_seekers: {
         Row: {
           age: number | null
           avatar_url: string | null
@@ -770,10 +787,10 @@ export type Database = {
           occupation: string
           phone: string
           schedule: string
+          seeker_token: string
           smoker: boolean
           social_level: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           age?: number | null
@@ -790,12 +807,12 @@ export type Database = {
           languages?: string[]
           move_in_date?: string | null
           occupation?: string
-          phone?: string
+          phone: string
           schedule?: string
+          seeker_token?: string
           smoker?: boolean
           social_level?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           age?: number | null
@@ -814,10 +831,10 @@ export type Database = {
           occupation?: string
           phone?: string
           schedule?: string
+          seeker_token?: string
           smoker?: boolean
           social_level?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -986,9 +1003,9 @@ export type Database = {
           move_in_date: string
           occupation: string
           schedule: string
+          seeker_id: string
           smoker: boolean
           social_level: string
-          user_id: string
         }[]
       }
       get_roomie_match_contact: {
@@ -1010,6 +1027,71 @@ export type Database = {
           title: string
           updated_at: string
         }[]
+      }
+      roomie_seeker_get: {
+        Args: { p_token: string }
+        Returns: {
+          age: number
+          bio: string
+          budget_max: number
+          cleanliness: string
+          desired_area: string
+          full_name: string
+          gender: string
+          has_pets: boolean
+          languages: string[]
+          move_in_date: string
+          occupation: string
+          phone: string
+          schedule: string
+          smoker: boolean
+          social_level: string
+        }[]
+      }
+      roomie_seeker_like: {
+        Args: { p_listing_id: string; p_token: string }
+        Returns: undefined
+      }
+      roomie_seeker_likes: {
+        Args: { p_token: string }
+        Returns: {
+          is_matched: boolean
+          listing_id: string
+        }[]
+      }
+      roomie_seeker_matches: {
+        Args: { p_token: string }
+        Returns: {
+          image: string
+          listing_id: string
+          matched_at: string
+          municipality: string
+          owner_name: string
+          owner_phone: string
+          rent_amount: number
+          title: string
+        }[]
+      }
+      roomie_seeker_upsert: {
+        Args: {
+          p_age?: number
+          p_bio?: string
+          p_budget_max?: number
+          p_cleanliness?: string
+          p_desired_area?: string
+          p_full_name: string
+          p_gender?: string
+          p_has_pets?: boolean
+          p_languages?: string[]
+          p_move_in_date?: string
+          p_occupation?: string
+          p_phone: string
+          p_schedule?: string
+          p_smoker?: boolean
+          p_social_level?: string
+          p_token: string
+        }
+        Returns: string
       }
       update_profile_email: { Args: never; Returns: undefined }
       validate_tenant_access: {
