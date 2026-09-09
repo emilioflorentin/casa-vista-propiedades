@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Header from '@/components/roomie/RoomieHeader';
 import Footer from '@/components/roomie/RoomieFooter';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,10 @@ import { Heart, MessageCircle, X } from 'lucide-react';
 import { formatMoney, openRoomieWhatsApp, SOCIAL_LEVELS, OCCUPATIONS, SCHEDULES, CLEANLINESS } from '@/utils/roomie';
 import type { RoomieListing } from '@/components/roomie/RoomieListingCard';
 import ListingStatsPanel from '@/components/stats/ListingStatsPanel';
+import { fetchSeekerMatches, getSeekerToken, type SeekerMatch } from '@/utils/roomieSeeker';
 
 interface Applicant {
-  user_id: string; full_name: string; age: number | null; gender: string; occupation: string;
+  seeker_id: string; full_name: string; age: number | null; gender: string; occupation: string;
   schedule: string; social_level: string; smoker: boolean; has_pets: boolean; cleanliness: string;
   languages: string[]; budget_max: number | null; desired_area: string; move_in_date: string | null;
   bio: string; avatar_url: string | null; liked_at: string; is_matched: boolean;
@@ -25,11 +26,12 @@ interface MatchRow { id: string; listing_id: string; seeker_id: string; owner_id
 
 const RoomieMatches = () => {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [myListings, setMyListings] = useState<RoomieListing[]>([]);
   const [applicants, setApplicants] = useState<Record<string, Applicant[]>>({});
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [listingsById, setListingsById] = useState<Record<string, RoomieListing>>({});
+  const [seekerMatches, setSeekerMatches] = useState<SeekerMatch[]>([]);
+  const [seekerLoading, setSeekerLoading] = useState(true);
 
   useEffect(() => { document.title = 'Matches | Roomie Finder — Nazarí Homes'; }, []);
 
@@ -59,9 +61,11 @@ const RoomieMatches = () => {
   }, [user]);
 
   useEffect(() => {
-    if (!authLoading && !user) { navigate('/auth'); return; }
-    load();
-  }, [user, authLoading, navigate, load]);
+    if (authLoading) return;
+    if (user) { load(); return; }
+    if (!getSeekerToken()) { setSeekerLoading(false); return; }
+    fetchSeekerMatches().then((m) => { setSeekerMatches(m); }).finally(() => setSeekerLoading(false));
+  }, [user, authLoading, load]);
 
   const acceptApplicant = async (listing: RoomieListing, seekerId: string) => {
     const { error } = await supabase.from('roomie_likes').insert({
@@ -87,6 +91,64 @@ const RoomieMatches = () => {
     if (!ok) toast.error('Teléfono no válido');
   };
 
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <main className="container mx-auto px-6 py-10 max-w-3xl">
+          <h1 className="text-3xl font-bold text-stone-800 mb-2">Mis matches</h1>
+          <p className="text-muted-foreground mb-6">
+            Sin registro: aquí aparecen las habitaciones cuyo anunciante también te ha elegido.
+          </p>
+          {seekerLoading ? (
+            <p className="text-muted-foreground">Cargando...</p>
+          ) : !getSeekerToken() ? (
+            <Card>
+              <CardContent className="p-6 space-y-3 text-center">
+                <p>Todavía no has creado tu ficha de búsqueda.</p>
+                <Link to="/roomie-finder/mi-perfil"><Button className="bg-stone-700 hover:bg-stone-800">Rellenar mi ficha</Button></Link>
+              </CardContent>
+            </Card>
+          ) : seekerMatches.length === 0 ? (
+            <p className="text-muted-foreground">Todavía no tienes matches. Sigue dando "me gusta" a habitaciones.</p>
+          ) : (
+            <div className="space-y-4">
+              {seekerMatches.map((m) => (
+                <Card key={m.listing_id}>
+                  <CardContent className="p-4 flex items-center gap-4">
+                    {m.image ? (
+                      <img src={m.image} alt={m.title} className="w-20 h-20 rounded-lg object-cover" />
+                    ) : <div className="w-20 h-20 rounded-lg bg-stone-200" />}
+                    <div className="flex-1">
+                      <Link to={`/roomie-finder/${m.listing_id}`} className="font-semibold hover:underline">{m.title}</Link>
+                      <p className="text-sm text-muted-foreground">{m.municipality} · {formatMoney(m.rent_amount)}/mes</p>
+                      <p className="text-sm text-muted-foreground">Anunciante: {m.owner_name}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        if (!m.owner_phone || !openRoomieWhatsApp(m.owner_phone, `Hola, te escribo desde Roomie Finder por "${m.title}". ¡Hemos hecho match!`)) {
+                          toast.error('No hay teléfono disponible');
+                        }
+                      }}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-1" />WhatsApp
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground mt-8">
+            ¿Eres anunciante? <Link to="/roomie-finder/acceso" className="text-primary hover:underline">Accede a tu cuenta</Link>.
+          </p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
@@ -109,7 +171,7 @@ const RoomieMatches = () => {
                 <CardContent className="space-y-4">
                   {(applicants[l.id] || []).length === 0 && <p className="text-sm text-muted-foreground">Todavía nadie ha mostrado interés.</p>}
                   {(applicants[l.id] || []).map((a) => (
-                    <div key={a.user_id} className="border rounded-lg p-4 flex gap-4">
+                    <div key={a.seeker_id} className="border rounded-lg p-4 flex gap-4">
                       {a.avatar_url ? (
                         <img src={a.avatar_url} alt={a.full_name} className="w-16 h-16 rounded-full object-cover" />
                       ) : <div className="w-16 h-16 rounded-full bg-stone-200" />}
@@ -129,13 +191,13 @@ const RoomieMatches = () => {
                         </p>
                         <div className="flex gap-2 pt-1">
                           {a.is_matched ? (
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => contact(l.id, a.user_id, l.title)}>
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => contact(l.id, a.seeker_id, l.title)}>
                               <MessageCircle className="w-4 h-4 mr-1" />WhatsApp
                             </Button>
                           ) : (
                             <>
-                              <Button size="sm" onClick={() => acceptApplicant(l, a.user_id)}><Heart className="w-4 h-4 mr-1" />Aceptar</Button>
-                              <Button size="sm" variant="outline" onClick={() => rejectApplicant(l.id, a.user_id)}><X className="w-4 h-4 mr-1" />Descartar</Button>
+                              <Button size="sm" onClick={() => acceptApplicant(l, a.seeker_id)}><Heart className="w-4 h-4 mr-1" />Aceptar</Button>
+                              <Button size="sm" variant="outline" onClick={() => rejectApplicant(l.id, a.seeker_id)}><X className="w-4 h-4 mr-1" />Descartar</Button>
                             </>
                           )}
                         </div>

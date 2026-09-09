@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RoomieHeader from '@/components/roomie/RoomieHeader';
+import RoomieFooter from '@/components/roomie/RoomieFooter';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,6 +20,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [userType, setUserType] = useState('particular');
   const [companyName, setCompanyName] = useState('');
+  const [platform, setPlatform] = useState('nazari');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,17 +29,27 @@ const Auth = () => {
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const roomieMode = pathname.startsWith('/roomie-finder');
+  const PageHeader = roomieMode ? RoomieHeader : Header;
+  const PageFooter = roomieMode ? RoomieFooter : Footer;
+
+  useEffect(() => {
+    if (roomieMode) setPlatform('roomie');
+  }, [roomieMode]);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
       if (user.email === 'multiservicios@nazarihomes.com') {
         navigate('/service-board');
+      } else if (roomieMode) {
+        navigate('/roomie-finder/matches');
       } else {
         navigate('/account');
       }
     }
-  }, [user, navigate]);
+  }, [user, navigate, roomieMode]);
 
   const validateForm = () => {
     if (!email || !password) {
@@ -103,12 +116,14 @@ const Auth = () => {
           // Redirect multiservicios to service board
           if (email.toLowerCase() === 'multiservicios@nazarihomes.com') {
             navigate('/service-board');
+          } else if (roomieMode) {
+            navigate('/roomie-finder/matches');
           } else {
             navigate('/account');
           }
         }
       } else {
-        const { error } = await signUp(email, password, fullName, userType, companyName);
+        const { error } = await signUp(email, password, fullName, userType, companyName, platform);
         
         if (error) {
           setError(error);
@@ -148,6 +163,7 @@ const Auth = () => {
     setFullName('');
     setUserType('particular');
     setCompanyName('');
+    setPlatform(roomieMode ? 'roomie' : 'nazari');
     setError('');
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -160,12 +176,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
-      <Header />
+      <PageHeader />
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <Link 
-            to="/" 
+            to={roomieMode ? "/roomie-finder" : "/"} 
             className="inline-flex items-center text-stone-600 hover:text-stone-800 mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -258,6 +274,40 @@ const Auth = () => {
                         />
                       </div>
                     )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-stone-700">
+                        ¿Para qué quieres la cuenta?
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            platform === 'nazari'
+                              ? 'border-stone-700 bg-stone-50 text-stone-800'
+                              : 'border-stone-200 hover:border-stone-300'
+                          }`}
+                          onClick={() => setPlatform('nazari')}
+                        >
+                          <div className="text-sm font-medium">Nazarí Homes</div>
+                          <div className="text-xs text-stone-500 mt-1">Comprar o alquilar vivienda</div>
+                        </button>
+                        <button
+                          type="button"
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            platform === 'roomie'
+                              ? 'border-stone-700 bg-stone-50 text-stone-800'
+                              : 'border-stone-200 hover:border-stone-300'
+                          }`}
+                          onClick={() => setPlatform('roomie')}
+                        >
+                          <div className="text-sm font-medium">Roomie Finder</div>
+                          <div className="text-xs text-stone-500 mt-1">Publicar habitación</div>
+                        </button>
+                      </div>
+                      <p className="text-xs text-stone-500">
+                        Si solo buscas habitación no necesitas cuenta: rellena tu ficha en Roomie Finder.
+                      </p>
+                    </div>
                   </>
                 )}
 
@@ -374,7 +424,7 @@ const Auth = () => {
         </div>
       </main>
 
-      <Footer />
+      <PageFooter />
     </div>
   );
 };

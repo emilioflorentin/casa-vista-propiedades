@@ -61,6 +61,7 @@ const App = () => (
               <Route path="/roomie-finder" element={<RoomieFinder />} />
               <Route path="/roomie-finder/publicar" element={<RoomiePublish />} />
               <Route path="/roomie-finder/mi-perfil" element={<RoomieProfile />} />
+              <Route path="/roomie-finder/acceso" element={<Auth />} />
               <Route path="/roomie-finder/matches" element={<RoomieMatches />} />
               <Route path="/roomie-finder/:id" element={<RoomieListingDetail />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
