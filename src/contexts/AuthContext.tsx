@@ -7,7 +7,7 @@ interface AuthContextProps {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName?: string, userType?: string, companyName?: string) => Promise<{ error?: string }>;
+  signUp: (email: string, password: string, fullName?: string, userType?: string, companyName?: string, platform?: string) => Promise<{ error?: string }>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error?: string }>;
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string, userType?: string, companyName?: string) => {
+  const signUp = async (email: string, password: string, fullName?: string, userType?: string, companyName?: string, platform?: string) => {
     try {
       setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
@@ -61,7 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userData = {
         full_name: fullName,
         user_type: userType,
-        company_name: companyName
+        company_name: companyName,
+        platform: platform || 'nazari'
       };
       
       const { error, data } = await supabase.auth.signUp({
