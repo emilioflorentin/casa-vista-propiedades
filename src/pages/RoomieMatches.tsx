@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Header from '@/components/roomie/RoomieHeader';
 import Footer from '@/components/roomie/RoomieFooter';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,6 @@ interface MatchRow { id: string; listing_id: string; seeker_id: string; owner_id
 
 const RoomieMatches = () => {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [myListings, setMyListings] = useState<RoomieListing[]>([]);
   const [applicants, setApplicants] = useState<Record<string, Applicant[]>>({});
   const [matches, setMatches] = useState<MatchRow[]>([]);
