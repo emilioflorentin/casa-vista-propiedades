@@ -14,6 +14,7 @@ import { Heart, Plus, UserRound, Sparkles } from 'lucide-react';
 import { RoomieListingCard, type RoomieListing } from '@/components/roomie/RoomieListingCard';
 import { RoomieSwipeDeck } from '@/components/roomie/RoomieSwipeDeck';
 import RoomieIntro from '@/components/roomie/RoomieIntro';
+import { fetchSeeker, fetchSeekerLikes, seekerLike } from '@/utils/roomieSeeker';
 
 const RoomieFinder = () => {
   const { user } = useAuth();
