@@ -15,6 +15,7 @@ import {
   OCCUPATIONS, GUESTS_POLICY, GENDER_MIX, GENDERS, PROPERTY_TYPES,
 } from '@/utils/roomie';
 import { trackListingEvent } from '@/utils/analyticsEvents';
+import { fetchSeekerLikes, seekerLike, getSeekerToken } from '@/utils/roomieSeeker';
 
 const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex justify-between gap-4 py-1.5 border-b border-stone-100 last:border-0 text-sm">
@@ -50,11 +51,9 @@ const RoomieListingDetail = () => {
         document.title = `${data.title} | Roomie Finder — Nazarí Homes`;
         trackListingEvent('roomie_listing', data.id, 'view', data.user_id);
       }
-      if (user && id) {
-        const { data: like } = await supabase
-          .from('roomie_likes').select('id')
-          .eq('listing_id', id).eq('seeker_id', user.id).eq('direction', 'seeker').maybeSingle();
-        setLiked(!!like);
+      if (getSeekerToken()) {
+        const likes = await fetchSeekerLikes();
+        setLiked(likes.some((l) => l.listing_id === id));
       }
       setLoading(false);
     };
@@ -62,19 +61,19 @@ const RoomieListingDetail = () => {
   }, [id, user]);
 
   const like = async () => {
-    if (!user) { navigate('/auth'); return; }
     if (!listing) return;
-    const { data: profile } = await supabase.from('roomie_profiles').select('id').eq('user_id', user.id).maybeSingle();
-    if (!profile) {
-      toast.info('Crea tu perfil de roomie antes de dar "me gusta"');
+    if (!getSeekerToken()) {
+      toast.info('Rellena tu ficha básica (sin registro) para dar "me gusta"');
       navigate('/roomie-finder/mi-perfil');
       return;
     }
-    const { error } = await supabase.from('roomie_likes').insert({
-      listing_id: listing.id, seeker_id: user.id, owner_id: listing.user_id, direction: 'seeker',
-    });
-    if (error) toast.error('No se pudo enviar tu "me gusta"');
-    else { setLiked(true); toast.success('¡Me gusta enviado!'); }
+    try {
+      await seekerLike(listing.id);
+      setLiked(true);
+      toast.success('¡Me gusta enviado! Te avisaremos si hay match.');
+    } catch {
+      toast.error('No se pudo enviar tu "me gusta"');
+    }
   };
 
   if (loading) return <div className="min-h-screen bg-stone-50"><Header /><p className="text-center py-20 text-muted-foreground">Cargando...</p><Footer /></div>;

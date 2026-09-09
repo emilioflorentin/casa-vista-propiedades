@@ -34,6 +34,9 @@ const RoomieHeader = () => {
               </Link>
             );
           })}
+          <Link to="/roomie-finder/acceso" className="ml-2">
+            <Button variant="ghost" size="sm">Acceso anunciantes</Button>
+          </Link>
           <Link to="/" className="ml-2">
             <Button variant="outline" size="sm" className="gap-1.5">
               <ArrowLeft className="w-4 h-4" /> Nazarí Homes
@@ -53,6 +56,9 @@ const RoomieHeader = () => {
               {l.label}
             </Link>
           ))}
+          <Link to="/roomie-finder/acceso" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-stone-700">
+            Acceso anunciantes
+          </Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm text-muted-foreground">
             ← Volver a Nazarí Homes
           </Link>
