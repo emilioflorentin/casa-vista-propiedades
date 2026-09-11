@@ -1,149 +1,111 @@
-import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Heart, Home, ShieldCheck, Sparkles, Users, Wallet, ChevronDown } from 'lucide-react';
-import roomieLogo from '@/assets/roomie-finder-logo.webp';
-
-/** Reveals children with a fade+rise once they enter the viewport. */
-const Reveal = ({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-};
+import { Plus, Search, ShieldCheck } from 'lucide-react';
+import heroImage from '@/assets/roomie-hero.jpg';
 
 const STEPS = [
-  {
-    icon: Home,
-    title: 'Publica tu habitación libre',
-    text: 'Sube fotos de la vivienda completa y de la habitación disponible, con el detalle real de los gastos: agua, luz, gas, internet y comunidad.',
-  },
-  {
-    icon: Users,
-    title: 'Crea tu perfil de convivencia',
-    text: 'Horarios, nivel de socialización, orden, mascotas, si fumas... Lo que de verdad importa para que la convivencia funcione.',
-  },
-  {
-    icon: Sparkles,
-    title: 'Descubre deslizando',
-    text: 'Ves anuncios uno a uno: te gusta, deslizas a la derecha; no encaja, a la izquierda. Sin listados infinitos ni mensajes en frío.',
-  },
-  {
-    icon: Heart,
-    title: 'Match y contacto',
-    text: 'Cuando el anunciante acepta tu interés, se abre el contacto por WhatsApp. Tu teléfono nunca es público antes del match.',
-  },
-];
-
-const HIGHLIGHTS = [
-  { icon: Wallet, title: 'Gastos siempre claros', text: 'Obligatorio indicar qué está incluido y una estimación mensual. Cero sorpresas al llegar.' },
-  { icon: ShieldCheck, title: 'Privacidad primero', text: 'Los datos de contacto solo se comparten cuando ambas partes dicen que sí.' },
-  { icon: Users, title: 'Compatibilidad real', text: 'Filtra por presupuesto, mascotas, fumadores y estilo de convivencia antes de escribir a nadie.' },
+  { n: '01', title: 'Rellena tu ficha', text: 'Sin registro: nombre, teléfono y cómo te gusta convivir. Dos minutos.' },
+  { n: '02', title: 'Descubre habitaciones', text: 'Fotos de la vivienda y de la habitación, con los gastos siempre detallados.' },
+  { n: '03', title: 'Marca lo que te gusta', text: 'Deslizas o pulsas “me interesa”. Nadie ve tu teléfono todavía.' },
+  { n: '04', title: 'Match y WhatsApp', text: 'Si el anunciante también dice que sí, se abre el contacto directo.' },
 ];
 
 export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative overflow-hidden">
+  <section>
     {/* Hero */}
-    <div className="relative py-16 md:py-24 text-center">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-stone-50 to-stone-50" />
-      <div className="absolute -top-24 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl" />
+    <div className="grid lg:grid-cols-[55%_45%] rounded-3xl overflow-hidden border border-roomie-ink/5 bg-roomie-sand">
+      <div className="flex items-center p-8 md:p-14">
+        <div className="max-w-xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-roomie-green/10 text-roomie-green text-xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-roomie-green" />
+            UN SERVICIO DE NAZARÍ HOMES
+          </div>
 
-      <Reveal>
-        <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="mx-auto h-24 md:h-36 w-auto object-contain" />
-      </Reveal>
-      <Reveal delay={120}>
-        <h1 className="mt-6 text-3xl md:text-5xl font-bold text-stone-800 max-w-3xl mx-auto leading-tight">
-          Encuentra compañero de piso sin jugártela
-        </h1>
-      </Reveal>
-      <Reveal delay={220}>
-        <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-          Habitaciones reales, gastos detallados y perfiles de convivencia. Desliza, haz match y habla solo con quien encaja contigo.
-        </p>
-      </Reveal>
-      <Reveal delay={320}>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button size="lg" className="bg-stone-800 hover:bg-stone-900" onClick={onStart}>
-            <Sparkles className="w-4 h-4 mr-2" /> Empezar a descubrir
-          </Button>
+          <h1 className="mt-7 text-4xl md:text-6xl font-bold text-roomie-ink leading-[1.02]">
+            Encuentra tu compañero ideal de piso.
+          </h1>
+
+          <p className="mt-6 text-lg text-roomie-ink/70 leading-relaxed">
+            Habitaciones con gastos claros y perfiles de convivencia reales. Sin registro para quien busca.
+          </p>
+
+          <div className="mt-10 grid sm:grid-cols-2 gap-4">
+            <Button
+              onClick={onStart}
+              className="w-full h-auto py-5 rounded-2xl bg-roomie-green text-white text-base font-bold hover:bg-roomie-ink shadow-xl shadow-roomie-green/20"
+            >
+              Busco habitación <Search className="w-5 h-5 ml-2" />
+            </Button>
+            <Link to="/roomie-finder/publicar" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full h-auto py-5 rounded-2xl bg-white border-2 border-roomie-ink/10 text-roomie-ink text-base font-bold hover:border-roomie-gold"
+              >
+                Publico habitación <Plus className="w-5 h-5 ml-2 text-roomie-gold" />
+              </Button>
+            </Link>
+          </div>
         </div>
-      </Reveal>
-      <Reveal delay={420}>
-        <ChevronDown className="mx-auto mt-10 w-6 h-6 text-stone-400 animate-bounce" />
-      </Reveal>
+      </div>
+
+      <div className="relative min-h-[320px] bg-roomie-ink">
+        <img
+          src={heroImage}
+          alt="Salón luminoso de un piso compartido"
+          width={896}
+          height={1344}
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-roomie-ink/70 via-transparent to-transparent" />
+        <div className="absolute bottom-6 left-6 right-6 bg-white p-5 rounded-2xl shadow-2xl border-l-4 border-roomie-gold flex items-center gap-4">
+          <div className="w-12 h-12 shrink-0 rounded-full bg-roomie-sand flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-roomie-green" />
+          </div>
+          <div>
+            <h2 className="font-bold text-roomie-ink">Tu teléfono, privado</h2>
+            <p className="text-sm text-roomie-ink/60">Solo se comparte cuando las dos partes dicen que sí.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     {/* Cómo funciona */}
-    <div className="py-12 md:py-20 border-t border-stone-200">
-      <Reveal>
-        <p className="text-center text-xs font-semibold tracking-[0.2em] uppercase text-amber-600">Cómo funciona</p>
-        <h2 className="mt-3 text-2xl md:text-3xl font-bold text-center text-stone-800">Cuatro pasos, sin rodeos</h2>
-      </Reveal>
-
-      <div className="mt-10 max-w-3xl mx-auto space-y-6">
-        {STEPS.map((s, i) => (
-          <Reveal key={s.title} delay={i * 90}>
-            <div className="flex gap-4 items-start bg-white rounded-2xl border border-stone-200 p-5 hover:shadow-lg transition-shadow">
-              <div className="shrink-0 h-11 w-11 rounded-xl bg-stone-100 flex items-center justify-center">
-                <s.icon className="w-5 h-5 text-stone-700" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Paso {i + 1}</p>
-                <h3 className="font-semibold text-stone-800">{s.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{s.text}</p>
-              </div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </div>
-
-    {/* Por qué */}
-    <div className="py-12 md:py-20 border-t border-stone-200">
-      <Reveal>
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-stone-800">Por qué Roomie Finder</h2>
-      </Reveal>
-      <div className="mt-10 grid gap-5 md:grid-cols-3 max-w-5xl mx-auto">
-        {HIGHLIGHTS.map((h, i) => (
-          <Reveal key={h.title} delay={i * 120}>
-            <div className="h-full bg-white rounded-2xl border border-stone-200 p-6 hover:-translate-y-1 transition-transform">
-              <h.icon className="w-6 h-6 text-amber-600" />
-              <h3 className="mt-3 font-semibold text-stone-800">{h.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1.5">{h.text}</p>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-      <Reveal delay={200}>
-        <div className="mt-12 text-center">
-          <Button size="lg" variant="outline" onClick={onStart}>
-            Ver habitaciones disponibles
-          </Button>
+    <div className="py-16 md:py-24">
+      <div className="flex flex-col md:flex-row md:items-end gap-6 mb-12">
+        <div className="max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-roomie-ink">¿Cómo funciona Roomie Finder?</h2>
+          <p className="mt-3 text-lg text-roomie-ink/60">Cuatro pasos simples, sin cuentas ni mensajes en frío.</p>
         </div>
-      </Reveal>
+        <div className="h-px flex-1 bg-roomie-ink/10 hidden md:block mb-4" />
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {STEPS.map((s, i) => {
+          const last = i === STEPS.length - 1;
+          return (
+            <div
+              key={s.n}
+              className={`group p-8 rounded-3xl transition-all duration-300 ${
+                last
+                  ? 'bg-roomie-green shadow-lg lg:-translate-y-4'
+                  : 'bg-white border border-roomie-ink/5 hover:shadow-xl'
+              }`}
+            >
+              <div
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl mb-6 transition-colors ${
+                  last
+                    ? 'bg-roomie-gold text-white'
+                    : 'bg-roomie-sand text-roomie-ink group-hover:bg-roomie-gold group-hover:text-white'
+                }`}
+              >
+                {s.n}
+              </div>
+              <h3 className={`text-xl font-bold mb-3 ${last ? 'text-white' : 'text-roomie-ink'}`}>{s.title}</h3>
+              <p className={`leading-relaxed ${last ? 'text-white/80' : 'text-roomie-ink/60'}`}>{s.text}</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   </section>
 );
