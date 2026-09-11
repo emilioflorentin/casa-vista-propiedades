@@ -39,6 +39,12 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Roomie Finder brand tokens */
+    --roomie-ink: 147 15% 14%;
+    --roomie-green: 146 26% 33%;
+    --roomie-sand: 48 22% 95%;
+    --roomie-gold: 46 68% 47%;
+
     --sidebar-background: 30 20% 98%;
     --sidebar-foreground: 25 10% 25%;
     --sidebar-primary: 25 15% 60%;
