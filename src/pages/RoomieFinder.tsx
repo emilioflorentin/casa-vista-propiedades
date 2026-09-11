@@ -92,29 +92,16 @@ const RoomieFinder = () => {
 
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-roomie-sand">
       <Header />
-      <main className="container mx-auto px-6 py-10">
+      <main className="container mx-auto px-6 py-8 md:py-10">
         <RoomieIntro onStart={() => exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
 
-        <div ref={exploreRef} className="scroll-mt-24 pt-6 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-stone-800">Explora habitaciones</h2>
-            <p className="text-muted-foreground mt-2 max-w-2xl">
-              Encuentra compañero de piso con perfiles de convivencia reales, gastos claros y fotos de la vivienda y de la habitación libre.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2 md:hidden">
-            <Link to="/roomie-finder/publicar">
-              <Button className="bg-stone-700 hover:bg-stone-800"><Plus className="w-4 h-4 mr-2" />Publicar habitación</Button>
-            </Link>
-            <Link to="/roomie-finder/mi-perfil">
-              <Button variant="outline"><UserRound className="w-4 h-4 mr-2" />Mi perfil roomie</Button>
-            </Link>
-            <Link to="/roomie-finder/matches">
-              <Button variant="outline"><Heart className="w-4 h-4 mr-2" />Matches</Button>
-            </Link>
-          </div>
+        <div ref={exploreRef} className="scroll-mt-24 mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-roomie-ink">Explora habitaciones</h2>
+          <p className="text-roomie-ink/60 mt-2 max-w-2xl">
+            Descubre una a una o consulta el listado completo con filtros.
+          </p>
         </div>
 
         <Tabs defaultValue="discover">
@@ -122,6 +109,7 @@ const RoomieFinder = () => {
             <TabsTrigger value="discover"><Sparkles className="w-4 h-4 mr-2" />Descubrir</TabsTrigger>
             <TabsTrigger value="grid">Listado</TabsTrigger>
           </TabsList>
+
 
           <TabsContent value="discover">
             {loading ? (
