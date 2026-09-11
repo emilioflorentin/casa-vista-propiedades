@@ -52,6 +52,12 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				roomie: {
+					ink: 'hsl(var(--roomie-ink))',
+					green: 'hsl(var(--roomie-green))',
+					sand: 'hsl(var(--roomie-sand))',
+					gold: 'hsl(var(--roomie-gold))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
