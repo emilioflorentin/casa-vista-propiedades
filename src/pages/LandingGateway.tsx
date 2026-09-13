@@ -18,7 +18,7 @@ const LandingGateway = () => {
 
   return (
     <div className="min-h-screen bg-roomie-sand text-roomie-ink">
-      <header className="absolute inset-x-0 top-0 z-30 px-5 py-5 md:px-10 md:py-8">
+      <header className="absolute inset-x-0 top-0 z-30 bg-roomie-sand/90 px-5 py-5 backdrop-blur-sm md:bg-transparent md:px-10 md:py-8 md:backdrop-blur-none">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <img
             src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png"
@@ -32,7 +32,7 @@ const LandingGateway = () => {
       </header>
 
       <main className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden pt-24 md:min-h-[760px] md:pt-0">
-        <div className="absolute right-0 top-0 h-[48%] w-[92%] overflow-hidden md:h-full md:w-[58%]">
+        <div className="absolute right-0 top-20 h-[280px] w-[92%] overflow-hidden md:top-0 md:h-full md:w-[58%]">
           <img
             src={gatewayHome}
             alt="Salón luminoso de una vivienda compartida"
@@ -44,7 +44,7 @@ const LandingGateway = () => {
         </div>
 
         <div className="relative mx-auto flex min-h-[calc(100vh-9rem)] max-w-7xl flex-col px-5 pb-8 md:min-h-[760px] md:justify-center md:px-10 md:py-36">
-          <Reveal className="relative z-10 max-w-2xl pt-[28vh] md:max-w-xl md:pt-0">
+          <Reveal className="relative z-10 max-w-2xl pt-[270px] md:max-w-xl md:pt-0">
             <p className="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-roomie-green">
               <span className="h-px w-10 bg-roomie-gold" />
               Tu próximo hogar empieza aquí
