@@ -3,6 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Outfit";
+  src: local("Outfit");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Figtree";
+  src: local("Figtree");
+  font-display: swap;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -101,6 +113,16 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
   }
 }
 
