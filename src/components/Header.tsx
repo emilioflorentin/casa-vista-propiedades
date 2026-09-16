@@ -22,7 +22,7 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="bg-primary sticky top-0 z-50 border-b border-primary-foreground/10">
+    <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20 md:h-28">
           {/* Logo */}
@@ -178,7 +178,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-primary-foreground/10 bg-primary">
+          <div className="md:hidden py-4 border-t border-primary-foreground/10 bg-header">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/inicio" 
