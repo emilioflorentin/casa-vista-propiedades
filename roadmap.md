@@ -1,5 +1,5 @@
 # Roadmap
 
 - [x] Compactar portada "/" (LandingGateway) en móvil
-- [ ] Compactar /inicio en móvil (hero y buscador hechos; faltan stats, carrusel, sección inquilinos y footer)
-- [ ] Explicar por qué www.nazarihomes.com se ve distinto al preview de Lovable (publicación/estado del dominio)
+- [x] Compactar /inicio en móvil (hero, buscador, stats, carrusel, inquilinos, footer, header)
+- [x] Explicar diferencia con www.nazarihomes.com — el dominio apunta a GitHub Pages (emilioflorentin.github.io), no a este proyecto Lovable; este proyecto no está publicado.
