@@ -209,8 +209,11 @@ const Properties = () => {
 
   const filteredProperties = allCombinedProperties.filter((property) => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch = hasRadiusSearch
-      ? Number.isFinite(property.latitude) && Number.isFinite(property.longitude) &&
+    const hasCoords = Number.isFinite(property.latitude) && Number.isFinite(property.longitude);
+    const matchesSearch = hasPolygonSearch
+      ? hasCoords && isInsidePolygon(Number(property.latitude), Number(property.longitude))
+      : hasRadiusSearch
+      ? hasCoords &&
         calculateDistance(searchLatitude, searchLongitude, Number(property.latitude), Number(property.longitude)) <= searchRadius
       : property.title.toLowerCase().includes(q) ||
         property.location.toLowerCase().includes(q) ||
