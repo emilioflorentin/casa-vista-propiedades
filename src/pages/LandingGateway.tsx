@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
+import { AlertCircle, ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BrandLogo from '@/components/BrandLogo';
 import LocationSearchOverlay from '@/components/LocationSearchOverlay';
@@ -11,6 +11,7 @@ const LandingGateway = () => {
   const [operation, setOperation] = useState<'sale' | 'rent'>('sale');
   const [query, setQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   useEffect(() => {
     document.title = 'PisoGo — Compra, alquila y vende viviendas';
@@ -25,8 +26,14 @@ const LandingGateway = () => {
 
   const search = (event: FormEvent) => {
     event.preventDefault();
+    if (!query.trim()) {
+      setLocationError(true);
+      setLocationOpen(true);
+      return;
+    }
+    setLocationError(false);
     const params = new URLSearchParams({ operation });
-    if (query.trim()) params.set('q', query.trim());
+    params.set('q', query.trim());
     navigate(`/properties?${params.toString()}`);
   };
 
