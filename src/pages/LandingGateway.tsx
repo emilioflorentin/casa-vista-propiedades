@@ -90,6 +90,9 @@ const LandingGateway = () => {
                 params.set('lat', String(value.lat));
                 params.set('lng', String(value.lng));
                 params.set('radius', String(value.radius));
+                if (value.polygon?.length) {
+                  params.set('poly', value.polygon.map(([la, ln]) => `${la.toFixed(5)},${ln.toFixed(5)}`).join(';'));
+                }
               }
               navigate(`/properties?${params.toString()}`);
             }}
