@@ -107,16 +107,6 @@ const Index = () => {
     console.log("Filtered results:", results.length, "properties found");
   };
 
-  // The main search button now does the same as the location search
-  const handleSearch = () => {
-    // If there's a selected location, use it directly
-    if (selectedLocation) {
-      handleSearchWithLocation();
-    }
-    // If no location is selected but there might be text in the input,
-    // let the LocationSearch component handle it through its own search
-  };
-
   const resetSearch = () => {
     setFilteredProperties(allUserProperties.slice(0, 8)); // Show first 8 properties as featured
     setShowingSearchResults(false);
