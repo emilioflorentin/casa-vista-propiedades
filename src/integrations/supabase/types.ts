@@ -74,6 +74,36 @@ export type Database = {
         }
         Relationships: []
       }
+      company_requests: {
+        Row: {
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          phone: string
+          status: string
+        }
+        Insert: {
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          phone: string
+          status?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          phone?: string
+          status?: string
+        }
+        Relationships: []
+      }
       incident_costs: {
         Row: {
           charge_amount: number | null
