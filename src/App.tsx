@@ -44,6 +44,7 @@ const App = () => (
             <Sonner />
             <CookieBanner />
             <NativeBootstrap />
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<LandingGateway />} />
               <Route path="/inicio" element={<Index />} />
