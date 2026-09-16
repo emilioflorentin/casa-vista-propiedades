@@ -20,6 +20,7 @@ const Index = () => {
   const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
+  const [locationError, setLocationError] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     address: string;
     lat: number;
@@ -219,8 +220,14 @@ const Index = () => {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
+                if (!searchQuery.trim()) {
+                  setLocationError(true);
+                  setLocationOpen(true);
+                  return;
+                }
+                setLocationError(false);
                 const params = new URLSearchParams({ operation: searchOperation });
-                if (searchQuery.trim()) params.set('q', searchQuery.trim());
+                params.set('q', searchQuery.trim());
                 navigate(`/properties?${params.toString()}`);
               }}
             >
