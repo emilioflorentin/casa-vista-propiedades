@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,6 +38,16 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const layerRefs = useRef<{ marker: any; circle: any }>({ marker: null, circle: null });
+
+  // Lock background scroll while the overlay is open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -156,7 +167,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex flex-col bg-background">
       <div className="flex items-center justify-between gap-4 border-b px-5 py-4">
         <h2 className="text-xl font-bold text-foreground md:text-2xl">
@@ -270,7 +281,8 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 
