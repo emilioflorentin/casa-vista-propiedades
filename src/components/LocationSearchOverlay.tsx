@@ -39,6 +39,16 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const mapInstance = useRef<any>(null);
   const layerRefs = useRef<{ marker: any; circle: any }>({ marker: null, circle: null });
 
+  // Lock background scroll while the overlay is open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   useEffect(() => {
     if (open) {
       setQuery(initialValue);
