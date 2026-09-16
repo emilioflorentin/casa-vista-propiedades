@@ -186,19 +186,29 @@ const ServiceBoard = () => {
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [savingBudget, setSavingBudget] = useState(false);
   const [loadingBudgets, setLoadingBudgets] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (authLoading) return;
+    if (!user) {
       navigate('/auth');
       return;
     }
-    if (!authLoading && user?.email !== 'multiservicios@nazarihomes.com') {
+    if (user.email !== 'multiservicios@nazarihomes.com') {
       navigate('/account');
       return;
     }
-    if (user) {
-      loadData();
-    }
+    loadData();
   }, [user, authLoading]);
+
+  // Safety net: never leave the board stuck on the spinner
+  useEffect(() => {
+    if (!loading) return;
+    const timer = window.setTimeout(() => {
+      setLoading(false);
+      setLoadError((prev) => prev ?? 'La carga ha tardado demasiado. Vuelve a intentarlo.');
+    }, 15000);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     if (activeTab === 'mantenimiento' && user) {
