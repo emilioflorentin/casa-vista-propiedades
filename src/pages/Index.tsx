@@ -4,6 +4,8 @@ import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapP
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import PropertyCard from "@/components/PropertyCard";
 import Reveal from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
