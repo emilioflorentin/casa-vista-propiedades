@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown } from "lucide-react";
+import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -43,7 +43,16 @@ const Index = () => {
   const [geoPermission, setGeoPermission] = useState<'unknown' | 'granted' | 'prompt' | 'denied' | 'unsupported'>('unknown');
   const [featuredProperties, setFeaturedProperties] = useState<FeaturedProperty[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const userCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  const scrollCarousel = (direction: 1 | -1) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('[data-carousel-card]');
+    const step = card ? card.offsetWidth + 16 : el.clientWidth * 0.8;
+    el.scrollBy({ left: step * direction, behavior: 'smooth' });
+  };
 
   // Track geolocation permission; featured section only shows when granted
   useEffect(() => {
@@ -313,12 +322,42 @@ const Index = () => {
               </div>
             ) : featuredProperties.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {featuredProperties.map((property, i) => (
-                    <Reveal key={property.originalId ?? property.id} delay={i * 80}>
-                      <PropertyCard property={property} />
-                    </Reveal>
-                  ))}
+                <div className="relative mb-8">
+                  <div
+                    ref={carouselRef}
+                    className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-6 px-6 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  >
+                    {featuredProperties.map((property, i) => (
+                      <div
+                        key={property.originalId ?? property.id}
+                        data-carousel-card
+                        className="w-[82%] shrink-0 snap-start sm:w-[46%] lg:w-[31.5%]"
+                      >
+                        <PropertyCard property={property} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {featuredProperties.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Anterior"
+                        onClick={() => scrollCarousel(-1)}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 md:-left-5 z-10 h-10 w-10 rounded-full bg-card text-foreground shadow-lg border border-border flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Siguiente"
+                        onClick={() => scrollCarousel(1)}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 md:-right-5 z-10 h-10 w-10 rounded-full bg-card text-foreground shadow-lg border border-border flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
                 </div>
                 <div className="text-center">
                   <Link to="/properties">
