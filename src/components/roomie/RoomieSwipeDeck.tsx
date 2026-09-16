@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, X, MapPin } from 'lucide-react';
+import { Heart, X, MapPin, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { formatMoney, includedBills, SOCIAL_LEVELS, CLEANLINESS, SCHEDULES } from '@/utils/roomie';
 import type { RoomieListing } from './RoomieListingCard';
 import { trackListingEvent } from '@/utils/analyticsEvents';
