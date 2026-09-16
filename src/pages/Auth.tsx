@@ -141,36 +141,33 @@ const Auth = () => {
             navigate('/account');
           }
         }
+      } else if (isCompanyRequest) {
+        const res = await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
+          method: "POST",
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            "Empresa": companyName,
+            "Persona de contacto": fullName,
+            "Email": email,
+            "Teléfono": phone,
+            "Tipo de cuenta": "Profesional / Empresa",
+            "_captcha": "false",
+            "_subject": "Solicitud de cuenta de empresa en PisoGo",
+            "_template": "table",
+          }),
+        });
+        if (!res.ok) throw new Error('mail failed');
+        alert('Hemos recibido tu solicitud de cuenta profesional. Te contactaremos por teléfono o correo para validar los datos de la empresa y activar tu cuenta.');
+        setIsLogin(true);
+        resetForm();
       } else {
-        const finalPlatform = userType === 'empresa' ? 'nazari' : platform;
-        const { error } = await signUp(email, password, fullName, userType, companyName, finalPlatform);
+        const { error } = await signUp(email, password, fullName, userType, companyName, platform);
         
         if (error) {
           setError(error);
         } else {
           setError('');
-          if (userType === 'empresa') {
-            try {
-              await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
-                method: "POST",
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  "Empresa": companyName,
-                  "Persona de contacto": fullName,
-                  "Email": email,
-                  "Tipo de cuenta": "Profesional / Empresa",
-                  "_captcha": "false",
-                  "_subject": "Solicitud de cuenta de empresa en PisoGo",
-                  "_template": "table",
-                }),
-              });
-            } catch (mailErr) {
-              console.error('No se pudo enviar la solicitud de cuenta de empresa', mailErr);
-            }
-            alert('Hemos recibido tu solicitud de cuenta profesional. Revisa tu email para confirmar la cuenta; te contactaremos para validar los datos de la empresa.');
-          } else {
-            alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
-          }
+          alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
           setIsLogin(true);
         }
       }
