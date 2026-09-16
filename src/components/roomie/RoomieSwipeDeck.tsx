@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, X, MapPin } from 'lucide-react';
+import { Heart, X, MapPin, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { formatMoney, includedBills, SOCIAL_LEVELS, CLEANLINESS, SCHEDULES } from '@/utils/roomie';
 import type { RoomieListing } from './RoomieListingCard';
 import { trackListingEvent } from '@/utils/analyticsEvents';
@@ -72,7 +73,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
         )}
 
         <div
-          className="absolute inset-0 rounded-2xl overflow-hidden bg-white shadow-2xl cursor-grab active:cursor-grabbing touch-none"
+          className="absolute inset-0 rounded-2xl overflow-hidden bg-white shadow-2xl cursor-grab active:cursor-grabbing touch-none flex flex-col"
           style={{
             transform: `translateX(${dx}px) rotate(${dx / 25}deg)`,
             transition: dragging ? 'none' : 'transform 180ms ease-out',
@@ -82,7 +83,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="relative h-[52%] md:h-[56%] bg-muted">
+          <div className="relative h-[52%] md:h-[56%] shrink-0 bg-muted">
             {cover ? (
               <img src={cover} alt={`Habitación en ${current.municipality}`} className="w-full h-full object-cover" draggable={false} />
             ) : (
@@ -100,7 +101,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
             )}
           </div>
 
-          <div className="p-3 space-y-1.5">
+          <div className="flex-1 flex flex-col p-3 space-y-1.5 min-h-0">
             <h3 className="font-semibold text-base leading-tight line-clamp-1">{current.title}</h3>
             <div className="flex flex-wrap gap-1">
               <Badge variant="secondary" className="text-[11px] px-1.5 py-0">{current.room_area} m² hab.</Badge>
@@ -113,6 +114,15 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
               {bills.length > 0 ? `Gastos incluidos: ${bills.join(', ')}` : `Gastos aparte · ~${formatMoney(current.bills_estimate)}/mes`}
               {' · '}Fianza {formatMoney(current.deposit_amount)}
             </p>
+            <Link
+              to={`/roomie-finder/${current.id}`}
+              className="mt-auto flex items-center justify-center gap-1.5 w-full rounded-full bg-primary text-primary-foreground text-xs font-semibold py-2 hover:bg-primary/90 transition-colors"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Ver ficha completa
+            </Link>
           </div>
         </div>
       </div>
