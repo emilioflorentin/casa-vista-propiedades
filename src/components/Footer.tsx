@@ -2,21 +2,22 @@
 import { Mail, Phone, MapPin, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/pisogo-wordmark.webp.asset.json";
 
 const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-stone-700 text-white">
+    <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/inicio" className="flex items-center">
               <img 
-                src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
-                alt="Nazarí Homes" 
-                className="h-12 w-auto brightness-0 invert"
+                src={logo.url}
+                alt="PisoGo"
+                className="h-12 w-auto"
               />
             </Link>
             <p className="text-gray-300 leading-relaxed">
@@ -91,9 +92,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  {t('footer.legal_advice')}
-                </a>
+                 <Link to="/roomie-finder" className="text-gray-300 hover:text-white transition-colors">Roomie Finder</Link>
               </li>
             </ul>
           </div>

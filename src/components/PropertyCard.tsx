@@ -62,7 +62,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   const isPropertyFavorite = isFavorite(property.id);
 
   return (
-    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg h-[500px] flex flex-col">
+    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border border-border shadow-sm h-[500px] flex flex-col">
       <div className="relative overflow-hidden">
         <img
           src={property.image}
@@ -78,7 +78,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
               variant={property.operation === 'rent' ? 'default' : 'secondary'}
               className={`${
                 property.operation === 'rent' 
-                  ? 'bg-stone-500 hover:bg-stone-600' 
+                  ? 'bg-primary hover:bg-primary/90' 
                   : 'bg-amber-500 hover:bg-amber-600'
               } text-white`}
             >
@@ -88,7 +88,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
               {getTypeLabel(property.type)}
             </Badge>
           </div>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-mono">
+          <Badge variant="outline" className="bg-secondary text-primary border-primary/20 text-xs font-mono">
             Ref: {property.reference}
           </Badge>
           <Badge 
@@ -123,7 +123,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
       <CardContent className="p-5 flex flex-col flex-1">
         <div className="mb-3">
           <Link to={`/property/${property.originalId || property.id}`}>
-            <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1 hover:text-stone-600 transition-colors cursor-pointer">
+            <h3 className="font-semibold text-lg text-foreground mb-1 line-clamp-1 hover:text-primary transition-colors cursor-pointer">
               {property.title}
             </h3>
           </Link>
@@ -148,12 +148,12 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           <div className="mb-4 flex-1">
             <div className="flex flex-wrap gap-1">
               {property.features.slice(0, 3).map((feature, index) => (
-                <Badge key={index} variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
+                <Badge key={index} variant="outline" className="text-xs bg-secondary text-secondary-foreground border-border">
                   {feature}
                 </Badge>
               ))}
               {property.features.length > 3 && (
-                <Badge variant="outline" className="text-xs bg-stone-50 text-stone-600 border-stone-200">
+                <Badge variant="outline" className="text-xs bg-secondary text-secondary-foreground border-border">
                   +{property.features.length - 3} {t('properties.more')}
                 </Badge>
               )}
@@ -166,7 +166,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.originalId || property.id}`}>
-            <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
+            <Button size="sm">
               <Eye className="h-4 w-4 mr-1" />
               {t('properties.view_details')}
             </Button>

@@ -19,7 +19,7 @@ const RoomieHeader = () => {
       <div className="container mx-auto px-6 h-[72px] flex items-center justify-between gap-4">
         <div className="flex items-center gap-10">
           <Link to="/roomie-finder" className="flex items-center shrink-0">
-            <img src={roomieLogo} alt="Roomie Finder by Nazarí Homes" className="h-11 md:h-14 w-auto object-contain" />
+            <img src={roomieLogo} alt="Roomie Finder by PisoGo" className="h-11 md:h-14 w-auto object-contain" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold text-roomie-ink/60">
@@ -40,7 +40,7 @@ const RoomieHeader = () => {
             to="/"
             className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-roomie-ink/40 hover:text-roomie-gold transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Volver a Nazarí Homes
+             <ArrowLeft className="w-3.5 h-3.5" /> Volver a PisoGo
           </Link>
           <Link to="/roomie-finder/publicar">
             <Button className="rounded-full bg-roomie-green text-white hover:bg-roomie-ink px-5">
@@ -68,7 +68,7 @@ const RoomieHeader = () => {
             Acceso anunciantes
           </Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm text-muted-foreground">
-            ← Volver a Nazarí Homes
+             ← Volver a PisoGo
           </Link>
         </nav>
       )}
