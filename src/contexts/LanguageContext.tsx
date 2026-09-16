@@ -153,7 +153,7 @@ const translations: Translations = {
       subtitle: "Conoce más sobre nuestra empresa y nuestro compromiso contigo",
       our_story: "Nuestra historia",
       story_p1:
-        "Nazarí Homes nació en 2023 con la visión de ofrecer un servicio innovador de gestión de propiedades sin coste para los propietarios. Desde nuestros humildes comienzos, hemos crecido hasta convertirnos en una de las agencias inmobiliarias más respetadas y confiables de la región.",
+        "Nazarí Homes, la inmobiliaria de PisoGo, nació en 2023 con la visión de ofrecer un servicio innovador de gestión de propiedades sin coste para los propietarios. Desde nuestros humildes comienzos, hemos crecido hasta convertirnos en una de las agencias inmobiliarias más respetadas y confiables de la región.",
       story_p2:
         "Nuestro compromiso con el servicio al cliente nos han permitido ayudar a miles de familias. Cada propiedad que gestionamos es tratada con el mismo cuidado y atención que si fuera nuestra propia casa.",
       our_values: "Nuestros valores",
@@ -686,7 +686,7 @@ const translations: Translations = {
       type_house: "House",
       type_loft: "Loft",
       type_studio: "Studio",
-      managed_nazari: "Managed by Nazarí",
+      managed_nazari: "Managed by PisoGo",
       managed_other: "Managed by third parties",
       area_unit: "m²",
       more: "more",
@@ -701,7 +701,7 @@ const translations: Translations = {
       subtitle: "Learn more about our company and our commitment to you",
       our_story: "Our story",
       story_p1:
-        "Nazarí Homes was born in 2009 with the vision of revolutionizing the real estate market on the Tropical Coast of Granada. From our humble beginnings, we have grown to become one of the most respected and trusted real estate agencies in the region.",
+        "Nazarí Homes, PisoGo's real estate agency, was born in 2023 with the vision of offering an innovative property management service at no cost to owners. From our humble beginnings, we have grown to become one of the most respected and trusted real estate agencies in the region.",
       story_p2:
         "Our passion for exceptional properties and our commitment to customer service have allowed us to help thousands of families find their ideal home. Every property we manage is treated with the same care and attention as if it were our own home.",
       our_values: "Our values",
