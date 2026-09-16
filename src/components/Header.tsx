@@ -13,7 +13,7 @@ import {
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import logo from "@/assets/pisogo-wordmark.webp.asset.json";
+import BrandLogo from "@/components/BrandLogo";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,7 +27,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <img src={logo.url} alt="PisoGo" className="h-12 w-auto" />
+              <BrandLogo />
           </Link>
 
           {/* Desktop Navigation */}

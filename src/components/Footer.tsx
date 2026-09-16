@@ -2,7 +2,7 @@
 import { Mail, Phone, MapPin, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import logo from "@/assets/pisogo-wordmark.webp.asset.json";
+import BrandLogo from "@/components/BrandLogo";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -14,11 +14,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/inicio" className="flex items-center">
-              <img 
-                src={logo.url}
-                alt="PisoGo"
-                className="h-12 w-auto"
-              />
+              <BrandLogo />
             </Link>
             <p className="text-gray-300 leading-relaxed">
               {t('footer.company_description')}
