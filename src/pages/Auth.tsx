@@ -274,6 +274,15 @@ const Auth = () => {
                         />
                       </div>
                     )}
+                    {userType === 'empresa' ? (
+                      <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
+                        <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
+                        <p className="text-xs text-muted-foreground">
+                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Al enviar el formulario recibiremos
+                          tu solicitud y la revisaremos antes de activar la cuenta.
+                        </p>
+                      </div>
+                    ) : (
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-foreground">
                         ¿Para qué quieres la cuenta?
@@ -308,6 +317,7 @@ const Auth = () => {
                         Si solo buscas habitación no necesitas cuenta: rellena tu ficha en Roomie Finder.
                       </p>
                     </div>
+                    )}
                   </>
                 )}
 
