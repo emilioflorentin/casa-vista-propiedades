@@ -88,7 +88,10 @@ const LandingGateway = () => {
       </section>
     </main>
 
-    <footer className="border-t border-primary/15 bg-primary px-5 py-6 text-center text-sm text-primary-foreground/70">© {new Date().getFullYear()} PisoGo · Tu portal inmobiliario.</footer>
+    <footer className="border-t border-primary/15 bg-primary px-5 py-6 text-center text-sm text-primary-foreground/70">
+      <p>© {new Date().getFullYear()} PisoGo · Tu portal inmobiliario.</p>
+      <p className="mt-1 text-primary-foreground/50">Nazarí Homes es la inmobiliaria de PisoGo · Roomie Finder es un servicio de PisoGo.</p>
+    </footer>
   </div>;
 };
 

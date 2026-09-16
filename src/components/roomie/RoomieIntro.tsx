@@ -18,7 +18,7 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
         <div className="max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-roomie-green/10 text-roomie-green text-xs font-bold">
             <span className="w-2 h-2 rounded-full bg-roomie-green" />
-            UN SERVICIO DE NAZARÍ HOMES
+            UN SERVICIO DE PISOGO
           </div>
 
           <h1 className="mt-7 text-4xl md:text-6xl font-bold text-roomie-ink leading-[1.02]">
