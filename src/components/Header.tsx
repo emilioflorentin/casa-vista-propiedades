@@ -226,7 +226,8 @@ const Header = () => {
               
               {/* Mobile Language Flags */}
               <div className="flex items-center space-x-3 pt-2">
-                <span className="text-sm text-muted-foreground">{t('common.language')}</span>
+                <span className="text-sm text-primary-foreground/70">{t('common.language')}</span>
+
                 <button
                   onClick={() => {
                     setLanguage('es');
