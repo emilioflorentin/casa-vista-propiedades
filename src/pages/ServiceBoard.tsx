@@ -248,13 +248,22 @@ const ServiceBoard = () => {
           propsData.forEach(p => { propsMap[p.id] = p; });
           setProperties(propsMap);
 
-          for (const ownerId of ownerIds) {
-            const { data: ownerData } = await supabase
-              .rpc('get_complete_profile_info', { profile_user_id: ownerId });
-            if (ownerData) {
-              setOwners(prev => ({ ...prev, [ownerId]: ownerData as unknown as OwnerInfo }));
-            }
-          }
+          const ownerResults = await Promise.all(
+            ownerIds.map(async (ownerId) => {
+              try {
+                const { data } = await supabase
+                  .rpc('get_complete_profile_info', { profile_user_id: ownerId });
+                return [ownerId, data] as const;
+              } catch {
+                return [ownerId, null] as const;
+              }
+            })
+          );
+          const ownersMap: Record<string, OwnerInfo> = {};
+          ownerResults.forEach(([ownerId, data]) => {
+            if (data) ownersMap[ownerId] = data as unknown as OwnerInfo;
+          });
+          setOwners(prev => ({ ...prev, ...ownersMap }));
         }
       }
 
