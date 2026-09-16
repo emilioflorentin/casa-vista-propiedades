@@ -20,6 +20,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [userType, setUserType] = useState('particular');
   const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
   const [platform, setPlatform] = useState('nazari');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,7 +52,25 @@ const Auth = () => {
     }
   }, [user, navigate, roomieMode]);
 
+  const isCompanyRequest = !isLogin && userType === 'empresa';
+
   const validateForm = () => {
+    if (isCompanyRequest) {
+      if (!fullName.trim() || !companyName.trim() || !email.trim() || !phone.trim()) {
+        setError('Por favor, completa todos los campos requeridos.');
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setError('Introduce un correo electrónico válido.');
+        return false;
+      }
+      if (!/^[+0-9][0-9\s-]{5,19}$/.test(phone.trim())) {
+        setError('Introduce un número de teléfono válido.');
+        return false;
+      }
+      return true;
+    }
+
     if (!email || !password) {
       setError('Por favor, completa todos los campos requeridos.');
       return false;
