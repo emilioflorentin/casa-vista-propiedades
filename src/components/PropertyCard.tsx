@@ -84,7 +84,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             >
               {property.operation === 'rent' ? t('properties.operation_rent') : t('properties.operation_sale')}
             </Badge>
-            <Badge variant="outline" className="bg-white/90 text-gray-700 border-gray-300">
+            <Badge variant="outline" className="bg-white/90 text-foreground border-border">
               {getTypeLabel(property.type)}
             </Badge>
           </div>
@@ -96,7 +96,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             className={`text-xs ${
               property.managedBy === 'nazari' 
                 ? 'bg-green-50 text-green-700 border-green-200' 
-                : 'bg-gray-50 text-gray-700 border-gray-200'
+                : 'bg-muted text-foreground border-border'
             }`}
           >
             {getManagementLabel(property.managedBy)}
@@ -108,7 +108,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           className={`absolute top-3 right-3 p-2 h-auto transition-all duration-200 ${
             isPropertyFavorite 
               ? 'bg-red-50 hover:bg-red-100 text-red-600' 
-              : 'bg-white/90 hover:bg-white text-gray-600'
+              : 'bg-white/90 hover:bg-white text-muted-foreground'
           }`}
           onClick={handleFavoriteClick}
         >
@@ -127,13 +127,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
               {property.title}
             </h3>
           </Link>
-          <div className="flex items-center text-gray-500 text-sm">
+          <div className="flex items-center text-muted-foreground text-sm">
             <MapPin className="h-4 w-4 mr-1" />
             {property.location}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+        <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
           <div className="flex items-center">
             <Bed className="h-4 w-4 mr-1" />
             <span className="mr-3">{property.bedrooms}</span>
@@ -162,7 +162,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         )}
 
         <div className="flex items-center justify-between mt-auto">
-          <div className="text-xl font-bold text-gray-700">
+          <div className="text-xl font-bold text-foreground">
             {formatPrice(property.price, property.operation)}
           </div>
           <Link to={`/property/${property.originalId || property.id}`}>

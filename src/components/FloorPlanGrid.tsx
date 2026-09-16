@@ -55,7 +55,7 @@ const getRoomTypeColor = (type: string, isOccupied: boolean): string => {
     kitchen: 'bg-amber-50 border-amber-300 hover:bg-amber-100',
     living: 'bg-purple-50 border-purple-300 hover:bg-purple-100',
     storage: 'bg-muted border-border hover:bg-muted',
-    other: 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+    other: 'bg-muted border-border hover:bg-muted'
   };
   return colors[type] || colors.other;
 };

@@ -337,7 +337,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
                   <Input
                     ref={modalInputRef}
                     placeholder={t('location.address_placeholder')}
-                    className="flex-1 bg-white border border-gray-300 text-base px-4 py-2"
+                    className="flex-1 bg-white border border-border text-base px-4 py-2"
                     onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
@@ -356,10 +356,10 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
                   {t('location.search_radius')}
                 </label>
                 <Select value={radius} onValueChange={setRadius}>
-                  <SelectTrigger className="w-full bg-white border border-gray-300">
+                  <SelectTrigger className="w-full bg-white border border-border">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                  <SelectContent className="bg-white border border-border shadow-lg">
                     <SelectItem value="500">{t('location.radius_500m')}</SelectItem>
                     <SelectItem value="1000">{t('location.radius_1km')}</SelectItem>
                     <SelectItem value="2000">{t('location.radius_2km')}</SelectItem>
@@ -373,7 +373,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
               <div className="relative">
                 <div 
                   ref={mapRef} 
-                  className="w-full h-96 rounded-lg bg-muted border border-gray-200"
+                  className="w-full h-96 rounded-lg bg-muted border border-border"
                   style={{ minHeight: '384px' }}
                 />
               </div>

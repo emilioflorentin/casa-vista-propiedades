@@ -16,7 +16,7 @@ const Footer = () => {
             <Link to="/inicio" className="flex items-center">
               <BrandLogo />
             </Link>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-primary-foreground/80 leading-relaxed">
               {t('footer.company_description')}
             </p>
             <div className="flex space-x-4">
@@ -36,32 +36,32 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.quick_links')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/inicio" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/inicio" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.home')}
                 </Link>
               </li>
               <li>
-                <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.properties')}
                 </Link>
               </li>
               <li>
-                <Link to="/roomie-finder" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/roomie-finder" className="text-primary-foreground/80 hover:text-white transition-colors">
                   Roomie Finder
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/contact" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.contact')}
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/services" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.services')}
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/about" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.about')}
                 </Link>
               </li>
@@ -73,22 +73,22 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.services_section')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('footer.rental_properties')}
                 </Link>
               </li>
               <li>
-                <Link to="/properties" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('footer.sale_properties')}
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                <a href="#" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('footer.free_valuation')}
                 </a>
               </li>
               <li>
-                 <Link to="/roomie-finder" className="text-gray-300 hover:text-white transition-colors">Roomie Finder</Link>
+                 <Link to="/roomie-finder" className="text-primary-foreground/80 hover:text-white transition-colors">Roomie Finder</Link>
               </li>
             </ul>
           </div>
@@ -98,20 +98,20 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.contact_section')}</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-gray-300" />
-                <span className="text-gray-300">
+                <MapPin className="h-5 w-5 text-primary-foreground/80" />
+                <span className="text-primary-foreground/80">
                   {t('footer.address')}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-gray-300" />
-                <span className="text-gray-300">
+                <Phone className="h-5 w-5 text-primary-foreground/80" />
+                <span className="text-primary-foreground/80">
                   {t('footer.phone')}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-gray-300" />
-                <span className="text-gray-300">
+                <Mail className="h-5 w-5 text-primary-foreground/80" />
+                <span className="text-primary-foreground/80">
                   {t('footer.email')}
                 </span>
               </div>
@@ -120,7 +120,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-600 mt-12 pt-8 text-center">
-          <p className="text-gray-300">
+          <p className="text-primary-foreground/80">
             {t('footer.copyright')}
           </p>
         </div>
