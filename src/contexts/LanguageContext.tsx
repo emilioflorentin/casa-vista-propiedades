@@ -320,7 +320,7 @@ const translations: Translations = {
     },
     footer: {
       company_description:
-        "Nazarí Homes, tu agencia inmobiliaria de confianza. Especialistas en venta y alquiler de propiedades excepcionales.",
+        "PisoGo reúne viviendas de particulares y profesionales para comprar, alquilar o compartir piso.",
       quick_links: "Enlaces rápidos",
       services_section: "Servicios",
       contact_section: "Contacto",
@@ -335,7 +335,7 @@ const translations: Translations = {
       contactUs: "Contáctanos",
       privacyPolicy: "Política de privacidad",
       termsOfService: "Términos de servicio",
-      copyright: "Derechos de autor © 2026 Nazarí Homes. Todos los derechos reservados.",
+      copyright: "Derechos de autor © 2026 PisoGo. Todos los derechos reservados.",
     },
     account: {
       login: "Iniciar Sesión",
@@ -628,7 +628,7 @@ const translations: Translations = {
       operation_sale: "Sale",
       managed_by: "Managed by",
       managed_by_any: "Any",
-      managed_by_nazari: "Nazarí Homes",
+      managed_by_nazari: "PisoGo",
       managed_by_other: "Others",
       search_btn: "Search",
     },
@@ -697,7 +697,7 @@ const translations: Translations = {
     },
     about: {
       title: "About",
-      title_highlight: "Nazarí Homes",
+      title_highlight: "PisoGo",
       subtitle: "Learn more about our company and our commitment to you",
       our_story: "Our story",
       story_p1:
@@ -866,7 +866,7 @@ const translations: Translations = {
     },
     footer: {
       company_description:
-        "Nazarí Homes, your trusted real estate agency on the Tropical Coast. Specialists in sale and rental of exceptional properties.",
+        "PisoGo brings together homes from private owners and professionals to buy, rent or share.",
       quick_links: "Quick links",
       services_section: "Services",
       contact_section: "Contact",
@@ -881,7 +881,7 @@ const translations: Translations = {
       contactUs: "Contact us",
       privacyPolicy: "Privacy policy",
       termsOfService: "Terms of service",
-      copyright: "Copyright © 2026 Nazarí Homes. All rights reserved.",
+      copyright: "Copyright © 2026 PisoGo. All rights reserved.",
     },
     account: {
       login: "Sign In",
