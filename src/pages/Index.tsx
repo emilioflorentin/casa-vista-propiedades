@@ -263,27 +263,27 @@ const Index = () => {
       <section className="py-10 md:py-16 bg-card">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 text-center">
-            <Reveal className="p-6">
-              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="h-8 w-8 text-primary" />
+            <Reveal className="p-4 md:p-6">
+              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <Home className="h-6 w-6 text-primary md:h-8 md:w-8" />
               </div>
-              <h3 className="text-3xl font-bold text-foreground mb-2">
+              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">
                 {allUserProperties.length.toLocaleString("es-ES")}+
               </h3>
               <p className="text-muted-foreground">{t("stats.properties")}</p>
             </Reveal>
-            <Reveal delay={120} className="p-6">
-              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Key className="h-8 w-8 text-primary" />
+            <Reveal delay={120} className="p-4 md:p-6">
+              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <Key className="h-6 w-6 text-primary md:h-8 md:w-8" />
               </div>
-              <h3 className="text-3xl font-bold text-foreground mb-2">190+</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">190+</h3>
               <p className="text-muted-foreground">{t("stats.clients")}</p>
             </Reveal>
-            <Reveal delay={240} className="p-6">
-              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-primary" />
+            <Reveal delay={240} className="p-4 md:p-6">
+              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <Zap className="h-6 w-6 text-primary md:h-8 md:w-8" />
               </div>
-              <h3 className="text-3xl font-bold text-foreground mb-2">98%</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">98%</h3>
               <p className="text-muted-foreground">{t("stats.success_rate")}</p>
             </Reveal>
           </div>
@@ -387,25 +387,25 @@ const Index = () => {
           </Reveal>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 max-w-4xl mx-auto mb-8 md:mb-12">
-            <Reveal className="text-center p-6">
-              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-primary-foreground/80" />
+            <Reveal className="text-center p-4 md:p-6">
+              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <Shield className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step1_title")}</h3>
+              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step1_title")}</h3>
               <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step1_desc")}</p>
             </Reveal>
-            <Reveal delay={120} className="text-center p-6">
-              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Camera className="h-8 w-8 text-primary-foreground/80" />
+            <Reveal delay={120} className="text-center p-4 md:p-6">
+              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <Camera className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step2_title")}</h3>
+              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step2_title")}</h3>
               <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step2_desc")}</p>
             </Reveal>
-            <Reveal delay={240} className="text-center p-6">
-              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="h-8 w-8 text-primary-foreground/80" />
+            <Reveal delay={240} className="text-center p-4 md:p-6">
+              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
+                <MessageCircle className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step3_title")}</h3>
+              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step3_title")}</h3>
               <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step3_desc")}</p>
             </Reveal>
           </div>
