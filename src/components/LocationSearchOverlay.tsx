@@ -281,7 +281,8 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 
