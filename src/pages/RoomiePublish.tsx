@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { uploadRoomieImages } from '@/utils/roomie';
+import { geocodeSpanishAddress } from '@/utils/geocoding';
+
 import { ArrowLeft, ArrowRight, Upload } from 'lucide-react';
 
 const STEPS = ['Vivienda', 'Habitación', 'Gastos', 'Convivencia', 'Preferencias', 'Fotos'];
@@ -81,10 +83,15 @@ const RoomiePublish = () => {
         uploadRoomieImages(homeFiles, user.id, 'home'),
         uploadRoomieImages(roomFiles, user.id, 'room'),
       ]);
+      const geo = await geocodeSpanishAddress(
+        [f.address.trim(), f.municipality.trim(), f.province.trim()].filter(Boolean).join(', ')
+      ).catch(() => null);
       const { data, error } = await supabase.from('roomie_listings').insert({
         user_id: user.id,
         title: f.title.trim(), address: f.address.trim(), municipality: f.municipality.trim(),
         province: f.province.trim(), property_type: f.property_type,
+        latitude: geo?.lat ?? null, longitude: geo?.lng ?? null,
+
         total_rooms: Number(f.total_rooms), bathrooms: Number(f.bathrooms), total_area: Number(f.total_area),
         home_images, room_images,
         room_area: Number(f.room_area), room_private_bath: f.room_private_bath,

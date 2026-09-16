@@ -605,6 +605,8 @@ export type Database = {
           includes_water: boolean
           is_active: boolean
           languages: string[]
+          latitude: number | null
+          longitude: number | null
           municipality: string
           pets_allowed: boolean
           pref_age_max: number | null
@@ -657,6 +659,8 @@ export type Database = {
           includes_water?: boolean
           is_active?: boolean
           languages?: string[]
+          latitude?: number | null
+          longitude?: number | null
           municipality: string
           pets_allowed?: boolean
           pref_age_max?: number | null
@@ -709,6 +713,8 @@ export type Database = {
           includes_water?: boolean
           is_active?: boolean
           languages?: string[]
+          latitude?: number | null
+          longitude?: number | null
           municipality?: string
           pets_allowed?: boolean
           pref_age_max?: number | null

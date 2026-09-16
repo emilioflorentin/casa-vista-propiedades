@@ -10,11 +10,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { MapPin, Sparkles } from 'lucide-react';
+import { MapPin, Sparkles, Map as MapIcon } from 'lucide-react';
 import { RoomieListingCard, type RoomieListing } from '@/components/roomie/RoomieListingCard';
 import { RoomieSwipeDeck } from '@/components/roomie/RoomieSwipeDeck';
 import RoomieIntro from '@/components/roomie/RoomieIntro';
 import { fetchSeeker, fetchSeekerLikes, seekerLike } from '@/utils/roomieSeeker';
+import LocationSearchOverlay, { type LocationSelection } from '@/components/LocationSearchOverlay';
+import { calculateDistance } from '@/utils/distanceCalculator';
+import { isInsidePolygon, resolveListingsCoords, type Coords } from '@/utils/roomieGeo';
+
+interface RoomieArea {
+  label: string;
+  lat: number;
+  lng: number;
+  radius: number;
+  polygon?: [number, number][];
+}
+
 
 const RoomieFinder = () => {
   const { user } = useAuth();
@@ -27,6 +39,18 @@ const RoomieFinder = () => {
 
   const [zone, setZone] = useState<string | null>(() => localStorage.getItem('roomie_zone'));
   const [zoneQuery, setZoneQuery] = useState('');
+  const [area, setArea] = useState<RoomieArea | null>(() => {
+    try {
+      const raw = localStorage.getItem('roomie_area');
+      return raw ? (JSON.parse(raw) as RoomieArea) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [mapOpen, setMapOpen] = useState(false);
+  const [coords, setCoords] = useState<Record<string, Coords>>({});
+  const [locating, setLocating] = useState(false);
+
 
   const [search, setSearch] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -79,19 +103,76 @@ const RoomieFinder = () => {
 
   const chooseZone = (name: string) => {
     setZone(name);
+    setArea(null);
+    localStorage.removeItem('roomie_area');
     localStorage.setItem('roomie_zone', name);
   };
 
   const clearZone = () => {
     setZone(null);
+    setArea(null);
     localStorage.removeItem('roomie_zone');
+    localStorage.removeItem('roomie_area');
   };
+
+  const chooseArea = (selection: LocationSelection | { address: string }) => {
+    setMapOpen(false);
+    if (!('lat' in selection)) {
+      if (selection.address?.trim()) chooseZone(selection.address.trim());
+      return;
+    }
+    const next: RoomieArea = {
+      label: selection.label || selection.address,
+      lat: selection.lat,
+      lng: selection.lng,
+      radius: selection.radius,
+      ...(selection.polygon ? { polygon: selection.polygon } : {}),
+    };
+    setArea(next);
+    setZone(null);
+    localStorage.removeItem('roomie_zone');
+    localStorage.setItem('roomie_area', JSON.stringify(next));
+  };
+
+  // Resolve coordinates for listings whenever a map area is active
+  useEffect(() => {
+    if (!area || listings.length === 0) return;
+    let cancelled = false;
+    setLocating(true);
+    resolveListingsCoords(
+      listings.map((l) => ({
+        id: l.id,
+        address: l.address,
+        municipality: l.municipality,
+        province: l.province,
+        latitude: (l as unknown as { latitude?: number | null }).latitude ?? null,
+        longitude: (l as unknown as { longitude?: number | null }).longitude ?? null,
+      }))
+    )
+      .then((resolved) => {
+        if (!cancelled) setCoords((prev) => ({ ...prev, ...resolved }));
+      })
+      .finally(() => {
+        if (!cancelled) setLocating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [area, listings]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const z = zone?.trim().toLowerCase();
     return listings.filter((l) => {
-      if (z && `${l.municipality} ${l.province}`.toLowerCase().indexOf(z) === -1) return false;
+      if (area) {
+        const point = coords[l.id];
+        if (!point) return false;
+        if (area.polygon && area.polygon.length >= 3) {
+          if (!isInsidePolygon(point, area.polygon)) return false;
+        } else if (calculateDistance(area.lat, area.lng, point.lat, point.lng) > area.radius / 1000) {
+          return false;
+        }
+      } else if (z && `${l.municipality} ${l.province}`.toLowerCase().indexOf(z) === -1) return false;
       if (q && !(`${l.title} ${l.address} ${l.municipality} ${l.province}`.toLowerCase().includes(q))) return false;
       if (maxPrice && Number(l.rent_amount) > Number(maxPrice)) return false;
       if (onlyBillsIncluded && !l.bills_included) return false;
@@ -99,7 +180,8 @@ const RoomieFinder = () => {
       if (noSmokers && l.smokers) return false;
       return true;
     });
-  }, [listings, zone, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
+  }, [listings, zone, area, coords, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
+
 
   const deck = useMemo(
     () => filtered.filter((l) => !seen.includes(l.id) && l.user_id !== user?.id),
@@ -132,24 +214,45 @@ const RoomieFinder = () => {
 
         <div ref={exploreRef} className="scroll-mt-24 mt-10 md:mt-2 mb-5 md:mb-8">
           <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">
-            {zone ? `Habitaciones en ${zone}` : '¿En qué zona estás interesada?'}
+            {area
+              ? `Habitaciones en ${area.label}`
+              : zone
+                ? `Habitaciones en ${zone}`
+                : '¿En qué zona estás interesada?'}
           </h2>
           <p className="text-sm md:text-base text-roomie-ink/60 mt-1 md:mt-2 max-w-2xl">
-            {zone
-              ? 'Descubre una a una o consulta el listado completo con filtros.'
-              : 'Elige una zona para ver solo las habitaciones disponibles allí.'}
+            {area
+              ? area.polygon
+                ? 'Habitaciones dentro de la zona que has dibujado en el mapa.'
+                : `Habitaciones a menos de ${area.radius >= 1000 ? `${area.radius / 1000} km` : `${area.radius} m`} de ese punto.`
+              : zone
+                ? 'Descubre una a una o consulta el listado completo con filtros.'
+                : 'Elige una zona en el mapa o de la lista para ver solo las habitaciones disponibles allí.'}
           </p>
-          {zone && (
-            <Button variant="outline" size="sm" className="mt-3" onClick={clearZone}>
-              <MapPin className="w-4 h-4 mr-2" />Cambiar zona
-            </Button>
+          {(zone || area) && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={clearZone}>
+                <MapPin className="w-4 h-4 mr-2" />Cambiar zona
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
+                <MapIcon className="w-4 h-4 mr-2" />Ajustar en el mapa
+              </Button>
+              {locating && <span className="text-sm text-roomie-ink/60 self-center">Situando habitaciones...</span>}
+            </div>
           )}
         </div>
 
-        {!zone ? (
+        {!zone && !area ? (
           <div className="bg-white rounded-xl border p-4 md:p-6 space-y-4">
+            <Button className="w-full h-12 bg-roomie-green hover:bg-roomie-green/90 text-white" onClick={() => setMapOpen(true)}>
+              <MapIcon className="w-5 h-5 mr-2" />Seleccionar zona en el mapa
+            </Button>
+            <p className="text-xs text-center text-roomie-ink/50">
+              Busca una calle, elige un radio o dibuja tu zona con el dedo.
+            </p>
+
             <div className="space-y-1.5">
-              <Label htmlFor="roomie-zone">Busca tu zona</Label>
+              <Label htmlFor="roomie-zone">O busca por municipio</Label>
               <Input
                 id="roomie-zone"
                 value={zoneQuery}
@@ -157,6 +260,7 @@ const RoomieFinder = () => {
                 placeholder="Granada, Jaén, Albolote..."
               />
             </div>
+
 
             {loading ? (
               <p className="text-center text-muted-foreground py-10">Cargando zonas...</p>
@@ -251,7 +355,14 @@ const RoomieFinder = () => {
         </Tabs>
         )}
       </main>
+      <LocationSearchOverlay
+        open={mapOpen}
+        initialValue={area?.label || zone || ''}
+        onClose={() => setMapOpen(false)}
+        onSelect={chooseArea}
+      />
       <Footer />
+
     </div>
   );
 };
