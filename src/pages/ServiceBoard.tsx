@@ -186,19 +186,29 @@ const ServiceBoard = () => {
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [savingBudget, setSavingBudget] = useState(false);
   const [loadingBudgets, setLoadingBudgets] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (authLoading) return;
+    if (!user) {
       navigate('/auth');
       return;
     }
-    if (!authLoading && user?.email !== 'multiservicios@nazarihomes.com') {
+    if (user.email !== 'multiservicios@nazarihomes.com') {
       navigate('/account');
       return;
     }
-    if (user) {
-      loadData();
-    }
+    loadData();
   }, [user, authLoading]);
+
+  // Safety net: never leave the board stuck on the spinner
+  useEffect(() => {
+    if (!loading) return;
+    const timer = window.setTimeout(() => {
+      setLoading(false);
+      setLoadError((prev) => prev ?? 'La carga ha tardado demasiado. Vuelve a intentarlo.');
+    }, 15000);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     if (activeTab === 'mantenimiento' && user) {
@@ -208,6 +218,7 @@ const ServiceBoard = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const { data: incidentsData, error: incidentsError } = await supabase
         .from('incidents')
@@ -216,6 +227,7 @@ const ServiceBoard = () => {
 
       if (incidentsError) {
         console.error('Error loading incidents:', incidentsError);
+        setLoadError(incidentsError.message || 'No se han podido cargar las incidencias.');
         return;
       }
 
@@ -236,13 +248,22 @@ const ServiceBoard = () => {
           propsData.forEach(p => { propsMap[p.id] = p; });
           setProperties(propsMap);
 
-          for (const ownerId of ownerIds) {
-            const { data: ownerData } = await supabase
-              .rpc('get_complete_profile_info', { profile_user_id: ownerId });
-            if (ownerData) {
-              setOwners(prev => ({ ...prev, [ownerId]: ownerData as unknown as OwnerInfo }));
-            }
-          }
+          const ownerResults = await Promise.all(
+            ownerIds.map(async (ownerId) => {
+              try {
+                const { data } = await supabase
+                  .rpc('get_complete_profile_info', { profile_user_id: ownerId });
+                return [ownerId, data] as const;
+              } catch {
+                return [ownerId, null] as const;
+              }
+            })
+          );
+          const ownersMap: Record<string, OwnerInfo> = {};
+          ownerResults.forEach(([ownerId, data]) => {
+            if (data) ownersMap[ownerId] = data as unknown as OwnerInfo;
+          });
+          setOwners(prev => ({ ...prev, ...ownersMap }));
         }
       }
 
@@ -304,8 +325,9 @@ const ServiceBoard = () => {
       if (tasksData) {
         setInternalTasks(tasksData.map((t: any) => ({ ...t, _isInternal: true as const })));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading data:', error);
+      setLoadError(error?.message || 'No se ha podido cargar el panel.');
     } finally {
       setLoading(false);
     }
@@ -1124,6 +1146,23 @@ const ServiceBoard = () => {
         <div className="container mx-auto px-4 py-20 text-center">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
           <p className="mt-4 text-muted-foreground">Cargando panel de servicios...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center space-y-4">
+          <p className="text-foreground font-semibold">No se ha podido cargar el panel de servicios</p>
+          <p className="text-sm text-muted-foreground">{loadError}</p>
+          <Button onClick={loadData}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reintentar
+          </Button>
         </div>
         <Footer />
       </div>
