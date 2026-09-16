@@ -214,24 +214,45 @@ const RoomieFinder = () => {
 
         <div ref={exploreRef} className="scroll-mt-24 mt-10 md:mt-2 mb-5 md:mb-8">
           <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">
-            {zone ? `Habitaciones en ${zone}` : '¿En qué zona estás interesada?'}
+            {area
+              ? `Habitaciones en ${area.label}`
+              : zone
+                ? `Habitaciones en ${zone}`
+                : '¿En qué zona estás interesada?'}
           </h2>
           <p className="text-sm md:text-base text-roomie-ink/60 mt-1 md:mt-2 max-w-2xl">
-            {zone
-              ? 'Descubre una a una o consulta el listado completo con filtros.'
-              : 'Elige una zona para ver solo las habitaciones disponibles allí.'}
+            {area
+              ? area.polygon
+                ? 'Habitaciones dentro de la zona que has dibujado en el mapa.'
+                : `Habitaciones a menos de ${area.radius >= 1000 ? `${area.radius / 1000} km` : `${area.radius} m`} de ese punto.`
+              : zone
+                ? 'Descubre una a una o consulta el listado completo con filtros.'
+                : 'Elige una zona en el mapa o de la lista para ver solo las habitaciones disponibles allí.'}
           </p>
-          {zone && (
-            <Button variant="outline" size="sm" className="mt-3" onClick={clearZone}>
-              <MapPin className="w-4 h-4 mr-2" />Cambiar zona
-            </Button>
+          {(zone || area) && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={clearZone}>
+                <MapPin className="w-4 h-4 mr-2" />Cambiar zona
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
+                <MapIcon className="w-4 h-4 mr-2" />Ajustar en el mapa
+              </Button>
+              {locating && <span className="text-sm text-roomie-ink/60 self-center">Situando habitaciones...</span>}
+            </div>
           )}
         </div>
 
-        {!zone ? (
+        {!zone && !area ? (
           <div className="bg-white rounded-xl border p-4 md:p-6 space-y-4">
+            <Button className="w-full h-12 bg-roomie-green hover:bg-roomie-green/90 text-white" onClick={() => setMapOpen(true)}>
+              <MapIcon className="w-5 h-5 mr-2" />Seleccionar zona en el mapa
+            </Button>
+            <p className="text-xs text-center text-roomie-ink/50">
+              Busca una calle, elige un radio o dibuja tu zona con el dedo.
+            </p>
+
             <div className="space-y-1.5">
-              <Label htmlFor="roomie-zone">Busca tu zona</Label>
+              <Label htmlFor="roomie-zone">O busca por municipio</Label>
               <Input
                 id="roomie-zone"
                 value={zoneQuery}
@@ -239,6 +260,7 @@ const RoomieFinder = () => {
                 placeholder="Granada, Jaén, Albolote..."
               />
             </div>
+
 
             {loading ? (
               <p className="text-center text-muted-foreground py-10">Cargando zonas...</p>
