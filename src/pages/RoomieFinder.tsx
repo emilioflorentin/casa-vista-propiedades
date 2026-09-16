@@ -103,19 +103,76 @@ const RoomieFinder = () => {
 
   const chooseZone = (name: string) => {
     setZone(name);
+    setArea(null);
+    localStorage.removeItem('roomie_area');
     localStorage.setItem('roomie_zone', name);
   };
 
   const clearZone = () => {
     setZone(null);
+    setArea(null);
     localStorage.removeItem('roomie_zone');
+    localStorage.removeItem('roomie_area');
   };
+
+  const chooseArea = (selection: LocationSelection | { address: string }) => {
+    setMapOpen(false);
+    if (!('lat' in selection)) {
+      if (selection.address?.trim()) chooseZone(selection.address.trim());
+      return;
+    }
+    const next: RoomieArea = {
+      label: selection.label || selection.address,
+      lat: selection.lat,
+      lng: selection.lng,
+      radius: selection.radius,
+      ...(selection.polygon ? { polygon: selection.polygon } : {}),
+    };
+    setArea(next);
+    setZone(null);
+    localStorage.removeItem('roomie_zone');
+    localStorage.setItem('roomie_area', JSON.stringify(next));
+  };
+
+  // Resolve coordinates for listings whenever a map area is active
+  useEffect(() => {
+    if (!area || listings.length === 0) return;
+    let cancelled = false;
+    setLocating(true);
+    resolveListingsCoords(
+      listings.map((l) => ({
+        id: l.id,
+        address: l.address,
+        municipality: l.municipality,
+        province: l.province,
+        latitude: (l as unknown as { latitude?: number | null }).latitude ?? null,
+        longitude: (l as unknown as { longitude?: number | null }).longitude ?? null,
+      }))
+    )
+      .then((resolved) => {
+        if (!cancelled) setCoords((prev) => ({ ...prev, ...resolved }));
+      })
+      .finally(() => {
+        if (!cancelled) setLocating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [area, listings]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const z = zone?.trim().toLowerCase();
     return listings.filter((l) => {
-      if (z && `${l.municipality} ${l.province}`.toLowerCase().indexOf(z) === -1) return false;
+      if (area) {
+        const point = coords[l.id];
+        if (!point) return false;
+        if (area.polygon && area.polygon.length >= 3) {
+          if (!isInsidePolygon(point, area.polygon)) return false;
+        } else if (calculateDistance(area.lat, area.lng, point.lat, point.lng) > area.radius / 1000) {
+          return false;
+        }
+      } else if (z && `${l.municipality} ${l.province}`.toLowerCase().indexOf(z) === -1) return false;
       if (q && !(`${l.title} ${l.address} ${l.municipality} ${l.province}`.toLowerCase().includes(q))) return false;
       if (maxPrice && Number(l.rent_amount) > Number(maxPrice)) return false;
       if (onlyBillsIncluded && !l.bills_included) return false;
@@ -123,7 +180,8 @@ const RoomieFinder = () => {
       if (noSmokers && l.smokers) return false;
       return true;
     });
-  }, [listings, zone, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
+  }, [listings, zone, area, coords, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
+
 
   const deck = useMemo(
     () => filtered.filter((l) => !seen.includes(l.id) && l.user_id !== user?.id),
