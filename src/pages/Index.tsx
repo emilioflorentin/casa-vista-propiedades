@@ -17,6 +17,9 @@ import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<{
     address: string;
     lat: number;
