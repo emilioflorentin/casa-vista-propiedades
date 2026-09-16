@@ -70,29 +70,29 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
     </div>
 
     {/* Cómo funciona */}
-    <div className="py-16 md:py-24">
-      <div className="flex flex-col md:flex-row md:items-end gap-6 mb-12">
+    <div className="py-8 md:py-24">
+      <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-6 md:mb-12">
         <div className="max-w-2xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-roomie-ink">¿Cómo funciona Roomie Finder?</h2>
-          <p className="mt-3 text-lg text-roomie-ink/60">Cuatro pasos simples, sin cuentas ni mensajes en frío.</p>
+          <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">¿Cómo funciona Roomie Finder?</h2>
+          <p className="mt-2 md:mt-3 text-base md:text-lg text-roomie-ink/60">Cuatro pasos simples, sin cuentas ni mensajes en frío.</p>
         </div>
         <div className="h-px flex-1 bg-roomie-ink/10 hidden md:block mb-4" />
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {STEPS.map((s, i) => {
           const last = i === STEPS.length - 1;
           return (
             <div
               key={s.n}
-              className={`group p-8 rounded-3xl transition-all duration-300 ${
+              className={`group p-4 md:p-8 rounded-2xl md:rounded-3xl transition-all duration-300 ${
                 last
                   ? 'bg-roomie-green shadow-lg lg:-translate-y-4'
                   : 'bg-white border border-roomie-ink/5 hover:shadow-xl'
               }`}
             >
               <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl mb-6 transition-colors ${
+                className={`w-9 h-9 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center font-bold text-sm md:text-2xl mb-3 md:mb-6 transition-colors ${
                   last
                     ? 'bg-roomie-gold text-white'
                     : 'bg-roomie-sand text-roomie-ink group-hover:bg-roomie-gold group-hover:text-white'
@@ -100,8 +100,8 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
               >
                 {s.n}
               </div>
-              <h3 className={`text-xl font-bold mb-3 ${last ? 'text-white' : 'text-roomie-ink'}`}>{s.title}</h3>
-              <p className={`leading-relaxed ${last ? 'text-white/80' : 'text-roomie-ink/60'}`}>{s.text}</p>
+              <h3 className={`text-sm md:text-xl font-bold mb-1.5 md:mb-3 ${last ? 'text-white' : 'text-roomie-ink'}`}>{s.title}</h3>
+              <p className={`text-xs md:text-base leading-relaxed ${last ? 'text-white/80' : 'text-roomie-ink/60'}`}>{s.text}</p>
             </div>
           );
         })}
