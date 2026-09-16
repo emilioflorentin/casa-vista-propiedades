@@ -2,17 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PropertyCard from "@/components/PropertyCard";
 import Reveal from "@/components/Reveal";
 import LocationSearchOverlay from "@/components/LocationSearchOverlay";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
-import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
-import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -21,181 +17,26 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<{
-    address: string;
-    lat: number;
-    lng: number;
-    radius: number;
-  } | null>(null);
-  const [propertyType, setPropertyType] = useState("");
-  const [operation, setOperation] = useState("");
-  const [managedBy, setManagedBy] = useState("");
-  const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
-  const [showingSearchResults, setShowingSearchResults] = useState(false);
-  const [allUserProperties, setAllUserProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [propertyCount, setPropertyCount] = useState(0);
 
-  const handleSearchWithLocation = (location?: { address: string; lat: number; lng: number; radius: number }) => {
-    const searchLocation = location || selectedLocation;
-
-    console.log("Search params:", {
-      location: searchLocation,
-      propertyType,
-      operation,
-      managedBy,
-    });
-
-    // Filter properties based on search criteria
-    let results = [...allUserProperties];
-
-    // Filter by property type if selected
-    if (propertyType && propertyType !== "any") {
-      results = results.filter((property) => property.type === propertyType);
-    }
-
-    // Filter by operation if selected
-    if (operation && operation !== "any") {
-      results = results.filter((property) => property.operation === operation);
-    }
-
-    // Filter by management if selected
-    if (managedBy && managedBy !== "any") {
-      results = results.filter((property) => property.managedBy === managedBy);
-    }
-
-    // Filter by location and radius if provided
-    if (searchLocation) {
-      const searchTerm = searchLocation.address.toLowerCase();
-      console.log("Filtering by location and radius:", searchTerm, searchLocation.radius);
-
-      results = results.filter((property) => {
-        const propertyLocation = property.location.toLowerCase();
-
-        // Get coordinates for the property location
-        const propertyCoords = getCoordinatesFromLocation(property.location);
-
-        if (propertyCoords && searchLocation.lat && searchLocation.lng) {
-          // Calculate distance between search location and property location
-          const distance = calculateDistance(
-            searchLocation.lat,
-            searchLocation.lng,
-            propertyCoords.lat,
-            propertyCoords.lng,
-          );
-
-          console.log(
-            `Property ${property.title} at ${property.location}: distance ${Math.round(distance)}m, radius ${searchLocation.radius}m`,
-          );
-
-          // ONLY include properties within the specified radius
-          return distance <= searchLocation.radius;
-        }
-
-        // If coordinates are not available, exclude the property from radius search
-        console.log(`No coordinates found for ${property.location}, excluding from radius search`);
-        return false;
-      });
-    }
-
-    setFilteredProperties(results);
-    setShowingSearchResults(true);
-    console.log("Filtered results:", results.length, "properties found");
-  };
-
-  const resetSearch = () => {
-    setFilteredProperties(allUserProperties.slice(0, 8)); // Show first 8 properties as featured
-    setShowingSearchResults(false);
-    setSelectedLocation(null);
-    setPropertyType("");
-    setOperation("");
-    setManagedBy("");
-  };
-
-  // Load user properties on component mount
+  // Load property count for the stats section
   useEffect(() => {
-    const loadUserProperties = async () => {
+    const loadPropertyCount = async () => {
       try {
-        // Load database properties (only available ones)
-        const { data: dbProperties, error } = await supabase
+        const { count } = await supabase
           .from("properties")
-          .select("*")
-          .or("is_rented.is.null,is_rented.eq.false") // Only show available properties
-          .order("created_at", { ascending: false });
+          .select("*", { count: "exact", head: true })
+          .or("is_rented.is.null,is_rented.eq.false"); // Only available properties
 
-        // Load profiles to determine managedBy
-        const userIds = [...new Set((dbProperties || []).map(p => p.user_id))];
-        const profiles: Record<string, { email?: string | null }> = {};
-        if (userIds.length > 0) {
-          const { data: profilesData } = await supabase
-            .from("profiles")
-            .select("id, email")
-            .in("id", userIds);
-          (profilesData || []).forEach(p => { profiles[p.id] = p; });
-        }
-
-        // Load local properties (only available ones)
         const localProperties = getLocalProperties().filter((prop) => !prop.is_rented);
-
-        // Convert and combine properties
-        const convertedDbProperties = (dbProperties || []).map((prop) => ({
-          id: parseInt(prop.id.slice(-8), 16),
-          originalId: prop.id,
-          reference: prop.reference,
-          title: prop.title,
-          type: prop.type,
-          price: prop.price,
-          currency: prop.currency,
-          operation: prop.operation,
-          location: prop.location,
-          bedrooms: prop.bedrooms,
-          bathrooms: prop.bathrooms,
-          area: prop.area,
-          image: prop.image ? prop.image.split(',')[0].trim() : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
-          features: prop.features || [],
-          description: prop.description,
-          managedBy: (profiles[prop.user_id]?.email?.endsWith('@nazarihomes.com') ? 'nazari' : 'other') as "nazari" | "other",
-          user_id: prop.user_id,
-        }));
-
-        const convertedLocalProperties = localProperties.map((prop) => ({
-          id: parseInt(prop.id),
-          originalId: prop.id,
-          reference: prop.reference,
-          title: prop.title,
-          type: prop.type,
-          price: prop.price,
-          currency: prop.currency,
-          operation: prop.operation,
-          location: prop.location,
-          bedrooms: prop.bedrooms,
-          bathrooms: prop.bathrooms,
-          area: prop.area,
-          image: prop.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
-          features: prop.features || [],
-          description: prop.description,
-          managedBy: "other" as const,
-          userHash: prop.userHash,
-        }));
-
-        const combinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
-        setAllUserProperties(combinedProperties);
-        setFilteredProperties(combinedProperties.slice(0, 8)); // Show first 8 as featured
+        setPropertyCount((count || 0) + localProperties.length);
       } catch (error) {
-        console.error("Error loading properties:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error loading property count:", error);
       }
     };
 
-    loadUserProperties();
+    loadPropertyCount();
   }, []);
-
-  // Auto-search when filters change and there's a selected location
-  useEffect(() => {
-    if (selectedLocation) {
-      handleSearchWithLocation();
-    }
-  }, [propertyType, operation, managedBy]);
 
   return (
     <div className="min-h-screen bg-secondary">
