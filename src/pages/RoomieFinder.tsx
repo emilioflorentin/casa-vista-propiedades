@@ -10,11 +10,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { MapPin, Sparkles } from 'lucide-react';
+import { MapPin, Sparkles, Map as MapIcon } from 'lucide-react';
 import { RoomieListingCard, type RoomieListing } from '@/components/roomie/RoomieListingCard';
 import { RoomieSwipeDeck } from '@/components/roomie/RoomieSwipeDeck';
 import RoomieIntro from '@/components/roomie/RoomieIntro';
 import { fetchSeeker, fetchSeekerLikes, seekerLike } from '@/utils/roomieSeeker';
+import LocationSearchOverlay, { type LocationSelection } from '@/components/LocationSearchOverlay';
+import { calculateDistance } from '@/utils/distanceCalculator';
+import { isInsidePolygon, resolveListingsCoords, type Coords } from '@/utils/roomieGeo';
+
+interface RoomieArea {
+  label: string;
+  lat: number;
+  lng: number;
+  radius: number;
+  polygon?: [number, number][];
+}
+
 
 const RoomieFinder = () => {
   const { user } = useAuth();
