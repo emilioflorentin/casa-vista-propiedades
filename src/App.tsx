@@ -29,6 +29,7 @@ import RoomiePublish from "./pages/RoomiePublish";
 import RoomieProfile from "./pages/RoomieProfile";
 import RoomieMatches from "./pages/RoomieMatches";
 import CookieBanner from "./components/CookieBanner";
+import ScrollToTop from "./components/ScrollToTop";
 import NativeBootstrap from "./native/NativeBootstrap";
 
 const queryClient = new QueryClient();
