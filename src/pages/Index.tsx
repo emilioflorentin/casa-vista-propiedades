@@ -43,7 +43,16 @@ const Index = () => {
   const [geoPermission, setGeoPermission] = useState<'unknown' | 'granted' | 'prompt' | 'denied' | 'unsupported'>('unknown');
   const [featuredProperties, setFeaturedProperties] = useState<FeaturedProperty[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const userCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  const scrollCarousel = (direction: 1 | -1) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('[data-carousel-card]');
+    const step = card ? card.offsetWidth + 16 : el.clientWidth * 0.8;
+    el.scrollBy({ left: step * direction, behavior: 'smooth' });
+  };
 
   // Track geolocation permission; featured section only shows when granted
   useEffect(() => {
