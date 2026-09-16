@@ -18,6 +18,7 @@ const Index = () => {
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [propertyCount, setPropertyCount] = useState(0);
+  const [showMore, setShowMore] = useState(false);
 
   // Load property count for the stats section
   useEffect(() => {
