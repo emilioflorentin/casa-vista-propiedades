@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,30 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import LocationSearchOverlay from "@/components/LocationSearchOverlay";
+import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
+import { calculateDistance } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
+
+interface FeaturedProperty {
+  id: number;
+  originalId?: string;
+  reference: string;
+  title: string;
+  type: string;
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image: string;
+  features?: string[];
+  managedBy: "nazari" | "other";
+  distanceKm: number | null;
+}
 
 const Index = () => {
   const { t } = useLanguage();
