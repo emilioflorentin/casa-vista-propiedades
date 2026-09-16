@@ -32,14 +32,6 @@ const Index = () => {
   const [allUserProperties, setAllUserProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
-    setSelectedLocation(location);
-    console.log("Selected location:", location);
-
-    // Automatically trigger search when location is selected
-    handleSearchWithLocation(location);
-  };
-
   const handleSearchWithLocation = (location?: { address: string; lat: number; lng: number; radius: number }) => {
     const searchLocation = location || selectedLocation;
 
