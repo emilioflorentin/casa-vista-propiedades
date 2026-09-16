@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
-import LocationSearch from "@/components/LocationSearch";
 import Reveal from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
@@ -17,6 +15,9 @@ import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<{
     address: string;
     lat: number;
@@ -30,14 +31,6 @@ const Index = () => {
   const [showingSearchResults, setShowingSearchResults] = useState(false);
   const [allUserProperties, setAllUserProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const handleLocationSelect = (location: { address: string; lat: number; lng: number; radius: number }) => {
-    setSelectedLocation(location);
-    console.log("Selected location:", location);
-
-    // Automatically trigger search when location is selected
-    handleSearchWithLocation(location);
-  };
 
   const handleSearchWithLocation = (location?: { address: string; lat: number; lng: number; radius: number }) => {
     const searchLocation = location || selectedLocation;
@@ -104,16 +97,6 @@ const Index = () => {
     setFilteredProperties(results);
     setShowingSearchResults(true);
     console.log("Filtered results:", results.length, "properties found");
-  };
-
-  // The main search button now does the same as the location search
-  const handleSearch = () => {
-    // If there's a selected location, use it directly
-    if (selectedLocation) {
-      handleSearchWithLocation();
-    }
-    // If no location is selected but there might be text in the input,
-    // let the LocationSearch component handle it through its own search
   };
 
   const resetSearch = () => {
@@ -230,54 +213,48 @@ const Index = () => {
           </Reveal>
 
           {/* Search Bar */}
-          <Reveal delay={280} variant="scale" className="bg-card rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <LocationSearch onLocationSelect={handleLocationSelect} placeholder={t("search.location_placeholder")} />
-
-              <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 border-0 text-foreground">
-                  <SelectValue placeholder={t("search.property_type")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">{t("search.property_type_any")}</SelectItem>
-                  <SelectItem value="apartment">{t("search.property_type_apartment")}</SelectItem>
-                  <SelectItem value="house">{t("search.property_type_house")}</SelectItem>
-                  <SelectItem value="loft">{t("search.property_type_loft")}</SelectItem>
-                  <SelectItem value="studio">{t("search.property_type_studio")}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 border-0 text-foreground">
-                  <SelectValue placeholder={t("search.operation")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">{t("search.operation_any")}</SelectItem>
-                  <SelectItem value="rent">{t("search.operation_rent")}</SelectItem>
-                  <SelectItem value="sale">{t("search.operation_sale")}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={managedBy} onValueChange={setManagedBy}>
-                <SelectTrigger className="h-12 border-0 text-foreground">
-                  <SelectValue placeholder={t("search.managed_by")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">{t("search.managed_by_any")}</SelectItem>
-                  <SelectItem value="nazari">{t("search.managed_by_nazari")}</SelectItem>
-                  <SelectItem value="other">{t("search.managed_by_other")}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button
-                size="lg"
-                className="h-12 bg-primary hover:bg-primary text-primary-foreground font-semibold"
-                onClick={handleSearch}
-              >
-                <Search className="mr-2 h-5 w-5" />
-                {t("search.search_btn")}
-              </Button>
-            </div>
+          <Reveal delay={280} variant="scale" className="max-w-4xl mx-auto">
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                const params = new URLSearchParams({ operation: searchOperation });
+                if (searchQuery.trim()) params.set('q', searchQuery.trim());
+                navigate(`/properties?${params.toString()}`);
+              }}
+            >
+              <div className="flex gap-1 px-2">
+                {([['sale', 'Comprar'], ['rent', 'Alquilar']] as const).map(([value, label]) => (
+                  <Button
+                    key={value}
+                    type="button"
+                    variant={searchOperation === value ? 'secondary' : 'ghost'}
+                    onClick={() => setSearchOperation(value)}
+                    className={searchOperation === value ? 'rounded-b-none' : 'rounded-b-none text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground'}
+                  >
+                    {label}
+                  </Button>
+                ))}
+                <Button asChild type="button" variant="ghost" className="rounded-b-none text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                  <Link to="/roomie-finder">Compartir</Link>
+                </Button>
+              </div>
+              <div className="flex flex-col gap-3 bg-card p-3 shadow-xl md:flex-row">
+                <label className="relative flex-1">
+                  <span className="sr-only">Ubicación o referencia</span>
+                  <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Ciudad, barrio o referencia"
+                    className="h-14 w-full rounded-md bg-secondary pl-12 pr-4 text-foreground outline-none ring-primary focus:ring-2"
+                  />
+                </label>
+                <Button type="submit" size="lg" className="h-14 px-9 text-base">
+                  <Search className="h-5 w-5" />
+                  Buscar viviendas
+                </Button>
+              </div>
+            </form>
           </Reveal>
         </div>
       </section>
