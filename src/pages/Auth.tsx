@@ -250,7 +250,7 @@ const Auth = () => {
                               ? 'border-primary bg-muted text-foreground'
                               : 'border-border hover:border-border'
                           }`}
-                          onClick={() => setUserType('empresa')}
+                          onClick={() => { setUserType('empresa'); setPlatform('nazari'); }}
                         >
                           <div className="text-sm font-medium">Profesional</div>
                           <div className="text-xs text-muted-foreground mt-1">Inmobiliaria</div>
