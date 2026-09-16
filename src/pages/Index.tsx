@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle } from "lucide-react";
+import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -18,6 +18,7 @@ const Index = () => {
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [propertyCount, setPropertyCount] = useState(0);
+  const [showMore, setShowMore] = useState(false);
 
   // Load property count for the stats section
   useEffect(() => {
@@ -167,36 +168,59 @@ const Index = () => {
       </section>
 
       {/* Tenant Section */}
-      <section className="py-10 md:py-20 bg-primary text-primary-foreground">
+      <section className="py-8 md:py-14 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6">
-          <Reveal className="max-w-4xl mx-auto text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">{t("tenant_section.title")}</h2>
-            <p className="text-base md:text-xl text-primary-foreground/80 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
+          <Reveal className="max-w-3xl mx-auto text-center mb-5 md:mb-8">
+            <h2 className="text-xl md:text-3xl font-bold mb-2">{t("tenant_section.title")}</h2>
+            <p className="text-sm md:text-lg text-primary-foreground/80 max-w-xl mx-auto">{t("tenant_section.subtitle")}</p>
           </Reveal>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 max-w-4xl mx-auto mb-8 md:mb-12">
-            <Reveal className="text-center p-4 md:p-6">
-              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <Shield className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step1_title")}</h3>
-              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step1_desc")}</p>
-            </Reveal>
-            <Reveal delay={120} className="text-center p-4 md:p-6">
-              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <Camera className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step2_title")}</h3>
-              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step2_desc")}</p>
-            </Reveal>
-            <Reveal delay={240} className="text-center p-4 md:p-6">
-              <div className="w-12 h-12 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <MessageCircle className="h-6 w-6 text-primary-foreground/80 md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-base font-semibold mb-1 md:text-lg md:mb-2">{t("tenant_section.step3_title")}</h3>
-              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step3_desc")}</p>
-            </Reveal>
+          {/* Compact steps */}
+          <div className="grid grid-cols-3 gap-2 md:gap-6 max-w-3xl mx-auto mb-4 md:mb-6">
+            {[
+              { icon: Shield, key: "step1", delay: 0 },
+              { icon: Camera, key: "step2", delay: 120 },
+              { icon: MessageCircle, key: "step3", delay: 240 },
+            ].map(({ icon: Icon, key, delay }) => (
+              <Reveal key={key} delay={delay} className="text-center">
+                <div className="bg-secondary/90 rounded-lg p-3 md:rounded-xl md:p-5 transition-colors hover:bg-accent/20">
+                  <Icon className="h-5 w-5 text-primary mx-auto mb-1.5 md:h-7 md:w-7 md:mb-2" />
+                  <p className="text-xs md:text-sm font-semibold text-foreground leading-tight">
+                    {t(`tenant_section.${key}_title`)}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
           </div>
+
+          {/* Ver más / Ver menos */}
+          <Reveal delay={120} className="text-center mb-5 md:mb-8">
+            <button
+              type="button"
+              onClick={() => setShowMore((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {showMore ? t("tenant_section.less") : t("tenant_section.more")}
+              <ChevronDown className={`h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`} />
+            </button>
+          </Reveal>
+
+          {/* Expanded details */}
+          {showMore && (
+            <div className="max-w-3xl mx-auto mb-6 md:mb-10 space-y-3 md:space-y-4">
+              {["step1", "step2", "step3"].map((key, i) => (
+                <Reveal key={key} delay={i * 80} className="flex items-start gap-3 bg-card/10 rounded-lg p-3 md:p-4">
+                  <span className="w-6 h-6 shrink-0 rounded-full bg-card/20 flex items-center justify-center text-xs font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <h3 className="text-sm md:text-base font-semibold">{t(`tenant_section.${key}_title`)}</h3>
+                    <p className="text-primary-foreground/70 text-xs md:text-sm">{t(`tenant_section.${key}_desc`)}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          )}
 
           <Reveal delay={120} className="text-center">
             <Link to="/tenant-incidents">
