@@ -33,10 +33,15 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const [mapMode, setMapMode] = useState(false);
   const [radius, setRadius] = useState('2000');
   const [picked, setPicked] = useState<GeocodedLocation | null>(null);
+  const [drawMode, setDrawMode] = useState(false);
+  const [polygon, setPolygon] = useState<[number, number][] | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const layerRefs = useRef<{ marker: any; circle: any }>({ marker: null, circle: null });
+  const leafletRef = useRef<any>(null);
+  const drawModeRef = useRef(false);
+  const drawPointsRef = useRef<[number, number][]>([]);
+  const layerRefs = useRef<{ marker: any; circle: any; shape: any }>({ marker: null, circle: null, shape: null });
 
   // Lock background scroll while the overlay is open
   useEffect(() => {
