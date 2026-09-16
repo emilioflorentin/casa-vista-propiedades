@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { geocodeSpanishAddress } from '@/utils/geocoding';
 
 // Property type for Supabase data
 interface PropertyData {
@@ -53,6 +54,8 @@ interface PropertyData {
   energy_consumption_value: number | null;
   energy_emissions_rating: string | null;
   energy_emissions_value: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const Account = () => {
@@ -158,6 +161,8 @@ const Account = () => {
           energy_consumption_value: p.energy_consumption_value,
           energy_emissions_rating: p.energy_emissions_rating,
           energy_emissions_value: p.energy_emissions_value
+          ,latitude: p.latitude,
+          longitude: p.longitude
         }));
         console.log('ACCOUNT: properties loaded from Supabase:', formattedProperties.length);
         setUserProperties(formattedProperties);
@@ -464,6 +469,13 @@ const Account = () => {
         }
       }
 
+      let coordinates: { lat: number; lng: number } | null = null;
+      try {
+        coordinates = await geocodeSpanishAddress(propertyForm.location);
+      } catch (error) {
+        console.warn('No se pudo geocodificar la vivienda:', error);
+      }
+
       const propertyData = {
         user_id: user.id,
         title: propertyForm.title,
@@ -472,6 +484,8 @@ const Account = () => {
         currency: propertyForm.currency,
         operation: propertyForm.operation,
         location: propertyForm.location,
+        latitude: coordinates?.lat ?? editingProperty?.latitude ?? null,
+        longitude: coordinates?.lng ?? editingProperty?.longitude ?? null,
         bedrooms: parseInt(propertyForm.bedrooms),
         bathrooms: parseInt(propertyForm.bathrooms),
         area: parseInt(propertyForm.area),

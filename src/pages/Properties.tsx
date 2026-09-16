@@ -17,6 +17,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties, LocalProperty } from "@/utils/localProperties";
+import { calculateDistance } from "@/utils/distanceCalculator";
 
 interface DBProperty {
   id: string;
@@ -27,6 +28,8 @@ interface DBProperty {
   currency: string;
   operation: "rent" | "sale";
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
   bedrooms: number;
   bathrooms: number;
   area: number;
@@ -51,6 +54,10 @@ const Properties = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+  const searchLatitude = Number(searchParams.get("lat"));
+  const searchLongitude = Number(searchParams.get("lng"));
+  const searchRadius = Number(searchParams.get("radius"));
+  const hasRadiusSearch = Number.isFinite(searchLatitude) && Number.isFinite(searchLongitude) && searchRadius > 0;
   const [propertyType, setPropertyType] = useState("all");
   const [operation, setOperation] = useState(() => {
     const requestedOperation = searchParams.get("operation");
@@ -146,6 +153,8 @@ const Properties = () => {
     currency: prop.currency,
     operation: prop.operation,
     location: prop.location,
+    latitude: prop.latitude,
+    longitude: prop.longitude,
     bedrooms: prop.bedrooms,
     bathrooms: prop.bathrooms,
     area: prop.area,
@@ -167,6 +176,8 @@ const Properties = () => {
     currency: prop.currency,
     operation: prop.operation,
     location: prop.location,
+    latitude: prop.latitude,
+    longitude: prop.longitude,
     bedrooms: prop.bedrooms,
     bathrooms: prop.bathrooms,
     area: prop.area,
@@ -184,10 +195,12 @@ const Properties = () => {
 
   const filteredProperties = allCombinedProperties.filter((property) => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      property.title.toLowerCase().includes(q) ||
-      property.location.toLowerCase().includes(q) ||
-      (property.reference?.toLowerCase().includes(q) ?? false);
+    const matchesSearch = hasRadiusSearch
+      ? Number.isFinite(property.latitude) && Number.isFinite(property.longitude) &&
+        calculateDistance(searchLatitude, searchLongitude, Number(property.latitude), Number(property.longitude)) <= searchRadius
+      : property.title.toLowerCase().includes(q) ||
+        property.location.toLowerCase().includes(q) ||
+        (property.reference?.toLowerCase().includes(q) ?? false);
     const matchesType = propertyType === "all" || property.type === propertyType;
     const matchesOperation = operation === "all" || property.operation === operation;
     const matchesManagement = managedBy === "all" || property.managedBy === managedBy;
@@ -456,7 +469,9 @@ const Properties = () => {
               {filteredProperties.length} {t('properties.page_title')}
             </h1>
             <p className="text-primary mt-1">
-              {t('properties.results_subtitle')}
+              {hasRadiusSearch
+                ? `Viviendas a menos de ${searchRadius >= 1000 ? `${searchRadius / 1000} km` : `${searchRadius} m`} de ${searchQuery}`
+                : t('properties.results_subtitle')}
             </p>
           </div>
           

@@ -3,19 +3,15 @@ import { createPortal } from 'react-dom';
 import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
 
-interface Suggestion {
-  label: string;
-  detail: string;
-  lat: number;
-  lng: number;
-}
+export interface LocationSelection extends GeocodedLocation { radius: number; }
 
 interface LocationSearchOverlayProps {
   open: boolean;
   initialValue?: string;
   onClose: () => void;
-  onSelect: (value: string) => void;
+  onSelect: (value: LocationSelection | { address: string }) => void;
 }
 
 const RADIUS_OPTIONS = [
@@ -28,12 +24,12 @@ const RADIUS_OPTIONS = [
 
 const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: LocationSearchOverlayProps) => {
   const [query, setQuery] = useState(initialValue);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<GeocodedLocation[]>([]);
   const [loading, setLoading] = useState(false);
   const [locating, setLocating] = useState(false);
   const [mapMode, setMapMode] = useState(false);
   const [radius, setRadius] = useState('2000');
-  const [picked, setPicked] = useState<Suggestion | null>(null);
+  const [picked, setPicked] = useState<GeocodedLocation | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
@@ -72,22 +68,9 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
     setLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=es&q=${encodeURIComponent(term)}`
-        );
-        const data = await res.json();
+        const data = await searchSpanishLocations(term);
         if (cancelled) return;
-        setSuggestions(
-          (data || []).map((item: any) => {
-            const parts = String(item.display_name).split(',').map((p: string) => p.trim());
-            return {
-              label: parts[0],
-              detail: parts.slice(1, 4).join(', '),
-              lat: parseFloat(item.lat),
-              lng: parseFloat(item.lon),
-            };
-          })
-        );
+        setSuggestions(data);
       } catch {
         if (!cancelled) setSuggestions([]);
       } finally {
@@ -101,25 +84,17 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
     };
   }, [query, open, mapMode]);
 
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-      const data = await res.json();
-      const a = data?.address || {};
-      return a.road || a.suburb || a.city || a.town || a.village || a.county || 'Zona seleccionada';
-    } catch {
-      return 'Zona seleccionada';
-    }
-  };
-
   const handleAroundMe = () => {
     if (!navigator.geolocation) return;
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const name = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-        setLocating(false);
-        onSelect(name);
+        try {
+          const location = await reverseSpanishLocation(pos.coords.latitude, pos.coords.longitude);
+          onSelect({ ...location, radius: Number(radius) });
+        } finally {
+          setLocating(false);
+        }
       },
       () => setLocating(false),
       { timeout: 8000 }
@@ -149,8 +124,11 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           fillColor: '#3F6B52',
           fillOpacity: 0.15,
         }).addTo(map);
-        const name = await reverseGeocode(lat, lng);
-        setPicked({ label: name, detail: '', lat, lng });
+        try {
+          setPicked(await reverseSpanishLocation(lat, lng));
+        } catch {
+          setPicked({ address: 'Zona seleccionada', label: 'Zona seleccionada', detail: '', lat, lng });
+        }
       });
       mapInstance.current = map;
       setTimeout(() => map.invalidateSize(), 150);
@@ -163,7 +141,11 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         layerRefs.current = { marker: null, circle: null };
       }
     };
-  }, [mapMode, radius]);
+  }, [mapMode]);
+
+  useEffect(() => {
+    if (layerRefs.current.circle) layerRefs.current.circle.setRadius(Number(radius));
+  }, [radius]);
 
   if (!open) return null;
 
@@ -201,7 +183,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             <p className="text-sm text-muted-foreground">
               {picked ? picked.label : 'Toca el mapa para elegir una zona'}
             </p>
-            <Button disabled={!picked} onClick={() => picked && onSelect(picked.label)}>
+            <Button disabled={!picked} onClick={() => picked && onSelect({ ...picked, radius: Number(radius) })}>
               Aplicar zona
             </Button>
           </div>
@@ -212,7 +194,9 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             className="relative mt-5"
             onSubmit={(e) => {
               e.preventDefault();
-              if (query.trim()) onSelect(query.trim());
+               const exact = suggestions[0];
+               if (exact) onSelect({ ...exact, radius: Number(radius) });
+               else if (query.trim()) onSelect({ address: query.trim() });
             }}
           >
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -226,13 +210,21 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             {loading && <Loader2 className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin text-muted-foreground" />}
           </form>
 
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="text-sm font-medium text-foreground">Buscar en un radio de</span>
+            <Select value={radius} onValueChange={setRadius}>
+              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+              <SelectContent>{RADIUS_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+
           {suggestions.length > 0 && (
             <ul className="mt-3 divide-y overflow-hidden rounded-lg border">
               {suggestions.map((s, i) => (
                 <li key={`${s.lat}-${s.lng}-${i}`}>
                   <button
                     type="button"
-                    onClick={() => onSelect(s.label)}
+                    onClick={() => onSelect({ ...s, radius: Number(radius) })}
                     className="flex w-full items-start gap-3 bg-card px-4 py-3 text-left hover:bg-secondary"
                   >
                     <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -249,10 +241,10 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           {query.trim().length > 0 && (
             <button
               type="button"
-              onClick={() => onSelect(query.trim())}
+              onClick={() => onSelect({ address: query.trim() })}
               className="mt-3 w-full rounded-lg border bg-card px-4 py-3 text-left text-sm font-semibold text-primary hover:bg-secondary"
             >
-              Buscar “{query.trim()}” en los anuncios
+               Buscar la referencia “{query.trim()}”
             </button>
           )}
 
