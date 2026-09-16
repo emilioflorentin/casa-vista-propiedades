@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone, LogOut } from "lucide-react";
+import { Menu, X, Heart, User, Phone, LogOut, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,10 +24,10 @@ const Header = () => {
   return (
     <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20 md:h-28">
+        <div className="flex items-center justify-between h-24 md:h-32">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <BrandLogo className="h-14 md:h-20" />
+              <BrandLogo className="h-[4.5rem] md:h-[6.5rem]" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -105,6 +105,12 @@ const Header = () => {
                 </Button>
               </Link>
             )}
+            <Link to="/account" aria-label="Publicar vivienda">
+              <Button size="sm" className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90">
+                <Plus className="h-4 w-4 mr-1" />
+                Publicar
+              </Button>
+            </Link>
             <Link to="/contact">
                <Button size="sm" variant="secondary">
                 <Phone className="h-4 w-4" />
@@ -163,17 +169,22 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 text-primary-foreground" />
-            ) : (
-              <Menu className="h-6 w-6 text-primary-foreground" />
-            )}
-          </button>
+          {/* Mobile Actions */}
+          <div className="md:hidden flex items-center gap-1">
+            <Link to="/account" aria-label="Publicar vivienda" className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md shadow-black/20">
+              <Plus className="h-5 w-5" />
+            </Link>
+            <button
+              className="p-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6 text-primary-foreground" />
+              ) : (
+                <Menu className="h-6 w-6 text-primary-foreground" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}

@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Home, KeyRound, MapPin, Search, Users } from 'lucide-react';
+import { ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BrandLogo from '@/components/BrandLogo';
 import gatewayHome from '@/assets/gateway-home.jpg';
@@ -29,16 +29,23 @@ const LandingGateway = () => {
   };
 
   return <div className="min-h-screen bg-secondary text-foreground">
-    <header className="relative z-30 border-b border-primary/15 bg-primary">
-      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-5 md:px-8">
-        <BrandLogo />
+    <header className="relative z-30 border-b border-accent/50 bg-header shadow-[0_2px_12px_rgba(0,0,0,0.25)]">
+      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-5 md:h-36 md:px-8">
+        <BrandLogo className="h-24 md:h-28" />
         <nav className="hidden items-center gap-7 text-sm font-semibold text-primary-foreground md:flex">
           <Link to="/properties?operation=sale" className="hover:text-accent">Comprar</Link>
           <Link to="/properties?operation=rent" className="hover:text-accent">Alquilar</Link>
           <Link to="/roomie-finder" className="hover:text-accent">Compartir piso</Link>
-          <Link to="/account" className="border-l border-primary-foreground/25 pl-7 hover:text-accent">Publicar anuncio</Link>
         </nav>
-        <Button asChild variant="secondary" className="md:hidden"><Link to="/account">Mi cuenta</Link></Button>
+        <div className="flex items-center gap-2 md:gap-3">
+          <Button asChild variant="secondary" className="h-11 rounded-full px-4 font-semibold md:h-12 md:px-6"><Link to="/account">Mi cuenta</Link></Button>
+          <Button asChild aria-label="Publicar vivienda" className="h-11 rounded-full bg-accent px-4 font-semibold text-accent-foreground shadow-lg shadow-black/20 transition hover:bg-accent/90 md:h-12 md:px-6">
+            <Link to="/account">
+              <Plus className="h-5 w-5" />
+              <span className="hidden sm:inline">Publicar vivienda</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </header>
 
