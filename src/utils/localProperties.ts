@@ -10,6 +10,8 @@ export interface LocalProperty {
   currency: string;
   operation: "rent" | "sale";
   location: string;
+  latitude?: number;
+  longitude?: number;
   bedrooms: number;
   bathrooms: number;
   area: number;
