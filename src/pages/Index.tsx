@@ -66,6 +66,15 @@ const Index = () => {
     return () => status?.removeEventListener('change', handleChange);
   }, []);
 
+  // Ask for location permission on entry; if granted, the permission listener
+  // above flips the state and the featured section loads. If denied, it never shows.
+  useEffect(() => {
+    if (geoPermission === 'prompt' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(() => {}, () => {}, { timeout: 15000 });
+    }
+  }, [geoPermission]);
+
+
   // Load featured properties only when location permission has been granted
   useEffect(() => {
     if (geoPermission !== 'granted') return;
