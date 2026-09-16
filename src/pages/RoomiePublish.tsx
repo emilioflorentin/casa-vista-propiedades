@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { uploadRoomieImages } from '@/utils/roomie';
+import { geocodeSpanishAddress } from '@/utils/geocoding';
+
 import { ArrowLeft, ArrowRight, Upload } from 'lucide-react';
 
 const STEPS = ['Vivienda', 'Habitación', 'Gastos', 'Convivencia', 'Preferencias', 'Fotos'];
