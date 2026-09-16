@@ -379,14 +379,14 @@ const Index = () => {
       </section>
 
       {/* Tenant Section */}
-      <section className="py-20 bg-primary text-primary-foreground">
+      <section className="py-10 md:py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6">
-          <Reveal className="max-w-4xl mx-auto text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">{t("tenant_section.title")}</h2>
-            <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
+          <Reveal className="max-w-4xl mx-auto text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">{t("tenant_section.title")}</h2>
+            <p className="text-base md:text-xl text-primary-foreground/80 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
           </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 max-w-4xl mx-auto mb-8 md:mb-12">
             <Reveal className="text-center p-6">
               <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-primary-foreground/80" />
