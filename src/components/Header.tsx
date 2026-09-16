@@ -27,7 +27,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-24 md:h-32">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <BrandLogo className="h-18 md:h-26" />
+              <BrandLogo className="h-[4.5rem] md:h-[6.5rem]" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -169,17 +169,22 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 text-primary-foreground" />
-            ) : (
-              <Menu className="h-6 w-6 text-primary-foreground" />
-            )}
-          </button>
+          {/* Mobile Actions */}
+          <div className="md:hidden flex items-center gap-1">
+            <Link to="/account" aria-label="Publicar vivienda" className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md shadow-black/20">
+              <Plus className="h-5 w-5" />
+            </Link>
+            <button
+              className="p-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6 text-primary-foreground" />
+              ) : (
+                <Menu className="h-6 w-6 text-primary-foreground" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
