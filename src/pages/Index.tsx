@@ -289,6 +289,42 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Featured Properties — only when geolocation permission is granted */}
+      {geoPermission === 'granted' && (
+        <section className="py-10 md:py-16 bg-secondary">
+          <div className="container mx-auto px-6">
+            <Reveal className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-2">{t("properties.featured")}</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">{t("properties.featured_desc")}</p>
+            </Reveal>
+
+            {featuredLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            ) : featuredProperties.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {featuredProperties.map((property, i) => (
+                    <Reveal key={property.originalId ?? property.id} delay={i * 80}>
+                      <PropertyCard property={property} />
+                    </Reveal>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <Link to="/properties">
+                    <Button variant="outline" size="lg">
+                      {t("properties.view_all")}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </section>
+      )}
+
       {/* Tenant Section */}
       <section className="py-8 md:py-14 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6">
