@@ -182,50 +182,52 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/inicio" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.home')}
               </Link>
               <Link 
                 to="/properties" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.properties')}
               </Link>
               <Link 
                 to="/roomie-finder" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Roomie Finder
               </Link>
               <Link 
                 to="/services" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.services')}
               </Link>
               <Link 
                 to="/about" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.about')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.contact')}
               </Link>
+
               
               {/* Mobile Language Flags */}
               <div className="flex items-center space-x-3 pt-2">
-                <span className="text-sm text-muted-foreground">{t('common.language')}</span>
+                <span className="text-sm text-primary-foreground/70">{t('common.language')}</span>
+
                 <button
                   onClick={() => {
                     setLanguage('es');
@@ -264,9 +266,9 @@ const Header = () => {
                 </button>
               </div>
               
-              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+              <div className="flex flex-col space-y-2 pt-4 border-t border-primary-foreground/10">
                 <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full relative">
+                  <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full relative">
                     <Heart className="h-4 w-4 mr-2" />
                     {t('nav.favorites')}
                     {favorites.length > 0 && (
@@ -278,22 +280,23 @@ const Header = () => {
                 </Link>
                 {user ? (
                   <div className="space-y-2">
-                    <div className="px-2 py-2 text-sm font-medium text-foreground">
+                    <div className="px-2 py-2 text-sm font-medium text-primary-foreground">
                       {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
                     </div>
-                    <div className="px-2 text-xs text-muted-foreground">
+                    <div className="px-2 text-xs text-primary-foreground/60">
                       {user.email}
                     </div>
                     <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
+                      <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
                         <User className="h-4 w-4 mr-2" />
                         Mi Perfil
                       </Button>
                     </Link>
+
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
+                      className="justify-start text-red-300 hover:text-red-200 hover:bg-red-500/20 w-full"
                       onClick={() => {
                         signOut();
                         setIsMenuOpen(false);
@@ -305,7 +308,8 @@ const Header = () => {
                   </div>
                 ) : (
                   <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
+                    <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
+
                       <User className="h-4 w-4 mr-2" />
                       {t('nav.account')}
                     </Button>
