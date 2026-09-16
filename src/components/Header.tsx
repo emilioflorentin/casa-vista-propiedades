@@ -296,7 +296,7 @@ const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
+                      className="justify-start text-red-300 hover:text-red-200 hover:bg-red-500/20 w-full"
                       onClick={() => {
                         signOut();
                         setIsMenuOpen(false);
@@ -308,7 +308,8 @@ const Header = () => {
                   </div>
                 ) : (
                   <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
+                    <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
+
                       <User className="h-4 w-4 mr-2" />
                       {t('nav.account')}
                     </Button>
