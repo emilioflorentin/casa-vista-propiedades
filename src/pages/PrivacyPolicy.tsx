@@ -7,15 +7,15 @@ const PrivacyPolicy = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <Header />
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white py-20">
+      <div className="relative bg-gradient-to-br from-border via-border to-muted-foreground text-white py-20">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-4">{t("privacy.title")}</h1>
-          <p className="text-xl text-stone-50">{t("privacy.subtitle")}</p>
+          <p className="text-xl text-primary-foreground">{t("privacy.subtitle")}</p>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ const PrivacyPolicy = () => {
               </a>
             </p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.who_we_are")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.who_we_are")}</h2>
             <p className="text-gray-700 mb-4">
               {t("privacy.who_we_are_p1")}
               <a href="https://nazarihomes.com/" className="text-blue-600 hover:underline ml-1">
@@ -47,20 +47,20 @@ const PrivacyPolicy = () => {
 
             <p className="text-gray-700 mb-8">{t("privacy.who_we_are_p3")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.limitations")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.limitations")}</h2>
             <p className="text-gray-700 mb-8">{t("privacy.limitations_p1")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.data_purpose")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.data_purpose")}</h2>
             <p className="text-gray-700 mb-4">{t("privacy.data_purpose_p1")}</p>
             <p className="text-gray-700 mb-8 font-semibold">{t("privacy.data_purpose_p2")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.what_data")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.what_data")}</h2>
             <p className="text-gray-700 mb-4">{t("privacy.what_data_p1")}</p>
             <p className="text-gray-700 mb-8">{t("privacy.what_data_p2")}</p>
 
             <p className="text-gray-700 mb-8">{t("privacy.what_data_p3")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">Uso de Cookies</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Uso de Cookies</h2>
             <p className="text-gray-700 mb-4">
               Utilizamos cookies para mejorar su experiencia en nuestro sitio web y proporcionar funcionalidades
               personalizadas:
@@ -87,11 +87,11 @@ const PrivacyPolicy = () => {
               Si rechaza las cookies, algunas funcionalidades como recordar sus favoritos no estarán disponibles.
             </p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.why_use_data")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.why_use_data")}</h2>
             <p className="text-gray-700 mb-4">{t("privacy.why_use_data_p1")}</p>
             <p className="text-gray-700 mb-8">{t("privacy.why_use_data_p2")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.data_retention")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.data_retention")}</h2>
             <p className="text-gray-700 mb-4">
               {t("privacy.data_retention_p1")}
               <a href="mailto:info@nazarihomes.com" className="text-blue-600 hover:underline">
@@ -103,7 +103,7 @@ const PrivacyPolicy = () => {
             <p className="text-gray-700 mb-4">{t("privacy.data_retention_p2")}</p>
             <p className="text-gray-700 mb-8">{t("privacy.data_retention_p3")}</p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.data_sharing")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.data_sharing")}</h2>
             <p className="text-gray-700 mb-4">{t("privacy.data_sharing_p1")}</p>
             <p className="text-gray-700 mb-4">{t("privacy.data_sharing_p2")}</p>
             <p className="text-gray-700 mb-8">
@@ -114,7 +114,7 @@ const PrivacyPolicy = () => {
               .
             </p>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.your_rights")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.your_rights")}</h2>
             <p className="text-gray-700 mb-4">
               {t("privacy.your_rights_p1")}
               <a href="mailto:info@nazarihomes.com" className="text-blue-600 hover:underline">
@@ -130,7 +130,7 @@ const PrivacyPolicy = () => {
               <li>{t("privacy.your_rights_li4")}</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-stone-800 mb-4">{t("privacy.policy_changes")}</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">{t("privacy.policy_changes")}</h2>
             <p className="text-gray-700 mb-4">{t("privacy.policy_changes_p1")}</p>
             <p className="text-gray-700 mb-4">{t("privacy.policy_changes_p2")}</p>
             <p className="text-gray-700 mb-8">{t("privacy.policy_changes_p3")}</p>

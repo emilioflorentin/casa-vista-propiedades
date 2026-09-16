@@ -675,8 +675,8 @@ const DocumentGenerator = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-stone-800">Generar documentación</h2>
-        <p className="text-stone-600">Rellena los campos marcados y descarga el PDF firmado.</p>
+        <h2 className="text-2xl font-bold text-foreground">Generar documentación</h2>
+        <p className="text-muted-foreground">Rellena los campos marcados y descarga el PDF firmado.</p>
       </div>
 
       <Tabs value={kind} onValueChange={(v) => setKind(v as DocKind)}>
@@ -690,7 +690,7 @@ const DocumentGenerator = () => {
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="p-6 space-y-5">
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Dirección de la propiedad
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -714,7 +714,7 @@ const DocumentGenerator = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Interesado
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -730,7 +730,7 @@ const DocumentGenerator = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Avalista
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -746,7 +746,7 @@ const DocumentGenerator = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Lugar y fecha de firma
                 </h3>
                 <div className="grid md:grid-cols-4 gap-4">
@@ -772,7 +772,7 @@ const DocumentGenerator = () => {
               <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
-                <Button onClick={generateConsentPdf} className="bg-stone-700 hover:bg-stone-600">
+                <Button onClick={generateConsentPdf} className="bg-primary hover:bg-primary/90">
                   <Download className="w-4 h-4 mr-2" />
                   Descargar PDF
                 </Button>
@@ -786,7 +786,7 @@ const DocumentGenerator = () => {
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="p-6 space-y-5">
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Inmueble objeto de reserva
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -811,7 +811,7 @@ const DocumentGenerator = () => {
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wide">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
                     Arrendatarios
                   </h3>
                   <Button
@@ -864,7 +864,7 @@ const DocumentGenerator = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Importes y condiciones
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -900,7 +900,7 @@ const DocumentGenerator = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wide">
+                <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   Lugar y fecha de firma
                 </h3>
                 <div className="grid md:grid-cols-4 gap-4">
@@ -926,7 +926,7 @@ const DocumentGenerator = () => {
               <SignaturePad label="Firma de Nazarí Homes *" onChange={setSignature} />
 
               <div className="flex justify-end pt-2">
-                <Button onClick={generateReservationPdf} className="bg-stone-700 hover:bg-stone-600">
+                <Button onClick={generateReservationPdf} className="bg-primary hover:bg-primary/90">
                   <Download className="w-4 h-4 mr-2" />
                   Descargar PDF
                 </Button>
@@ -936,7 +936,7 @@ const DocumentGenerator = () => {
         </TabsContent>
       </Tabs>
 
-      <div className="flex items-center gap-2 text-xs text-stone-500">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <FileText className="w-3 h-3" />
         El PDF se genera en tu navegador y se descarga al instante. No se almacena en servidor.
       </div>

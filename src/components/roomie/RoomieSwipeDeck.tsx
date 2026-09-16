@@ -59,7 +59,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
     <div className="relative w-full max-w-md mx-auto select-none">
       <div className="relative h-[560px]">
         {next && (
-          <div className="absolute inset-0 rounded-2xl bg-stone-200 scale-95 translate-y-3 shadow-md overflow-hidden">
+          <div className="absolute inset-0 rounded-2xl bg-muted scale-95 translate-y-3 shadow-md overflow-hidden">
             {(next.room_images?.[0] || next.home_images?.[0]) && (
               <img src={next.room_images?.[0] || next.home_images?.[0]} alt="" className="w-full h-full object-cover opacity-60" />
             )}
@@ -77,7 +77,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="relative h-[62%] bg-stone-100">
+          <div className="relative h-[62%] bg-muted">
             {cover ? (
               <img src={cover} alt={`Habitación en ${current.municipality}`} className="w-full h-full object-cover" draggable={false} />
             ) : (

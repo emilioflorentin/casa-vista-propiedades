@@ -1036,36 +1036,36 @@ const ServiceBoard = () => {
         draggable
         onDragStart={(e) => handleDragStart(e, incident.id, false)}
         onDragEnd={handleDragEnd}
-        className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-stone-400 ${isDragging ? 'opacity-40 scale-95' : ''}`}
+        className={`cursor-grab hover:shadow-md transition-all border-l-4 border-l-primary ${isDragging ? 'opacity-40 scale-95' : ''}`}
         onClick={() => { setSelectedIncident(incident); loadCostForItem(incident.id); }}
       >
         <CardContent className="p-4 space-y-2">
           <div className="flex items-start justify-between">
-            <h4 className="font-semibold text-sm text-stone-800 line-clamp-1">{incident.title}</h4>
+            <h4 className="font-semibold text-sm text-foreground line-clamp-1">{incident.title}</h4>
             <Badge variant="outline" className="text-xs shrink-0 ml-2">
               {CATEGORY_LABELS[incident.category] || incident.category}
             </Badge>
           </div>
-          <p className="text-xs text-stone-500 line-clamp-2">{incident.description}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2">{incident.description}</p>
           {property && (
-            <div className="flex items-center text-xs text-stone-500">
+            <div className="flex items-center text-xs text-muted-foreground">
               <MapPin className="h-3 w-3 mr-1" />
               <span className="line-clamp-1">{property.title} - {property.location}</span>
             </div>
           )}
           {tenant && (
-            <div className="flex items-center text-xs text-stone-500">
+            <div className="flex items-center text-xs text-muted-foreground">
               <User className="h-3 w-3 mr-1" />
               <span>{tenant.tenant_name}</span>
             </div>
           )}
           {owner && (
-            <div className="flex items-center text-xs text-stone-400">
+            <div className="flex items-center text-xs text-muted-foreground">
               <span>Propietario: {owner.full_name}</span>
             </div>
           )}
           {incident.images && incident.images.length > 0 && (
-            <div className="flex items-center text-xs text-stone-400">
+            <div className="flex items-center text-xs text-muted-foreground">
               <ImageIcon className="h-3 w-3 mr-1" />
               <span>{incident.images.length} foto(s)</span>
             </div>
@@ -1076,7 +1076,7 @@ const ServiceBoard = () => {
               <span>{(incidentCosts[incident.id].repair_cost + incidentCosts[incident.id].materials_cost).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
             </div>
           )}
-          <div className="text-xs text-stone-400">{formatDate(incident.created_at)}</div>
+          <div className="text-xs text-muted-foreground">{formatDate(incident.created_at)}</div>
         </CardContent>
       </Card>
     );
@@ -1094,13 +1094,13 @@ const ServiceBoard = () => {
       >
         <CardContent className="p-4 space-y-2">
           <div className="flex items-start justify-between">
-            <h4 className="font-semibold text-sm text-stone-800 line-clamp-1">{task.title}</h4>
+            <h4 className="font-semibold text-sm text-foreground line-clamp-1">{task.title}</h4>
             <Badge className="text-xs shrink-0 ml-2 bg-indigo-100 text-indigo-700 border-indigo-200">
               Propia
             </Badge>
           </div>
-          {task.description && <p className="text-xs text-stone-500 line-clamp-2">{task.description}</p>}
-          <div className="flex items-center text-xs text-stone-400 gap-2">
+          {task.description && <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>}
+          <div className="flex items-center text-xs text-muted-foreground gap-2">
             <Badge variant="outline" className="text-xs">
               {CATEGORY_LABELS[task.category] || task.category}
             </Badge>
@@ -1111,7 +1111,7 @@ const ServiceBoard = () => {
               <span>{(incidentCosts[task.id].repair_cost + incidentCosts[task.id].materials_cost).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
             </div>
           )}
-          <div className="text-xs text-stone-400">{formatDate(task.created_at)}</div>
+          <div className="text-xs text-muted-foreground">{formatDate(task.created_at)}</div>
         </CardContent>
       </Card>
     );
@@ -1119,11 +1119,11 @@ const ServiceBoard = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-stone-50">
+      <div className="min-h-screen bg-muted">
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto text-stone-400" />
-          <p className="mt-4 text-stone-500">Cargando panel de servicios...</p>
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+          <p className="mt-4 text-muted-foreground">Cargando panel de servicios...</p>
         </div>
         <Footer />
       </div>
@@ -1142,7 +1142,7 @@ const ServiceBoard = () => {
           <span className="w-7" />
         </div>
         {costLines.length === 0 && (
-          <p className="text-xs text-stone-500 italic px-1">Sin líneas. Pulsa "+ Añadir fila" para empezar.</p>
+          <p className="text-xs text-muted-foreground italic px-1">Sin líneas. Pulsa "+ Añadir fila" para empezar.</p>
         )}
         {costLines.map((line) => (
           <div key={line.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
@@ -1210,16 +1210,16 @@ const ServiceBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-muted">
       <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-stone-800 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <Wrench className="h-8 w-8" />
             Panel de Multiservicios
           </h1>
-          <p className="text-stone-500 mt-1">Gestión de mantenimiento y presupuestos</p>
+          <p className="text-muted-foreground mt-1">Gestión de mantenimiento y presupuestos</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -1237,7 +1237,7 @@ const ServiceBoard = () => {
           {/* MANTENIMIENTO TAB */}
           <TabsContent value="mantenimiento">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-              <h2 className="text-xl font-semibold text-stone-700">Panel de Mantenimiento</h2>
+              <h2 className="text-xl font-semibold text-foreground">Panel de Mantenimiento</h2>
               <div className="flex gap-2">
                 <Button onClick={() => setShowNewTaskDialog(true)} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
                   <Plus className="h-4 w-4" />
@@ -1255,14 +1255,14 @@ const ServiceBoard = () => {
               <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-200/50">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-bold text-stone-700 text-sm">En Aprobación</h3>
+                  <h3 className="font-bold text-foreground text-sm">En Aprobación</h3>
                   <Badge className="bg-purple-100 text-purple-700 border-purple-200">
                     {approvalIncidents.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
                   {approvalIncidents.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">Sin incidencias pendientes de aprobación</p>
+                    <p className="text-muted-foreground text-sm text-center py-8">Sin incidencias pendientes de aprobación</p>
                   ) : (
                     approvalIncidents.map(incident => (
                       <IncidentCard key={incident.id} incident={incident} />
@@ -1280,14 +1280,14 @@ const ServiceBoard = () => {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Wrench className="h-5 w-5 text-amber-600" />
-                  <h3 className="font-bold text-stone-700 text-sm">En Progreso</h3>
+                  <h3 className="font-bold text-foreground text-sm">En Progreso</h3>
                   <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                     {inProgressIncidents.length + inProgressTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
                   {inProgressIncidents.length === 0 && inProgressTasks.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas en progreso</p>
+                    <p className="text-muted-foreground text-sm text-center py-8">No hay tareas en progreso</p>
                   ) : (
                     <>
                       {inProgressIncidents.map(incident => (
@@ -1310,14 +1310,14 @@ const ServiceBoard = () => {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="h-5 w-5 text-orange-500" />
-                  <h3 className="font-bold text-stone-700 text-sm">Pausada</h3>
+                  <h3 className="font-bold text-foreground text-sm">Pausada</h3>
                   <Badge className="bg-orange-100 text-orange-700 border-orange-200">
                     {pausedIncidents.length + pausedTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
                   {pausedIncidents.length === 0 && pausedTasks.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas pausadas</p>
+                    <p className="text-muted-foreground text-sm text-center py-8">No hay tareas pausadas</p>
                   ) : (
                     <>
                       {pausedIncidents.map(incident => (
@@ -1340,14 +1340,14 @@ const ServiceBoard = () => {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <CreditCard className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-bold text-stone-700 text-sm">Pdte. Pago</h3>
+                  <h3 className="font-bold text-foreground text-sm">Pdte. Pago</h3>
                   <Badge className="bg-blue-100 text-blue-700 border-blue-200">
                     {pendingPaymentIncidents.length + pendingPaymentTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
                   {pendingPaymentIncidents.length === 0 && pendingPaymentTasks.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas pendientes de pago</p>
+                    <p className="text-muted-foreground text-sm text-center py-8">No hay tareas pendientes de pago</p>
                   ) : (
                     <>
                       {pendingPaymentIncidents.map(incident => (
@@ -1370,14 +1370,14 @@ const ServiceBoard = () => {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <h3 className="font-bold text-stone-700 text-sm">Resueltos</h3>
+                  <h3 className="font-bold text-foreground text-sm">Resueltos</h3>
                   <Badge className="bg-green-100 text-green-700 border-green-200">
                     {resolvedIncidents.length + resolvedTasks.length}
                   </Badge>
                 </div>
                 <div className="space-y-3">
                   {resolvedIncidents.length === 0 && resolvedTasks.length === 0 ? (
-                    <p className="text-stone-400 text-sm text-center py-8">No hay tareas resueltas</p>
+                    <p className="text-muted-foreground text-sm text-center py-8">No hay tareas resueltas</p>
                   ) : (
                     <>
                       {resolvedIncidents.map(incident => (
@@ -1396,7 +1396,7 @@ const ServiceBoard = () => {
             <div className="mt-10 space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-xl font-semibold text-stone-700 flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
                     <History className="h-5 w-5" />
                     Historial de Servicios
                   </h2>
@@ -1417,7 +1417,7 @@ const ServiceBoard = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
+                  <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
                     <Button 
                       variant={historyPeriod === 'week' ? 'default' : 'ghost'} 
                       size="sm" 
@@ -1458,7 +1458,7 @@ const ServiceBoard = () => {
                   <Card>
                     <CardContent className="p-4 text-center">
                       <p className="text-xs text-muted-foreground">Tareas resueltas</p>
-                      <p className="text-2xl font-bold text-stone-800">{historyData.length}</p>
+                      <p className="text-2xl font-bold text-foreground">{historyData.length}</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -1490,12 +1490,12 @@ const ServiceBoard = () => {
 
               {loadingHistory ? (
                 <div className="text-center py-8">
-                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-stone-400" />
-                  <p className="text-stone-500 mt-2">Cargando historial...</p>
+                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                  <p className="text-muted-foreground mt-2">Cargando historial...</p>
                 </div>
               ) : historyData.length === 0 ? (
-                <div className="text-center py-8 text-stone-500">
-                  <History className="h-10 w-10 mx-auto mb-3 text-stone-300" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
                   <p>No hay registros en este periodo</p>
                   <p className="text-xs mt-1">Los datos se guardan automáticamente al resolver una incidencia</p>
                 </div>
@@ -1505,29 +1505,29 @@ const ServiceBoard = () => {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b bg-stone-50">
-                            <th className="text-left p-3 font-medium text-stone-600">Título</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Propiedad</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Inquilino</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Categoría</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Coste</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Cobro</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Beneficio</th>
-                            <th className="text-left p-3 font-medium text-stone-600">Resuelto</th>
-                            <th className="text-right p-3 font-medium text-stone-600">Acciones</th>
+                          <tr className="border-b bg-muted">
+                            <th className="text-left p-3 font-medium text-muted-foreground">Título</th>
+                            <th className="text-left p-3 font-medium text-muted-foreground">Propiedad</th>
+                            <th className="text-left p-3 font-medium text-muted-foreground">Inquilino</th>
+                            <th className="text-left p-3 font-medium text-muted-foreground">Categoría</th>
+                            <th className="text-right p-3 font-medium text-muted-foreground">Coste</th>
+                            <th className="text-right p-3 font-medium text-muted-foreground">Cobro</th>
+                            <th className="text-right p-3 font-medium text-muted-foreground">Beneficio</th>
+                            <th className="text-left p-3 font-medium text-muted-foreground">Resuelto</th>
+                            <th className="text-right p-3 font-medium text-muted-foreground">Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
                           {historyData.map(h => (
-                            <tr key={h.id} className="border-b hover:bg-stone-50/50">
+                            <tr key={h.id} className="border-b hover:bg-muted/50">
                               <td className="p-3 font-medium">
                                 {h.title}
                                 {h.is_internal_task && (
                                   <Badge className="ml-2 text-xs bg-indigo-100 text-indigo-700 border-indigo-200">Propia</Badge>
                                 )}
                               </td>
-                              <td className="p-3 text-stone-500">{h.property_title || '-'}</td>
-                              <td className="p-3 text-stone-500">{h.tenant_name || '-'}</td>
+                              <td className="p-3 text-muted-foreground">{h.property_title || '-'}</td>
+                              <td className="p-3 text-muted-foreground">{h.tenant_name || '-'}</td>
                               <td className="p-3">
                                 <Badge variant="outline" className="text-xs">
                                   {CATEGORY_LABELS[h.category] || h.category}
@@ -1538,7 +1538,7 @@ const ServiceBoard = () => {
                               <td className={`p-3 text-right font-medium ${(Number(h.profit) || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {(Number(h.profit) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
                               </td>
-                              <td className="p-3 text-stone-500 text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
+                              <td className="p-3 text-muted-foreground text-xs">{h.resolved_at ? new Date(h.resolved_at).toLocaleDateString('es-ES') : '-'}</td>
                               <td className="p-3 text-right">
                                 <Button
                                   variant="ghost"
@@ -1631,7 +1631,7 @@ const ServiceBoard = () => {
               {/* Budget Title */}
               <Card>
                 <CardContent className="p-6">
-                  <Label className="text-sm font-medium text-stone-600">Título del presupuesto</Label>
+                  <Label className="text-sm font-medium text-muted-foreground">Título del presupuesto</Label>
                   <Input
                     value={budgetTitle}
                     onChange={e => setBudgetTitle(e.target.value)}
@@ -1907,7 +1907,7 @@ const ServiceBoard = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-stone-600">{selectedIncident.description}</p>
+              <p className="text-muted-foreground">{selectedIncident.description}</p>
 
               {selectedIncident.images && selectedIncident.images.length > 0 && (
                 <div className="grid grid-cols-2 gap-2">
@@ -1918,19 +1918,19 @@ const ServiceBoard = () => {
               )}
 
               {properties[selectedIncident.property_id] && (
-                <div className="bg-stone-50 rounded-lg p-3 space-y-2">
+                <div className="bg-muted rounded-lg p-3 space-y-2">
                   <div className="flex items-center text-sm">
-                    <MapPin className="h-4 w-4 mr-2 text-stone-400" />
+                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
                     <span className="font-medium">{properties[selectedIncident.property_id].title}</span>
                   </div>
-                  <p className="text-xs text-stone-500 ml-6">{properties[selectedIncident.property_id].location}</p>
+                  <p className="text-xs text-muted-foreground ml-6">{properties[selectedIncident.property_id].location}</p>
                 </div>
               )}
 
               {tenants[selectedIncident.tenant_access_id] && (
-                <div className="bg-stone-50 rounded-lg p-3 space-y-1">
+                <div className="bg-muted rounded-lg p-3 space-y-1">
                   <p className="text-sm font-medium flex items-center">
-                    <User className="h-4 w-4 mr-2 text-stone-400" />
+                    <User className="h-4 w-4 mr-2 text-muted-foreground" />
                     {tenants[selectedIncident.tenant_access_id].tenant_name}
                   </p>
                   {tenants[selectedIncident.tenant_access_id].tenant_phone && (
@@ -1948,7 +1948,7 @@ const ServiceBoard = () => {
               )}
 
               {properties[selectedIncident.property_id] && owners[properties[selectedIncident.property_id].user_id] && (
-                <div className="bg-stone-50 rounded-lg p-3 space-y-1">
+                <div className="bg-muted rounded-lg p-3 space-y-1">
                   <p className="text-sm font-medium">Propietario: {owners[properties[selectedIncident.property_id].user_id].full_name}</p>
                   {owners[properties[selectedIncident.property_id].user_id].phone && (
                     <a 
@@ -1964,7 +1964,7 @@ const ServiceBoard = () => {
                 </div>
               )}
 
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-muted-foreground">
                 Creado: {formatDate(selectedIncident.created_at)} · Actualizado: {formatDate(selectedIncident.updated_at)}
               </p>
 
@@ -2012,7 +2012,7 @@ const ServiceBoard = () => {
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 download
-                                className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200"
+                                className="flex items-center justify-center h-20 bg-muted rounded-lg border text-xs text-muted-foreground hover:bg-muted"
                               >
                                 <FileText className="h-6 w-6 mr-1" />
                                 {isPdf ? 'PDF' : 'DOC'}
@@ -2169,7 +2169,7 @@ const ServiceBoard = () => {
                 <select
                   value={newTaskCategory}
                   onChange={e => setNewTaskCategory(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
                 >
                   {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
                     <option key={val} value={val}>{label}</option>
@@ -2203,12 +2203,12 @@ const ServiceBoard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {selectedInternalTask.description && (
-                <p className="text-stone-600">{selectedInternalTask.description}</p>
+                <p className="text-muted-foreground">{selectedInternalTask.description}</p>
               )}
               <Badge variant="outline">
                 {CATEGORY_LABELS[selectedInternalTask.category] || selectedInternalTask.category}
               </Badge>
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-muted-foreground">
                 Creado: {formatDate(selectedInternalTask.created_at)}
               </p>
 
@@ -2256,7 +2256,7 @@ const ServiceBoard = () => {
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 download
-                                className="flex items-center justify-center h-20 bg-stone-100 rounded-lg border text-xs text-stone-500 hover:bg-stone-200"
+                                className="flex items-center justify-center h-20 bg-muted rounded-lg border text-xs text-muted-foreground hover:bg-muted"
                               >
                                 <FileText className="h-6 w-6 mr-1" />
                                 {isPdf ? 'PDF' : 'DOC'}
@@ -2343,7 +2343,7 @@ const ServiceBoard = () => {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Esta acción es <strong>permanente</strong> y no se puede deshacer. Vas a eliminar:
-              <span className="block mt-2 font-medium text-stone-700">"{deletingHistoryRow?.title}"</span>
+              <span className="block mt-2 font-medium text-foreground">"{deletingHistoryRow?.title}"</span>
               <span className="block mt-3">Para confirmar, escribe <strong>ELIMINAR</strong> en mayúsculas:</span>
             </AlertDialogDescription>
           </AlertDialogHeader>

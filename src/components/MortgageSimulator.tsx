@@ -94,9 +94,9 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
   const interestBarWidth = (totalInterest / totalWithMortgage) * 100;
 
   return (
-    <div className="py-6 border-t border-stone-200">
-      <h2 className="text-xl font-semibold mb-6 text-stone-800 flex items-center">
-        <Calculator className="h-5 w-5 mr-2 text-stone-600" />
+    <div className="py-6 border-t border-border">
+      <h2 className="text-xl font-semibold mb-6 text-foreground flex items-center">
+        <Calculator className="h-5 w-5 mr-2 text-muted-foreground" />
         Simulador de hipotecas
       </h2>
 
@@ -105,7 +105,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
         <div className="space-y-6">
           {/* Property Price */}
           <div className="space-y-3">
-            <Label className="text-stone-700 font-medium">Precio del inmueble</Label>
+            <Label className="text-foreground font-medium">Precio del inmueble</Label>
             <Input
               type="text"
               value={formatCurrency(price)}
@@ -113,7 +113,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
                 const value = parseInt(e.target.value.replace(/\D/g, ''));
                 if (!isNaN(value)) setPrice(value);
               }}
-              className="h-12 text-lg font-semibold border-stone-300"
+              className="h-12 text-lg font-semibold border-border"
             />
             <Slider
               value={[price]}
@@ -127,7 +127,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
 
           {/* Savings */}
           <div className="space-y-3">
-            <Label className="text-stone-700 font-medium">Ahorro aportado</Label>
+            <Label className="text-foreground font-medium">Ahorro aportado</Label>
             <div className="flex items-center gap-2">
               <Input
                 type="text"
@@ -136,9 +136,9 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
                   const value = parseInt(e.target.value.replace(/\D/g, ''));
                   if (!isNaN(value)) setSavings(Math.min(value, price));
                 }}
-                className="h-12 text-lg font-semibold border-stone-300 flex-1"
+                className="h-12 text-lg font-semibold border-border flex-1"
               />
-              <span className="text-stone-600 font-medium w-14">{savingsPercentage}%</span>
+              <span className="text-muted-foreground font-medium w-14">{savingsPercentage}%</span>
             </div>
             <Slider
               value={[savings]}
@@ -158,12 +158,12 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
 
           {/* Years */}
           <div className="space-y-3">
-            <Label className="text-stone-700 font-medium">Plazo en años</Label>
+            <Label className="text-foreground font-medium">Plazo en años</Label>
             <Input
               type="number"
               value={years}
               onChange={(e) => setYears(Math.min(40, Math.max(5, parseInt(e.target.value) || 5)))}
-              className="h-12 text-lg font-semibold border-stone-300"
+              className="h-12 text-lg font-semibold border-border"
             />
             <Slider
               value={[years]}
@@ -178,10 +178,10 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
           {/* Interest Type & Rate */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Label className="text-stone-700 font-medium">Tipo de interés</Label>
+              <Label className="text-foreground font-medium">Tipo de interés</Label>
               <Tooltip>
                 <TooltipTrigger>
-                  <Info className="h-4 w-4 text-stone-400" />
+                  <Info className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-xs text-sm">
@@ -231,9 +231,9 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
 
           {/* Location */}
           <div className="space-y-3">
-            <Label className="text-stone-700 font-medium">Localización del inmueble</Label>
+            <Label className="text-foreground font-medium">Localización del inmueble</Label>
             <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="h-12 border-stone-300">
+              <SelectTrigger className="h-12 border-border">
                 <SelectValue placeholder="Selecciona provincia" />
               </SelectTrigger>
               <SelectContent>
@@ -248,7 +248,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
 
           {/* Property Status */}
           <div className="space-y-3">
-            <Label className="text-stone-700 font-medium">Estado del inmueble</Label>
+            <Label className="text-foreground font-medium">Estado del inmueble</Label>
             <RadioGroup
               value={propertyStatus}
               onValueChange={(value) => setPropertyStatus(value as 'new' | 'secondHand')}
@@ -269,17 +269,17 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
         {/* Right side - Results */}
         <div className="bg-blue-50 rounded-xl p-6 h-fit">
           <div className="text-center mb-6">
-            <p className="text-stone-600 font-medium">Tu cuota mensual</p>
-            <p className="text-4xl font-bold text-stone-800">{formatCurrency(monthlyPayment)}</p>
+            <p className="text-muted-foreground font-medium">Tu cuota mensual</p>
+            <p className="text-4xl font-bold text-foreground">{formatCurrency(monthlyPayment)}</p>
           </div>
 
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1">
-                <span className="text-stone-700">Importe hipoteca</span>
+                <span className="text-foreground">Importe hipoteca</span>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Info className="h-4 w-4 text-stone-400" />
+                    <Info className="h-4 w-4 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="text-sm">Cantidad que financiarás con la hipoteca</p>
@@ -290,10 +290,10 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1">
-                <span className="text-stone-700">Porcentaje de financiación</span>
+                <span className="text-foreground">Porcentaje de financiación</span>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Info className="h-4 w-4 text-stone-400" />
+                    <Info className="h-4 w-4 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="text-sm">% del precio del inmueble que financiarás</p>
@@ -308,7 +308,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-amber-500 rounded-sm"></div>
-                <span className="text-stone-700">Precio del inmueble</span>
+                <span className="text-foreground">Precio del inmueble</span>
               </div>
               <span className="font-semibold">{formatCurrency(price)}</span>
             </div>
@@ -316,10 +316,10 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-amber-600 rounded-sm"></div>
                 <div className="flex items-center gap-1">
-                  <span className="text-stone-700">Impuestos y gastos de la compra</span>
+                  <span className="text-foreground">Impuestos y gastos de la compra</span>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Info className="h-4 w-4 text-stone-400" />
+                      <Info className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-sm">Incluye IVA/ITP, notaría, registro, gestoría</p>
@@ -330,7 +330,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
               <span className="font-semibold">{formatCurrency(taxesAndExpenses)}</span>
             </div>
             <div className="flex justify-between items-center font-bold">
-              <span className="text-stone-800">Coste total del inmueble</span>
+              <span className="text-foreground">Coste total del inmueble</span>
               <span>{formatCurrency(totalCost)}</span>
             </div>
           </div>
@@ -350,7 +350,7 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
               <div className="bg-teal-600" style={{ width: `${mortgageBarWidth}%` }}></div>
               <div className="bg-pink-500" style={{ width: `${interestBarWidth}%` }}></div>
             </div>
-            <div className="flex justify-between text-xs text-stone-600 mt-1">
+            <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>Tu ahorro aportado</span>
               <span>Hipoteca</span>
               <span>Interés</span>
@@ -361,26 +361,26 @@ const MortgageSimulator = ({ propertyPrice, propertyLocation = "Madrid" }: Mortg
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-teal-400 rounded-sm"></div>
-                <span className="text-stone-700">Ahorro aportado</span>
+                <span className="text-foreground">Ahorro aportado</span>
               </div>
               <span className="font-semibold">{formatCurrency(savings)}</span>
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-teal-600 rounded-sm"></div>
-                <span className="text-stone-700">Importe hipoteca</span>
+                <span className="text-foreground">Importe hipoteca</span>
               </div>
               <span className="font-semibold">{formatCurrency(mortgageAmount)}</span>
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-pink-500 rounded-sm"></div>
-                <span className="text-stone-700">Interés hipoteca</span>
+                <span className="text-foreground">Interés hipoteca</span>
               </div>
               <span className="font-semibold">{formatCurrency(totalInterest)}</span>
             </div>
             <div className="flex justify-between items-center font-bold">
-              <span className="text-stone-800">Coste total con hipoteca</span>
+              <span className="text-foreground">Coste total con hipoteca</span>
               <span>{formatCurrency(totalWithMortgage)}</span>
             </div>
           </div>

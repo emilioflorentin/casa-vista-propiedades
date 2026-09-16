@@ -64,7 +64,7 @@ const FloorPlanToolbar = ({
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-4 bg-white border border-stone-200 rounded-lg shadow-sm">
+    <div className="flex flex-wrap items-center gap-2 p-4 bg-white border border-border rounded-lg shadow-sm">
       {/* Selection Tools */}
       <div className="flex items-center gap-1">
         {tools.map((tool) => (
@@ -150,7 +150,7 @@ const FloorPlanToolbar = ({
         <Button
           size="sm"
           onClick={onSave}
-          className="bg-stone-700 hover:bg-stone-600"
+          className="bg-primary hover:bg-primary/90"
           title="Guardar plano"
         >
           <Save className="w-4 h-4 mr-2" />

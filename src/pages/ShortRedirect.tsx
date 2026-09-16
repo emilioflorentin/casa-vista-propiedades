@@ -36,15 +36,15 @@ const ShortRedirect = () => {
   }, [code]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50">
+    <div className="min-h-screen flex items-center justify-center bg-muted">
       <div className="text-center">
         {error ? (
           <>
-            <h1 className="text-2xl font-semibold text-stone-800 mb-2">{error}</h1>
-            <a href="/" className="text-stone-600 underline">Volver al inicio</a>
+            <h1 className="text-2xl font-semibold text-foreground mb-2">{error}</h1>
+            <a href="/" className="text-muted-foreground underline">Volver al inicio</a>
           </>
         ) : (
-          <p className="text-stone-600">Redirigiendo…</p>
+          <p className="text-muted-foreground">Redirigiendo…</p>
         )}
       </div>
     </div>

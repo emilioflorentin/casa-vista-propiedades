@@ -232,7 +232,7 @@ const Header = () => {
                     setIsMenuOpen(false);
                   }}
                   className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
-                    language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                    language === 'es' ? 'ring-2 ring-ring' : 'opacity-70'
                   }`}
                   title="Español"
                 >
@@ -249,7 +249,7 @@ const Header = () => {
                     setIsMenuOpen(false);
                   }}
                   className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
-                    language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                    language === 'en' ? 'ring-2 ring-ring' : 'opacity-70'
                   }`}
                   title="English"
                 >

@@ -14,7 +14,7 @@ export const RoomieListingCard = ({ listing }: { listing: RoomieListing }) => {
   return (
     <Link to={`/roomie-finder/${listing.id}`}>
       <Card className="overflow-hidden hover:shadow-xl transition-shadow h-full">
-        <div className="aspect-[4/3] bg-stone-100">
+        <div className="aspect-[4/3] bg-muted">
           {cover ? (
             <img src={cover} alt={`Habitación en ${listing.municipality}`} className="w-full h-full object-cover" loading="lazy" />
           ) : (

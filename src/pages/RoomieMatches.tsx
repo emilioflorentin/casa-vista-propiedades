@@ -93,10 +93,10 @@ const RoomieMatches = () => {
 
   if (!authLoading && !user) {
     return (
-      <div className="min-h-screen bg-stone-50">
+      <div className="min-h-screen bg-muted">
         <Header />
         <main className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="text-3xl font-bold text-stone-800 mb-2">Mis matches</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Mis matches</h1>
           <p className="text-muted-foreground mb-6">
             Sin registro: aquí aparecen las habitaciones cuyo anunciante también te ha elegido.
           </p>
@@ -106,7 +106,7 @@ const RoomieMatches = () => {
             <Card>
               <CardContent className="p-6 space-y-3 text-center">
                 <p>Todavía no has creado tu ficha de búsqueda.</p>
-                <Link to="/roomie-finder/mi-perfil"><Button className="bg-stone-700 hover:bg-stone-800">Rellenar mi ficha</Button></Link>
+                <Link to="/roomie-finder/mi-perfil"><Button className="bg-primary hover:bg-primary/90">Rellenar mi ficha</Button></Link>
               </CardContent>
             </Card>
           ) : seekerMatches.length === 0 ? (
@@ -118,7 +118,7 @@ const RoomieMatches = () => {
                   <CardContent className="p-4 flex items-center gap-4">
                     {m.image ? (
                       <img src={m.image} alt={m.title} className="w-20 h-20 rounded-lg object-cover" />
-                    ) : <div className="w-20 h-20 rounded-lg bg-stone-200" />}
+                    ) : <div className="w-20 h-20 rounded-lg bg-muted" />}
                     <div className="flex-1">
                       <Link to={`/roomie-finder/${m.listing_id}`} className="font-semibold hover:underline">{m.title}</Link>
                       <p className="text-sm text-muted-foreground">{m.municipality} · {formatMoney(m.rent_amount)}/mes</p>
@@ -150,10 +150,10 @@ const RoomieMatches = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-muted">
       <Header />
       <main className="container mx-auto px-6 py-10 max-w-4xl">
-        <h1 className="text-3xl font-bold text-stone-800 mb-6">Matches e interesados</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-6">Matches e interesados</h1>
         <Tabs defaultValue="received">
           <TabsList className="mb-6">
             <TabsTrigger value="received">Interesados en mi habitación</TabsTrigger>
@@ -174,7 +174,7 @@ const RoomieMatches = () => {
                     <div key={a.seeker_id} className="border rounded-lg p-4 flex gap-4">
                       {a.avatar_url ? (
                         <img src={a.avatar_url} alt={a.full_name} className="w-16 h-16 rounded-full object-cover" />
-                      ) : <div className="w-16 h-16 rounded-full bg-stone-200" />}
+                      ) : <div className="w-16 h-16 rounded-full bg-muted" />}
                       <div className="flex-1 space-y-2">
                         <p className="font-semibold">{a.full_name}{a.age ? `, ${a.age}` : ''}</p>
                         <div className="flex flex-wrap gap-1.5">
@@ -185,7 +185,7 @@ const RoomieMatches = () => {
                           {a.smoker && <Badge variant="destructive">Fumador</Badge>}
                           {a.has_pets && <Badge variant="secondary">Con mascota</Badge>}
                         </div>
-                        {a.bio && <p className="text-sm text-stone-700">{a.bio}</p>}
+                        {a.bio && <p className="text-sm text-foreground">{a.bio}</p>}
                         <p className="text-xs text-muted-foreground">
                           Presupuesto: {a.budget_max ? formatMoney(a.budget_max) : '—'} · Zona: {a.desired_area || '—'}
                         </p>

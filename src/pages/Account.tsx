@@ -670,17 +670,17 @@ const Account = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
         <Header />
         
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-md mx-auto">
             <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-stone-800">
+                <CardTitle className="text-2xl font-bold text-foreground">
                   {t('account.accessAccount')}
                 </CardTitle>
-                <p className="text-stone-600 mt-2">
+                <p className="text-muted-foreground mt-2">
                   {t('account.loginRequired')}
                 </p>
               </CardHeader>
@@ -688,20 +688,20 @@ const Account = () => {
                 <div className="space-y-4">
                   <Link 
                     to="/auth"
-                    className="w-full bg-stone-700 hover:bg-stone-600 text-white py-3 px-4 rounded-lg font-medium transition-colors block text-center"
+                    className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-colors block text-center"
                   >
                     {t('account.login')}
                   </Link>
                   
                   <div className="text-center">
-                    <span className="text-stone-600 text-sm">
+                    <span className="text-muted-foreground text-sm">
                       {t('account.noAccount')}
                     </span>
                   </div>
                   
                   <Link 
                     to="/auth"
-                    className="w-full border border-stone-300 hover:bg-stone-50 text-stone-700 py-3 px-4 rounded-lg font-medium transition-colors block text-center"
+                    className="w-full border border-border hover:bg-muted text-foreground py-3 px-4 rounded-lg font-medium transition-colors block text-center"
                   >
                     {t('account.register')}
                   </Link>
@@ -717,14 +717,14 @@ const Account = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-stone-800 mb-2">Mi Cuenta</h1>
-            <p className="text-stone-600">Gestiona tu perfil y propiedades</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Mi Cuenta</h1>
+            <p className="text-muted-foreground">Gestiona tu perfil y propiedades</p>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -745,7 +745,7 @@ const Account = () => {
             <TabsContent value="stats" className="space-y-6">
               <ListingStatsPanel
                 entityType="property"
-                accentClass="text-stone-600"
+                accentClass="text-muted-foreground"
                 emptyMessage="Todavía no tienes propiedades publicadas."
                 items={userProperties.map((p: any) => ({
                   id: String(p.id),
@@ -768,7 +768,7 @@ const Account = () => {
                   <div className="flex items-center space-x-4">
                     <Avatar className="w-20 h-20">
                       <AvatarImage src={avatarUrl} />
-                      <AvatarFallback className="bg-stone-700 text-white text-xl">
+                      <AvatarFallback className="bg-primary text-white text-xl">
                         {user?.email?.[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -810,7 +810,7 @@ const Account = () => {
                         type="email"
                         value={user?.email || ''}
                         disabled
-                        className="bg-stone-50"
+                        className="bg-muted"
                       />
                     </div>
                     
@@ -851,7 +851,7 @@ const Account = () => {
                     <Button 
                       onClick={handleSaveProfile}
                       disabled={savingProfile}
-                      className="bg-stone-700 hover:bg-stone-600"
+                      className="bg-primary hover:bg-primary/90"
                     >
                       {savingProfile ? 'Guardando...' : 'Guardar cambios'}
                     </Button>
@@ -875,9 +875,9 @@ const Account = () => {
             <TabsContent value="properties" className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold text-stone-800">Mis Propiedades</h2>
+                  <h2 className="text-2xl font-bold text-foreground">Mis Propiedades</h2>
                   <div className="flex items-center gap-2">
-                    <p className="text-stone-600">Gestiona tus propiedades publicadas</p>
+                    <p className="text-muted-foreground">Gestiona tus propiedades publicadas</p>
                     {profileData.user_type === 'particular' && (
                       <Badge variant="outline" className="text-xs">
                         {userProperties.length}/3 propiedades
@@ -888,14 +888,14 @@ const Account = () => {
                 <div className="text-right">
                   <Button
                     onClick={handleShowNewPropertyForm}
-                    className="bg-stone-700 hover:bg-stone-600"
+                    className="bg-primary hover:bg-primary/90"
                     disabled={!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Nueva Propiedad
                   </Button>
                   {!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3 && (
-                    <p className="text-xs text-stone-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Límite de propiedades alcanzado
                     </p>
                   )}
@@ -935,7 +935,7 @@ const Account = () => {
                   return availableProperties;
                 })().map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                    <div className="aspect-video bg-stone-200 relative">
+                    <div className="aspect-video bg-muted relative">
                       {property.image ? (
                         <img 
                           src={property.image.split(',')[0].trim()} 
@@ -945,11 +945,11 @@ const Account = () => {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Home className="w-12 h-12 text-stone-400" />
+                          <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
                       <div className="absolute top-2 left-2 flex gap-1">
-                        <Badge className="bg-stone-700 text-white">
+                        <Badge className="bg-primary text-white">
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
                          <Badge variant="secondary">
@@ -986,12 +986,12 @@ const Account = () => {
                        </div>
                     </div>
                     <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 text-stone-800">{property.title}</h3>
-                      <div className="flex items-center text-stone-600 mb-2">
+                      <h3 className="font-semibold text-lg mb-2 text-foreground">{property.title}</h3>
+                      <div className="flex items-center text-muted-foreground mb-2">
                         <MapPin className="w-4 h-4 mr-1" />
                         <span className="text-sm">{property.location}</span>
                       </div>
-                      <div className="text-2xl font-bold text-stone-700 mb-3">
+                      <div className="text-2xl font-bold text-foreground mb-3">
                         €{property.price.toLocaleString()}
                         {property.operation === 'rent' && <span className="text-sm font-normal">/mes</span>}
                       </div>
@@ -1015,16 +1015,16 @@ const Account = () => {
               {userProperties.filter(property => !property.is_rented).length === 0 && !showPropertyForm && (
                 <Card className="text-center p-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent>
-                    <Home className="w-16 h-16 text-stone-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-stone-800 mb-2">
+                    <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       No tienes propiedades aún
                     </h3>
-                    <p className="text-stone-600 mb-6">
+                    <p className="text-muted-foreground mb-6">
                       ¡Publica tu primera propiedad y comienza a recibir consultas!
                     </p>
                     <Button
                       onClick={handleShowNewPropertyForm}
-                      className="bg-stone-700 hover:bg-stone-600"
+                      className="bg-primary hover:bg-primary/90"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Publicar Primera Propiedad
@@ -1037,8 +1037,8 @@ const Account = () => {
             <TabsContent value="rented" className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold text-stone-800">Mis Propiedades Alquiladas</h2>
-                  <p className="text-stone-600">Propiedades que ya están alquiladas</p>
+                  <h2 className="text-2xl font-bold text-foreground">Mis Propiedades Alquiladas</h2>
+                  <p className="text-muted-foreground">Propiedades que ya están alquiladas</p>
                 </div>
               </div>
 
@@ -1046,7 +1046,7 @@ const Account = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {userProperties.filter(property => property.is_rented).map((property) => (
                   <Card key={property.id} className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                    <div className="aspect-video bg-stone-200 relative">
+                    <div className="aspect-video bg-muted relative">
                       {property.image ? (
                         <img 
                           src={property.image.split(',')[0].trim()} 
@@ -1056,14 +1056,14 @@ const Account = () => {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Home className="w-12 h-12 text-stone-400" />
+                          <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
                       <div className="absolute top-2 left-2 flex gap-1">
                         <Badge className="bg-green-600 text-white">
                           Alquilada
                         </Badge>
-                        <Badge className="bg-stone-700 text-white">
+                        <Badge className="bg-primary text-white">
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
                          <Badge variant="secondary">
@@ -1084,12 +1084,12 @@ const Account = () => {
                       </div>
                     </div>
                     <CardContent className="p-4 space-y-3">
-                      <h3 className="font-semibold text-lg text-stone-800">{property.title}</h3>
-                      <div className="flex items-center text-stone-600">
+                      <h3 className="font-semibold text-lg text-foreground">{property.title}</h3>
+                      <div className="flex items-center text-muted-foreground">
                         <MapPin className="w-4 h-4 mr-1" />
                         <span className="text-sm">{property.location}</span>
                       </div>
-                      <div className="text-2xl font-bold text-stone-700">
+                      <div className="text-2xl font-bold text-foreground">
                         €{property.price.toLocaleString()}
                         {property.operation === 'rent' && <span className="text-sm font-normal">/mes</span>}
                       </div>
@@ -1132,11 +1132,11 @@ const Account = () => {
               {userProperties.filter(property => property.is_rented).length === 0 && (
                 <Card className="text-center p-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent>
-                    <Home className="w-16 h-16 text-stone-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-stone-800 mb-2">
+                    <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       No tienes propiedades alquiladas
                     </h3>
-                    <p className="text-stone-600">
+                    <p className="text-muted-foreground">
                       Cuando marques una propiedad como alquilada, aparecerá aquí.
                     </p>
                   </CardContent>
@@ -1147,22 +1147,22 @@ const Account = () => {
             <TabsContent value="tenants" className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold text-stone-800">Gestión de Inquilinos</h2>
-                  <p className="text-stone-600">Genera códigos de acceso y gestiona incidencias de tus inquilinos</p>
+                  <h2 className="text-2xl font-bold text-foreground">Gestión de Inquilinos</h2>
+                  <p className="text-muted-foreground">Genera códigos de acceso y gestiona incidencias de tus inquilinos</p>
                 </div>
               </div>
 
               <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                 <CardContent className="p-8 text-center space-y-4">
-                  <Shield className="w-16 h-16 text-stone-400 mx-auto" />
-                  <h3 className="text-xl font-semibold text-stone-800">
+                  <Shield className="w-16 h-16 text-muted-foreground mx-auto" />
+                  <h3 className="text-xl font-semibold text-foreground">
                     Panel de Incidencias
                   </h3>
-                  <p className="text-stone-600 max-w-md mx-auto">
+                  <p className="text-muted-foreground max-w-md mx-auto">
                     Desde aquí puedes generar códigos UUID para tus inquilinos, ver las incidencias que reportan y gestionar su estado.
                   </p>
                   <Link to="/owner-incidents">
-                    <Button className="bg-stone-700 hover:bg-stone-600">
+                    <Button className="bg-primary hover:bg-primary/90">
                       <Shield className="w-4 h-4 mr-2" />
                       Ir al panel de incidencias
                     </Button>

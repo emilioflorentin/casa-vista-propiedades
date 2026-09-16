@@ -77,10 +77,10 @@ const RoomieProfile = () => {
   );
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-muted">
       <Header />
       <main className="container mx-auto px-6 py-10 max-w-2xl">
-        <h1 className="text-3xl font-bold text-stone-800 mb-2">Mi ficha de búsqueda</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Mi ficha de búsqueda</h1>
         <p className="text-muted-foreground mb-6">
           Sin registro ni contraseña: rellena este formulario básico y ya podrás dar "me gusta" a las habitaciones.
           Así te verán los anunciantes. Tu teléfono solo se comparte cuando hay match mutuo.
@@ -111,7 +111,7 @@ const RoomieProfile = () => {
             <div className="space-y-1.5"><Label htmlFor="ph">Teléfono *</Label>
               <Input id="ph" maxLength={30} value={f.phone} onChange={(e) => set('phone', e.target.value)} placeholder="600 000 000" />
               <p className="text-xs text-muted-foreground">Solo se comparte cuando hay match mutuo.</p></div>
-            <Button className="w-full bg-stone-700 hover:bg-stone-800" onClick={save} disabled={saving}>
+            <Button className="w-full bg-primary hover:bg-primary/90" onClick={save} disabled={saving}>
               {saving ? 'Guardando...' : hasProfile ? 'Guardar cambios' : 'Guardar y empezar a buscar'}
             </Button>
             <p className="text-xs text-muted-foreground text-center">

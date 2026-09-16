@@ -168,7 +168,7 @@ export function PropertyForm({
         <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Título *
               </label>
               <Input
@@ -181,7 +181,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Tipo de propiedad
               </label>
               <Select value={propertyForm.type} onValueChange={(value) => handleSelectChange('type', value)}>
@@ -198,7 +198,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Operación
               </label>
               <Select value={propertyForm.operation} onValueChange={(value) => handleSelectChange('operation', value)}>
@@ -213,7 +213,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Ubicación *
               </label>
               <Input
@@ -227,7 +227,7 @@ export function PropertyForm({
 
             <div className="flex gap-2">
               <div className="flex-1 space-y-2">
-                <label className="text-sm font-medium text-stone-700">
+                <label className="text-sm font-medium text-foreground">
                   Precio *
                 </label>
                 <Input
@@ -240,7 +240,7 @@ export function PropertyForm({
                 />
               </div>
               <div className="w-20 space-y-2">
-                <label className="text-sm font-medium text-stone-700">
+                <label className="text-sm font-medium text-foreground">
                   Moneda
                 </label>
                 <Select value={propertyForm.currency} onValueChange={(value) => handleSelectChange('currency', value)}>
@@ -256,7 +256,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Área (m²) *
               </label>
               <Input
@@ -270,7 +270,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Habitaciones
               </label>
               <Select value={propertyForm.bedrooms} onValueChange={(value) => handleSelectChange('bedrooms', value)}>
@@ -286,7 +286,7 @@ export function PropertyForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Baños
               </label>
               <Select value={propertyForm.bathrooms} onValueChange={(value) => handleSelectChange('bathrooms', value)}>
@@ -303,7 +303,7 @@ export function PropertyForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700">
+            <label className="text-sm font-medium text-foreground">
               Descripción
             </label>
             <Textarea
@@ -316,12 +316,12 @@ export function PropertyForm({
           </div>
 
           {/* Energy Certificate Section */}
-          <div className="space-y-4 pt-4 border-t border-stone-200">
-            <h3 className="text-lg font-medium text-stone-700 flex items-center gap-2">
+          <div className="space-y-4 pt-4 border-t border-border">
+            <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
               <Zap className="h-5 w-5 text-amber-500" />
               Certificado Energético *
             </h3>
-            <p className="text-sm text-stone-500 -mt-2">
+            <p className="text-sm text-muted-foreground -mt-2">
               El certificado energético es obligatorio para publicar una vivienda
             </p>
             
@@ -330,13 +330,13 @@ export function PropertyForm({
               <div className="space-y-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-amber-600" />
-                  <label className="text-sm font-medium text-stone-700">
+                  <label className="text-sm font-medium text-foreground">
                     Consumo de energía
                   </label>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs text-stone-600">Calificación *</label>
+                  <label className="text-xs text-muted-foreground">Calificación *</label>
                   <Select 
                     value={propertyForm.energyConsumptionRating} 
                     onValueChange={(value) => handleSelectChange('energyConsumptionRating', value)}
@@ -365,7 +365,7 @@ export function PropertyForm({
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs text-stone-600">Valor (kWh/m² año) *</label>
+                  <label className="text-xs text-muted-foreground">Valor (kWh/m² año) *</label>
                   <Input
                     name="energyConsumptionValue"
                     type="number"
@@ -383,13 +383,13 @@ export function PropertyForm({
               <div className="space-y-3 p-4 bg-green-50 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2">
                   <Leaf className="h-4 w-4 text-green-600" />
-                  <label className="text-sm font-medium text-stone-700">
+                  <label className="text-sm font-medium text-foreground">
                     Emisiones CO₂
                   </label>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs text-stone-600">Calificación *</label>
+                  <label className="text-xs text-muted-foreground">Calificación *</label>
                   <Select 
                     value={propertyForm.energyEmissionsRating} 
                     onValueChange={(value) => handleSelectChange('energyEmissionsRating', value)}
@@ -418,7 +418,7 @@ export function PropertyForm({
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs text-stone-600">Valor (kg CO₂/m² año) *</label>
+                  <label className="text-xs text-muted-foreground">Valor (kg CO₂/m² año) *</label>
                   <Input
                     name="energyEmissionsValue"
                     type="number"
@@ -435,12 +435,12 @@ export function PropertyForm({
           </div>
 
           {/* Contact Information */}
-          <div className="space-y-4 pt-4 border-t border-stone-200">
-            <h3 className="text-lg font-medium text-stone-700">Información de Contacto</h3>
+          <div className="space-y-4 pt-4 border-t border-border">
+            <h3 className="text-lg font-medium text-foreground">Información de Contacto</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">
+                <label className="text-sm font-medium text-foreground">
                   Email de contacto *
                 </label>
                 <Input
@@ -451,15 +451,15 @@ export function PropertyForm({
                   placeholder="email@ejemplo.com"
                   required
                   readOnly
-                  className="bg-stone-50"
+                  className="bg-muted"
                 />
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted-foreground">
                   El email coincide con tu cuenta de Supabase
                 </p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">
+                <label className="text-sm font-medium text-foreground">
                   Teléfono de contacto *
                 </label>
                 {userProfile?.phone && (
@@ -478,7 +478,7 @@ export function PropertyForm({
                           }
                         }}
                       />
-                      <label htmlFor="useRegisteredPhone" className="text-sm text-stone-700">
+                      <label htmlFor="useRegisteredPhone" className="text-sm text-foreground">
                         Usar teléfono registrado: {userProfile.phone}
                       </label>
                     </div>
@@ -492,9 +492,9 @@ export function PropertyForm({
                   placeholder="+34 123 456 789"
                   required
                   disabled={propertyForm.useRegisteredPhone && !!userProfile?.phone}
-                  className={propertyForm.useRegisteredPhone && userProfile?.phone ? "bg-stone-50" : ""}
+                  className={propertyForm.useRegisteredPhone && userProfile?.phone ? "bg-muted" : ""}
                 />
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-muted-foreground">
                   {propertyForm.useRegisteredPhone ? "Usando teléfono registrado" : "Puedes usar un teléfono diferente al registrado"}
                 </p>
               </div>
@@ -503,7 +503,7 @@ export function PropertyForm({
 
           {/* Características predefinidas */}
           <div className="space-y-4">
-            <label className="text-sm font-medium text-stone-700">
+            <label className="text-sm font-medium text-foreground">
               Características
             </label>
             
@@ -517,7 +517,7 @@ export function PropertyForm({
                   />
                   <label 
                     htmlFor={feature} 
-                    className="text-sm text-stone-700 cursor-pointer"
+                    className="text-sm text-foreground cursor-pointer"
                   >
                     {feature}
                   </label>
@@ -527,7 +527,7 @@ export function PropertyForm({
 
             {/* Características personalizadas */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">
+              <label className="text-sm font-medium text-foreground">
                 Añadir característica personalizada
               </label>
               <div className="flex gap-2">
@@ -556,7 +556,7 @@ export function PropertyForm({
             {/* Características seleccionadas */}
             {propertyForm.features.length > 0 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">
+                <label className="text-sm font-medium text-foreground">
                   Características seleccionadas
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -579,11 +579,11 @@ export function PropertyForm({
 
           {/* Subida múltiple de imágenes */}
           <div className="space-y-4">
-            <label className="text-sm font-medium text-stone-700">
+            <label className="text-sm font-medium text-foreground">
               Imágenes de la propiedad
             </label>
             
-            <div className="border-2 border-dashed border-stone-300 rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
               <input
                 type="file"
                 accept="image/*"
@@ -593,13 +593,13 @@ export function PropertyForm({
                 id="property-images"
               />
               <label htmlFor="property-images" className="cursor-pointer">
-                <Upload className="w-8 h-8 text-stone-400 mx-auto mb-2" />
-                <p className="text-stone-600">
+                <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground">
                   {propertyForm.images.length > 0 
                     ? `${propertyForm.images.length} imagen(es) seleccionada(s)` 
                     : 'Selecciona múltiples imágenes'}
                 </p>
-                <p className="text-xs text-stone-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Puedes seleccionar varias imágenes a la vez
                 </p>
               </label>
@@ -610,7 +610,7 @@ export function PropertyForm({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {propertyForm.images.map((image, index) => (
                   <div key={index} className="relative group">
-                    <div className="aspect-square bg-stone-200 rounded-lg overflow-hidden">
+                    <div className="aspect-square bg-muted rounded-lg overflow-hidden">
                       <img 
                         src={URL.createObjectURL(image)} 
                         alt={`Preview ${index + 1}`}
@@ -624,7 +624,7 @@ export function PropertyForm({
                     >
                       <X className="w-3 h-3" />
                     </button>
-                    <p className="text-xs text-stone-500 mt-1 truncate">
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
                       {image.name}
                     </p>
                   </div>
@@ -645,7 +645,7 @@ export function PropertyForm({
             <Button
               type="submit"
               disabled={isUploading}
-              className="flex-1 bg-stone-700 hover:bg-stone-600"
+              className="flex-1 bg-primary hover:bg-primary/90"
             >
               {isUploading ? 'Subiendo...' : editingProperty ? 'Actualizar' : 'Publicar'}
             </Button>
