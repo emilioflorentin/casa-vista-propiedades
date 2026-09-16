@@ -219,22 +219,22 @@ const TenantIncidents = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <Header />
 
       <main className="container mx-auto px-6 py-12">
         {!tenantInfo ? (
           /* Access Code Validation */
           <div className="max-w-md mx-auto">
-            <Card className="shadow-xl border-stone-200">
+            <Card className="shadow-xl border-border">
               <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-stone-600" />
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <CardTitle className="text-2xl">
                   {language === "es" ? "Acceso para inquilinos" : "Tenant Access"}
                 </CardTitle>
-                <p className="text-stone-500 text-sm mt-2">
+                <p className="text-muted-foreground text-sm mt-2">
                   {language === "es"
                     ? "Introduce el código de acceso que te proporcionó tu inmobiliaria al firmar el contrato."
                     : "Enter the access code provided by your property manager when signing the contract."}
@@ -253,18 +253,18 @@ const TenantIncidents = () => {
                     checked={privacyAccepted}
                     onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
                   />
-                  <label htmlFor="privacy-policy" className="text-sm text-stone-600 leading-tight cursor-pointer">
+                  <label htmlFor="privacy-policy" className="text-sm text-muted-foreground leading-tight cursor-pointer">
                     {language === "es" ? (
-                      <>He leído y acepto la <a href="/privacy-policy" target="_blank" className="underline text-stone-800 hover:text-stone-900">política de privacidad</a></>
+                      <>He leído y acepto la <a href="/privacy-policy" target="_blank" className="underline text-foreground hover:text-foreground">política de privacidad</a></>
                     ) : (
-                      <>I have read and accept the <a href="/privacy-policy" target="_blank" className="underline text-stone-800 hover:text-stone-900">privacy policy</a></>
+                      <>I have read and accept the <a href="/privacy-policy" target="_blank" className="underline text-foreground hover:text-foreground">privacy policy</a></>
                     )}
                   </label>
                 </div>
                 <Button
                   onClick={validateCode}
                   disabled={!accessCode.trim() || isValidating || !privacyAccepted}
-                  className="w-full bg-stone-600 hover:bg-stone-700"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   {isValidating
                     ? language === "es" ? "Verificando..." : "Verifying..."
@@ -277,18 +277,18 @@ const TenantIncidents = () => {
           /* Tenant Dashboard */
           <div className="max-w-4xl mx-auto space-y-8">
             {/* Property Info */}
-            <Card className="border-stone-200">
+            <Card className="border-border">
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <p className="text-sm text-stone-500">
+                    <p className="text-sm text-muted-foreground">
                       {language === "es" ? "Bienvenido/a," : "Welcome,"}
                     </p>
-                    <h2 className="text-2xl font-bold text-stone-800">{tenantInfo.tenant_name}</h2>
-                    <p className="text-stone-600">{tenantInfo.property_title} — {tenantInfo.property_location}</p>
+                    <h2 className="text-2xl font-bold text-foreground">{tenantInfo.tenant_name}</h2>
+                    <p className="text-muted-foreground">{tenantInfo.property_title} — {tenantInfo.property_location}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={() => setShowForm(true)} className="bg-stone-600 hover:bg-stone-700">
+                    <Button onClick={() => setShowForm(true)} className="bg-primary hover:bg-primary/90">
                       <Send className="h-4 w-4 mr-2" />
                       {language === "es" ? "Nueva incidencia" : "New incident"}
                     </Button>
@@ -309,17 +309,17 @@ const TenantIncidents = () => {
 
             {/* New Incident Form */}
             {showForm && (
-              <Card className="border-stone-200 shadow-lg">
+              <Card className="border-border shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-stone-600" />
+                    <AlertTriangle className="h-5 w-5 text-muted-foreground" />
                     {language === "es" ? "Reportar incidencia" : "Report incident"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         {language === "es" ? "Título" : "Title"} *
                       </label>
                       <Input
@@ -331,7 +331,7 @@ const TenantIncidents = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         {language === "es" ? "Categoría" : "Category"}
                       </label>
                       <Select value={category} onValueChange={setCategory}>
@@ -348,7 +348,7 @@ const TenantIncidents = () => {
                       </Select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         {language === "es" ? "Descripción" : "Description"} *
                       </label>
                       <Textarea
@@ -361,13 +361,13 @@ const TenantIncidents = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         {language === "es" ? "Fotos (máx. 5)" : "Photos (max 5)"}
                       </label>
                       <div className="mt-2">
-                        <label className="flex items-center gap-2 cursor-pointer bg-stone-50 border border-dashed border-stone-300 rounded-lg p-4 hover:bg-stone-100 transition-colors">
-                          <Camera className="h-5 w-5 text-stone-500" />
-                          <span className="text-sm text-stone-600">
+                        <label className="flex items-center gap-2 cursor-pointer bg-muted border border-dashed border-border rounded-lg p-4 hover:bg-muted transition-colors">
+                          <Camera className="h-5 w-5 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
                             {language === "es" ? "Añadir fotos" : "Add photos"}
                           </span>
                           <input
@@ -400,7 +400,7 @@ const TenantIncidents = () => {
                       <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                         {language === "es" ? "Cancelar" : "Cancel"}
                       </Button>
-                      <Button type="submit" disabled={isSubmitting} className="bg-stone-600 hover:bg-stone-700">
+                      <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
                         {isSubmitting
                           ? language === "es" ? "Enviando..." : "Sending..."
                           : language === "es" ? "Enviar incidencia" : "Submit incident"}
@@ -413,13 +413,13 @@ const TenantIncidents = () => {
 
             {/* Incidents List */}
             <div>
-              <h3 className="text-xl font-semibold text-stone-800 mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 {language === "es" ? "Mis incidencias" : "My incidents"}
-                <span className="text-sm font-normal text-stone-500 ml-2">({incidents.length})</span>
+                <span className="text-sm font-normal text-muted-foreground ml-2">({incidents.length})</span>
               </h3>
               {incidents.length === 0 ? (
-                <Card className="border-stone-200">
-                  <CardContent className="py-12 text-center text-stone-500">
+                <Card className="border-border">
+                  <CardContent className="py-12 text-center text-muted-foreground">
                     <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-400" />
                     <p>{language === "es" ? "No tienes incidencias reportadas" : "You have no reported incidents"}</p>
                   </CardContent>
@@ -431,12 +431,12 @@ const TenantIncidents = () => {
                     const StatusIcon = statusCfg.icon;
                     const catLabel = CATEGORIES.find((c) => c.value === incident.category);
                     return (
-                      <Card key={incident.id} className="border-stone-200">
+                      <Card key={incident.id} className="border-border">
                         <CardContent className="pt-6">
                           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-semibold text-stone-800">{incident.title}</h4>
+                                <h4 className="font-semibold text-foreground">{incident.title}</h4>
                                 <Badge className={statusCfg.color}>
                                   <StatusIcon className="h-3 w-3 mr-1" />
                                   {language === "es" ? statusCfg.label : statusCfg.labelEn}
@@ -445,7 +445,7 @@ const TenantIncidents = () => {
                               <Badge variant="outline" className="mb-2">
                                 {language === "es" ? catLabel?.label : catLabel?.labelEn}
                               </Badge>
-                              <p className="text-sm text-stone-600 mt-1">{incident.description}</p>
+                              <p className="text-sm text-muted-foreground mt-1">{incident.description}</p>
                               {incident.images && incident.images.length > 0 && (
                                 <div className="flex gap-2 mt-3 flex-wrap">
                                   {incident.images.map((img, idx) => (
@@ -456,7 +456,7 @@ const TenantIncidents = () => {
                                 </div>
                               )}
                             </div>
-                            <span className="text-xs text-stone-400 whitespace-nowrap">
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
                               {new Date(incident.created_at).toLocaleDateString(language === "es" ? "es-ES" : "en-US")}
                             </span>
                           </div>
@@ -468,7 +468,7 @@ const TenantIncidents = () => {
               )}
             </div>
 
-            <Button variant="ghost" onClick={() => { setTenantInfo(null); setIncidents([]); }} className="text-stone-500">
+            <Button variant="ghost" onClick={() => { setTenantInfo(null); setIncidents([]); }} className="text-muted-foreground">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {language === "es" ? "Cerrar sesión de inquilino" : "Log out tenant"}
             </Button>

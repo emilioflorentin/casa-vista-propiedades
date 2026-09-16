@@ -258,14 +258,14 @@ const OwnerIncidents = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
         <Header />
         <div className="container mx-auto px-6 py-20 text-center">
-          <p className="text-stone-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             {language === "es" ? "Debes iniciar sesión para gestionar incidencias." : "You must log in to manage incidents."}
           </p>
           <Link to="/account">
-            <Button className="bg-stone-600 hover:bg-stone-700">
+            <Button className="bg-primary hover:bg-primary/90">
               {language === "es" ? "Iniciar sesión" : "Log in"}
             </Button>
           </Link>
@@ -276,7 +276,7 @@ const OwnerIncidents = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <Header />
 
       <main className="container mx-auto px-6 py-12 space-y-10">
@@ -284,10 +284,10 @@ const OwnerIncidents = () => {
         {/* Header row: title + filter + new access button */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-stone-800">
+            <h1 className="text-3xl font-bold text-foreground">
               {language === "es" ? "Gestión de incidencias" : "Incident Management"}
             </h1>
-            <p className="text-stone-500">
+            <p className="text-muted-foreground">
               {language === "es" ? "Gestiona los accesos de tus inquilinos y sus incidencias" : "Manage your tenants' access and their incidents"}
             </p>
           </div>
@@ -296,7 +296,7 @@ const OwnerIncidents = () => {
             {/* Global property filter */}
             {properties.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-stone-500 whitespace-nowrap">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">
                   {language === "es" ? "Filtrar por:" : "Filter by:"}
                 </span>
                 <Select value={selectedProperty} onValueChange={setSelectedProperty}>
@@ -315,7 +315,7 @@ const OwnerIncidents = () => {
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-stone-600 hover:bg-stone-700 whitespace-nowrap">
+                <Button className="bg-primary hover:bg-primary/90 whitespace-nowrap">
                   <Plus className="h-4 w-4 mr-2" />
                   {language === "es" ? "Nuevo acceso inquilino" : "New tenant access"}
                 </Button>
@@ -350,7 +350,7 @@ const OwnerIncidents = () => {
                     <label className="text-sm font-medium">{language === "es" ? "Teléfono" : "Phone"}</label>
                     <Input value={newTenantPhone} onChange={(e) => setNewTenantPhone(e.target.value)} maxLength={20} />
                   </div>
-                  <Button onClick={createTenantAccess} disabled={!newTenantName.trim() || !newTenantPropertyId || isCreating} className="w-full bg-stone-600 hover:bg-stone-700">
+                  <Button onClick={createTenantAccess} disabled={!newTenantName.trim() || !newTenantPropertyId || isCreating} className="w-full bg-primary hover:bg-primary/90">
                     {isCreating ? "..." : language === "es" ? "Crear acceso" : "Create access"}
                   </Button>
                 </div>
@@ -362,10 +362,10 @@ const OwnerIncidents = () => {
         {/* Tenant Access Codes */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-stone-800 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <Shield className="h-5 w-5" />
               {language === "es" ? "Accesos de inquilinos" : "Tenant access codes"}
-              <span className="text-sm font-normal text-stone-500">({filteredTenantAccesses.length})</span>
+              <span className="text-sm font-normal text-muted-foreground">({filteredTenantAccesses.length})</span>
             </h2>
             {filteredTenantAccesses.length > 0 && (
               <Button
@@ -385,8 +385,8 @@ const OwnerIncidents = () => {
           </div>
 
           {filteredTenantAccesses.length === 0 ? (
-            <Card className="border-stone-200">
-              <CardContent className="py-8 text-center text-stone-500">
+            <Card className="border-border">
+              <CardContent className="py-8 text-center text-muted-foreground">
                 {tenantAccesses.length === 0
                   ? (language === "es" ? "No hay accesos creados. Crea uno para que tus inquilinos puedan reportar incidencias." : "No accesses created. Create one so your tenants can report incidents.")
                   : (language === "es" ? "No hay inquilinos en esta propiedad." : "No tenants for this property.")}
@@ -395,10 +395,10 @@ const OwnerIncidents = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredTenantAccesses.map((access) => (
-                <Card key={access.id} className={`border-stone-200 ${!access.is_active ? "opacity-60" : ""}`}>
+                <Card key={access.id} className={`border-border ${!access.is_active ? "opacity-60" : ""}`}>
                   <CardContent className="pt-6 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-stone-800">{access.tenant_name}</h4>
+                      <h4 className="font-semibold text-foreground">{access.tenant_name}</h4>
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => toggleAccessActive(access)}
@@ -407,7 +407,7 @@ const OwnerIncidents = () => {
                           {access.is_active ? (
                             <ToggleRight className="h-6 w-6 text-green-600" />
                           ) : (
-                            <ToggleLeft className="h-6 w-6 text-stone-400" />
+                            <ToggleLeft className="h-6 w-6 text-muted-foreground" />
                           )}
                         </button>
                         <button
@@ -423,14 +423,14 @@ const OwnerIncidents = () => {
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-stone-500">{getPropertyTitle(access.property_id)}</p>
-                    <div className="flex items-center gap-2 bg-stone-50 rounded-lg p-2">
-                      <code className="text-xs flex-1 truncate text-stone-600">{access.access_code}</code>
+                    <p className="text-sm text-muted-foreground">{getPropertyTitle(access.property_id)}</p>
+                    <div className="flex items-center gap-2 bg-muted rounded-lg p-2">
+                      <code className="text-xs flex-1 truncate text-muted-foreground">{access.access_code}</code>
                       <Button variant="ghost" size="sm" onClick={() => copyCode(access.access_code)}>
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                    {access.tenant_email && <p className="text-xs text-stone-400">{access.tenant_email}</p>}
+                    {access.tenant_email && <p className="text-xs text-muted-foreground">{access.tenant_email}</p>}
                   </CardContent>
                 </Card>
               ))}
@@ -441,16 +441,16 @@ const OwnerIncidents = () => {
         {/* Incidents */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-xl font-semibold text-stone-800 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
               {language === "es" ? "Incidencias" : "Incidents"}
-              <span className="text-sm font-normal text-stone-500">({filteredIncidents.length})</span>
+              <span className="text-sm font-normal text-muted-foreground">({filteredIncidents.length})</span>
             </h2>
           </div>
 
           {filteredIncidents.length === 0 ? (
-            <Card className="border-stone-200">
-              <CardContent className="py-12 text-center text-stone-500">
+            <Card className="border-border">
+              <CardContent className="py-12 text-center text-muted-foreground">
                 <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-400" />
                 <p>{language === "es" ? "No hay incidencias" : "No incidents"}</p>
               </CardContent>
@@ -461,21 +461,21 @@ const OwnerIncidents = () => {
                 const statusCfg = STATUS_OPTIONS.find((s) => s.value === incident.status) || STATUS_OPTIONS[0];
                 const cat = CATEGORIES[incident.category] || CATEGORIES.other;
                 return (
-                  <Card key={incident.id} className="border-stone-200">
+                  <Card key={incident.id} className="border-border">
                     <CardContent className="pt-6">
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-semibold text-stone-800">{incident.title}</h4>
+                            <h4 className="font-semibold text-foreground">{incident.title}</h4>
                             <Badge className={statusCfg.color}>
                               {language === "es" ? statusCfg.label : statusCfg.labelEn}
                             </Badge>
                             <Badge variant="outline">{language === "es" ? cat.label : cat.labelEn}</Badge>
                           </div>
-                          <p className="text-sm text-stone-500">
+                          <p className="text-sm text-muted-foreground">
                             {language === "es" ? "Inquilino:" : "Tenant:"} {getTenantName(incident.tenant_access_id)} · {getPropertyTitle(incident.property_id)}
                           </p>
-                          <p className="text-sm text-stone-600">{incident.description}</p>
+                          <p className="text-sm text-muted-foreground">{incident.description}</p>
                           {incident.images && incident.images.length > 0 && (
                             <div className="flex gap-2 mt-2 flex-wrap">
                               {incident.images.map((img, idx) => (
@@ -487,7 +487,7 @@ const OwnerIncidents = () => {
                           )}
                         </div>
                         <div className="flex flex-col gap-2 items-end">
-                          <span className="text-xs text-stone-400">
+                          <span className="text-xs text-muted-foreground">
                             {new Date(incident.created_at).toLocaleDateString(language === "es" ? "es-ES" : "en-US")}
                           </span>
                           <Select

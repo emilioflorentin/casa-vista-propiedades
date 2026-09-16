@@ -175,14 +175,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <PageHeader />
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <Link 
             to={roomieMode ? "/roomie-finder" : "/"} 
-            className="inline-flex items-center text-stone-600 hover:text-stone-800 mb-6 transition-colors"
+            className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al inicio
@@ -190,10 +190,10 @@ const Auth = () => {
 
           <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
             <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-stone-800">
+              <CardTitle className="text-2xl font-bold text-foreground">
                 {isLogin ? t('account.login') : t('account.register')}
               </CardTitle>
-              <p className="text-stone-600 mt-2">
+              <p className="text-muted-foreground mt-2">
                 {isLogin ? t('account.loginDescription') : t('account.registerDescription')}
               </p>
             </CardHeader>
@@ -212,7 +212,7 @@ const Auth = () => {
                 {!isLogin && (
                   <>
                     <div className="space-y-2">
-                      <label htmlFor="fullName" className="text-sm font-medium text-stone-700">
+                      <label htmlFor="fullName" className="text-sm font-medium text-foreground">
                         {t('account.fullName')}
                       </label>
                       <Input
@@ -222,12 +222,12 @@ const Auth = () => {
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder={t('account.enterName')}
                         required={!isLogin}
-                        className="h-12 border-stone-300"
+                        className="h-12 border-border"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         Tipo de usuario
                       </label>
                       <div className="grid grid-cols-2 gap-3">
@@ -235,32 +235,32 @@ const Auth = () => {
                           type="button"
                           className={`p-3 rounded-lg border-2 transition-all ${
                             userType === 'particular'
-                              ? 'border-stone-700 bg-stone-50 text-stone-800'
-                              : 'border-stone-200 hover:border-stone-300'
+                              ? 'border-primary bg-muted text-foreground'
+                              : 'border-border hover:border-border'
                           }`}
                           onClick={() => setUserType('particular')}
                         >
                           <div className="text-sm font-medium">Particular</div>
-                          <div className="text-xs text-stone-500 mt-1">Uso personal</div>
+                          <div className="text-xs text-muted-foreground mt-1">Uso personal</div>
                         </button>
                         <button
                           type="button"
                           className={`p-3 rounded-lg border-2 transition-all ${
                             userType === 'empresa'
-                              ? 'border-stone-700 bg-stone-50 text-stone-800'
-                              : 'border-stone-200 hover:border-stone-300'
+                              ? 'border-primary bg-muted text-foreground'
+                              : 'border-border hover:border-border'
                           }`}
                           onClick={() => setUserType('empresa')}
                         >
                           <div className="text-sm font-medium">Profesional</div>
-                          <div className="text-xs text-stone-500 mt-1">Inmobiliaria</div>
+                          <div className="text-xs text-muted-foreground mt-1">Inmobiliaria</div>
                         </button>
                       </div>
                     </div>
 
                     {userType === 'empresa' && (
                       <div className="space-y-2">
-                        <label htmlFor="companyName" className="text-sm font-medium text-stone-700">
+                        <label htmlFor="companyName" className="text-sm font-medium text-foreground">
                           Nombre de la empresa
                         </label>
                         <Input
@@ -270,12 +270,12 @@ const Auth = () => {
                           onChange={(e) => setCompanyName(e.target.value)}
                           placeholder="Ej. Inmobiliaria López S.L."
                           required={userType === 'empresa'}
-                          className="h-12 border-stone-300"
+                          className="h-12 border-border"
                         />
                       </div>
                     )}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label className="text-sm font-medium text-foreground">
                         ¿Para qué quieres la cuenta?
                       </label>
                       <div className="grid grid-cols-2 gap-3">
@@ -283,28 +283,28 @@ const Auth = () => {
                           type="button"
                           className={`p-3 rounded-lg border-2 transition-all ${
                             platform === 'nazari'
-                              ? 'border-stone-700 bg-stone-50 text-stone-800'
-                              : 'border-stone-200 hover:border-stone-300'
+                              ? 'border-primary bg-muted text-foreground'
+                              : 'border-border hover:border-border'
                           }`}
                           onClick={() => setPlatform('nazari')}
                         >
                           <div className="text-sm font-medium">Nazarí Homes</div>
-                          <div className="text-xs text-stone-500 mt-1">Comprar o alquilar vivienda</div>
+                          <div className="text-xs text-muted-foreground mt-1">Comprar o alquilar vivienda</div>
                         </button>
                         <button
                           type="button"
                           className={`p-3 rounded-lg border-2 transition-all ${
                             platform === 'roomie'
-                              ? 'border-stone-700 bg-stone-50 text-stone-800'
-                              : 'border-stone-200 hover:border-stone-300'
+                              ? 'border-primary bg-muted text-foreground'
+                              : 'border-border hover:border-border'
                           }`}
                           onClick={() => setPlatform('roomie')}
                         >
                           <div className="text-sm font-medium">Roomie Finder</div>
-                          <div className="text-xs text-stone-500 mt-1">Publicar habitación</div>
+                          <div className="text-xs text-muted-foreground mt-1">Publicar habitación</div>
                         </button>
                       </div>
-                      <p className="text-xs text-stone-500">
+                      <p className="text-xs text-muted-foreground">
                         Si solo buscas habitación no necesitas cuenta: rellena tu ficha en Roomie Finder.
                       </p>
                     </div>
@@ -312,7 +312,7 @@ const Auth = () => {
                 )}
 
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-stone-700">
+                  <label htmlFor="email" className="text-sm font-medium text-foreground">
                     {t('account.email')}
                   </label>
                   <Input
@@ -322,12 +322,12 @@ const Auth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('account.enterEmail')}
                     required
-                    className="h-12 border-stone-300"
+                    className="h-12 border-border"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-stone-700">
+                  <label htmlFor="password" className="text-sm font-medium text-foreground">
                     {t('account.password')}
                   </label>
                   <div className="relative">
@@ -338,7 +338,7 @@ const Auth = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('account.enterPassword')}
                       required
-                      className="h-12 border-stone-300 pr-10"
+                      className="h-12 border-border pr-10"
                     />
                     <button
                       type="button"
@@ -346,9 +346,9 @@ const Auth = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-stone-400" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4 text-stone-400" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
                     </button>
                   </div>
@@ -356,7 +356,7 @@ const Auth = () => {
 
                 {!isLogin && (
                   <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="text-sm font-medium text-stone-700">
+                    <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                       {t('account.confirmPassword')}
                     </label>
                     <div className="relative">
@@ -367,7 +367,7 @@ const Auth = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder={t('account.confirmPasswordPlaceholder')}
                         required={!isLogin}
-                        className="h-12 border-stone-300 pr-10"
+                        className="h-12 border-border pr-10"
                       />
                       <button
                         type="button"
@@ -375,9 +375,9 @@ const Auth = () => {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       >
                         {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4 text-stone-400" />
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-stone-400" />
+                          <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
                       </button>
                     </div>
@@ -388,7 +388,7 @@ const Auth = () => {
                   <div className="text-right">
                     <button
                       type="button"
-                      className="text-sm text-stone-600 hover:text-stone-800 hover:underline"
+                      className="text-sm text-muted-foreground hover:text-foreground hover:underline"
                     >
                       {t('account.forgotPassword')}
                     </button>
@@ -397,7 +397,7 @@ const Auth = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-stone-700 hover:bg-stone-600 text-white font-medium"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium"
                   disabled={loading}
                 >
                   {loading 
@@ -408,13 +408,13 @@ const Auth = () => {
               </form>
 
               {/* Switch Mode */}
-              <div className="text-center text-sm text-stone-600">
+              <div className="text-center text-sm text-muted-foreground">
                 {isLogin ? t('account.noAccount') : t('account.hasAccount')}
                 {' '}
                 <button
                   type="button"
                   onClick={toggleMode}
-                  className="text-stone-700 hover:text-stone-900 font-medium hover:underline"
+                  className="text-foreground hover:text-foreground font-medium hover:underline"
                 >
                   {isLogin ? t('account.createAccount') : t('account.loginHere')}
                 </button>

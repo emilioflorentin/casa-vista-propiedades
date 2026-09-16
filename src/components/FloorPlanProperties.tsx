@@ -69,7 +69,7 @@ const FloorPlanProperties = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-stone-600 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             Selecciona un objeto para editar sus propiedades
           </p>
         </CardContent>
@@ -104,7 +104,7 @@ const FloorPlanProperties = ({
               <button
                 key={color}
                 className={`w-8 h-8 rounded-md border-2 ${
-                  properties.fill === color ? 'border-stone-400' : 'border-stone-200'
+                  properties.fill === color ? 'border-border' : 'border-border'
                 }`}
                 style={{ backgroundColor: color }}
                 onClick={() => handlePropertyChange('fill', color)}

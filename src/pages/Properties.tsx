@@ -243,7 +243,7 @@ const Properties = () => {
                 placeholder={t('properties.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 border-border focus:border-stone-500"
+                className="pl-10 h-12 border-border focus:border-border"
               />
             </div>
             

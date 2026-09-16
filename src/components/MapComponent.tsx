@@ -136,23 +136,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ location, title }) => {
 
   if (error) {
     return (
-      <div className="w-full h-80 rounded-lg border border-stone-200 flex items-center justify-center bg-stone-50">
-        <div className="text-center text-stone-600">
+      <div className="w-full h-80 rounded-lg border border-border flex items-center justify-center bg-muted">
+        <div className="text-center text-muted-foreground">
           <p className="text-sm">Error al cargar el mapa</p>
-          <p className="text-xs text-stone-500 mt-1">{location}</p>
+          <p className="text-xs text-muted-foreground mt-1">{location}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-80 rounded-lg border border-stone-200" style={{ minHeight: '320px' }}>
+    <div className="relative w-full h-80 rounded-lg border border-border" style={{ minHeight: '320px' }}>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-stone-50 rounded-lg z-10">
-          <div className="text-center text-stone-600">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-600 mx-auto mb-2"></div>
+        <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg z-10">
+          <div className="text-center text-muted-foreground">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-sm">Cargando ubicación...</p>
-            <p className="text-xs text-stone-500 mt-1">{location}</p>
+            <p className="text-xs text-muted-foreground mt-1">{location}</p>
           </div>
         </div>
       )}

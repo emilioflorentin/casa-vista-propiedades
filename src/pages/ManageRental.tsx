@@ -446,7 +446,7 @@ const ManageRental = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <p>Acceso no autorizado</p>
@@ -457,7 +457,7 @@ const ManageRental = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-muted to-muted">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
@@ -472,9 +472,9 @@ const ManageRental = () => {
               Volver
             </Button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-stone-800">Gestionar Alquiler</h1>
+              <h1 className="text-3xl font-bold text-foreground">Gestionar Alquiler</h1>
               {property && (
-                <p className="text-stone-600">{property.title} - {property.location}</p>
+                <p className="text-muted-foreground">{property.title} - {property.location}</p>
               )}
             </div>
             <Button onClick={handleAddRoom} className="flex items-center gap-2">

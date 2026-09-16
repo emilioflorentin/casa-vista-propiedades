@@ -42,14 +42,14 @@ const EnergyLabel = ({
 }) => {
   return (
     <div className="flex items-center gap-2 mb-1">
-      <div className={`${labelWidths[rating]} ${labelColors[rating]} h-6 flex items-center justify-between px-2 rounded-r-lg transition-all ${isSelected ? 'ring-2 ring-stone-800 ring-offset-1' : ''}`}>
+      <div className={`${labelWidths[rating]} ${labelColors[rating]} h-6 flex items-center justify-between px-2 rounded-r-lg transition-all ${isSelected ? 'ring-2 ring-ring ring-offset-1' : ''}`}>
         <span className="text-white font-bold text-sm">{rating}</span>
         {isSelected && value && (
           <span className="text-white text-xs font-medium">{value} {unit}</span>
         )}
       </div>
       {isSelected && (
-        <div className="bg-stone-800 text-white text-xs px-2 py-1 rounded font-bold">
+        <div className="bg-primary text-white text-xs px-2 py-1 rounded font-bold">
           {rating}
         </div>
       )}
@@ -64,20 +64,20 @@ const EnergyCertificate = ({
   emissionsValue = 32
 }: EnergyCertificateProps) => {
   return (
-    <div className="py-6 border-t border-stone-200">
-      <h2 className="text-xl font-semibold mb-6 text-stone-800 flex items-center">
+    <div className="py-6 border-t border-border">
+      <h2 className="text-xl font-semibold mb-6 text-foreground flex items-center">
         <Zap className="h-5 w-5 mr-2 text-yellow-500" />
         Certificado Energético
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Consumo */}
-        <div className="bg-stone-50 p-4 rounded-lg">
+        <div className="bg-muted p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-yellow-500" />
-            <h3 className="font-semibold text-stone-800">Consumo de energía</h3>
+            <h3 className="font-semibold text-foreground">Consumo de energía</h3>
           </div>
-          <p className="text-sm text-stone-600 mb-4">kWh/m² año</p>
+          <p className="text-sm text-muted-foreground mb-4">kWh/m² año</p>
           
           <div className="space-y-1">
             {energyLabels.map((label) => (
@@ -93,12 +93,12 @@ const EnergyCertificate = ({
         </div>
 
         {/* Emisiones */}
-        <div className="bg-stone-50 p-4 rounded-lg">
+        <div className="bg-muted p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-4">
             <Leaf className="h-5 w-5 text-green-500" />
-            <h3 className="font-semibold text-stone-800">Emisiones</h3>
+            <h3 className="font-semibold text-foreground">Emisiones</h3>
           </div>
-          <p className="text-sm text-stone-600 mb-4">kg CO₂/m² año</p>
+          <p className="text-sm text-muted-foreground mb-4">kg CO₂/m² año</p>
           
           <div className="space-y-1">
             {energyLabels.map((label) => (
@@ -114,7 +114,7 @@ const EnergyCertificate = ({
         </div>
       </div>
 
-      <p className="text-xs text-stone-500 mt-4">
+      <p className="text-xs text-muted-foreground mt-4">
         * Los valores indicados corresponden al certificado energético oficial del inmueble.
       </p>
     </div>

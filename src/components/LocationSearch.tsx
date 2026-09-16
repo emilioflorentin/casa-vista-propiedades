@@ -286,14 +286,14 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
     <div className="relative">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-3 h-5 w-5 text-stone-600" />
+          <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
           <Input
             ref={inputRef}
             placeholder={defaultPlaceholder}
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className="pl-10 h-12 border-0 text-stone-700"
+            className="pl-10 h-12 border-0 text-foreground"
           />
         </div>
         <Button
@@ -302,7 +302,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
           size="sm"
           onClick={performSearch}
           disabled={!searchQuery.trim() || isSearching}
-          className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
+          className="h-12 px-3 border-0 bg-muted hover:bg-muted text-foreground"
           title={t('location.search_text')}
         >
           <Search className="h-4 w-4" />
@@ -315,7 +315,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
               variant="outline"
               size="sm"
               onClick={handleShowMap}
-              className="h-12 px-3 border-0 bg-stone-100 hover:bg-stone-200 text-stone-700"
+              className="h-12 px-3 border-0 bg-muted hover:bg-muted text-foreground"
               title={t('location.search_location')}
             >
               <Target className="h-4 w-4" />
@@ -323,27 +323,27 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
           </DialogTrigger>
           <DialogContent className="max-w-[98vw] w-full max-h-[95vh] bg-white overflow-y-auto p-6">
             <DialogHeader>
-              <DialogTitle className="text-lg font-semibold text-stone-800">
+              <DialogTitle className="text-lg font-semibold text-foreground">
                 {t('location.search_by_location')}
               </DialogTitle>
             </DialogHeader>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t('location.search_address')}
                 </label>
                 <div className="flex gap-2 w-full">
                   <Input
                     ref={modalInputRef}
                     placeholder={t('location.address_placeholder')}
-                    className="flex-1 bg-white border border-gray-300 text-base px-4 py-2"
+                    className="flex-1 bg-white border border-border text-base px-4 py-2"
                     onKeyDown={handleModalInputKeyDown}
                   />
                   <Button
                     onClick={handleModalLocationSearch}
                     size="sm"
-                    className="bg-stone-600 hover:bg-stone-700 text-white flex-shrink-0 px-4"
+                    className="bg-primary hover:bg-primary/90 text-white flex-shrink-0 px-4"
                   >
                     <Search className="h-4 w-4" />
                     <span className="ml-2 hidden sm:inline">{t('common.search')}</span>
@@ -352,14 +352,14 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t('location.search_radius')}
                 </label>
                 <Select value={radius} onValueChange={setRadius}>
-                  <SelectTrigger className="w-full bg-white border border-gray-300">
+                  <SelectTrigger className="w-full bg-white border border-border">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                  <SelectContent className="bg-white border border-border shadow-lg">
                     <SelectItem value="500">{t('location.radius_500m')}</SelectItem>
                     <SelectItem value="1000">{t('location.radius_1km')}</SelectItem>
                     <SelectItem value="2000">{t('location.radius_2km')}</SelectItem>
@@ -373,7 +373,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
               <div className="relative">
                 <div 
                   ref={mapRef} 
-                  className="w-full h-96 rounded-lg bg-stone-50 border border-gray-200"
+                  className="w-full h-96 rounded-lg bg-muted border border-border"
                   style={{ minHeight: '384px' }}
                 />
               </div>
@@ -383,14 +383,14 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
                   variant="outline"
                   onClick={handleCloseMap}
                   size="sm"
-                  className="bg-white hover:bg-stone-50 border-stone-300 text-stone-700"
+                  className="bg-white hover:bg-muted border-border text-foreground"
                 >
                   {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleCurrentLocation}
                   size="sm"
-                  className="bg-stone-600 hover:bg-stone-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                 >
                   {t('location.my_location')}
                 </Button>
@@ -398,7 +398,7 @@ const LocationSearch = ({ onLocationSelect, placeholder }: LocationSearchProps) 
                   onClick={handleApplyLocation}
                   disabled={!selectedLocation}
                   size="sm"
-                  className="bg-stone-600 hover:bg-stone-700 text-white disabled:opacity-50"
+                  className="bg-primary hover:bg-primary/90 text-white disabled:opacity-50"
                 >
                   {t('location.apply_location')}
                 </Button>

@@ -18,7 +18,7 @@ const RoomieFooter = () => (
         <Link to="/" className="text-muted-foreground hover:underline">Volver a PisoGo</Link>
       </div>
     </div>
-    <div className="border-t border-stone-100 py-4 text-center text-xs text-muted-foreground">
+    <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
       Roomie Finder · by PisoGo · info@nazarihomes.com
     </div>
   </footer>

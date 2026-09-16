@@ -291,7 +291,7 @@ const Index = () => {
       </section>
 
       {/* Properties Section */}
-      <section className="py-20 bg-stone-25">
+      <section className="py-20 bg-muted/40">
         <div className="container mx-auto px-6">
           <Reveal className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">

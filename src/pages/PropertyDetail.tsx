@@ -324,7 +324,7 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-primary">Cargando propiedad...</p>
         </div>
       </div>
@@ -609,7 +609,7 @@ const PropertyDetail = () => {
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`aspect-video rounded-lg overflow-hidden border-2 ${
-                      currentImageIndex === index ? "border-stone-500" : "border-transparent"
+                      currentImageIndex === index ? "border-border" : "border-transparent"
                     }`}
                   >
                     <img
@@ -1019,7 +1019,7 @@ const PropertyDetail = () => {
                     value={whatsappMessage}
                     onChange={(e) => setWhatsappMessage(e.target.value)}
                     rows={3}
-                    className="border-border focus:border-stone-500 text-sm resize-none"
+                    className="border-border focus:border-border text-sm resize-none"
                   />
                   <Button 
                     onClick={handleWhatsAppChat}

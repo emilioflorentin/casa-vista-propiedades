@@ -140,15 +140,15 @@ const RoomiePublish = () => {
   );
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-muted">
       <Header />
       <main className="container mx-auto px-6 py-10 max-w-3xl">
-        <h1 className="text-3xl font-bold text-stone-800 mb-2">Publicar habitación</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Publicar habitación</h1>
         <p className="text-muted-foreground mb-6">Los gastos y las fotos de la vivienda y de la habitación son obligatorios.</p>
 
         <div className="flex flex-wrap gap-2 mb-6">
           {STEPS.map((s, i) => (
-            <span key={s} className={`text-xs px-3 py-1 rounded-full border ${i === step ? 'bg-stone-700 text-white border-stone-700' : i < step ? 'bg-stone-200 border-stone-200' : 'bg-white'}`}>
+            <span key={s} className={`text-xs px-3 py-1 rounded-full border ${i === step ? 'bg-primary text-white border-primary' : i < step ? 'bg-muted border-border' : 'bg-white'}`}>
               {i + 1}. {s}
             </span>
           ))}
@@ -271,7 +271,7 @@ const RoomiePublish = () => {
               {step < STEPS.length - 1 ? (
                 <Button onClick={() => validateStep() && setStep((s) => s + 1)}>Siguiente<ArrowRight className="w-4 h-4 ml-2" /></Button>
               ) : (
-                <Button onClick={submit} disabled={saving} className="bg-stone-700 hover:bg-stone-800">
+                <Button onClick={submit} disabled={saving} className="bg-primary hover:bg-primary/90">
                   <Upload className="w-4 h-4 mr-2" />{saving ? 'Publicando...' : 'Publicar anuncio'}
                 </Button>
               )}

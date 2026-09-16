@@ -54,8 +54,8 @@ const getRoomTypeColor = (type: string, isOccupied: boolean): string => {
     bathroom: 'bg-teal-50 border-teal-300 hover:bg-teal-100',
     kitchen: 'bg-amber-50 border-amber-300 hover:bg-amber-100',
     living: 'bg-purple-50 border-purple-300 hover:bg-purple-100',
-    storage: 'bg-stone-50 border-stone-300 hover:bg-stone-100',
-    other: 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+    storage: 'bg-muted border-border hover:bg-muted',
+    other: 'bg-muted border-border hover:bg-muted'
   };
   return colors[type] || colors.other;
 };
@@ -153,13 +153,13 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
 
   if (rooms.length === 0) {
     return (
-      <Card className="bg-stone-50 border-dashed">
+      <Card className="bg-muted border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <Home className="w-12 h-12 text-stone-400 mb-4" />
-          <h3 className="text-lg font-medium text-stone-700 mb-2">
+          <Home className="w-12 h-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">
             Sin habitaciones
           </h3>
-          <p className="text-stone-500 max-w-sm">
+          <p className="text-muted-foreground max-w-sm">
             Añade habitaciones para ver la distribución visual de la vivienda
           </p>
         </CardContent>
@@ -174,11 +174,11 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-emerald-200 border border-emerald-400" />
-            <span className="text-sm text-stone-600">Ocupada ({occupiedCount})</span>
+            <span className="text-sm text-muted-foreground">Ocupada ({occupiedCount})</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-blue-100 border border-blue-300" />
-            <span className="text-sm text-stone-600">Disponible ({availableCount})</span>
+            <span className="text-sm text-muted-foreground">Disponible ({availableCount})</span>
           </div>
         </div>
         
@@ -207,7 +207,7 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
       {/* Grid area */}
       <div
         ref={containerRef}
-        className="relative bg-stone-100 rounded-xl border-2 border-dashed border-stone-300 overflow-hidden"
+        className="relative bg-muted rounded-xl border-2 border-dashed border-border overflow-hidden"
         style={{ 
           minHeight: '400px',
           backgroundImage: `
@@ -245,10 +245,10 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
             >
               <div className="p-3 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-1">
-                  <span className="font-medium text-sm text-stone-800 truncate flex-1">
+                  <span className="font-medium text-sm text-foreground truncate flex-1">
                     {room.room_name}
                   </span>
-                  <Move className="w-3 h-3 text-stone-400 flex-shrink-0" />
+                  <Move className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                 </div>
                 
                 <Badge 
@@ -265,11 +265,11 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
                       <span className="truncate">{room.tenant_name}</span>
                     </div>
                   ) : (
-                    <span className="text-xs text-stone-500">Disponible</span>
+                    <span className="text-xs text-muted-foreground">Disponible</span>
                   )}
                   
                   {room.rent_amount && (
-                    <div className="text-xs font-medium text-stone-700">
+                    <div className="text-xs font-medium text-foreground">
                       {room.rent_amount}€/mes
                     </div>
                   )}
@@ -280,7 +280,7 @@ const FloorPlanGrid = ({ rooms, savedPositions = {}, onSaveLayout, onRoomClick }
         })}
       </div>
       
-      <p className="text-xs text-stone-500 text-center">
+      <p className="text-xs text-muted-foreground text-center">
         Arrastra las habitaciones para organizar la distribución visual de la vivienda
       </p>
     </div>

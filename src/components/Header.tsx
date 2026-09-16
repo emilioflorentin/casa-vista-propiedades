@@ -77,7 +77,7 @@ const Header = () => {
                   <div className="px-2 py-1.5 text-sm font-medium">
                     {user.user_metadata?.full_name || 'Usuario'}
                   </div>
-                  <div className="px-2 py-1.5 text-xs text-gray-500">
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
                     {user.email}
                   </div>
                   <DropdownMenuSeparator />
@@ -225,14 +225,14 @@ const Header = () => {
               
               {/* Mobile Language Flags */}
               <div className="flex items-center space-x-3 pt-2">
-                <span className="text-sm text-gray-600">{t('common.language')}</span>
+                <span className="text-sm text-muted-foreground">{t('common.language')}</span>
                 <button
                   onClick={() => {
                     setLanguage('es');
                     setIsMenuOpen(false);
                   }}
                   className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
-                    language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                    language === 'es' ? 'ring-2 ring-ring' : 'opacity-70'
                   }`}
                   title="Español"
                 >
@@ -249,7 +249,7 @@ const Header = () => {
                     setIsMenuOpen(false);
                   }}
                   className={`w-5 h-3 rounded overflow-hidden transition-all duration-200 ${
-                    language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70'
+                    language === 'en' ? 'ring-2 ring-ring' : 'opacity-70'
                   }`}
                   title="English"
                 >
@@ -278,10 +278,10 @@ const Header = () => {
                 </Link>
                 {user ? (
                   <div className="space-y-2">
-                    <div className="px-2 py-2 text-sm font-medium text-gray-700">
+                    <div className="px-2 py-2 text-sm font-medium text-foreground">
                       {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
                     </div>
-                    <div className="px-2 text-xs text-gray-500">
+                    <div className="px-2 text-xs text-muted-foreground">
                       {user.email}
                     </div>
                     <Link to="/account" onClick={() => setIsMenuOpen(false)}>

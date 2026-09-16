@@ -439,7 +439,7 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-4 bg-white border border-stone-200 rounded-lg shadow-sm">
+      <div className="flex flex-wrap items-center gap-2 p-4 bg-white border border-border rounded-lg shadow-sm">
         <div className="flex items-center gap-1">
           {tools.map((tool) => (
             <Button
@@ -550,7 +550,7 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
         {/* Canvas */}
         <div 
           ref={containerRef}
-          className="flex-1 border-2 border-stone-200 rounded-xl overflow-hidden bg-white"
+          className="flex-1 border-2 border-border rounded-xl overflow-hidden bg-white"
           onClick={handleCanvasClick}
         >
           <canvas ref={canvasRef} className="w-full" />
@@ -639,9 +639,9 @@ const FloorPlanEditor = ({ rooms, propertyId, savedFloorPlan, onSave }: FloorPla
                 <p className="text-sm text-muted-foreground">
                   Selecciona un elemento para ver sus propiedades
                 </p>
-                <div className="text-xs text-left bg-stone-50 p-3 rounded-lg space-y-2">
-                  <p className="font-medium text-stone-700">Cómo vincular habitaciones:</p>
-                  <ol className="list-decimal list-inside space-y-1 text-stone-600">
+                <div className="text-xs text-left bg-muted p-3 rounded-lg space-y-2">
+                  <p className="font-medium text-foreground">Cómo vincular habitaciones:</p>
+                  <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
                     <li>Selecciona la herramienta "Habitación"</li>
                     <li>Haz clic en el plano para crear un rectángulo</li>
                     <li>Selecciona el rectángulo creado</li>

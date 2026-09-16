@@ -18,7 +18,7 @@ import { trackListingEvent } from '@/utils/analyticsEvents';
 import { fetchSeekerLikes, seekerLike, getSeekerToken } from '@/utils/roomieSeeker';
 
 const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="flex justify-between gap-4 py-1.5 border-b border-stone-100 last:border-0 text-sm">
+  <div className="flex justify-between gap-4 py-1.5 border-b border-border last:border-0 text-sm">
     <span className="text-muted-foreground">{label}</span>
     <span className="font-medium text-right">{value}</span>
   </div>
@@ -27,7 +27,7 @@ const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
 const Gallery = ({ images, alt }: { images: string[]; alt: string }) => (
   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
     {images.map((src, i) => (
-      <a key={i} href={src} target="_blank" rel="noreferrer" className="block aspect-[4/3] bg-stone-100 rounded-lg overflow-hidden">
+      <a key={i} href={src} target="_blank" rel="noreferrer" className="block aspect-[4/3] bg-muted rounded-lg overflow-hidden">
         <img src={src} alt={`${alt} ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" loading="lazy" />
       </a>
     ))}
@@ -76,24 +76,24 @@ const RoomieListingDetail = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-stone-50"><Header /><p className="text-center py-20 text-muted-foreground">Cargando...</p><Footer /></div>;
-  if (!listing) return <div className="min-h-screen bg-stone-50"><Header /><p className="text-center py-20">Anuncio no encontrado.</p><Footer /></div>;
+  if (loading) return <div className="min-h-screen bg-muted"><Header /><p className="text-center py-20 text-muted-foreground">Cargando...</p><Footer /></div>;
+  if (!listing) return <div className="min-h-screen bg-muted"><Header /><p className="text-center py-20">Anuncio no encontrado.</p><Footer /></div>;
 
   const bills = includedBills(listing);
   const yn = (v: boolean) => (v ? <Check className="w-4 h-4 text-green-600 inline" /> : <X className="w-4 h-4 text-red-500 inline" />);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-muted">
       <Header />
       <main className="container mx-auto px-6 py-8">
-        <Link to="/roomie-finder" className="inline-flex items-center text-sm text-muted-foreground hover:text-stone-800 mb-6">
+        <Link to="/roomie-finder" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="w-4 h-4 mr-1" /> Volver a Roomie Finder
         </Link>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <h1 className="text-3xl font-bold text-stone-800">{listing.title}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{listing.title}</h1>
               <p className="text-muted-foreground flex items-center gap-1 mt-2">
                 <MapPin className="w-4 h-4" />{listing.address}, {listing.municipality} ({listing.province})
               </p>
@@ -124,7 +124,7 @@ const RoomieListingDetail = () => {
                 <Row label="Hay mascotas" value={yn(listing.has_pets)} />
                 <Row label="Se admiten mascotas" value={yn(listing.pets_allowed)} />
                 <Row label="Idiomas" value={listing.languages?.join(', ') || '—'} />
-                {listing.atmosphere && <p className="pt-3 text-sm text-stone-700 whitespace-pre-line">{listing.atmosphere}</p>}
+                {listing.atmosphere && <p className="pt-3 text-sm text-foreground whitespace-pre-line">{listing.atmosphere}</p>}
               </CardContent>
             </Card>
 

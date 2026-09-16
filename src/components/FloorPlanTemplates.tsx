@@ -326,19 +326,19 @@ const FloorPlanTemplates = ({ onLoadTemplate }: FloorPlanTemplatesProps) => {
         {templates.map((template) => {
           const Icon = template.icon;
           return (
-            <div key={template.id} className="border border-stone-200 rounded-lg p-4 hover:bg-stone-50 transition-colors">
+            <div key={template.id} className="border border-border rounded-lg p-4 hover:bg-muted transition-colors">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-stone-600" />
+                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-stone-900">{template.name}</h4>
+                    <h4 className="font-medium text-foreground">{template.name}</h4>
                     <Badge variant="secondary" className="text-xs">
                       {template.roomCount} espacios
                     </Badge>
                   </div>
-                  <p className="text-sm text-stone-600 mb-3">{template.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
                   <Button
                     size="sm"
                     variant="outline"
