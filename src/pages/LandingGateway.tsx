@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BrandLogo from '@/components/BrandLogo';
+import LocationSearchOverlay from '@/components/LocationSearchOverlay';
 import gatewayHome from '@/assets/gateway-home.jpg';
 
 const LandingGateway = () => {
