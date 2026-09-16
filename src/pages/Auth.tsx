@@ -201,6 +201,7 @@ const Auth = () => {
     setFullName('');
     setUserType('particular');
     setCompanyName('');
+    setPhone('');
     setPlatform(roomieMode ? 'roomie' : 'nazari');
     setError('');
     setShowPassword(false);
@@ -316,8 +317,8 @@ const Auth = () => {
                       <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
                         <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
                         <p className="text-xs text-muted-foreground">
-                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Al enviar el formulario recibiremos
-                          tu solicitud y la revisaremos antes de activar la cuenta.
+                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Déjanos tu número de teléfono y
+                          correo electrónico y te contactaremos para validar los datos y activar tu cuenta.
                         </p>
                       </div>
                     ) : (
