@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import Reveal from "@/components/Reveal";
+import LocationSearchOverlay from "@/components/LocationSearchOverlay";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
 import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distanceCalculator";
@@ -18,6 +19,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationOpen, setLocationOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     address: string;
     lat: number;
@@ -239,22 +241,34 @@ const Index = () => {
                 </Button>
               </div>
               <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:gap-3 md:p-3">
-                <label className="relative flex-1">
-                  <span className="sr-only">Ubicación o referencia</span>
+                <div className="relative flex-1">
                   <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Ciudad, barrio o referencia"
-                    className="h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-base text-foreground outline-none ring-primary focus:ring-2 md:h-14"
-                  />
-                </label>
+                  <button
+                    type="button"
+                    onClick={() => setLocationOpen(true)}
+                    className={`h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-left text-base outline-none ring-primary focus:ring-2 md:h-14 ${searchQuery ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
+                    {searchQuery || 'Ciudad, barrio o referencia'}
+                  </button>
+                </div>
                 <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14">
                   <Search className="h-5 w-5" />
                   Buscar viviendas
                 </Button>
               </div>
             </form>
+            <LocationSearchOverlay
+              open={locationOpen}
+              initialValue={searchQuery}
+              onClose={() => setLocationOpen(false)}
+              onSelect={(value) => {
+                setSearchQuery(value);
+                setLocationOpen(false);
+                const params = new URLSearchParams({ operation: searchOperation });
+                if (value.trim()) params.set('q', value.trim());
+                navigate(`/properties?${params.toString()}`);
+              }}
+            />
           </Reveal>
         </div>
       </section>
