@@ -14,7 +14,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/inicio" className="flex items-center">
-              <BrandLogo />
+              <BrandLogo className="h-14 md:h-20" />
             </Link>
             <p className="text-primary-foreground/80 leading-relaxed">
               {t('footer.company_description')}
