@@ -274,23 +274,47 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
 
       {mapMode ? (
         <div className="flex flex-1 flex-col gap-3 overflow-hidden p-5">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Radio</span>
-            <Select value={radius} onValueChange={setRadius}>
-              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {RADIUS_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            {!polygon && (
+              <>
+                <span className="text-sm text-muted-foreground">Radio</span>
+                <Select value={radius} onValueChange={setRadius}>
+                  <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                  <SelectContent className="z-[300]" position="popper">
+                    {RADIUS_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+            <Button
+              type="button"
+              size="sm"
+              variant={drawMode ? 'default' : 'outline'}
+              onClick={() => setDrawMode((v) => !v)}
+              className="ml-auto gap-2"
+            >
+              <Pencil className="h-4 w-4" />
+              {drawMode ? 'Dibujando…' : 'Dibujar zona'}
+            </Button>
+            {polygon && (
+              <Button type="button" size="sm" variant="ghost" onClick={clearDrawing}>Borrar</Button>
+            )}
           </div>
           <div ref={mapRef} className="min-h-[280px] flex-1 overflow-hidden rounded-lg border" />
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              {picked ? picked.label : 'Toca el mapa para elegir una zona'}
+              {drawMode
+                ? 'Dibuja con el dedo el contorno de la zona'
+                : picked
+                  ? polygon ? `Zona dibujada · ${picked.label}` : picked.label
+                  : 'Toca el mapa o dibuja tu zona'}
             </p>
-            <Button disabled={!picked} onClick={() => picked && onSelect({ ...picked, radius: Number(radius) })}>
+            <Button
+              disabled={!picked}
+              onClick={() => picked && onSelect({ ...picked, radius: Number(radius), ...(polygon ? { polygon } : {}) })}
+            >
               Aplicar zona
             </Button>
           </div>
