@@ -2,8 +2,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Home, KeyRound, MapPin, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BrandLogo from '@/components/BrandLogo';
 import gatewayHome from '@/assets/gateway-home.jpg';
-import logo from '@/assets/pisogo-wordmark.webp.asset.json';
 
 const LandingGateway = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const LandingGateway = () => {
   return <div className="min-h-screen bg-secondary text-foreground">
     <header className="relative z-30 border-b border-primary/15 bg-primary">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
-        <img src={logo.url} alt="PisoGo" className="h-12 w-auto" />
+        <BrandLogo />
         <nav className="hidden items-center gap-7 text-sm font-semibold text-primary-foreground md:flex">
           <Link to="/properties?operation=sale" className="hover:text-accent">Comprar</Link>
           <Link to="/properties?operation=rent" className="hover:text-accent">Alquilar</Link>

@@ -2,7 +2,7 @@
 import { Mail, Phone, MapPin, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import logo from "@/assets/pisogo-wordmark.webp.asset.json";
+import BrandLogo from "@/components/BrandLogo";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -14,21 +14,17 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/inicio" className="flex items-center">
-              <img 
-                src={logo.url}
-                alt="PisoGo"
-                className="h-12 w-auto"
-              />
+              <BrandLogo />
             </Link>
             <p className="text-gray-300 leading-relaxed">
               {t('footer.company_description')}
             </p>
             <div className="flex space-x-4">
               <a href="https://www.instagram.com/nazarihomes" target="_blank" rel="noopener noreferrer">
-                <Instagram className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" />
+                <Instagram className="h-5 w-5 text-primary-foreground/70 hover:text-accent cursor-pointer transition-colors" />
               </a>
               <a href="https://www.tiktok.com/@nazari.homes" target="_blank" rel="noopener noreferrer">
-                <svg className="h-5 w-5 text-gray-300 hover:text-stone-300 cursor-pointer transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-5 w-5 text-primary-foreground/70 hover:text-accent cursor-pointer transition-colors" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.72a8.19 8.19 0 0 0 4.76 1.52V6.79a4.84 4.84 0 0 1-1-.1z"/>
                 </svg>
               </a>

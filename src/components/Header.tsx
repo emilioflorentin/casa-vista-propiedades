@@ -13,7 +13,7 @@ import {
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import logo from "@/assets/pisogo-wordmark.webp.asset.json";
+import BrandLogo from "@/components/BrandLogo";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,7 +27,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <img src={logo.url} alt="PisoGo" className="h-12 w-auto" />
+              <BrandLogo />
           </Link>
 
           {/* Desktop Navigation */}
@@ -112,11 +112,11 @@ const Header = () => {
             </Link>
             
             {/* Language Flags */}
-            <div className="flex items-center space-x-2 ml-4 border-l border-stone-200 pl-4">
+            <div className="flex items-center space-x-2 ml-4 border-l border-primary-foreground/20 pl-4">
               <button
                 onClick={() => setLanguage('es')}
                 className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
-                  language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                  language === 'es' ? 'ring-2 ring-accent' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="Español"
               >
@@ -130,7 +130,7 @@ const Header = () => {
               <button
                 onClick={() => setLanguage('en')}
                 className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
-                  language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                  language === 'en' ? 'ring-2 ring-accent' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="English"
               >
@@ -182,42 +182,42 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/inicio" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.home')}
               </Link>
               <Link 
                 to="/properties" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.properties')}
               </Link>
               <Link 
                 to="/roomie-finder" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Roomie Finder
               </Link>
               <Link 
                 to="/services" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.services')}
               </Link>
               <Link 
                 to="/about" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.about')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-gray-700 hover:text-stone-700 font-medium transition-colors"
+                className="text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.contact')}
@@ -264,9 +264,9 @@ const Header = () => {
                 </button>
               </div>
               
-              <div className="flex flex-col space-y-2 pt-4 border-t border-stone-200">
+              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
                 <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full relative">
+                  <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full relative">
                     <Heart className="h-4 w-4 mr-2" />
                     {t('nav.favorites')}
                     {favorites.length > 0 && (
@@ -285,7 +285,7 @@ const Header = () => {
                       {user.email}
                     </div>
                     <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full">
+                      <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
                         <User className="h-4 w-4 mr-2" />
                         Mi Perfil
                       </Button>
@@ -305,14 +305,14 @@ const Header = () => {
                   </div>
                 ) : (
                   <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm" className="justify-start text-gray-700 hover:text-stone-700 hover:bg-stone-50 w-full">
+                    <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
                       <User className="h-4 w-4 mr-2" />
                       {t('nav.account')}
                     </Button>
                   </Link>
                 )}
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                  <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white justify-start">
+                  <Button size="sm" className="justify-start">
                     <Phone className="h-4 w-4" />
                   </Button>
                 </Link>
