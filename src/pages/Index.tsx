@@ -19,6 +19,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationOpen, setLocationOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     address: string;
     lat: number;
