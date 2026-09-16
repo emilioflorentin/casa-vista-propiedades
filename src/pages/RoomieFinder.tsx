@@ -25,6 +25,9 @@ const RoomieFinder = () => {
   const [hasProfile, setHasProfile] = useState(false);
   const exploreRef = useRef<HTMLDivElement>(null);
 
+  const [zone, setZone] = useState<string | null>(() => localStorage.getItem('roomie_zone'));
+  const [zoneQuery, setZoneQuery] = useState('');
+
   const [search, setSearch] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [onlyBillsIncluded, setOnlyBillsIncluded] = useState(false);
