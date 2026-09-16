@@ -247,7 +247,7 @@ const Properties = () => {
               />
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Select value={operation} onValueChange={setOperation}>
                 <SelectTrigger className="h-12 w-40 border-border">
                   <SelectValue placeholder={t('search.operation')} />
