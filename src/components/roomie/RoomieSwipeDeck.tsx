@@ -73,7 +73,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
         )}
 
         <div
-          className="absolute inset-0 rounded-2xl overflow-hidden bg-white shadow-2xl cursor-grab active:cursor-grabbing touch-none"
+          className="absolute inset-0 rounded-2xl overflow-hidden bg-white shadow-2xl cursor-grab active:cursor-grabbing touch-none flex flex-col"
           style={{
             transform: `translateX(${dx}px) rotate(${dx / 25}deg)`,
             transition: dragging ? 'none' : 'transform 180ms ease-out',
@@ -83,7 +83,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="relative h-[52%] md:h-[56%] bg-muted">
+          <div className="relative h-[52%] md:h-[56%] shrink-0 bg-muted">
             {cover ? (
               <img src={cover} alt={`Habitación en ${current.municipality}`} className="w-full h-full object-cover" draggable={false} />
             ) : (
