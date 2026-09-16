@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2 } from 'lucide-react';
+import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
 
-export interface LocationSelection extends GeocodedLocation { radius: number; }
+export interface LocationSelection extends GeocodedLocation {
+  radius: number;
+  polygon?: [number, number][];
+}
 
 interface LocationSearchOverlayProps {
   open: boolean;
@@ -30,10 +33,15 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const [mapMode, setMapMode] = useState(false);
   const [radius, setRadius] = useState('2000');
   const [picked, setPicked] = useState<GeocodedLocation | null>(null);
+  const [drawMode, setDrawMode] = useState(false);
+  const [polygon, setPolygon] = useState<[number, number][] | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const layerRefs = useRef<{ marker: any; circle: any }>({ marker: null, circle: null });
+  const leafletRef = useRef<any>(null);
+  const drawModeRef = useRef(false);
+  const drawPointsRef = useRef<[number, number][]>([]);
+  const layerRefs = useRef<{ marker: any; circle: any; shape: any }>({ marker: null, circle: null, shape: null });
 
   // Lock background scroll while the overlay is open
   useEffect(() => {
@@ -114,9 +122,12 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         attribution: '© OpenStreetMap',
       }).addTo(map);
       map.on('click', async (event: any) => {
+        if (drawModeRef.current) return;
         const { lat, lng } = event.latlng;
         if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
         if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
+        if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+        setPolygon(null);
         layerRefs.current.marker = L.marker([lat, lng]).addTo(map);
         layerRefs.current.circle = L.circle([lat, lng], {
           radius: parseInt(radius, 10),
@@ -130,18 +141,114 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           setPicked({ address: 'Zona seleccionada', label: 'Zona seleccionada', detail: '', lat, lng });
         }
       });
+
+      // Freehand drawing with finger / mouse
+      const container = map.getContainer();
+      const toLatLng = (event: PointerEvent): [number, number] => {
+        const rect = container.getBoundingClientRect();
+        const point = L.point(event.clientX - rect.left, event.clientY - rect.top);
+        const ll = map.containerPointToLatLng(point);
+        return [ll.lat, ll.lng];
+      };
+      const onDown = (event: PointerEvent) => {
+        if (!drawModeRef.current) return;
+        event.preventDefault();
+        container.setPointerCapture?.(event.pointerId);
+        drawPointsRef.current = [toLatLng(event)];
+        if (layerRefs.current.shape) map.removeLayer(layerRefs.current.shape);
+        layerRefs.current.shape = L.polyline(drawPointsRef.current, { color: '#C9A227', weight: 3 }).addTo(map);
+      };
+      const onMove = (event: PointerEvent) => {
+        if (!drawModeRef.current || drawPointsRef.current.length === 0) return;
+        event.preventDefault();
+        drawPointsRef.current.push(toLatLng(event));
+        layerRefs.current.shape?.setLatLngs(drawPointsRef.current);
+      };
+      const onUp = async (event: PointerEvent) => {
+        if (!drawModeRef.current || drawPointsRef.current.length === 0) return;
+        container.releasePointerCapture?.(event.pointerId);
+        const points = drawPointsRef.current;
+        drawPointsRef.current = [];
+        if (points.length < 3) {
+          if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+          return;
+        }
+        if (layerRefs.current.shape) map.removeLayer(layerRefs.current.shape);
+        layerRefs.current.shape = L.polygon(points, {
+          color: '#C9A227',
+          fillColor: '#C9A227',
+          fillOpacity: 0.18,
+          weight: 3,
+        }).addTo(map);
+        if (layerRefs.current.marker) { map.removeLayer(layerRefs.current.marker); layerRefs.current.marker = null; }
+        if (layerRefs.current.circle) { map.removeLayer(layerRefs.current.circle); layerRefs.current.circle = null; }
+        setPolygon(points);
+        const center = layerRefs.current.shape.getBounds().getCenter();
+        try {
+          setPicked(await reverseSpanishLocation(center.lat, center.lng));
+        } catch {
+          setPicked({ address: 'Zona dibujada', label: 'Zona dibujada', detail: '', lat: center.lat, lng: center.lng });
+        }
+      };
+      container.addEventListener('pointerdown', onDown);
+      container.addEventListener('pointermove', onMove);
+      container.addEventListener('pointerup', onUp);
+      container.addEventListener('pointercancel', onUp);
+      (map as any)._pisogoCleanup = () => {
+        container.removeEventListener('pointerdown', onDown);
+        container.removeEventListener('pointermove', onMove);
+        container.removeEventListener('pointerup', onUp);
+        container.removeEventListener('pointercancel', onUp);
+      };
+
+      leafletRef.current = L;
       mapInstance.current = map;
       setTimeout(() => map.invalidateSize(), 150);
     })();
     return () => {
       disposed = true;
       if (mapInstance.current) {
+        (mapInstance.current as any)._pisogoCleanup?.();
         mapInstance.current.remove();
         mapInstance.current = null;
-        layerRefs.current = { marker: null, circle: null };
+        layerRefs.current = { marker: null, circle: null, shape: null };
       }
+      drawPointsRef.current = [];
+      setPolygon(null);
+      setDrawMode(false);
+      drawModeRef.current = false;
     };
   }, [mapMode]);
+
+  // Toggle map dragging while drawing
+  useEffect(() => {
+    drawModeRef.current = drawMode;
+    const map = mapInstance.current;
+    if (!map) return;
+    if (drawMode) {
+      map.dragging.disable();
+      map.doubleClickZoom.disable();
+      map.touchZoom.disable();
+      map.getContainer().style.cursor = 'crosshair';
+      map.getContainer().style.touchAction = 'none';
+    } else {
+      map.dragging.enable();
+      map.doubleClickZoom.enable();
+      map.touchZoom.enable();
+      map.getContainer().style.cursor = '';
+      map.getContainer().style.touchAction = '';
+    }
+  }, [drawMode, mapMode]);
+
+  const clearDrawing = () => {
+    const map = mapInstance.current;
+    if (map && layerRefs.current.shape) {
+      map.removeLayer(layerRefs.current.shape);
+      layerRefs.current.shape = null;
+    }
+    setPolygon(null);
+    setPicked(null);
+  };
 
   useEffect(() => {
     if (layerRefs.current.circle) layerRefs.current.circle.setRadius(Number(radius));
@@ -167,23 +274,47 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
 
       {mapMode ? (
         <div className="flex flex-1 flex-col gap-3 overflow-hidden p-5">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Radio</span>
-            <Select value={radius} onValueChange={setRadius}>
-              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {RADIUS_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            {!polygon && (
+              <>
+                <span className="text-sm text-muted-foreground">Radio</span>
+                <Select value={radius} onValueChange={setRadius}>
+                  <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                  <SelectContent className="z-[300]" position="popper">
+                    {RADIUS_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+            <Button
+              type="button"
+              size="sm"
+              variant={drawMode ? 'default' : 'outline'}
+              onClick={() => setDrawMode((v) => !v)}
+              className="ml-auto gap-2"
+            >
+              <Pencil className="h-4 w-4" />
+              {drawMode ? 'Dibujando…' : 'Dibujar zona'}
+            </Button>
+            {polygon && (
+              <Button type="button" size="sm" variant="ghost" onClick={clearDrawing}>Borrar</Button>
+            )}
           </div>
           <div ref={mapRef} className="min-h-[280px] flex-1 overflow-hidden rounded-lg border" />
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              {picked ? picked.label : 'Toca el mapa para elegir una zona'}
+              {drawMode
+                ? 'Dibuja con el dedo el contorno de la zona'
+                : picked
+                  ? polygon ? `Zona dibujada · ${picked.label}` : picked.label
+                  : 'Toca el mapa o dibuja tu zona'}
             </p>
-            <Button disabled={!picked} onClick={() => picked && onSelect({ ...picked, radius: Number(radius) })}>
+            <Button
+              disabled={!picked}
+              onClick={() => picked && onSelect({ ...picked, radius: Number(radius), ...(polygon ? { polygon } : {}) })}
+            >
               Aplicar zona
             </Button>
           </div>
@@ -214,7 +345,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             <span className="text-sm font-medium text-foreground">Buscar en un radio de</span>
             <Select value={radius} onValueChange={setRadius}>
               <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-              <SelectContent>{RADIUS_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+              <SelectContent className="z-[300]" position="popper">{RADIUS_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
             </Select>
           </div>
 

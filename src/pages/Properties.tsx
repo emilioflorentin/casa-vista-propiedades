@@ -58,6 +58,20 @@ const Properties = () => {
   const searchLongitude = Number(searchParams.get("lng"));
   const searchRadius = Number(searchParams.get("radius"));
   const hasRadiusSearch = Number.isFinite(searchLatitude) && Number.isFinite(searchLongitude) && searchRadius > 0;
+  const searchPolygon = (searchParams.get("poly") || "")
+    .split(";")
+    .map((pair) => pair.split(",").map(Number) as [number, number])
+    .filter(([la, ln]) => Number.isFinite(la) && Number.isFinite(ln));
+  const hasPolygonSearch = searchPolygon.length >= 3;
+  const isInsidePolygon = (lat: number, lng: number) => {
+    let inside = false;
+    for (let i = 0, j = searchPolygon.length - 1; i < searchPolygon.length; j = i++) {
+      const [yi, xi] = searchPolygon[i];
+      const [yj, xj] = searchPolygon[j];
+      if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
   const [propertyType, setPropertyType] = useState("all");
   const [operation, setOperation] = useState(() => {
     const requestedOperation = searchParams.get("operation");
@@ -195,8 +209,11 @@ const Properties = () => {
 
   const filteredProperties = allCombinedProperties.filter((property) => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch = hasRadiusSearch
-      ? Number.isFinite(property.latitude) && Number.isFinite(property.longitude) &&
+    const hasCoords = Number.isFinite(property.latitude) && Number.isFinite(property.longitude);
+    const matchesSearch = hasPolygonSearch
+      ? hasCoords && isInsidePolygon(Number(property.latitude), Number(property.longitude))
+      : hasRadiusSearch
+      ? hasCoords &&
         calculateDistance(searchLatitude, searchLongitude, Number(property.latitude), Number(property.longitude)) <= searchRadius
       : property.title.toLowerCase().includes(q) ||
         property.location.toLowerCase().includes(q) ||
@@ -469,7 +486,9 @@ const Properties = () => {
               {filteredProperties.length} {t('properties.page_title')}
             </h1>
             <p className="text-primary mt-1">
-              {hasRadiusSearch
+              {hasPolygonSearch
+                ? `Viviendas dentro de la zona que has dibujado`
+                : hasRadiusSearch
                 ? `Viviendas a menos de ${searchRadius >= 1000 ? `${searchRadius / 1000} km` : `${searchRadius} m`} de ${searchQuery}`
                 : t('properties.results_subtitle')}
             </p>
