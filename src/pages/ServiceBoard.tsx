@@ -325,8 +325,9 @@ const ServiceBoard = () => {
       if (tasksData) {
         setInternalTasks(tasksData.map((t: any) => ({ ...t, _isInternal: true as const })));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading data:', error);
+      setLoadError(error?.message || 'No se ha podido cargar el panel.');
     } finally {
       setLoading(false);
     }
