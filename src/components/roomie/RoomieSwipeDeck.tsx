@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, X, MapPin, Info } from 'lucide-react';
+import { Heart, X, MapPin, ArrowRight } from 'lucide-react';
 import { formatMoney, includedBills, SOCIAL_LEVELS, CLEANLINESS, SCHEDULES } from '@/utils/roomie';
 import type { RoomieListing } from './RoomieListingCard';
 import { trackListingEvent } from '@/utils/analyticsEvents';
@@ -14,9 +14,11 @@ interface Props {
 }
 
 export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
+  const navigate = useNavigate();
   const [dx, setDx] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startX = useRef(0);
+  const moved = useRef(false);
   const current = listings[0];
   const next = listings[1];
 
@@ -37,16 +39,24 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
 
   const onPointerDown = (e: React.PointerEvent) => {
     setDragging(true);
+    moved.current = false;
     startX.current = e.clientX;
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragging) return;
-    setDx(e.clientX - startX.current);
+    const delta = e.clientX - startX.current;
+    if (Math.abs(delta) > 8 || Math.abs(e.movementY) > 8) moved.current = true;
+    setDx(delta);
   };
   const onPointerUp = () => {
     if (!dragging) return;
     setDragging(false);
+    if (!moved.current) {
+      setDx(0);
+      navigate(`/roomie-finder/${current.id}`);
+      return;
+    }
     if (dx > 110) finish('like');
     else if (dx < -110) finish('skip');
     else setDx(0);
@@ -57,7 +67,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
 
   return (
     <div className="relative w-full max-w-md mx-auto select-none">
-      <div className="relative h-[560px]">
+      <div className="relative h-[470px] sm:h-[540px] md:h-[560px]">
         {next && (
           <div className="absolute inset-0 rounded-2xl bg-muted scale-95 translate-y-3 shadow-md overflow-hidden">
             {(next.room_images?.[0] || next.home_images?.[0]) && (
@@ -77,7 +87,7 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="relative h-[62%] bg-muted">
+          <div className="relative h-[55%] md:h-[62%] bg-muted">
             {cover ? (
               <img src={cover} alt={`Habitación en ${current.municipality}`} className="w-full h-full object-cover" draggable={false} />
             ) : (
@@ -108,9 +118,9 @@ export const RoomieSwipeDeck = ({ listings, onLike, onSkip }: Props) => {
               {bills.length > 0 ? `Gastos incluidos: ${bills.join(', ')}` : `Gastos aparte · ~${formatMoney(current.bills_estimate)}/mes`}
               {' · '}Fianza {formatMoney(current.deposit_amount)}
             </p>
-            <Link to={`/roomie-finder/${current.id}`} className="text-xs text-primary inline-flex items-center gap-1 hover:underline">
-              <Info className="w-3 h-3" /> Ver ficha completa
-            </Link>
+            <span className="pointer-events-none mt-1.5 flex w-full items-center justify-center gap-2 rounded-full bg-roomie-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform active:scale-[0.98]">
+              Ver ficha completa <ArrowRight className="h-4 w-4" />
+            </span>
           </div>
         </div>
       </div>
