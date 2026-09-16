@@ -9,12 +9,12 @@ const Footer = () => {
 
   return (
     <footer className="bg-primary text-primary-foreground">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-6 py-8 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/inicio" className="flex items-center">
-              <BrandLogo />
+              <BrandLogo className="h-14 md:h-20" />
             </Link>
             <p className="text-primary-foreground/80 leading-relaxed">
               {t('footer.company_description')}
@@ -119,7 +119,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/20 mt-12 pt-8 text-center">
+        <div className="border-t border-primary-foreground/20 mt-6 pt-5 text-center md:mt-12 md:pt-8">
           <p className="text-primary-foreground/80">
             {t('footer.copyright')}
           </p>
