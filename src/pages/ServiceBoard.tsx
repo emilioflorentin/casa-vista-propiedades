@@ -218,6 +218,7 @@ const ServiceBoard = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const { data: incidentsData, error: incidentsError } = await supabase
         .from('incidents')
