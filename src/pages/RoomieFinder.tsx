@@ -59,9 +59,39 @@ const RoomieFinder = () => {
     load();
   }, [user]);
 
+  const zones = useMemo(() => {
+    const map = new Map<string, { name: string; province: string; count: number }>();
+    listings.forEach((l) => {
+      const key = l.municipality?.trim();
+      if (!key) return;
+      const current = map.get(key.toLowerCase());
+      if (current) current.count += 1;
+      else map.set(key.toLowerCase(), { name: key, province: l.province, count: 1 });
+    });
+    return Array.from(map.values()).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  }, [listings]);
+
+  const visibleZones = useMemo(() => {
+    const q = zoneQuery.trim().toLowerCase();
+    if (!q) return zones;
+    return zones.filter((z) => `${z.name} ${z.province}`.toLowerCase().includes(q));
+  }, [zones, zoneQuery]);
+
+  const chooseZone = (name: string) => {
+    setZone(name);
+    localStorage.setItem('roomie_zone', name);
+  };
+
+  const clearZone = () => {
+    setZone(null);
+    localStorage.removeItem('roomie_zone');
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const z = zone?.trim().toLowerCase();
     return listings.filter((l) => {
+      if (z && `${l.municipality} ${l.province}`.toLowerCase().indexOf(z) === -1) return false;
       if (q && !(`${l.title} ${l.address} ${l.municipality} ${l.province}`.toLowerCase().includes(q))) return false;
       if (maxPrice && Number(l.rent_amount) > Number(maxPrice)) return false;
       if (onlyBillsIncluded && !l.bills_included) return false;
