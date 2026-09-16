@@ -11,6 +11,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RoomieHeader from '@/components/roomie/RoomieHeader';
 import RoomieFooter from '@/components/roomie/RoomieFooter';
+import { supabase } from '@/integrations/supabase/client';
+
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -142,43 +144,16 @@ const Auth = () => {
           }
         }
       } else if (isCompanyRequest) {
-        const fd = new FormData();
-        fd.append("Empresa", companyName);
-        fd.append("Persona de contacto", fullName);
-        fd.append("Email", email);
-        fd.append("Teléfono", phone);
-        fd.append("Tipo de cuenta", "Profesional / Empresa");
-        fd.append("_captcha", "false");
-        fd.append("_subject", "Solicitud de cuenta de empresa en PisoGo");
-        fd.append("_template", "table");
+        const { data, error: fnError } = await supabase.functions.invoke('company-request', {
+          body: {
+            companyName,
+            contactName: fullName,
+            email,
+            phone,
+          },
+        });
 
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 12000);
-        let sent = false;
-        try {
-          const res = await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
-            method: "POST",
-            body: fd,
-            signal: controller.signal,
-          });
-          sent = res.ok;
-        } catch {
-          // Fallback: envío sin lectura de respuesta (evita bloqueos por CORS/red lenta)
-          try {
-            await fetch("https://formsubmit.co/info@nazarihomes.com", {
-              method: "POST",
-              mode: "no-cors",
-              body: fd,
-            });
-            sent = true;
-          } catch {
-            sent = false;
-          }
-        } finally {
-          clearTimeout(timer);
-        }
-
-        if (!sent) {
+        if (fnError || !data?.ok) {
           setError('No hemos podido enviar la solicitud. Escríbenos a info@nazarihomes.com o inténtalo de nuevo.');
           setLoading(false);
           return;
@@ -187,6 +162,7 @@ const Auth = () => {
         alert('Hemos recibido tu solicitud de cuenta profesional. Te contactaremos por teléfono o correo para validar los datos de la empresa y activar tu cuenta.');
         setIsLogin(true);
         resetForm();
+
 
       } else {
         const { error } = await signUp(email, password, fullName, userType, companyName, platform);
@@ -362,8 +338,9 @@ const Auth = () => {
                       <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
                         <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
                         <p className="text-xs text-muted-foreground">
-                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Déjanos tu número de teléfono y
+                          Las cuentas de empresa tiene una tarificación especial. Déjanos tu número de teléfono y
                           correo electrónico y te contactaremos para validar los datos y activar tu cuenta.
+
                         </p>
                       </div>
                     ) : (
