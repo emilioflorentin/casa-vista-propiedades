@@ -355,7 +355,14 @@ const RoomieFinder = () => {
         </Tabs>
         )}
       </main>
+      <LocationSearchOverlay
+        open={mapOpen}
+        initialValue={area?.label || zone || ''}
+        onClose={() => setMapOpen(false)}
+        onSelect={chooseArea}
+      />
       <Footer />
+
     </div>
   );
 };
