@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
