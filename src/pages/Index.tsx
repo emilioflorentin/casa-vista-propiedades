@@ -257,6 +257,18 @@ const Index = () => {
                 </Button>
               </div>
             </form>
+            <LocationSearchOverlay
+              open={locationOpen}
+              initialValue={searchQuery}
+              onClose={() => setLocationOpen(false)}
+              onSelect={(value) => {
+                setSearchQuery(value);
+                setLocationOpen(false);
+                const params = new URLSearchParams({ operation: searchOperation });
+                if (value.trim()) params.set('q', value.trim());
+                navigate(`/properties?${params.toString()}`);
+              }}
+            />
           </Reveal>
         </div>
       </section>
