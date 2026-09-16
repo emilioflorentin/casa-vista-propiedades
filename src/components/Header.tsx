@@ -266,9 +266,9 @@ const Header = () => {
                 </button>
               </div>
               
-              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+              <div className="flex flex-col space-y-2 pt-4 border-t border-primary-foreground/10">
                 <Link to="/favorites" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full relative">
+                  <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full relative">
                     <Heart className="h-4 w-4 mr-2" />
                     {t('nav.favorites')}
                     {favorites.length > 0 && (
@@ -280,18 +280,19 @@ const Header = () => {
                 </Link>
                 {user ? (
                   <div className="space-y-2">
-                    <div className="px-2 py-2 text-sm font-medium text-foreground">
+                    <div className="px-2 py-2 text-sm font-medium text-primary-foreground">
                       {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
                     </div>
-                    <div className="px-2 text-xs text-muted-foreground">
+                    <div className="px-2 text-xs text-primary-foreground/60">
                       {user.email}
                     </div>
                     <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="justify-start text-foreground hover:text-primary hover:bg-secondary w-full">
+                      <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
                         <User className="h-4 w-4 mr-2" />
                         Mi Perfil
                       </Button>
                     </Link>
+
                     <Button 
                       variant="ghost" 
                       size="sm" 
