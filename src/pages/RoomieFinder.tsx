@@ -131,12 +131,65 @@ const RoomieFinder = () => {
         <RoomieIntro onStart={() => exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
 
         <div ref={exploreRef} className="scroll-mt-24 mt-10 md:mt-2 mb-5 md:mb-8">
-          <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">Explora habitaciones</h2>
+          <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">
+            {zone ? `Habitaciones en ${zone}` : '¿En qué zona estás interesada?'}
+          </h2>
           <p className="text-sm md:text-base text-roomie-ink/60 mt-1 md:mt-2 max-w-2xl">
-            Descubre una a una o consulta el listado completo con filtros.
+            {zone
+              ? 'Descubre una a una o consulta el listado completo con filtros.'
+              : 'Elige una zona para ver solo las habitaciones disponibles allí.'}
           </p>
+          {zone && (
+            <Button variant="outline" size="sm" className="mt-3" onClick={clearZone}>
+              <MapPin className="w-4 h-4 mr-2" />Cambiar zona
+            </Button>
+          )}
         </div>
 
+        {!zone ? (
+          <div className="bg-white rounded-xl border p-4 md:p-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="roomie-zone">Busca tu zona</Label>
+              <Input
+                id="roomie-zone"
+                value={zoneQuery}
+                onChange={(e) => setZoneQuery(e.target.value)}
+                placeholder="Granada, Jaén, Albolote..."
+              />
+            </div>
+
+            {loading ? (
+              <p className="text-center text-muted-foreground py-10">Cargando zonas...</p>
+            ) : visibleZones.length === 0 ? (
+              <div className="py-8 text-center space-y-3">
+                <p className="text-muted-foreground">No hay habitaciones publicadas en esa zona.</p>
+                {zoneQuery.trim() && (
+                  <Button variant="outline" onClick={() => chooseZone(zoneQuery.trim())}>
+                    Buscar igualmente en "{zoneQuery.trim()}"
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {visibleZones.map((z) => (
+                  <button
+                    key={z.name}
+                    onClick={() => chooseZone(z.name)}
+                    className="text-left rounded-xl border bg-roomie-sand/60 hover:bg-roomie-sand p-4 transition-colors"
+                  >
+                    <span className="flex items-center gap-2 font-semibold text-roomie-ink">
+                      <MapPin className="w-4 h-4 text-roomie-green" />
+                      {z.name}
+                    </span>
+                    <span className="block text-sm text-roomie-ink/60 mt-1">
+                      {z.province} · {z.count} {z.count === 1 ? 'habitación' : 'habitaciones'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
         <Tabs defaultValue="discover">
           <TabsList className="mb-6">
             <TabsTrigger value="discover"><Sparkles className="w-4 h-4 mr-2" />Descubrir</TabsTrigger>
