@@ -182,8 +182,8 @@ const Index = () => {
               { icon: Camera, key: "step2", delay: 120 },
               { icon: MessageCircle, key: "step3", delay: 240 },
             ].map(({ icon: Icon, key, delay }) => (
-              <Reveal key={key} delay={delay} className="text-center">
-                <div className="bg-secondary/90 rounded-lg p-3 md:rounded-xl md:p-5 transition-colors hover:bg-accent/20">
+              <Reveal key={key} delay={delay} className="text-center h-full">
+                <div className="bg-secondary/90 rounded-lg p-3 md:rounded-xl md:p-5 transition-colors hover:bg-accent/20 h-full flex flex-col items-center justify-center">
                   <Icon className="h-5 w-5 text-primary mx-auto mb-1.5 md:h-7 md:w-7 md:mb-2" />
                   <p className="text-xs md:text-sm font-semibold text-foreground leading-tight">
                     {t(`tenant_section.${key}_title`)}
