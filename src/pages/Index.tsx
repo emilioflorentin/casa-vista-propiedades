@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Home, Key, Zap, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,30 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import LocationSearchOverlay from "@/components/LocationSearchOverlay";
+import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalProperties } from "@/utils/localProperties";
+import { calculateDistance } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
+
+interface FeaturedProperty {
+  id: number;
+  originalId?: string;
+  reference: string;
+  title: string;
+  type: string;
+  price: number;
+  currency: string;
+  operation: "rent" | "sale";
+  location: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  image: string;
+  features?: string[];
+  managedBy: "nazari" | "other";
+  distanceKm: number | null;
+}
 
 const Index = () => {
   const { t } = useLanguage();
@@ -19,6 +40,116 @@ const Index = () => {
   const [locationError, setLocationError] = useState(false);
   const [propertyCount, setPropertyCount] = useState(0);
   const [showMore, setShowMore] = useState(false);
+  const [geoPermission, setGeoPermission] = useState<'unknown' | 'granted' | 'prompt' | 'denied' | 'unsupported'>('unknown');
+  const [featuredProperties, setFeaturedProperties] = useState<FeaturedProperty[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
+  const userCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  // Track geolocation permission; featured section only shows when granted
+  useEffect(() => {
+    if (!('permissions' in navigator)) {
+      setGeoPermission('unsupported');
+      return;
+    }
+    let status: PermissionStatus | null = null;
+    const handleChange = () => {
+      if (status) setGeoPermission(status.state as 'granted' | 'prompt' | 'denied');
+    };
+    navigator.permissions
+      .query({ name: 'geolocation' as PermissionName })
+      .then((s) => {
+        status = s;
+        handleChange();
+        s.addEventListener('change', handleChange);
+      })
+      .catch(() => setGeoPermission('unsupported'));
+    return () => status?.removeEventListener('change', handleChange);
+  }, []);
+
+  // Ask for location permission on entry; if granted, the permission listener
+  // above flips the state and the featured section loads. If denied, it never shows.
+  useEffect(() => {
+    if (geoPermission === 'prompt' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(() => {}, () => {}, { timeout: 15000 });
+    }
+  }, [geoPermission]);
+
+
+  // Load featured properties only when location permission has been granted
+  useEffect(() => {
+    if (geoPermission !== 'granted') return;
+    let cancelled = false;
+
+    const load = async () => {
+      setFeaturedLoading(true);
+      try {
+        // Best-effort position; featured still loads if the browser refuses
+        await new Promise<void>((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              userCoordsRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+              resolve();
+            },
+            () => resolve(),
+            { timeout: 8000, maximumAge: 600000 }
+          );
+        });
+        if (cancelled) return;
+
+        const [propsRes, profilesRes] = await Promise.all([
+          supabase
+            .from('properties')
+            .select('*')
+            .or('is_rented.is.null,is_rented.eq.false')
+            .order('created_at', { ascending: false })
+            .limit(24),
+          supabase.from('profiles').select('id, email'),
+        ]);
+        if (cancelled || propsRes.error || !propsRes.data) return;
+
+        const emails = new Map<string, string>(
+          (profilesRes.data || []).map((p: { id: string; email: string | null }) => [p.id, p.email || ''])
+        );
+        const coords = userCoordsRef.current;
+
+        const mapped: FeaturedProperty[] = propsRes.data.map((prop: any) => ({
+          id: parseInt(prop.id.slice(-8), 16),
+          originalId: prop.id,
+          reference: prop.reference,
+          title: prop.title,
+          type: prop.type,
+          price: prop.price,
+          currency: prop.currency,
+          operation: prop.operation,
+          location: prop.location,
+          bedrooms: prop.bedrooms,
+          bathrooms: prop.bathrooms,
+          area: prop.area,
+          image: prop.image ? prop.image.split(',')[0].trim() : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3",
+          features: prop.features || [],
+          managedBy: (emails.get(prop.user_id)?.endsWith('@nazarihomes.com') ? 'nazari' : 'other') as 'nazari' | 'other',
+          distanceKm:
+            coords && prop.latitude != null && prop.longitude != null
+              ? calculateDistance(coords.lat, coords.lng, prop.latitude, prop.longitude)
+              : null,
+        }));
+
+        // Closest first (properties without coordinates keep their recency order at the end)
+        mapped.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
+        if (!cancelled) setFeaturedProperties(mapped.slice(0, 6));
+      } catch (error) {
+        console.error('Error loading featured properties:', error);
+      } finally {
+        if (!cancelled) setFeaturedLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [geoPermission]);
+
 
   // Load property count for the stats section
   useEffect(() => {
@@ -166,6 +297,42 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Properties — only when geolocation permission is granted */}
+      {geoPermission === 'granted' && (
+        <section className="py-10 md:py-16 bg-secondary">
+          <div className="container mx-auto px-6">
+            <Reveal className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-2">{t("properties.featured")}</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">{t("properties.featured_desc")}</p>
+            </Reveal>
+
+            {featuredLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            ) : featuredProperties.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {featuredProperties.map((property, i) => (
+                    <Reveal key={property.originalId ?? property.id} delay={i * 80}>
+                      <PropertyCard property={property} />
+                    </Reveal>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <Link to="/properties">
+                    <Button variant="outline" size="lg">
+                      {t("properties.view_all")}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </section>
+      )}
 
       {/* Tenant Section */}
       <section className="py-8 md:py-14 bg-primary text-primary-foreground">
