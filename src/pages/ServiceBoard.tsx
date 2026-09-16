@@ -1152,6 +1152,23 @@ const ServiceBoard = () => {
     );
   }
 
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center space-y-4">
+          <p className="text-foreground font-semibold">No se ha podido cargar el panel de servicios</p>
+          <p className="text-sm text-muted-foreground">{loadError}</p>
+          <Button onClick={loadData}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reintentar
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   const renderCostLinesEditor = (onSave: () => void) => {
     const totals = sumLines(costLines);
     const profit = totals.charge - totals.repair - totals.materials;
