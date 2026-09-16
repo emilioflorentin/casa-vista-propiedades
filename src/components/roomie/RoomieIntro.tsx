@@ -14,32 +14,32 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
   <section>
     {/* Hero */}
     <div className="grid lg:grid-cols-[55%_45%] rounded-3xl overflow-hidden border border-roomie-ink/5 bg-roomie-sand">
-      <div className="flex items-center p-8 md:p-14">
+      <div className="p-5 md:p-14">
         <div className="max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-roomie-green/10 text-roomie-green text-xs font-bold">
             <span className="w-2 h-2 rounded-full bg-roomie-green" />
             UN SERVICIO DE PISOGO
           </div>
 
-          <h1 className="mt-7 text-4xl md:text-6xl font-bold text-roomie-ink leading-[1.02]">
+          <h1 className="mt-4 md:mt-7 text-3xl md:text-6xl font-bold text-roomie-ink leading-[1.05]">
             Encuentra tu compañero ideal de piso.
           </h1>
 
-          <p className="mt-6 text-lg text-roomie-ink/70 leading-relaxed">
+          <p className="mt-3 md:mt-6 text-base md:text-lg text-roomie-ink/70 leading-relaxed">
             Habitaciones con gastos claros y perfiles de convivencia reales. Sin registro para quien busca.
           </p>
 
-          <div className="mt-10 grid sm:grid-cols-2 gap-4">
+          <div className="mt-5 md:mt-10 grid sm:grid-cols-2 gap-3 md:gap-4">
             <Button
               onClick={onStart}
-              className="w-full h-auto py-5 rounded-2xl bg-roomie-green text-white text-base font-bold hover:bg-roomie-ink shadow-xl shadow-roomie-green/20"
+              className="w-full h-auto py-4 md:py-5 rounded-2xl bg-roomie-green text-white text-base font-bold hover:bg-roomie-ink shadow-xl shadow-roomie-green/20"
             >
               Busco habitación <Search className="w-5 h-5 ml-2" />
             </Button>
             <Link to="/roomie-finder/publicar" className="w-full">
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 rounded-2xl bg-white border-2 border-roomie-ink/10 text-roomie-ink text-base font-bold hover:border-roomie-gold"
+                className="w-full h-auto py-4 md:py-5 rounded-2xl bg-white border-2 border-roomie-ink/10 text-roomie-ink text-base font-bold hover:border-roomie-gold"
               >
                 Publico habitación <Plus className="w-5 h-5 ml-2 text-roomie-gold" />
               </Button>
@@ -48,7 +48,7 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
         </div>
       </div>
 
-      <div className="relative min-h-[320px] bg-roomie-ink">
+      <div className="relative min-h-[200px] md:min-h-[320px] bg-roomie-ink">
         <img
           src={heroImage}
           alt="Salón luminoso de un piso compartido"
@@ -57,13 +57,13 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
           className="w-full h-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-roomie-ink/70 via-transparent to-transparent" />
-        <div className="absolute bottom-6 left-6 right-6 bg-white p-5 rounded-2xl shadow-2xl border-l-4 border-roomie-gold flex items-center gap-4">
-          <div className="w-12 h-12 shrink-0 rounded-full bg-roomie-sand flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-roomie-green" />
+        <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 bg-white p-3 md:p-5 rounded-2xl shadow-2xl border-l-4 border-roomie-gold flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-roomie-sand flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-roomie-green" />
           </div>
           <div>
-            <h2 className="font-bold text-roomie-ink">Tu teléfono, privado</h2>
-            <p className="text-sm text-roomie-ink/60">Solo se comparte cuando las dos partes dicen que sí.</p>
+            <h2 className="font-bold text-sm md:text-base text-roomie-ink">Tu teléfono, privado</h2>
+            <p className="text-xs md:text-sm text-roomie-ink/60">Solo se comparte cuando las dos partes dicen que sí.</p>
           </div>
         </div>
       </div>
