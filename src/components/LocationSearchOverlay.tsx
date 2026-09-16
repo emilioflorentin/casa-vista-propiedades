@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
 
-export interface LocationSelection extends GeocodedLocation { radius: number; }
+export interface LocationSelection extends GeocodedLocation {
+  radius: number;
+  polygon?: [number, number][];
+}
 
 interface LocationSearchOverlayProps {
   open: boolean;
