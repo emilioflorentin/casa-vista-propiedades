@@ -182,46 +182,47 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/inicio" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.home')}
               </Link>
               <Link 
                 to="/properties" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.properties')}
               </Link>
               <Link 
                 to="/roomie-finder" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Roomie Finder
               </Link>
               <Link 
                 to="/services" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.services')}
               </Link>
               <Link 
                 to="/about" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.about')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-foreground hover:text-primary font-medium transition-colors"
+                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.contact')}
               </Link>
+
               
               {/* Mobile Language Flags */}
               <div className="flex items-center space-x-3 pt-2">
