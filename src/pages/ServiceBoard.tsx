@@ -227,6 +227,7 @@ const ServiceBoard = () => {
 
       if (incidentsError) {
         console.error('Error loading incidents:', incidentsError);
+        setLoadError(incidentsError.message || 'No se han podido cargar las incidencias.');
         return;
       }
 
