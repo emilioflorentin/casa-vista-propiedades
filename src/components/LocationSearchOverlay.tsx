@@ -345,7 +345,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             <span className="text-sm font-medium text-foreground">Buscar en un radio de</span>
             <Select value={radius} onValueChange={setRadius}>
               <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-              <SelectContent>{RADIUS_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+              <SelectContent className="z-[300]" position="popper">{RADIUS_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
             </Select>
           </div>
 
