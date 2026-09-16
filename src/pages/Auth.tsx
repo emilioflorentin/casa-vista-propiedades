@@ -420,8 +420,9 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
+                )}
 
-                {!isLogin && (
+                {!isLogin && !isCompanyRequest && (
                   <div className="space-y-2">
                     <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                       {t('account.confirmPassword')}
@@ -467,9 +468,9 @@ const Auth = () => {
                   className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium"
                   disabled={loading}
                 >
-                  {loading 
-                    ? (isLogin ? 'Iniciando sesión...' : 'Creando cuenta...') 
-                    : (isLogin ? t('account.loginButton') : t('account.registerButton'))
+                  {loading
+                    ? (isLogin ? 'Iniciando sesión...' : (isCompanyRequest ? 'Enviando solicitud...' : 'Creando cuenta...'))
+                    : (isLogin ? t('account.loginButton') : (isCompanyRequest ? 'Enviar solicitud' : t('account.registerButton')))
                   }
                 </Button>
               </form>
