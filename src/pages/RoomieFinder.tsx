@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Sparkles } from 'lucide-react';
+import { MapPin, Sparkles } from 'lucide-react';
 import { RoomieListingCard, type RoomieListing } from '@/components/roomie/RoomieListingCard';
 import { RoomieSwipeDeck } from '@/components/roomie/RoomieSwipeDeck';
 import RoomieIntro from '@/components/roomie/RoomieIntro';
