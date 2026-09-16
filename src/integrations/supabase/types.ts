@@ -379,7 +379,9 @@ export type Database = {
           id: string
           image: string | null
           is_rented: boolean
+          latitude: number | null
           location: string
+          longitude: number | null
           operation: string
           price: number
           reference: string
@@ -404,7 +406,9 @@ export type Database = {
           id?: string
           image?: string | null
           is_rented?: boolean
+          latitude?: number | null
           location: string
+          longitude?: number | null
           operation: string
           price: number
           reference: string
@@ -429,7 +433,9 @@ export type Database = {
           id?: string
           image?: string | null
           is_rented?: boolean
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           operation?: string
           price?: number
           reference?: string
