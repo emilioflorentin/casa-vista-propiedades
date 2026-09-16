@@ -20,6 +20,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [userType, setUserType] = useState('particular');
   const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
   const [platform, setPlatform] = useState('nazari');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,7 +52,25 @@ const Auth = () => {
     }
   }, [user, navigate, roomieMode]);
 
+  const isCompanyRequest = !isLogin && userType === 'empresa';
+
   const validateForm = () => {
+    if (isCompanyRequest) {
+      if (!fullName.trim() || !companyName.trim() || !email.trim() || !phone.trim()) {
+        setError('Por favor, completa todos los campos requeridos.');
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setError('Introduce un correo electrónico válido.');
+        return false;
+      }
+      if (!/^[+0-9][0-9\s-]{5,19}$/.test(phone.trim())) {
+        setError('Introduce un número de teléfono válido.');
+        return false;
+      }
+      return true;
+    }
+
     if (!email || !password) {
       setError('Por favor, completa todos los campos requeridos.');
       return false;
@@ -122,36 +141,33 @@ const Auth = () => {
             navigate('/account');
           }
         }
+      } else if (isCompanyRequest) {
+        const res = await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
+          method: "POST",
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            "Empresa": companyName,
+            "Persona de contacto": fullName,
+            "Email": email,
+            "Teléfono": phone,
+            "Tipo de cuenta": "Profesional / Empresa",
+            "_captcha": "false",
+            "_subject": "Solicitud de cuenta de empresa en PisoGo",
+            "_template": "table",
+          }),
+        });
+        if (!res.ok) throw new Error('mail failed');
+        alert('Hemos recibido tu solicitud de cuenta profesional. Te contactaremos por teléfono o correo para validar los datos de la empresa y activar tu cuenta.');
+        setIsLogin(true);
+        resetForm();
       } else {
-        const finalPlatform = userType === 'empresa' ? 'nazari' : platform;
-        const { error } = await signUp(email, password, fullName, userType, companyName, finalPlatform);
+        const { error } = await signUp(email, password, fullName, userType, companyName, platform);
         
         if (error) {
           setError(error);
         } else {
           setError('');
-          if (userType === 'empresa') {
-            try {
-              await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
-                method: "POST",
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  "Empresa": companyName,
-                  "Persona de contacto": fullName,
-                  "Email": email,
-                  "Tipo de cuenta": "Profesional / Empresa",
-                  "_captcha": "false",
-                  "_subject": "Solicitud de cuenta de empresa en PisoGo",
-                  "_template": "table",
-                }),
-              });
-            } catch (mailErr) {
-              console.error('No se pudo enviar la solicitud de cuenta de empresa', mailErr);
-            }
-            alert('Hemos recibido tu solicitud de cuenta profesional. Revisa tu email para confirmar la cuenta; te contactaremos para validar los datos de la empresa.');
-          } else {
-            alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
-          }
+          alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
           setIsLogin(true);
         }
       }
@@ -185,6 +201,7 @@ const Auth = () => {
     setFullName('');
     setUserType('particular');
     setCompanyName('');
+    setPhone('');
     setPlatform(roomieMode ? 'roomie' : 'nazari');
     setError('');
     setShowPassword(false);
@@ -296,12 +313,29 @@ const Auth = () => {
                         />
                       </div>
                     )}
+
+                    {userType === 'empresa' && (
+                      <div className="space-y-2">
+                        <label htmlFor="phone" className="text-sm font-medium text-foreground">
+                          Teléfono de contacto
+                        </label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="Ej. 600 123 456"
+                          required={userType === 'empresa'}
+                          className="h-12 border-border"
+                        />
+                      </div>
+                    )}
                     {userType === 'empresa' ? (
                       <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
                         <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
                         <p className="text-xs text-muted-foreground">
-                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Al enviar el formulario recibiremos
-                          tu solicitud y la revisaremos antes de activar la cuenta.
+                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Déjanos tu número de teléfono y
+                          correo electrónico y te contactaremos para validar los datos y activar tu cuenta.
                         </p>
                       </div>
                     ) : (
@@ -358,6 +392,7 @@ const Auth = () => {
                   />
                 </div>
 
+                {!isCompanyRequest && (
                 <div className="space-y-2">
                   <label htmlFor="password" className="text-sm font-medium text-foreground">
                     {t('account.password')}
@@ -385,8 +420,9 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
+                )}
 
-                {!isLogin && (
+                {!isLogin && !isCompanyRequest && (
                   <div className="space-y-2">
                     <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                       {t('account.confirmPassword')}
@@ -432,9 +468,9 @@ const Auth = () => {
                   className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium"
                   disabled={loading}
                 >
-                  {loading 
-                    ? (isLogin ? 'Iniciando sesión...' : 'Creando cuenta...') 
-                    : (isLogin ? t('account.loginButton') : t('account.registerButton'))
+                  {loading
+                    ? (isLogin ? 'Iniciando sesión...' : (isCompanyRequest ? 'Enviando solicitud...' : 'Creando cuenta...'))
+                    : (isLogin ? t('account.loginButton') : (isCompanyRequest ? 'Enviar solicitud' : t('account.registerButton')))
                   }
                 </Button>
               </form>
