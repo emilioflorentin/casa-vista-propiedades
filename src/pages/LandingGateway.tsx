@@ -10,6 +10,7 @@ const LandingGateway = () => {
   const navigate = useNavigate();
   const [operation, setOperation] = useState<'sale' | 'rent'>('sale');
   const [query, setQuery] = useState('');
+  const [locationOpen, setLocationOpen] = useState(false);
 
   useEffect(() => {
     document.title = 'PisoGo — Compra, alquila y vende viviendas';
