@@ -13,6 +13,7 @@ import {
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import logo from "@/assets/pisogo-wordmark.webp.asset.json";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,36 +22,32 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-stone-200">
+    <header className="bg-primary sticky top-0 z-50 border-b border-primary-foreground/10">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-            <img 
-              src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png" 
-              alt="Nazarí Homes" 
-              className="h-12 w-auto"
-            />
+              <img src={logo.url} alt="PisoGo" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/inicio" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/inicio" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
                {t('nav.home')}
              </Link>
-             <Link to="/properties" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+             <Link to="/properties" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               {t('nav.properties')}
             </Link>
-            <Link to="/roomie-finder" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/roomie-finder" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               Roomie Finder
             </Link>
-            <Link to="/services" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/services" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               {t('nav.services')}
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/about" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               {t('nav.about')}
             </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-stone-700 font-medium transition-colors">
+            <Link to="/contact" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               {t('nav.contact')}
             </Link>
           </nav>
@@ -58,7 +55,7 @@ const Header = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/favorites">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50 relative">
+               <Button variant="ghost" size="sm" className="text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 relative">
                 <Heart className="h-4 w-4 mr-2" />
                 {t('nav.favorites')}
                 {favorites.length > 0 && (
@@ -71,7 +68,7 @@ const Header = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                  <Button variant="ghost" size="sm" className="text-primary-foreground hover:text-accent hover:bg-primary-foreground/10">
                     <User className="h-4 w-4 mr-2" />
                     {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario'}
                   </Button>
@@ -102,14 +99,14 @@ const Header = () => {
               </DropdownMenu>
             ) : (
               <Link to="/account">
-                <Button variant="ghost" size="sm" className="text-gray-700 hover:text-stone-700 hover:bg-stone-50">
+                 <Button variant="ghost" size="sm" className="text-primary-foreground hover:text-accent hover:bg-primary-foreground/10">
                   <User className="h-4 w-4 mr-2" />
                   {t('nav.account')}
                 </Button>
               </Link>
             )}
             <Link to="/contact">
-              <Button size="sm" className="bg-stone-600 hover:bg-stone-700 text-white">
+               <Button size="sm" variant="secondary">
                 <Phone className="h-4 w-4" />
               </Button>
             </Link>
@@ -172,16 +169,16 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-gray-700" />
+              <X className="h-6 w-6 text-primary-foreground" />
             ) : (
-              <Menu className="h-6 w-6 text-gray-700" />
+              <Menu className="h-6 w-6 text-primary-foreground" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-stone-200">
+          <div className="md:hidden py-4 border-t border-primary-foreground/10 bg-primary">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/inicio" 

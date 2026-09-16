@@ -21,50 +21,50 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 30 20% 98%;
-    --foreground: 25 10% 20%;
+    --background: 120 6% 98%;
+    --foreground: 161 47% 16%;
 
-    --card: 30 25% 99%;
-    --card-foreground: 25 10% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 161 47% 16%;
 
-    --popover: 30 25% 99%;
-    --popover-foreground: 25 10% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 161 47% 16%;
 
-    --primary: 25 15% 65%;
-    --primary-foreground: 30 25% 98%;
+    --primary: 160 30% 36%;
+    --primary-foreground: 120 14% 97%;
 
-    --secondary: 28 25% 92%;
-    --secondary-foreground: 25 10% 25%;
+    --secondary: 120 11% 94%;
+    --secondary-foreground: 161 47% 16%;
 
-    --muted: 28 25% 92%;
-    --muted-foreground: 25 15% 55%;
+    --muted: 120 11% 94%;
+    --muted-foreground: 158 12% 42%;
 
-    --accent: 28 25% 92%;
-    --accent-foreground: 25 10% 25%;
+    --accent: 120 40% 72%;
+    --accent-foreground: 161 47% 16%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 30 25% 98%;
+    --destructive-foreground: 120 14% 97%;
 
-    --border: 28 20% 88%;
-    --input: 28 20% 88%;
-    --ring: 25 15% 65%;
+    --border: 145 12% 86%;
+    --input: 145 12% 86%;
+    --ring: 160 30% 36%;
 
     --radius: 0.5rem;
 
     /* Roomie Finder brand tokens */
-    --roomie-ink: 147 15% 14%;
-    --roomie-green: 146 26% 33%;
-    --roomie-sand: 48 22% 95%;
-    --roomie-gold: 46 68% 47%;
+    --roomie-ink: 161 47% 16%;
+    --roomie-green: 160 30% 36%;
+    --roomie-sand: 120 11% 94%;
+    --roomie-gold: 120 40% 72%;
 
-    --sidebar-background: 30 20% 98%;
-    --sidebar-foreground: 25 10% 25%;
-    --sidebar-primary: 25 15% 60%;
-    --sidebar-primary-foreground: 30 25% 98%;
-    --sidebar-accent: 28 25% 90%;
-    --sidebar-accent-foreground: 25 15% 35%;
-    --sidebar-border: 28 20% 85%;
-    --sidebar-ring: 25 20% 70%;
+    --sidebar-background: 120 11% 94%;
+    --sidebar-foreground: 161 47% 16%;
+    --sidebar-primary: 160 30% 36%;
+    --sidebar-primary-foreground: 120 14% 97%;
+    --sidebar-accent: 120 40% 72%;
+    --sidebar-accent-foreground: 161 47% 16%;
+    --sidebar-border: 145 12% 82%;
+    --sidebar-ring: 160 30% 36%;
   }
 
   .dark {

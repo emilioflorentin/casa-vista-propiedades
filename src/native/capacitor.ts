@@ -24,7 +24,7 @@ export const initNative = async (onDeepLink?: (path: string) => void) => {
   try {
     await StatusBar.setStyle({ style: Style.Dark });
     if (nativePlatform() === 'android') {
-      await StatusBar.setBackgroundColor({ color: '#0f2647' });
+      await StatusBar.setBackgroundColor({ color: '#163d35' });
     }
   } catch {
     /* status bar not available */

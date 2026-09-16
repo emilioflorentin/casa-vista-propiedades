@@ -1,123 +1,95 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowUpRight, Building2, Users } from 'lucide-react';
-import Reveal from '@/components/Reveal';
+import { FormEvent, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Building2, Home, KeyRound, MapPin, Search, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import gatewayHome from '@/assets/gateway-home.jpg';
+import logo from '@/assets/pisogo-wordmark.webp.asset.json';
 
 const LandingGateway = () => {
+  const navigate = useNavigate();
+  const [operation, setOperation] = useState<'sale' | 'rent'>('sale');
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
-    document.title = 'Nazarí Homes & Roomie Finder — ¿Qué estás buscando?';
+    document.title = 'PisoGo — Compra, alquila y vende viviendas';
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(
         'content',
-        'Elige tu camino: explora viviendas en Nazarí Homes o encuentra compañero de piso con Roomie Finder.'
+        'Encuentra viviendas en venta y alquiler, publica tu inmueble o busca compañero de piso con PisoGo.'
       );
     }
   }, []);
 
-  return (
-    <div className="min-h-screen bg-roomie-sand text-roomie-ink">
-      <header className="absolute inset-x-0 top-0 z-30 bg-roomie-sand/90 px-5 py-5 backdrop-blur-sm md:bg-transparent md:px-10 md:py-8 md:backdrop-blur-none">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <img
-            src="/lovable-uploads/dcb0aee9-6c77-42b4-ac43-890fb3993d1a.png"
-            alt="Nazarí Homes"
-            className="h-9 w-auto md:h-12"
-          />
-          <p className="hidden text-xs font-semibold uppercase tracking-widest text-roomie-ink/55 md:block">
-            Dos formas de encontrar tu lugar
-          </p>
+  const search = (event: FormEvent) => {
+    event.preventDefault();
+    const params = new URLSearchParams({ operation });
+    if (query.trim()) params.set('q', query.trim());
+    navigate(`/properties?${params.toString()}`);
+  };
+
+  return <div className="min-h-screen bg-secondary text-foreground">
+    <header className="relative z-30 border-b border-primary/15 bg-primary">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
+        <img src={logo.url} alt="PisoGo" className="h-12 w-auto" />
+        <nav className="hidden items-center gap-7 text-sm font-semibold text-primary-foreground md:flex">
+          <Link to="/properties?operation=sale" className="hover:text-accent">Comprar</Link>
+          <Link to="/properties?operation=rent" className="hover:text-accent">Alquilar</Link>
+          <Link to="/roomie-finder" className="hover:text-accent">Compartir piso</Link>
+          <Link to="/account" className="border-l border-primary-foreground/25 pl-7 hover:text-accent">Publicar anuncio</Link>
+        </nav>
+        <Button asChild variant="secondary" className="md:hidden"><Link to="/account">Mi cuenta</Link></Button>
+      </div>
+    </header>
+
+    <main>
+      <section className="relative isolate overflow-hidden bg-primary">
+        <img src={gatewayHome} alt="Interior de una vivienda luminosa" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 -z-10 bg-primary/80" />
+        <div className="mx-auto flex min-h-[610px] max-w-7xl flex-col items-center justify-center px-5 py-16 text-center md:px-8">
+          <p className="mb-4 text-sm font-semibold uppercase text-accent">Comprar · Alquilar · Vender</p>
+          <h1 className="max-w-4xl text-4xl font-bold leading-tight text-primary-foreground md:text-6xl">Encuentra tu lugar ideal para vivir</h1>
+          <p className="mt-5 max-w-2xl text-lg text-primary-foreground/80">Viviendas de particulares y profesionales, reunidas en un portal sencillo y transparente.</p>
+
+          <form onSubmit={search} className="mt-10 w-full max-w-4xl text-left">
+            <div className="flex gap-1 px-2">
+              {([['sale', 'Comprar'], ['rent', 'Alquilar']] as const).map(([value, label]) => (
+                <Button key={value} type="button" variant={operation === value ? 'secondary' : 'ghost'} onClick={() => setOperation(value)} className={operation === value ? 'rounded-b-none' : 'rounded-b-none text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground'}>{label}</Button>
+              ))}
+              <Button asChild type="button" variant="ghost" className="rounded-b-none text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><Link to="/roomie-finder">Compartir</Link></Button>
+            </div>
+            <div className="flex flex-col gap-3 bg-card p-3 shadow-2xl md:flex-row">
+              <label className="relative flex-1">
+                <span className="sr-only">Ubicación o referencia</span>
+                <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Ciudad, barrio o referencia" className="h-14 w-full rounded-md bg-secondary pl-12 pr-4 text-foreground outline-none ring-primary focus:ring-2" />
+              </label>
+              <Button type="submit" size="lg" className="h-14 px-9 text-base"><Search className="h-5 w-5" />Buscar viviendas</Button>
+            </div>
+          </form>
         </div>
-      </header>
+      </section>
 
-      <main className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden pt-24 md:min-h-[760px] md:pt-0">
-        <div className="absolute right-0 top-20 h-[280px] w-[92%] overflow-hidden md:top-0 md:h-full md:w-[58%]">
-          <img
-            src={gatewayHome}
-            alt="Salón luminoso de una vivienda compartida"
-            width={1600}
-            height={1200}
-            className="h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-roomie-ink/10 md:bg-roomie-ink/5" />
+      <section className="mx-auto max-w-7xl px-5 py-14 md:px-8">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div><p className="text-sm font-semibold text-primary">Empieza por aquí</p><h2 className="mt-1 text-3xl font-bold">¿Qué necesitas hoy?</h2></div>
+          <Link to="/properties" className="hidden items-center gap-2 text-sm font-semibold text-primary md:flex">Ver todos los anuncios <ArrowRight className="h-4 w-4" /></Link>
         </div>
-
-        <div className="relative mx-auto flex min-h-[calc(100vh-9rem)] max-w-7xl flex-col px-5 pb-8 md:min-h-[760px] md:justify-center md:px-10 md:py-36">
-          <Reveal className="relative z-10 max-w-2xl pt-[270px] md:max-w-xl md:pt-0">
-            <p className="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-roomie-green">
-              <span className="h-px w-10 bg-roomie-gold" />
-              Tu próximo hogar empieza aquí
-            </p>
-            <h1 className="text-4xl font-bold leading-tight md:text-6xl lg:text-7xl">
-              ¿Qué estás buscando?
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-roomie-ink/65 md:text-lg">
-              Elige cómo quieres encontrar tu lugar. Dos servicios distintos, con la confianza de Nazarí Homes.
-            </p>
-          </Reveal>
-
-          <div className="relative z-20 mt-8 grid w-full gap-3 md:mt-12 md:max-w-4xl md:grid-cols-2 md:gap-0">
-            <Reveal delay={100}>
-              <Link
-                to="/inicio"
-                className="group flex min-h-44 items-end justify-between gap-5 bg-roomie-ink p-6 text-roomie-sand transition-transform duration-300 hover:-translate-y-1 md:min-h-56 md:p-8"
-              >
-                <div className="flex h-full flex-col justify-between">
-                  <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-roomie-gold">
-                    <Building2 className="h-5 w-5" />
-                    Nazarí Homes
-                  </div>
-                  <div className="mt-8">
-                    <h2 className="text-2xl font-bold md:text-3xl">Busco una vivienda</h2>
-                    <p className="mt-2 max-w-xs text-sm leading-relaxed text-roomie-sand/65">
-                      Viviendas y locales en alquiler o venta con gestión integral.
-                    </p>
-                  </div>
-                </div>
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-roomie-sand/30 transition-colors group-hover:bg-roomie-gold group-hover:text-roomie-ink">
-                  <ArrowUpRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <span className="sr-only">Entrar en Nazarí Homes</span>
-                </span>
-              </Link>
-            </Reveal>
-
-            <Reveal delay={190} className="md:translate-y-8">
-              <Link
-                to="/roomie-finder"
-                className="group flex min-h-44 items-end justify-between gap-5 border border-roomie-ink/10 bg-background p-6 transition-transform duration-300 hover:-translate-y-1 md:min-h-56 md:p-8"
-              >
-                <div className="flex h-full flex-col justify-between">
-                  <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-roomie-green">
-                    <Users className="h-5 w-5" />
-                    Roomie Finder
-                  </div>
-                  <div className="mt-8">
-                    <h2 className="text-2xl font-bold md:text-3xl">Busco compañero de piso</h2>
-                    <p className="mt-2 max-w-xs text-sm leading-relaxed text-roomie-ink/60">
-                      Habitaciones, gastos claros y perfiles compatibles. Sin registro.
-                    </p>
-                  </div>
-                </div>
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-roomie-ink/20 transition-colors group-hover:bg-roomie-green group-hover:text-roomie-sand">
-                  <ArrowUpRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <span className="sr-only">Entrar en Roomie Finder</span>
-                </span>
-              </Link>
-            </Reveal>
-          </div>
-
-          <p className="relative z-10 mt-6 text-xs text-roomie-ink/45 md:mt-14">
-            Roomie Finder es un servicio de Nazarí Homes.
-          </p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { to: '/properties?operation=sale', icon: Home, title: 'Comprar vivienda', copy: 'Pisos, casas y estudios en venta.' },
+            { to: '/properties?operation=rent', icon: KeyRound, title: 'Alquilar vivienda', copy: 'Encuentra un alquiler que encaje contigo.' },
+            { to: '/account', icon: Building2, title: 'Publicar inmueble', copy: 'Anuncia una vivienda de forma sencilla.' },
+            { to: '/roomie-finder', icon: Users, title: 'Roomie Finder', copy: 'Busca habitación o compañero de piso.' },
+          ].map(({ to, icon: Icon, title, copy }) => <Link key={title} to={to} className="group flex min-h-52 flex-col justify-between border border-border bg-card p-6 transition duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg">
+            <Icon className="h-8 w-8 text-primary" /><div><h3 className="text-xl font-bold">{title}</h3><p className="mt-2 text-sm text-muted-foreground">{copy}</p><ArrowRight className="mt-5 h-5 w-5 text-primary transition-transform group-hover:translate-x-1" /></div>
+          </Link>)}
         </div>
-      </main>
+      </section>
+    </main>
 
-      <footer className="border-t border-roomie-ink/10 px-5 py-5 text-center text-xs text-roomie-ink/50">
-        <p>© {new Date().getFullYear()} Nazarí Homes · Gestión inmobiliaria integral.</p>
-      </footer>
-    </div>
-  );
+    <footer className="border-t border-primary/15 bg-primary px-5 py-6 text-center text-sm text-primary-foreground/70">© {new Date().getFullYear()} PisoGo · Tu portal inmobiliario.</footer>
+  </div>;
 };
 
 export default LandingGateway;
