@@ -94,12 +94,12 @@ const RoomieFinder = () => {
   return (
     <div className="min-h-screen bg-roomie-sand">
       <Header />
-      <main className="container mx-auto px-6 py-8 md:py-10">
+      <main className="container mx-auto px-4 md:px-6 py-5 md:py-10">
         <RoomieIntro onStart={() => exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
 
-        <div ref={exploreRef} className="scroll-mt-24 mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-roomie-ink">Explora habitaciones</h2>
-          <p className="text-roomie-ink/60 mt-2 max-w-2xl">
+        <div ref={exploreRef} className="scroll-mt-24 mt-10 md:mt-2 mb-5 md:mb-8">
+          <h2 className="text-2xl md:text-4xl font-bold text-roomie-ink">Explora habitaciones</h2>
+          <p className="text-sm md:text-base text-roomie-ink/60 mt-1 md:mt-2 max-w-2xl">
             Descubre una a una o consulta el listado completo con filtros.
           </p>
         </div>
