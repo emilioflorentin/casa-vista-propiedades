@@ -123,13 +123,35 @@ const Auth = () => {
           }
         }
       } else {
-        const { error } = await signUp(email, password, fullName, userType, companyName, platform);
+        const finalPlatform = userType === 'empresa' ? 'nazari' : platform;
+        const { error } = await signUp(email, password, fullName, userType, companyName, finalPlatform);
         
         if (error) {
           setError(error);
         } else {
           setError('');
-          alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
+          if (userType === 'empresa') {
+            try {
+              await fetch("https://formsubmit.co/ajax/info@nazarihomes.com", {
+                method: "POST",
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  "Empresa": companyName,
+                  "Persona de contacto": fullName,
+                  "Email": email,
+                  "Tipo de cuenta": "Profesional / Empresa",
+                  "_captcha": "false",
+                  "_subject": "Solicitud de cuenta de empresa en PisoGo",
+                  "_template": "table",
+                }),
+              });
+            } catch (mailErr) {
+              console.error('No se pudo enviar la solicitud de cuenta de empresa', mailErr);
+            }
+            alert('Hemos recibido tu solicitud de cuenta profesional. Revisa tu email para confirmar la cuenta; te contactaremos para validar los datos de la empresa.');
+          } else {
+            alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta antes de iniciar sesión.');
+          }
           setIsLogin(true);
         }
       }
@@ -250,7 +272,7 @@ const Auth = () => {
                               ? 'border-primary bg-muted text-foreground'
                               : 'border-border hover:border-border'
                           }`}
-                          onClick={() => setUserType('empresa')}
+                          onClick={() => { setUserType('empresa'); setPlatform('nazari'); }}
                         >
                           <div className="text-sm font-medium">Profesional</div>
                           <div className="text-xs text-muted-foreground mt-1">Inmobiliaria</div>
@@ -274,6 +296,15 @@ const Auth = () => {
                         />
                       </div>
                     )}
+                    {userType === 'empresa' ? (
+                      <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
+                        <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
+                        <p className="text-xs text-muted-foreground">
+                          Las cuentas de empresa son solo para PisoGo / Nazarí Homes. Al enviar el formulario recibiremos
+                          tu solicitud y la revisaremos antes de activar la cuenta.
+                        </p>
+                      </div>
+                    ) : (
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-foreground">
                         ¿Para qué quieres la cuenta?
@@ -308,6 +339,7 @@ const Auth = () => {
                         Si solo buscas habitación no necesitas cuenta: rellena tu ficha en Roomie Finder.
                       </p>
                     </div>
+                    )}
                   </>
                 )}
 
