@@ -80,7 +80,7 @@ const translations: Translations = {
       operation_sale: "Venta",
       managed_by: "Gestionado por",
       managed_by_any: "Cualquiera",
-      managed_by_nazari: "Nazarí Homes",
+      managed_by_nazari: "PisoGo",
       managed_by_other: "Otros",
       search_btn: "Buscar",
     },
@@ -138,7 +138,7 @@ const translations: Translations = {
       type_house: "Casa",
       type_loft: "Loft",
       type_studio: "Estudio",
-      managed_nazari: "Gestionado por Nazarí",
+      managed_nazari: "Gestionado por PisoGo",
       managed_other: "Gestionado por terceros",
       area_unit: "m²",
       more: "más",
@@ -149,7 +149,7 @@ const translations: Translations = {
     },
     about: {
       title: "Acerca de",
-      title_highlight: "Nazarí Homes",
+      title_highlight: "PisoGo",
       subtitle: "Conoce más sobre nuestra empresa y nuestro compromiso contigo",
       our_story: "Nuestra historia",
       story_p1:

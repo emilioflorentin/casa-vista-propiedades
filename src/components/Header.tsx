@@ -116,7 +116,7 @@ const Header = () => {
               <button
                 onClick={() => setLanguage('es')}
                 className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
-                  language === 'es' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                  language === 'es' ? 'ring-2 ring-accent' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="Español"
               >
@@ -130,7 +130,7 @@ const Header = () => {
               <button
                 onClick={() => setLanguage('en')}
                 className={`w-6 h-4 rounded overflow-hidden transition-all duration-200 hover:scale-110 ${
-                  language === 'en' ? 'ring-2 ring-stone-600' : 'opacity-70 hover:opacity-100'
+                  language === 'en' ? 'ring-2 ring-accent' : 'opacity-70 hover:opacity-100'
                 }`}
                 title="English"
               >

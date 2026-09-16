@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 // Removed static properties import - only using user properties now
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -47,11 +47,15 @@ interface Profile {
 }
 
 const Properties = () => {
+  const [searchParams] = useSearchParams();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
   const [propertyType, setPropertyType] = useState("all");
-  const [operation, setOperation] = useState("all");
+  const [operation, setOperation] = useState(() => {
+    const requestedOperation = searchParams.get("operation");
+    return requestedOperation === "sale" || requestedOperation === "rent" ? requestedOperation : "all";
+  });
   const [managedBy, setManagedBy] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
