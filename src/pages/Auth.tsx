@@ -313,6 +313,23 @@ const Auth = () => {
                         />
                       </div>
                     )}
+
+                    {userType === 'empresa' && (
+                      <div className="space-y-2">
+                        <label htmlFor="phone" className="text-sm font-medium text-foreground">
+                          Teléfono de contacto
+                        </label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="Ej. 600 123 456"
+                          required={userType === 'empresa'}
+                          className="h-12 border-border"
+                        />
+                      </div>
+                    )}
                     {userType === 'empresa' ? (
                       <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
                         <div className="text-sm font-medium text-foreground">Cuenta profesional en PisoGo</div>
@@ -375,6 +392,7 @@ const Auth = () => {
                   />
                 </div>
 
+                {!isCompanyRequest && (
                 <div className="space-y-2">
                   <label htmlFor="password" className="text-sm font-medium text-foreground">
                     {t('account.password')}
