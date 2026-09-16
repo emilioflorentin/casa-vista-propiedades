@@ -99,7 +99,7 @@ const RoomieFinder = () => {
       if (noSmokers && l.smokers) return false;
       return true;
     });
-  }, [listings, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
+  }, [listings, zone, search, maxPrice, onlyBillsIncluded, onlyPets, noSmokers]);
 
   const deck = useMemo(
     () => filtered.filter((l) => !seen.includes(l.id) && l.user_id !== user?.id),
