@@ -249,6 +249,7 @@ const RoomieFinder = () => {
             )}
           </TabsContent>
         </Tabs>
+        )}
       </main>
       <Footer />
     </div>
