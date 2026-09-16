@@ -167,7 +167,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex flex-col bg-background">
       <div className="flex items-center justify-between gap-4 border-b px-5 py-4">
         <h2 className="text-xl font-bold text-foreground md:text-2xl">
