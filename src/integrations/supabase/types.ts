@@ -74,35 +74,117 @@ export type Database = {
         }
         Relationships: []
       }
+      companies: {
+        Row: {
+          company_name: string
+          contact_name: string
+          created_at: string
+          custom_max_advisors: number | null
+          custom_max_listings: number | null
+          email: string
+          id: string
+          notes: string
+          owner_user_id: string | null
+          phone: string
+          plan_id: string | null
+          request_id: string | null
+          services: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_name?: string
+          created_at?: string
+          custom_max_advisors?: number | null
+          custom_max_listings?: number | null
+          email: string
+          id?: string
+          notes?: string
+          owner_user_id?: string | null
+          phone?: string
+          plan_id?: string | null
+          request_id?: string | null
+          services?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          custom_max_advisors?: number | null
+          custom_max_listings?: number | null
+          email?: string
+          id?: string
+          notes?: string
+          owner_user_id?: string | null
+          phone?: string
+          plan_id?: string | null
+          request_id?: string | null
+          services?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_requests: {
         Row: {
+          admin_notes: string
+          company_id: string | null
           company_name: string
           contact_name: string
           created_at: string
           email: string
           id: string
           phone: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
         }
         Insert: {
+          admin_notes?: string
+          company_id?: string | null
           company_name: string
           contact_name: string
           created_at?: string
           email: string
           id?: string
           phone: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
         }
         Update: {
+          admin_notes?: string
+          company_id?: string | null
           company_name?: string
           contact_name?: string
           created_at?: string
           email?: string
           id?: string
           phone?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "company_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       incident_costs: {
         Row: {
@@ -347,6 +429,48 @@ export type Database = {
           id?: string
           owner_id?: string | null
           visitor_hash?: string | null
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          max_advisors: number
+          max_listings: number
+          name: string
+          price_monthly: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          max_advisors?: number
+          max_listings?: number
+          name: string
+          price_monthly?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          max_advisors?: number
+          max_listings?: number
+          name?: string
+          price_monthly?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -954,6 +1078,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1070,6 +1215,13 @@ export type Database = {
           updated_at: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       roomie_seeker_get: {
         Args: { p_token: string }
         Returns: {
@@ -1148,7 +1300,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "superadmin" | "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1275,6 +1427,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["superadmin", "admin", "user"],
+    },
   },
 } as const
