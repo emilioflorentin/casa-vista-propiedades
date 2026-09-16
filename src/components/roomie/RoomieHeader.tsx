@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, ArrowLeft } from 'lucide-react';
-import roomieLogo from '@/assets/roomie-finder-logo.webp';
+import roomieLogo from '@/assets/roomiefinder-logo.png';
 
 const links = [
   { to: '/roomie-finder', label: 'Descubrir' },

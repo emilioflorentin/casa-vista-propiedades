@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import roomieLogo from '@/assets/roomie-finder-logo.webp';
+import roomieLogo from '@/assets/roomiefinder-logo.png';
 
 const RoomieFooter = () => (
   <footer className="border-t border-border bg-card mt-16">
