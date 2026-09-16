@@ -48,13 +48,13 @@ export const RoomieIntro = ({ onStart }: { onStart: () => void }) => (
         </div>
       </div>
 
-      <div className="relative min-h-[200px] md:min-h-[320px] bg-roomie-ink">
+      <div className="relative h-56 md:h-auto lg:min-h-[420px] bg-roomie-ink">
         <img
           src={heroImage}
           alt="Salón luminoso de un piso compartido"
           width={896}
           height={1344}
-          className="w-full h-full object-cover opacity-90"
+          className="absolute inset-0 w-full h-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-roomie-ink/70 via-transparent to-transparent" />
         <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 bg-white p-3 md:p-5 rounded-2xl shadow-2xl border-l-4 border-roomie-gold flex items-center gap-3 md:gap-4">
