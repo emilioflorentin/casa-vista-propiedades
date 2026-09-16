@@ -486,7 +486,9 @@ const Properties = () => {
               {filteredProperties.length} {t('properties.page_title')}
             </h1>
             <p className="text-primary mt-1">
-              {hasRadiusSearch
+              {hasPolygonSearch
+                ? `Viviendas dentro de la zona que has dibujado`
+                : hasRadiusSearch
                 ? `Viviendas a menos de ${searchRadius >= 1000 ? `${searchRadius / 1000} km` : `${searchRadius} m`} de ${searchQuery}`
                 : t('properties.results_subtitle')}
             </p>
