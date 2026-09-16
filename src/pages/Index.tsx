@@ -262,10 +262,15 @@ const Index = () => {
               initialValue={searchQuery}
               onClose={() => setLocationOpen(false)}
               onSelect={(value) => {
-                setSearchQuery(value);
+                setSearchQuery(value.address);
                 setLocationOpen(false);
                 const params = new URLSearchParams({ operation: searchOperation });
-                if (value.trim()) params.set('q', value.trim());
+                if (value.address.trim()) params.set('q', value.address.trim());
+                if ('lat' in value) {
+                  params.set('lat', String(value.lat));
+                  params.set('lng', String(value.lng));
+                  params.set('radius', String(value.radius));
+                }
                 navigate(`/properties?${params.toString()}`);
               }}
             />
