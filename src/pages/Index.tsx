@@ -247,16 +247,22 @@ const Index = () => {
                   <Link to="/roomie-finder">Compartir</Link>
                 </Button>
               </div>
-              <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:gap-3 md:p-3">
+              <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:items-start md:gap-3 md:p-3">
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <MapPin className="absolute left-4 top-6 h-5 w-5 -translate-y-1/2 text-muted-foreground md:top-7" />
                   <button
                     type="button"
-                    onClick={() => setLocationOpen(true)}
-                    className={`h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-left text-base outline-none ring-primary focus:ring-2 md:h-14 ${searchQuery ? 'text-foreground' : 'text-muted-foreground'}`}
+                    onClick={() => { setLocationError(false); setLocationOpen(true); }}
+                    className={`h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-left text-base outline-none ring-primary focus:ring-2 md:h-14 ${locationError ? 'ring-2 ring-destructive' : ''} ${searchQuery ? 'text-foreground' : 'text-muted-foreground'}`}
                   >
                     {searchQuery || 'Ciudad, barrio o referencia'}
                   </button>
+                  {locationError && (
+                    <p className="mt-2 flex items-center gap-2 text-left text-sm font-medium text-destructive">
+                      <AlertCircle className="h-4 w-4 shrink-0" />
+                      Escribe una ubicación donde buscar
+                    </p>
+                  )}
                 </div>
                 <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14">
                   <Search className="h-5 w-5" />
