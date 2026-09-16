@@ -201,15 +201,15 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative bg-primary text-primary-foreground">
         <div className="absolute inset-0 bg-black opacity-5"></div>
-        <div className="relative container mx-auto px-6 py-24 text-center">
+        <div className="relative container mx-auto px-6 py-10 text-center md:py-24">
           <Reveal variant="fade">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-3xl md:text-6xl font-bold mb-4 md:mb-6 leading-tight">
               {t("hero.title")}
               <span className="block text-primary-foreground">{t("hero.title_highlight")}</span>
             </h1>
           </Reveal>
           <Reveal delay={150}>
-            <p className="text-xl md:text-2xl mb-12 text-primary-foreground/90 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
+            <p className="text-base md:text-2xl mb-6 md:mb-12 text-primary-foreground/90 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
           </Reveal>
 
           {/* Search Bar */}
@@ -238,7 +238,7 @@ const Index = () => {
                   <Link to="/roomie-finder">Compartir</Link>
                 </Button>
               </div>
-              <div className="flex flex-col gap-3 bg-card p-3 shadow-xl md:flex-row">
+              <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:gap-3 md:p-3">
                 <label className="relative flex-1">
                   <span className="sr-only">Ubicación o referencia</span>
                   <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -246,10 +246,10 @@ const Index = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Ciudad, barrio o referencia"
-                    className="h-14 w-full rounded-md bg-secondary pl-12 pr-4 text-foreground outline-none ring-primary focus:ring-2"
+                    className="h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-base text-foreground outline-none ring-primary focus:ring-2 md:h-14"
                   />
                 </label>
-                <Button type="submit" size="lg" className="h-14 px-9 text-base">
+                <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14">
                   <Search className="h-5 w-5" />
                   Buscar viviendas
                 </Button>
@@ -260,9 +260,9 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-card">
+      <section className="py-10 md:py-16 bg-card">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 text-center">
             <Reveal className="p-6">
               <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home className="h-8 w-8 text-primary" />
@@ -291,13 +291,13 @@ const Index = () => {
       </section>
 
       {/* Properties Section */}
-      <section className="py-20 bg-muted/40">
+      <section className="py-10 md:py-20 bg-muted/40">
         <div className="container mx-auto px-6">
-          <Reveal className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+          <Reveal className="text-center mb-8 md:mb-16">
+            <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
               {showingSearchResults ? t("properties.search_results") : t("properties.featured")}
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto">
               {showingSearchResults
                 ? t("properties.search_results_desc").replace("{count}", filteredProperties.length.toString())
                 : t("properties.featured_desc")}
