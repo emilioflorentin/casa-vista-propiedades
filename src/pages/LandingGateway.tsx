@@ -32,16 +32,16 @@ const LandingGateway = () => {
 
   return <div className="min-h-screen bg-secondary text-foreground">
     <header className="relative z-30 border-b border-accent/50 bg-header shadow-[0_2px_12px_rgba(0,0,0,0.25)]">
-      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-5 md:h-36 md:px-8">
-        <BrandLogo className="h-20 md:h-28" />
+      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-6 md:h-36 md:px-8">
+        <BrandLogo className="h-20 max-[359px]:h-16 md:h-28" />
         <nav className="hidden items-center gap-7 text-sm font-semibold text-primary-foreground md:flex">
           <Link to="/properties?operation=sale" className="hover:text-accent">Comprar</Link>
           <Link to="/properties?operation=rent" className="hover:text-accent">Alquilar</Link>
           <Link to="/roomie-finder" className="hover:text-accent">Compartir piso</Link>
         </nav>
-        <div className="flex items-center gap-1.5 md:gap-3">
-          <Button asChild variant="secondary" className="h-11 rounded-full px-3.5 font-semibold md:h-12 md:px-6"><Link to="/account">Mi cuenta</Link></Button>
-          <Button asChild aria-label="Publicar vivienda" className="h-11 rounded-full bg-accent px-3.5 font-semibold text-accent-foreground shadow-lg shadow-black/20 transition hover:bg-accent/90 md:h-12 md:px-6">
+        <div className="flex shrink-0 items-center gap-2.5 max-[359px]:gap-2 md:gap-3">
+          <Button asChild variant="secondary" className="h-11 rounded-full px-3.5 font-semibold max-[359px]:h-10 max-[359px]:px-3 md:h-12 md:px-6"><Link to="/account">Mi cuenta</Link></Button>
+          <Button asChild aria-label="Publicar vivienda" className="h-11 shrink-0 rounded-full bg-accent px-3.5 font-semibold text-accent-foreground shadow-lg shadow-black/20 transition hover:bg-accent/90 max-[359px]:h-10 max-[359px]:px-3 md:h-12 md:px-6">
             <Link to="/account">
               <Plus className="h-5 w-5" />
               <span className="hidden sm:inline">Publicar vivienda</span>
