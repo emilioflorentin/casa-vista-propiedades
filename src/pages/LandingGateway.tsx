@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
+import { AlertCircle, ArrowRight, Building2, Home, KeyRound, MapPin, Plus, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BrandLogo from '@/components/BrandLogo';
 import LocationSearchOverlay from '@/components/LocationSearchOverlay';
@@ -11,6 +11,7 @@ const LandingGateway = () => {
   const [operation, setOperation] = useState<'sale' | 'rent'>('sale');
   const [query, setQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   useEffect(() => {
     document.title = 'PisoGo — Compra, alquila y vende viviendas';
@@ -25,8 +26,14 @@ const LandingGateway = () => {
 
   const search = (event: FormEvent) => {
     event.preventDefault();
+    if (!query.trim()) {
+      setLocationError(true);
+      setLocationOpen(true);
+      return;
+    }
+    setLocationError(false);
     const params = new URLSearchParams({ operation });
-    if (query.trim()) params.set('q', query.trim());
+    params.set('q', query.trim());
     navigate(`/properties?${params.toString()}`);
   };
 
@@ -67,12 +74,18 @@ const LandingGateway = () => {
               ))}
               <Button asChild type="button" variant="ghost" className="rounded-b-none text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><Link to="/roomie-finder">Compartir</Link></Button>
             </div>
-            <div className="flex flex-col gap-2 bg-card p-2 shadow-2xl md:flex-row md:gap-3 md:p-3">
+            <div className="flex flex-col gap-2 bg-card p-2 shadow-2xl md:flex-row md:items-start md:gap-3 md:p-3">
               <div className="relative flex-1">
-                <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                <button type="button" onClick={() => setLocationOpen(true)} className={`h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-left text-base outline-none ring-primary focus:ring-2 md:h-14 ${query ? 'text-foreground' : 'text-muted-foreground'}`}>
+                <MapPin className="absolute left-4 top-6 h-5 w-5 -translate-y-1/2 text-muted-foreground md:top-7" />
+                <button type="button" onClick={() => { setLocationError(false); setLocationOpen(true); }} className={`h-12 w-full rounded-md bg-secondary pl-12 pr-4 text-left text-base outline-none ring-primary focus:ring-2 md:h-14 ${locationError ? 'ring-2 ring-destructive' : ''} ${query ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {query || 'Ciudad, barrio o referencia'}
                 </button>
+                {locationError && (
+                  <p className="mt-2 flex items-center gap-2 text-left text-sm font-medium text-destructive">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    Escribe una ubicación donde buscar
+                  </p>
+                )}
               </div>
               <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14"><Search className="h-5 w-5" />Buscar viviendas</Button>
             </div>
