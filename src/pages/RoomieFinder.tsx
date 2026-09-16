@@ -39,6 +39,18 @@ const RoomieFinder = () => {
 
   const [zone, setZone] = useState<string | null>(() => localStorage.getItem('roomie_zone'));
   const [zoneQuery, setZoneQuery] = useState('');
+  const [area, setArea] = useState<RoomieArea | null>(() => {
+    try {
+      const raw = localStorage.getItem('roomie_area');
+      return raw ? (JSON.parse(raw) as RoomieArea) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [mapOpen, setMapOpen] = useState(false);
+  const [coords, setCoords] = useState<Record<string, Coords>>({});
+  const [locating, setLocating] = useState(false);
+
 
   const [search, setSearch] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
