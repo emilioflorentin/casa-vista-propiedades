@@ -144,7 +144,7 @@ const Index = () => {
                 <Home className="h-6 w-6 text-primary md:h-8 md:w-8" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">
-                {allUserProperties.length.toLocaleString("es-ES")}+
+                {propertyCount.toLocaleString("es-ES")}+
               </h3>
               <p className="text-muted-foreground">{t("stats.properties")}</p>
             </Reveal>
@@ -163,94 +163,6 @@ const Index = () => {
               <p className="text-muted-foreground">{t("stats.success_rate")}</p>
             </Reveal>
           </div>
-        </div>
-      </section>
-
-      {/* Properties Section */}
-      <section className="py-10 md:py-20 bg-muted/40">
-        <div className="container mx-auto px-6">
-          <Reveal className="text-center mb-8 md:mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
-              {showingSearchResults ? t("properties.search_results") : t("properties.featured")}
-            </h2>
-            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              {showingSearchResults
-                ? t("properties.search_results_desc").replace("{count}", filteredProperties.length.toString())
-                : t("properties.featured_desc")}
-            </p>
-            {showingSearchResults && (
-              <Button
-                onClick={resetSearch}
-                variant="outline"
-                className="mt-4 hover:bg-secondary border-border text-foreground"
-              >
-                {t("properties.show_featured")}
-              </Button>
-            )}
-          </Reveal>
-
-          {filteredProperties.length > 0 ? (
-            <>
-              {!showingSearchResults ? (
-                /* Carousel for featured properties */
-                <Carousel
-                  plugins={[
-                    Autoplay({
-                      delay: 3000,
-                      stopOnInteraction: false,
-                      stopOnMouseEnter: true,
-                    }),
-                  ]}
-                  opts={{
-                    align: "start",
-                    loop: true,
-                    duration: 25,
-                    dragFree: true,
-                    containScroll: "trimSnaps",
-                    slidesToScroll: 1,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent className="-ml-2 md:-ml-4 transition-transform duration-700 ease-in-out">
-                    {filteredProperties.map((property) => (
-                      <CarouselItem
-                        key={property.id}
-                        className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 transform transition-all duration-500 hover:scale-105"
-                      >
-                        <PropertyCard property={property} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-accent/20 shadow-lg" />
-                  <CarouselNext className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-accent/20 shadow-lg" />
-                </Carousel>
-              ) : (
-                /* Grid layout for search results */
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {filteredProperties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-xl text-muted-foreground mb-4">{t("properties.no_results")}</p>
-              <Button onClick={resetSearch} className="bg-primary hover:bg-primary text-primary-foreground">
-                {t("properties.view_all")}
-              </Button>
-            </div>
-          )}
-
-          {!showingSearchResults && (
-            <Reveal className="text-center mt-12">
-              <Link to="/properties">
-                <Button size="lg" variant="outline" className="hover:bg-secondary border-border text-foreground">
-                  {t("properties.view_all")}
-                </Button>
-              </Link>
-            </Reveal>
-          )}
         </div>
       </section>
 
