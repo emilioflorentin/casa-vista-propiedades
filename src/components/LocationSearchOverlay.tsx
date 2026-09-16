@@ -122,9 +122,12 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         attribution: '© OpenStreetMap',
       }).addTo(map);
       map.on('click', async (event: any) => {
+        if (drawModeRef.current) return;
         const { lat, lng } = event.latlng;
         if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
         if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
+        if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+        setPolygon(null);
         layerRefs.current.marker = L.marker([lat, lng]).addTo(map);
         layerRefs.current.circle = L.circle([lat, lng], {
           radius: parseInt(radius, 10),
@@ -138,18 +141,114 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           setPicked({ address: 'Zona seleccionada', label: 'Zona seleccionada', detail: '', lat, lng });
         }
       });
+
+      // Freehand drawing with finger / mouse
+      const container = map.getContainer();
+      const toLatLng = (event: PointerEvent): [number, number] => {
+        const rect = container.getBoundingClientRect();
+        const point = L.point(event.clientX - rect.left, event.clientY - rect.top);
+        const ll = map.containerPointToLatLng(point);
+        return [ll.lat, ll.lng];
+      };
+      const onDown = (event: PointerEvent) => {
+        if (!drawModeRef.current) return;
+        event.preventDefault();
+        container.setPointerCapture?.(event.pointerId);
+        drawPointsRef.current = [toLatLng(event)];
+        if (layerRefs.current.shape) map.removeLayer(layerRefs.current.shape);
+        layerRefs.current.shape = L.polyline(drawPointsRef.current, { color: '#C9A227', weight: 3 }).addTo(map);
+      };
+      const onMove = (event: PointerEvent) => {
+        if (!drawModeRef.current || drawPointsRef.current.length === 0) return;
+        event.preventDefault();
+        drawPointsRef.current.push(toLatLng(event));
+        layerRefs.current.shape?.setLatLngs(drawPointsRef.current);
+      };
+      const onUp = async (event: PointerEvent) => {
+        if (!drawModeRef.current || drawPointsRef.current.length === 0) return;
+        container.releasePointerCapture?.(event.pointerId);
+        const points = drawPointsRef.current;
+        drawPointsRef.current = [];
+        if (points.length < 3) {
+          if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+          return;
+        }
+        if (layerRefs.current.shape) map.removeLayer(layerRefs.current.shape);
+        layerRefs.current.shape = L.polygon(points, {
+          color: '#C9A227',
+          fillColor: '#C9A227',
+          fillOpacity: 0.18,
+          weight: 3,
+        }).addTo(map);
+        if (layerRefs.current.marker) { map.removeLayer(layerRefs.current.marker); layerRefs.current.marker = null; }
+        if (layerRefs.current.circle) { map.removeLayer(layerRefs.current.circle); layerRefs.current.circle = null; }
+        setPolygon(points);
+        const center = layerRefs.current.shape.getBounds().getCenter();
+        try {
+          setPicked(await reverseSpanishLocation(center.lat, center.lng));
+        } catch {
+          setPicked({ address: 'Zona dibujada', label: 'Zona dibujada', detail: '', lat: center.lat, lng: center.lng });
+        }
+      };
+      container.addEventListener('pointerdown', onDown);
+      container.addEventListener('pointermove', onMove);
+      container.addEventListener('pointerup', onUp);
+      container.addEventListener('pointercancel', onUp);
+      (map as any)._pisogoCleanup = () => {
+        container.removeEventListener('pointerdown', onDown);
+        container.removeEventListener('pointermove', onMove);
+        container.removeEventListener('pointerup', onUp);
+        container.removeEventListener('pointercancel', onUp);
+      };
+
+      leafletRef.current = L;
       mapInstance.current = map;
       setTimeout(() => map.invalidateSize(), 150);
     })();
     return () => {
       disposed = true;
       if (mapInstance.current) {
+        (mapInstance.current as any)._pisogoCleanup?.();
         mapInstance.current.remove();
         mapInstance.current = null;
-        layerRefs.current = { marker: null, circle: null };
+        layerRefs.current = { marker: null, circle: null, shape: null };
       }
+      drawPointsRef.current = [];
+      setPolygon(null);
+      setDrawMode(false);
+      drawModeRef.current = false;
     };
   }, [mapMode]);
+
+  // Toggle map dragging while drawing
+  useEffect(() => {
+    drawModeRef.current = drawMode;
+    const map = mapInstance.current;
+    if (!map) return;
+    if (drawMode) {
+      map.dragging.disable();
+      map.doubleClickZoom.disable();
+      map.touchZoom.disable();
+      map.getContainer().style.cursor = 'crosshair';
+      map.getContainer().style.touchAction = 'none';
+    } else {
+      map.dragging.enable();
+      map.doubleClickZoom.enable();
+      map.touchZoom.enable();
+      map.getContainer().style.cursor = '';
+      map.getContainer().style.touchAction = '';
+    }
+  }, [drawMode, mapMode]);
+
+  const clearDrawing = () => {
+    const map = mapInstance.current;
+    if (map && layerRefs.current.shape) {
+      map.removeLayer(layerRefs.current.shape);
+      layerRefs.current.shape = null;
+    }
+    setPolygon(null);
+    setPicked(null);
+  };
 
   useEffect(() => {
     if (layerRefs.current.circle) layerRefs.current.circle.setRadius(Number(radius));
