@@ -30,7 +30,7 @@ const LandingGateway = () => {
 
   return <div className="min-h-screen bg-secondary text-foreground">
     <header className="relative z-30 border-b border-primary/15 bg-primary">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-5 md:px-8">
         <BrandLogo />
         <nav className="hidden items-center gap-7 text-sm font-semibold text-primary-foreground md:flex">
           <Link to="/properties?operation=sale" className="hover:text-accent">Comprar</Link>

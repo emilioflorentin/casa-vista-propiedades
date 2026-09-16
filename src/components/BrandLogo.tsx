@@ -5,7 +5,7 @@ type BrandLogoProps = {
   className?: string;
 };
 
-const BrandLogo = ({ className = "h-12" }: BrandLogoProps) => {
+const BrandLogo = ({ className = "h-16" }: BrandLogoProps) => {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
