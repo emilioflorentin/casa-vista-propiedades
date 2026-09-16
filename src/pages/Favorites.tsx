@@ -115,7 +115,7 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-secondary">
       <Header />
       
       <main className="container mx-auto px-6 py-8">
@@ -123,7 +123,7 @@ const Favorites = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Heart className="h-8 w-8 text-red-500 fill-current" />
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-foreground">
                 {t('favorites.title')}
               </h1>
             </div>
@@ -155,18 +155,18 @@ const Favorites = () => {
               </AlertDialog>
             )}
           </div>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {getFavoritesCountText()}
           </p>
         </div>
 
         {favoriteProperties.length === 0 ? (
           <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-500 mb-2">
+            <Heart className="h-16 w-16 text-primary-foreground/70 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-muted-foreground mb-2">
               {t('favorites.empty_title')}
             </h3>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground/70">
               {t('favorites.empty_desc')}
             </p>
           </div>

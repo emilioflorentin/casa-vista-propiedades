@@ -212,30 +212,30 @@ const Index = () => {
   }, [propertyType, operation, managedBy]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-secondary">
       <Header />
       <main>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white">
+      <section className="relative bg-primary text-primary-foreground">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-6 py-24 text-center">
           <Reveal variant="fade">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
               {t("hero.title")}
-              <span className="block text-stone-100">{t("hero.title_highlight")}</span>
+              <span className="block text-primary-foreground">{t("hero.title_highlight")}</span>
             </h1>
           </Reveal>
           <Reveal delay={150}>
-            <p className="text-xl md:text-2xl mb-12 text-stone-50 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
+            <p className="text-xl md:text-2xl mb-12 text-primary-foreground/90 max-w-3xl mx-auto">{t("hero.subtitle")}</p>
           </Reveal>
 
           {/* Search Bar */}
-          <Reveal delay={280} variant="scale" className="bg-white rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
+          <Reveal delay={280} variant="scale" className="bg-card rounded-2xl p-6 max-w-5xl mx-auto shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <LocationSearch onLocationSelect={handleLocationSelect} placeholder={t("search.location_placeholder")} />
 
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 border-0 text-stone-700">
+                <SelectTrigger className="h-12 border-0 text-foreground">
                   <SelectValue placeholder={t("search.property_type")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,7 +248,7 @@ const Index = () => {
               </Select>
 
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 border-0 text-stone-700">
+                <SelectTrigger className="h-12 border-0 text-foreground">
                   <SelectValue placeholder={t("search.operation")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,7 +259,7 @@ const Index = () => {
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
-                <SelectTrigger className="h-12 border-0 text-stone-700">
+                <SelectTrigger className="h-12 border-0 text-foreground">
                   <SelectValue placeholder={t("search.managed_by")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -271,7 +271,7 @@ const Index = () => {
 
               <Button
                 size="lg"
-                className="h-12 bg-stone-600 hover:bg-stone-700 text-white font-semibold"
+                className="h-12 bg-primary hover:bg-primary text-primary-foreground font-semibold"
                 onClick={handleSearch}
               >
                 <Search className="mr-2 h-5 w-5" />
@@ -283,31 +283,31 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <Reveal className="p-6">
-              <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="h-8 w-8 text-stone-600" />
+              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Home className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">
+              <h3 className="text-3xl font-bold text-foreground mb-2">
                 {allUserProperties.length.toLocaleString("es-ES")}+
               </h3>
-              <p className="text-gray-600">{t("stats.properties")}</p>
+              <p className="text-muted-foreground">{t("stats.properties")}</p>
             </Reveal>
             <Reveal delay={120} className="p-6">
-              <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Key className="h-8 w-8 text-stone-600" />
+              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Key className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">190+</h3>
-              <p className="text-gray-600">{t("stats.clients")}</p>
+              <h3 className="text-3xl font-bold text-foreground mb-2">190+</h3>
+              <p className="text-muted-foreground">{t("stats.clients")}</p>
             </Reveal>
             <Reveal delay={240} className="p-6">
-              <div className="bg-stone-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-stone-600" />
+              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-800 mb-2">98%</h3>
-              <p className="text-gray-600">{t("stats.success_rate")}</p>
+              <h3 className="text-3xl font-bold text-foreground mb-2">98%</h3>
+              <p className="text-muted-foreground">{t("stats.success_rate")}</p>
             </Reveal>
           </div>
         </div>
@@ -317,10 +317,10 @@ const Index = () => {
       <section className="py-20 bg-stone-25">
         <div className="container mx-auto px-6">
           <Reveal className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               {showingSearchResults ? t("properties.search_results") : t("properties.featured")}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {showingSearchResults
                 ? t("properties.search_results_desc").replace("{count}", filteredProperties.length.toString())
                 : t("properties.featured_desc")}
@@ -329,7 +329,7 @@ const Index = () => {
               <Button
                 onClick={resetSearch}
                 variant="outline"
-                className="mt-4 hover:bg-stone-50 border-stone-300 text-stone-700"
+                className="mt-4 hover:bg-secondary border-border text-foreground"
               >
                 {t("properties.show_featured")}
               </Button>
@@ -368,8 +368,8 @@ const Index = () => {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
-                  <CarouselNext className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-stone-100 shadow-lg" />
+                  <CarouselPrevious className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-accent/20 shadow-lg" />
+                  <CarouselNext className="hidden md:flex transition-all duration-300 hover:scale-110 hover:bg-accent/20 shadow-lg" />
                 </Carousel>
               ) : (
                 /* Grid layout for search results */
@@ -382,8 +382,8 @@ const Index = () => {
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-xl text-gray-600 mb-4">{t("properties.no_results")}</p>
-              <Button onClick={resetSearch} className="bg-stone-600 hover:bg-stone-700 text-white">
+              <p className="text-xl text-muted-foreground mb-4">{t("properties.no_results")}</p>
+              <Button onClick={resetSearch} className="bg-primary hover:bg-primary text-primary-foreground">
                 {t("properties.view_all")}
               </Button>
             </div>
@@ -392,7 +392,7 @@ const Index = () => {
           {!showingSearchResults && (
             <Reveal className="text-center mt-12">
               <Link to="/properties">
-                <Button size="lg" variant="outline" className="hover:bg-stone-50 border-stone-300 text-stone-700">
+                <Button size="lg" variant="outline" className="hover:bg-secondary border-border text-foreground">
                   {t("properties.view_all")}
                 </Button>
               </Link>
@@ -402,40 +402,40 @@ const Index = () => {
       </section>
 
       {/* Tenant Section */}
-      <section className="py-20 bg-gradient-to-br from-stone-600 to-stone-800 text-white">
+      <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6">
           <Reveal className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">{t("tenant_section.title")}</h2>
-            <p className="text-xl text-stone-200 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
+            <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">{t("tenant_section.subtitle")}</p>
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
             <Reveal className="text-center p-6">
-              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-stone-200" />
+              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-primary-foreground/80" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step1_title")}</h3>
-              <p className="text-stone-300 text-sm">{t("tenant_section.step1_desc")}</p>
+              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step1_desc")}</p>
             </Reveal>
             <Reveal delay={120} className="text-center p-6">
-              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Camera className="h-8 w-8 text-stone-200" />
+              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Camera className="h-8 w-8 text-primary-foreground/80" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step2_title")}</h3>
-              <p className="text-stone-300 text-sm">{t("tenant_section.step2_desc")}</p>
+              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step2_desc")}</p>
             </Reveal>
             <Reveal delay={240} className="text-center p-6">
-              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="h-8 w-8 text-stone-200" />
+              <div className="w-16 h-16 bg-card/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-primary-foreground/80" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{t("tenant_section.step3_title")}</h3>
-              <p className="text-stone-300 text-sm">{t("tenant_section.step3_desc")}</p>
+              <p className="text-primary-foreground/70 text-sm">{t("tenant_section.step3_desc")}</p>
             </Reveal>
           </div>
 
           <Reveal delay={120} className="text-center">
             <Link to="/tenant-incidents">
-              <Button size="lg" className="bg-white text-stone-800 hover:bg-stone-100 font-semibold">
+              <Button size="lg" className="bg-card text-foreground hover:bg-accent/20 font-semibold">
                 {t("tenant_section.cta")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

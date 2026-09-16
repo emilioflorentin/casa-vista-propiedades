@@ -322,10 +322,10 @@ const PropertyDetail = () => {
   // Show loading while fetching property data
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+      <div className="min-h-screen bg-secondary flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-600 mx-auto mb-4"></div>
-          <p className="text-stone-600">Cargando propiedad...</p>
+          <p className="text-primary">Cargando propiedad...</p>
         </div>
       </div>
     );
@@ -333,11 +333,11 @@ const PropertyDetail = () => {
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+      <div className="min-h-screen bg-secondary flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-stone-800 mb-4">{t('property.not_found')}</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">{t('property.not_found')}</h1>
           <Link to="/properties">
-            <Button className="bg-stone-600 hover:bg-stone-700">{t('property.back_to_properties')}</Button>
+            <Button className="bg-primary hover:bg-primary">{t('property.back_to_properties')}</Button>
           </Link>
         </div>
       </div>
@@ -576,14 +576,14 @@ const PropertyDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-secondary">
       <Header />
       
       <div className="container mx-auto px-6 py-6">
         {/* Back Button */}
         <button 
           onClick={handleGoBack}
-          className="inline-flex items-center text-stone-600 hover:text-stone-700 mb-6 cursor-pointer"
+          className="inline-flex items-center text-primary hover:text-foreground mb-6 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t('common.back')}
@@ -598,7 +598,7 @@ const PropertyDetail = () => {
                 <img
                   src={images[currentImageIndex]}
                   alt={property.title}
-                  className="w-full h-full object-contain bg-stone-100 transition-transform duration-300 hover:scale-105"
+                  className="w-full h-full object-contain bg-accent/20 transition-transform duration-300 hover:scale-105"
                   loading="eager"
                   decoding="async"
                 />
@@ -615,7 +615,7 @@ const PropertyDetail = () => {
                     <img
                       src={image}
                       alt={t('property.view_number', { number: index + 1 })}
-                      className="w-full h-full object-contain bg-stone-100"
+                      className="w-full h-full object-contain bg-accent/20"
                       loading="lazy"
                       decoding="async"
                     />
@@ -631,7 +631,7 @@ const PropertyDetail = () => {
                 onClick={() => setLightboxOpen(false)}
               >
                 <button
-                  className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
+                  className="absolute top-4 right-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
                   onClick={() => setLightboxOpen(false)}
                 >
                   <X className="h-8 w-8" />
@@ -640,7 +640,7 @@ const PropertyDetail = () => {
                 {images.length > 1 && (
                   <>
                     <button
-                      className="absolute left-4 text-white/80 hover:text-white z-10"
+                      className="absolute left-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
                       onClick={(e) => {
                         e.stopPropagation();
                         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
@@ -649,7 +649,7 @@ const PropertyDetail = () => {
                       <ChevronLeft className="h-10 w-10" />
                     </button>
                     <button
-                      className="absolute right-4 text-white/80 hover:text-white z-10"
+                      className="absolute right-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
                       onClick={(e) => {
                         e.stopPropagation();
                         setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -676,7 +676,7 @@ const PropertyDetail = () => {
                         setCurrentImageIndex(index);
                       }}
                       className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                        currentImageIndex === index ? "bg-white" : "bg-white/40"
+                        currentImageIndex === index ? "bg-card" : "bg-card/40"
                       }`}
                     />
                   ))}
@@ -685,7 +685,7 @@ const PropertyDetail = () => {
             )}
 
             {/* Property Info */}
-            <div className="bg-white rounded-lg p-6 mb-6 h-fit">
+            <div className="bg-card rounded-lg p-6 mb-6 h-fit">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex gap-2 mb-2">
@@ -693,9 +693,9 @@ const PropertyDetail = () => {
                       variant={property.operation === 'rent' ? 'default' : 'secondary'}
                       className={`${
                         property.operation === 'rent' 
-                          ? 'bg-stone-500 hover:bg-stone-600' 
+                          ? 'bg-primary hover:bg-primary' 
                           : 'bg-amber-500 hover:bg-amber-600'
-                      } text-white`}
+                      } text-primary-foreground`}
                     >
                       {property.operation === 'rent' ? t('search.operation_rent') : t('search.operation_sale')}
                     </Badge>
@@ -703,14 +703,14 @@ const PropertyDetail = () => {
                       {t('property.reference')}: {property.reference}
                     </Badge>
                   </div>
-                  <h1 className="text-3xl font-bold text-stone-800 mb-2">
+                  <h1 className="text-3xl font-bold text-foreground mb-2">
                     {property.title}
                   </h1>
-                  <div className="flex items-center text-stone-600 mb-4">
+                  <div className="flex items-center text-primary mb-4">
                     <MapPin className="h-5 w-5 mr-2" />
                     {property.location}
                   </div>
-                  <div className="text-3xl font-bold text-stone-600">
+                  <div className="text-3xl font-bold text-primary">
                     {formatPrice(property.price, property.operation)}
                   </div>
                 </div>
@@ -718,7 +718,7 @@ const PropertyDetail = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-stone-300 text-stone-600 hover:bg-stone-50"
+                    className="border-border text-primary hover:bg-secondary"
                     onClick={() => {
                       toggleFavorite(property.id, { entityType: "property", entityId: property.originalId || property.id, ownerId: property.user_id });
                       toast({
@@ -738,13 +738,13 @@ const PropertyDetail = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-stone-300 text-stone-600 hover:bg-stone-50"
+                        className="border-border text-primary hover:bg-secondary"
                         aria-label="Compartir"
                       >
                         <Share2 className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white z-50">
+                    <DropdownMenuContent align="end" className="bg-card z-50">
                       <DropdownMenuItem
                         onClick={() => {
                           const text = `${property.title} - Ref ${property.reference}: ${displayLink}`;
@@ -799,47 +799,47 @@ const PropertyDetail = () => {
               </div>
 
               {/* Property Stats */}
-              <div className="grid grid-cols-4 gap-4 py-6 border-y border-stone-200">
+              <div className="grid grid-cols-4 gap-4 py-6 border-y border-border">
                 <div className="text-center">
-                  <Bed className="h-6 w-6 mx-auto text-stone-400 mb-2" />
+                  <Bed className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
                   <div className="font-semibold">{property.bedrooms}</div>
-                  <div className="text-sm text-stone-600">{t('property.bedrooms')}</div>
+                  <div className="text-sm text-primary">{t('property.bedrooms')}</div>
                 </div>
                 <div className="text-center">
-                  <Bath className="h-6 w-6 mx-auto text-stone-400 mb-2" />
+                  <Bath className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
                   <div className="font-semibold">{property.bathrooms}</div>
-                  <div className="text-sm text-stone-600">{t('property.bathrooms')}</div>
+                  <div className="text-sm text-primary">{t('property.bathrooms')}</div>
                 </div>
                 <div className="text-center">
-                  <Square className="h-6 w-6 mx-auto text-stone-400 mb-2" />
+                  <Square className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
                   <div className="font-semibold">{property.area}m²</div>
-                  <div className="text-sm text-stone-600">{t('property.area_label')}</div>
+                  <div className="text-sm text-primary">{t('property.area_label')}</div>
                 </div>
                 {property.features?.some((f: string) => f.toLowerCase().includes('parking') || f.toLowerCase().includes('garaje') || f.toLowerCase().includes('aparcamiento')) && (
                 <div className="text-center">
-                  <Car className="h-6 w-6 mx-auto text-stone-400 mb-2" />
+                  <Car className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
                   <div className="font-semibold">Sí</div>
-                  <div className="text-sm text-stone-600">{t('property.parking')}</div>
+                  <div className="text-sm text-primary">{t('property.parking')}</div>
                 </div>
                 )}
               </div>
 
               {/* Description */}
               <div className="py-6">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.description')}</h2>
-                <p className="text-stone-700 leading-relaxed">
+                <h2 className="text-xl font-semibold mb-4 text-foreground">{t('property.description')}</h2>
+                <p className="text-foreground leading-relaxed">
                   {getDescription(property)}
                 </p>
               </div>
 
               {/* OpenStreetMap Location Section */}
-              <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800 flex items-center">
-                  <Map className="h-5 w-5 mr-2 text-stone-600" />
+              <div className="py-6 border-t border-border">
+                <h2 className="text-xl font-semibold mb-4 text-foreground flex items-center">
+                  <Map className="h-5 w-5 mr-2 text-primary" />
                   {t('property.location')}
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center text-stone-600 mb-4">
+                  <div className="flex items-center text-primary mb-4">
                     <MapPin className="h-5 w-5 mr-2" />
                     <span className="text-lg">{property.location}</span>
                   </div>
@@ -848,9 +848,9 @@ const PropertyDetail = () => {
                   <MapComponent location={property.location} title={property.title} />
                   
                   {/* Location info */}
-                  <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">{t('property.area_info')}</h3>
-                    <p className="text-stone-600 text-sm">
+                  <div className="bg-secondary p-4 rounded-lg">
+                    <h3 className="font-medium text-foreground mb-2">{t('property.area_info')}</h3>
+                    <p className="text-primary text-sm">
                       {t('property.area_description')}
                     </p>
                   </div>
@@ -859,13 +859,13 @@ const PropertyDetail = () => {
 
               {/* Features */}
               {property.features && property.features.length > 0 && (
-                <div className="py-6 border-t border-stone-200">
-                  <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.features')}</h2>
+                <div className="py-6 border-t border-border">
+                  <h2 className="text-xl font-semibold mb-4 text-foreground">{t('property.features')}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {property.features.map((feature, index) => (
                       <div key={index} className="flex items-center">
-                        <div className="w-2 h-2 bg-stone-500 rounded-full mr-3"></div>
-                        <span className="text-stone-700">{feature}</span>
+                        <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                        <span className="text-foreground">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -874,13 +874,13 @@ const PropertyDetail = () => {
 
               {/* Amenities/Services */}
               {amenities.length > 0 && (
-              <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-6 text-stone-800">{t('property.services')}</h2>
+              <div className="py-6 border-t border-border">
+                <h2 className="text-xl font-semibold mb-6 text-foreground">{t('property.services')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                   {amenities.map((amenity, index) => (
-                    <div key={index} className="text-center p-4 bg-stone-50 rounded-lg">
-                      <amenity.icon className="h-8 w-8 mx-auto text-stone-600 mb-3" />
-                      <span className="text-sm text-stone-700 font-medium">{amenity.label}</span>
+                    <div key={index} className="text-center p-4 bg-secondary rounded-lg">
+                      <amenity.icon className="h-8 w-8 mx-auto text-primary mb-3" />
+                      <span className="text-sm text-foreground font-medium">{amenity.label}</span>
                     </div>
                   ))}
                 </div>
@@ -904,24 +904,24 @@ const PropertyDetail = () => {
               )}
 
               {/* Additional Information Section */}
-              <div className="py-6 border-t border-stone-200">
-                <h2 className="text-xl font-semibold mb-4 text-stone-800">{t('property.additional_info')}</h2>
+              <div className="py-6 border-t border-border">
+                <h2 className="text-xl font-semibold mb-4 text-foreground">{t('property.additional_info')}</h2>
                 <div className="space-y-4">
-                  <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">{t('property.transport')}</h3>
-                    <p className="text-stone-600 text-sm">
+                  <div className="bg-secondary p-4 rounded-lg">
+                    <h3 className="font-medium text-foreground mb-2">{t('property.transport')}</h3>
+                    <p className="text-primary text-sm">
                       {t('property.transport_description')}
                     </p>
                   </div>
-                  <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">{t('property.neighborhood')}</h3>
-                    <p className="text-stone-600 text-sm">
+                  <div className="bg-secondary p-4 rounded-lg">
+                    <h3 className="font-medium text-foreground mb-2">{t('property.neighborhood')}</h3>
+                    <p className="text-primary text-sm">
                       {t('property.neighborhood_description')}
                     </p>
                   </div>
-                  <div className="bg-stone-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-stone-800 mb-2">{t('property.nearby_services')}</h3>
-                    <p className="text-stone-600 text-sm">
+                  <div className="bg-secondary p-4 rounded-lg">
+                    <h3 className="font-medium text-foreground mb-2">{t('property.nearby_services')}</h3>
+                    <p className="text-primary text-sm">
                       {t('property.nearby_services_description')}
                     </p>
                   </div>
@@ -933,9 +933,9 @@ const PropertyDetail = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Agent Card - Updated to show agency */}
-            <Card className="border-stone-200">
+            <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-stone-800">{t('property.real_estate_agent')}</CardTitle>
+                <CardTitle className="text-foreground">{t('property.real_estate_agent')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center mb-4">
@@ -945,24 +945,24 @@ const PropertyDetail = () => {
                     className="w-16 h-16 rounded-full mr-4"
                   />
                   <div>
-                    <h3 className="font-semibold text-lg text-stone-800">{agent.name}</h3>
-                    <p className="text-sm text-stone-500 font-medium">{agent.agency}</p>
+                    <h3 className="font-semibold text-lg text-foreground">{agent.name}</h3>
+                    <p className="text-sm text-muted-foreground font-medium">{agent.agency}</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-3 text-stone-400" />
-                    <span className="text-stone-700">{agent.phone}</span>
+                    <Phone className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <span className="text-foreground">{agent.phone}</span>
                   </div>
                   <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-3 text-stone-400" />
-                    <span className="text-stone-700">{agent.email}</span>
+                    <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <span className="text-foreground">{agent.email}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <Button 
                     size="sm" 
-                    className="bg-stone-600 hover:bg-stone-700"
+                    className="bg-primary hover:bg-primary"
                     onClick={() => {
                       const phoneNumber = agent.phone?.replace(/\s/g, '') || '';
                       if (phoneNumber && phoneNumber !== 'No disponible') {
@@ -973,7 +973,7 @@ const PropertyDetail = () => {
                     <Phone className="h-4 w-4 mr-1" />
                     {t('property.call')}
                   </Button>
-                  <Button variant="outline" size="sm" className="border-stone-300 text-stone-600 hover:bg-stone-50">
+                  <Button variant="outline" size="sm" className="border-border text-primary hover:bg-secondary">
                     <Calendar className="h-4 w-4 mr-1" />
                     {t('property.appointment')}
                   </Button>
@@ -982,9 +982,9 @@ const PropertyDetail = () => {
             </Card>
 
             {/* WhatsApp Chat Card - moved before reservation card */}
-            <Card className="border-stone-200">
+            <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-stone-800 flex items-center">
+                <CardTitle className="text-foreground flex items-center">
                   <div className="relative mr-2">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.516" fill="#25D366"/>
@@ -994,18 +994,18 @@ const PropertyDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-stone-600 mb-4">
+                <p className="text-sm text-primary mb-4">
                   {t('property.whatsapp_description', { agency: agent.agency })}
                 </p>
                 
                 {/* Quick message buttons */}
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm font-medium text-stone-700">{t('property.quick_messages')}:</p>
+                  <p className="text-sm font-medium text-foreground">{t('property.quick_messages')}:</p>
                   {quickMessages.map((message, index) => (
                     <button
                       key={index}
                       onClick={() => setWhatsappMessage(message)}
-                      className="w-full text-left p-2 text-sm bg-stone-50 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="w-full text-left p-2 text-sm bg-secondary hover:bg-accent/20 rounded-lg transition-colors"
                     >
                       {message}
                     </button>
@@ -1019,11 +1019,11 @@ const PropertyDetail = () => {
                     value={whatsappMessage}
                     onChange={(e) => setWhatsappMessage(e.target.value)}
                     rows={3}
-                    className="border-stone-300 focus:border-stone-500 text-sm resize-none"
+                    className="border-border focus:border-stone-500 text-sm resize-none"
                   />
                   <Button 
                     onClick={handleWhatsAppChat}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                    className="w-full bg-green-500 hover:bg-green-600 text-primary-foreground"
                   >
                     <Send className="h-4 w-4 mr-2" />
                     {t('property.open_whatsapp')}

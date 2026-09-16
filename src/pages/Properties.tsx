@@ -230,26 +230,26 @@ const Properties = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-secondary">
       <Header />
       
       {/* Search Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card shadow-sm border-b">
         <div className="container mx-auto px-6 py-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 placeholder={t('properties.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 border-stone-300 focus:border-stone-500"
+                className="pl-10 h-12 border-border focus:border-stone-500"
               />
             </div>
             
             <div className="flex gap-3">
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 w-40 border-stone-300">
+                <SelectTrigger className="h-12 w-40 border-border">
                   <SelectValue placeholder={t('search.operation')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -260,7 +260,7 @@ const Properties = () => {
               </Select>
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 w-40 border-stone-300">
+                <SelectTrigger className="h-12 w-40 border-border">
                   <SelectValue placeholder={t('search.property_type')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,7 +273,7 @@ const Properties = () => {
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
-                <SelectTrigger className="h-12 w-40 border-stone-300">
+                <SelectTrigger className="h-12 w-40 border-border">
                   <SelectValue placeholder={t('search.managed_by')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,7 +286,7 @@ const Properties = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="h-12 border-stone-300 text-stone-600 hover:bg-stone-50"
+                className="h-12 border-border text-primary hover:bg-secondary"
               >
                 <Filter className="h-4 w-4 mr-2" />
                 {t('properties.filters')}
@@ -295,10 +295,10 @@ const Properties = () => {
           </div>
           
           {showFilters && (
-            <div className="mt-6 p-6 bg-stone-50 rounded-lg">
+            <div className="mt-6 p-6 bg-secondary rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t('properties.price_range')}
                   </label>
                   <Slider
@@ -309,18 +309,18 @@ const Properties = () => {
                     step={10000}
                     className="mt-2"
                   />
-                  <div className="flex justify-between text-sm text-stone-500 mt-1">
+                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
                     <span>{priceRange[0].toLocaleString()}€</span>
                     <span>{priceRange[1].toLocaleString()}€</span>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t('properties.min_bedrooms')}
                   </label>
                   <Select value={minBedrooms} onValueChange={setMinBedrooms}>
-                    <SelectTrigger className="border-stone-300">
+                    <SelectTrigger className="border-border">
                       <SelectValue placeholder={t('properties.any')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,11 +335,11 @@ const Properties = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t('properties.min_bathrooms')}
                   </label>
                   <Select value={minBathrooms} onValueChange={setMinBathrooms}>
-                    <SelectTrigger className="border-stone-300">
+                    <SelectTrigger className="border-border">
                       <SelectValue placeholder={t('properties.any')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -354,7 +354,7 @@ const Properties = () => {
               </div>
               
               <div className="mt-6">
-                <label className="block text-sm font-medium text-stone-700 mb-4">
+                <label className="block text-sm font-medium text-foreground mb-4">
                   {t('properties.features')}
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -364,7 +364,7 @@ const Properties = () => {
                       checked={hasHeating}
                       onCheckedChange={(checked) => setHasHeating(checked === true)}
                     />
-                    <Label htmlFor="heating" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="heating" className="flex items-center text-sm text-primary">
                       <Heater className="h-4 w-4 mr-1" />
                       {t('properties.heating')}
                     </Label>
@@ -376,7 +376,7 @@ const Properties = () => {
                       checked={hasPool}
                       onCheckedChange={(checked) => setHasPool(checked === true)}
                     />
-                    <Label htmlFor="pool" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="pool" className="flex items-center text-sm text-primary">
                       <Waves className="h-4 w-4 mr-1" />
                       {t('properties.pool')}
                     </Label>
@@ -388,7 +388,7 @@ const Properties = () => {
                       checked={hasGarage}
                       onCheckedChange={(checked) => setHasGarage(checked === true)}
                     />
-                    <Label htmlFor="garage" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="garage" className="flex items-center text-sm text-primary">
                       <Car className="h-4 w-4 mr-1" />
                       {t('properties.garage')}
                     </Label>
@@ -400,7 +400,7 @@ const Properties = () => {
                       checked={hasAirConditioning}
                       onCheckedChange={(checked) => setHasAirConditioning(checked === true)}
                     />
-                    <Label htmlFor="airConditioning" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="airConditioning" className="flex items-center text-sm text-primary">
                       <Zap className="h-4 w-4 mr-1" />
                       {t('properties.air_conditioning')}
                     </Label>
@@ -412,7 +412,7 @@ const Properties = () => {
                       checked={hasElevator}
                       onCheckedChange={(checked) => setHasElevator(checked === true)}
                     />
-                    <Label htmlFor="elevator" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="elevator" className="flex items-center text-sm text-primary">
                       <Square className="h-4 w-4 mr-1" />
                       {t('properties.elevator')}
                     </Label>
@@ -424,7 +424,7 @@ const Properties = () => {
                       checked={hasTerrace}
                       onCheckedChange={(checked) => setHasTerrace(checked === true)}
                     />
-                    <Label htmlFor="terrace" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="terrace" className="flex items-center text-sm text-primary">
                       <Home className="h-4 w-4 mr-1" />
                       {t('properties.terrace')}
                     </Label>
@@ -436,7 +436,7 @@ const Properties = () => {
                       checked={hasGarden}
                       onCheckedChange={(checked) => setHasGarden(checked === true)}
                     />
-                    <Label htmlFor="garden" className="flex items-center text-sm text-stone-600">
+                    <Label htmlFor="garden" className="flex items-center text-sm text-primary">
                       <Square className="h-4 w-4 mr-1" />
                       {t('properties.garden')}
                     </Label>
@@ -452,10 +452,10 @@ const Properties = () => {
       <div className="container mx-auto px-6 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-stone-800">
+            <h1 className="text-2xl font-bold text-foreground">
               {filteredProperties.length} {t('properties.page_title')}
             </h1>
-            <p className="text-stone-600 mt-1">
+            <p className="text-primary mt-1">
               {t('properties.results_subtitle')}
             </p>
           </div>
@@ -465,7 +465,7 @@ const Properties = () => {
               variant={viewMode === "grid" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={viewMode === "grid" ? "bg-stone-600 hover:bg-stone-700" : "border-stone-300 text-stone-600 hover:bg-stone-50"}
+              className={viewMode === "grid" ? "bg-primary hover:bg-primary" : "border-border text-primary hover:bg-secondary"}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
@@ -473,7 +473,7 @@ const Properties = () => {
               variant={viewMode === "list" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("list")}
-              className={viewMode === "list" ? "bg-stone-600 hover:bg-stone-700" : "border-stone-300 text-stone-600 hover:bg-stone-50"}
+              className={viewMode === "list" ? "bg-primary hover:bg-primary" : "border-border text-primary hover:bg-secondary"}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -490,7 +490,7 @@ const Properties = () => {
         ) : (
           <div className="space-y-4">
             {filteredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow border-stone-200">
+              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow border-border">
                 <CardContent className="p-0">
                   <div className="flex">
                     <div className="w-64 h-48 flex-shrink-0">
@@ -508,17 +508,17 @@ const Properties = () => {
                               variant={property.operation === 'rent' ? 'default' : 'secondary'}
                               className={`${
                                 property.operation === 'rent' 
-                                  ? 'bg-stone-500 hover:bg-stone-600' 
+                                  ? 'bg-primary hover:bg-primary' 
                                   : 'bg-amber-500 hover:bg-amber-600'
-                              } text-white`}
+                              } text-primary-foreground`}
                             >
                               {property.operation === 'rent' ? t('properties.operation_rent') : t('properties.operation_sale')}
                             </Badge>
                           </div>
-                          <h3 className="text-xl font-semibold text-stone-800 mb-1">
+                          <h3 className="text-xl font-semibold text-foreground mb-1">
                             {property.title}
                           </h3>
-                          <div className="flex items-center text-stone-500 mb-4">
+                          <div className="flex items-center text-muted-foreground mb-4">
                             <MapPin className="h-4 w-4 mr-1" />
                             {property.location}
                           </div>
@@ -529,7 +529,7 @@ const Properties = () => {
                           className={`transition-all duration-200 ${
                             isFavorite(property.id)
                               ? 'text-red-600 hover:bg-red-50' 
-                              : 'text-stone-600 hover:bg-stone-50'
+                              : 'text-primary hover:bg-secondary'
                           }`}
                           onClick={(e) => handleFavoriteClick(e, property.id)}
                         >
@@ -541,7 +541,7 @@ const Properties = () => {
                         </Button>
                       </div>
                       
-                      <div className="flex items-center gap-6 text-stone-600 mb-4">
+                      <div className="flex items-center gap-6 text-primary mb-4">
                         <div className="flex items-center">
                           <Bed className="h-4 w-4 mr-1" />
                           <span>{property.bedrooms} {t('properties.bedrooms_unit')}</span>
@@ -557,12 +557,12 @@ const Properties = () => {
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <div className="text-2xl font-bold text-stone-600">
+                        <div className="text-2xl font-bold text-primary">
                           {new Intl.NumberFormat('es-ES').format(property.price)}€
                           {property.operation === 'rent' && t('properties.per_month')}
                         </div>
                         <Link to={`/property/${(property as any).originalId || property.id}`}>
-                          <Button className="bg-stone-600 hover:bg-stone-700">
+                          <Button className="bg-primary hover:bg-primary">
                             <Eye className="h-4 w-4 mr-2" />
                             {t('properties.view_details')}
                           </Button>
@@ -579,11 +579,11 @@ const Properties = () => {
         {filteredProperties.length === 0 && (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
-              <Search className="h-16 w-16 text-stone-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-stone-800 mb-2">
+              <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 {t('properties.no_results_title')}
               </h3>
-              <p className="text-stone-600">
+              <p className="text-primary">
                 {t('properties.no_results_desc')}
               </p>
             </div>

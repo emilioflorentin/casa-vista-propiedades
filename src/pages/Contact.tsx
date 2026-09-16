@@ -177,15 +177,15 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-secondary">
       <Header />
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-stone-300 via-stone-400 to-stone-500 text-white py-20">
+      <div className="relative bg-primary text-primary-foreground py-20">
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-4">{t("contact.title")}</h1>
-          <p className="text-xl text-stone-50">{t("contact.subtitle")}</p>
+          <p className="text-xl text-primary-foreground/90">{t("contact.subtitle")}</p>
         </div>
       </div>
 
@@ -209,17 +209,17 @@ const Contact = () => {
                 )}
 
                 <div
-                  className={`flex items-center space-x-3 text-stone-600 ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
+                  className={`flex items-center space-x-3 text-primary ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
                 >
                   <Mail className="h-5 w-5" />
-                  <button onClick={handleEmailClick} className="font-medium hover:text-stone-800 transition-colors">
+                  <button onClick={handleEmailClick} className="font-medium hover:text-foreground transition-colors">
                     info@nazarihomes.com
                   </button>
                 </div>
 
                 <button
                   onClick={() => handlePhoneCall("671030927")}
-                  className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
+                  className={`flex items-center space-x-3 text-primary hover:text-foreground transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
                 >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">671 030 927</span>
@@ -227,7 +227,7 @@ const Contact = () => {
 
                 <button
                   onClick={() => handlePhoneCall("624567853")}
-                  className={`flex items-center space-x-3 text-stone-600 hover:text-stone-800 transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
+                  className={`flex items-center space-x-3 text-primary hover:text-foreground transition-colors ${!isCaptchaVerified ? "filter blur-sm pointer-events-none" : ""}`}
                 >
                   <Phone className="h-5 w-5" />
                   <span className="font-medium">624 567 853</span>
@@ -249,12 +249,12 @@ const Contact = () => {
                   </button>
                 </div>
 
-                <div className="flex items-start space-x-3 text-stone-600">
+                <div className="flex items-start space-x-3 text-primary">
                   <MapPin className="h-5 w-5 mt-1" />
                   <div>
                     <p className="font-medium">{t("contact.operation_zone")}</p>
-                    <p className="text-stone-600">{t("contact.granada_province")}</p>
-                    <p className="text-stone-500 text-sm mt-1">{t("contact.no_physical_office")}</p>
+                    <p className="text-primary">{t("contact.granada_province")}</p>
+                    <p className="text-muted-foreground text-sm mt-1">{t("contact.no_physical_office")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -266,8 +266,8 @@ const Contact = () => {
             <Card>
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-stone-800 mb-4">{t("contact.form_title")}</h2>
-                  <p className="text-stone-600 text-lg font-medium">{t("contact.form_subtitle")}</p>
+                  <h2 className="text-3xl font-bold text-foreground mb-4">{t("contact.form_title")}</h2>
+                  <p className="text-primary text-lg font-medium">{t("contact.form_subtitle")}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -348,11 +348,11 @@ const Contact = () => {
                         }}
                         required
                       />
-                      <label htmlFor="privacy" className="text-sm text-stone-600">
+                      <label htmlFor="privacy" className="text-sm text-primary">
                         {t("contact.privacy_text")}{" "}
                         <Link
                           to="/privacy-policy"
-                          className="text-stone-600 hover:underline"
+                          className="text-primary hover:underline"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -381,7 +381,7 @@ const Contact = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-lg font-semibold bg-stone-600 hover:bg-stone-700 text-white"
+                    className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary text-primary-foreground"
                     disabled={!privacyAccepted || isSubmitting}
                   >
                     {isSubmitting ? "Enviando..." : t("contact.send_button")}
