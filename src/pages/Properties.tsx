@@ -247,9 +247,9 @@ const Properties = () => {
               />
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Select value={operation} onValueChange={setOperation}>
-                <SelectTrigger className="h-12 w-40 border-border">
+                <SelectTrigger className="h-12 w-[46%] sm:w-40 border-border">
                   <SelectValue placeholder={t('search.operation')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -260,7 +260,7 @@ const Properties = () => {
               </Select>
               
               <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="h-12 w-40 border-border">
+                <SelectTrigger className="h-12 w-[46%] sm:w-40 border-border">
                   <SelectValue placeholder={t('search.property_type')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,7 +273,7 @@ const Properties = () => {
               </Select>
 
               <Select value={managedBy} onValueChange={setManagedBy}>
-                <SelectTrigger className="h-12 w-40 border-border">
+                <SelectTrigger className="h-12 w-[46%] sm:w-40 border-border">
                   <SelectValue placeholder={t('search.managed_by')} />
                 </SelectTrigger>
                 <SelectContent>
