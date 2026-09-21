@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone, LogOut, Plus } from "lucide-react";
+import { Menu, X, Heart, User, Phone, LogOut, Plus, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,12 +14,14 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BrandLogo from "@/components/BrandLogo";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { language, setLanguage, t } = useLanguage();
   const { user, signOut } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
 
   return (
     <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
