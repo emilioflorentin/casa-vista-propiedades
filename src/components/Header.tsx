@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone, LogOut, Plus } from "lucide-react";
+import { Menu, X, Heart, User, Phone, LogOut, Plus, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,12 +14,14 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BrandLogo from "@/components/BrandLogo";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { language, setLanguage, t } = useLanguage();
   const { user, signOut } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
 
   return (
     <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
@@ -87,6 +89,14 @@ const Header = () => {
                       Mi Perfil
                     </Link>
                   </DropdownMenuItem>
+                  {isSuperAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/superadmin" className="w-full">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Panel de administración
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={signOut}
@@ -303,6 +313,14 @@ const Header = () => {
                         Mi Perfil
                       </Button>
                     </Link>
+                    {isSuperAdmin && (
+                      <Link to="/superadmin" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
+                          <Shield className="h-4 w-4 mr-2" />
+                          Panel de administración
+                        </Button>
+                      </Link>
+                    )}
 
                     <Button 
                       variant="ghost" 

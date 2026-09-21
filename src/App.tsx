@@ -22,6 +22,7 @@ import ManageRental from "./pages/ManageRental";
 import TenantIncidents from "./pages/TenantIncidents";
 import OwnerIncidents from "./pages/OwnerIncidents";
 import ServiceBoard from "./pages/ServiceBoard";
+import SuperAdmin from "./pages/SuperAdmin";
 import ShortRedirect from "./pages/ShortRedirect";
 import RoomieFinder from "./pages/RoomieFinder";
 import RoomieListingDetail from "./pages/RoomieListingDetail";
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/tenant-incidents" element={<TenantIncidents />} />
               <Route path="/owner-incidents" element={<OwnerIncidents />} />
               <Route path="/service-board" element={<ServiceBoard />} />
+              <Route path="/superadmin" element={<SuperAdmin />} />
               <Route path="/roomie-finder" element={<RoomieFinder />} />
               <Route path="/roomie-finder/publicar" element={<RoomiePublish />} />
               <Route path="/roomie-finder/mi-perfil" element={<RoomieProfile />} />
