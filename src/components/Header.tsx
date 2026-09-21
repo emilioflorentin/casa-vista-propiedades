@@ -313,6 +313,14 @@ const Header = () => {
                         Mi Perfil
                       </Button>
                     </Link>
+                    {isSuperAdmin && (
+                      <Link to="/superadmin" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
+                          <Shield className="h-4 w-4 mr-2" />
+                          Panel de administración
+                        </Button>
+                      </Link>
+                    )}
 
                     <Button 
                       variant="ghost" 
