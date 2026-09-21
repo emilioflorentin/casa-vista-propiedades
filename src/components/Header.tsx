@@ -89,6 +89,14 @@ const Header = () => {
                       Mi Perfil
                     </Link>
                   </DropdownMenuItem>
+                  {isSuperAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/superadmin" className="w-full">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Panel de administración
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={signOut}
