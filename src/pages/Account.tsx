@@ -747,19 +747,21 @@ const Account = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className={`grid w-full ${(user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com') ? 'grid-cols-6' : 'grid-cols-5'}`}>
-              <TabsTrigger value="profile">Mi Perfil</TabsTrigger>
-              <TabsTrigger value="properties">Mis Propiedades</TabsTrigger>
-              <TabsTrigger value="rented">Alquiladas</TabsTrigger>
-              <TabsTrigger value="tenants">Inquilinos</TabsTrigger>
-              <TabsTrigger value="stats">Estadísticas</TabsTrigger>
-              {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
-                <TabsTrigger value="documents">
-                  <FileSignature className="w-4 h-4 mr-1" />
-                  Generar documentación
-                </TabsTrigger>
-              )}
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="flex w-max min-w-full gap-1 sm:w-full">
+                <TabsTrigger value="profile" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Mi Perfil</TabsTrigger>
+                <TabsTrigger value="properties" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Mis Propiedades</TabsTrigger>
+                <TabsTrigger value="rented" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Alquiladas</TabsTrigger>
+                <TabsTrigger value="tenants" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Inquilinos</TabsTrigger>
+                <TabsTrigger value="stats" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Estadísticas</TabsTrigger>
+                {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
+                  <TabsTrigger value="documents" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">
+                    <FileSignature className="w-4 h-4 mr-1" />
+                    Documentación
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </div>
 
             <TabsContent value="stats" className="space-y-6">
               <ListingStatsPanel
@@ -967,7 +969,7 @@ const Account = () => {
                           <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 flex gap-1">
+                      <div className="absolute top-2 left-2 right-12 flex flex-wrap gap-1">
                         <Badge className="bg-primary text-white">
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
@@ -1078,7 +1080,7 @@ const Account = () => {
                           <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 flex gap-1">
+                      <div className="absolute top-2 left-2 right-12 flex flex-wrap gap-1">
                         <Badge className="bg-green-600 text-white">
                           Alquilada
                         </Badge>
