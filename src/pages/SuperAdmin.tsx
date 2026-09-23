@@ -626,6 +626,63 @@ const SuperAdmin = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Nuevo plan */}
+      <Dialog open={!!newPlan} onOpenChange={(o) => !o && setNewPlan(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Nuevo plan</DialogTitle></DialogHeader>
+          {newPlan && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Nombre</Label>
+                <Input value={newPlan.name} onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })} placeholder="Ej. Plan Emprendedor" />
+              </div>
+              <div className="space-y-2">
+                <Label>Descripción</Label>
+                <Input value={newPlan.description} onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label>€/mes</Label>
+                  <Input type="number" value={newPlan.price_monthly} onChange={(e) => setNewPlan({ ...newPlan, price_monthly: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Anuncios</Label>
+                  <Input type="number" value={newPlan.max_listings} onChange={(e) => setNewPlan({ ...newPlan, max_listings: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Asesores</Label>
+                  <Input type="number" value={newPlan.max_advisors} onChange={(e) => setNewPlan({ ...newPlan, max_advisors: Number(e.target.value) })} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <span className="text-sm">Plan visible</span>
+                <Switch checked={newPlan.is_active} onCheckedChange={(v) => setNewPlan({ ...newPlan, is_active: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewPlan(null)}>Cancelar</Button>
+            <Button onClick={createPlan} disabled={saving}>Crear plan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Eliminar plan */}
+      <AlertDialog open={!!planToDelete} onOpenChange={(o) => !o && setPlanToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar el plan {planToDelete?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Las empresas que tengan este plan quedarán sin plan asignado. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={deletePlan}>Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
