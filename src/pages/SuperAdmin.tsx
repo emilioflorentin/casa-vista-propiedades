@@ -50,6 +50,7 @@ import {
   Euro,
   Trash2,
   Settings2,
+  Plus,
 } from 'lucide-react';
 
 type PlanRow = {
@@ -127,6 +128,8 @@ const SuperAdmin = () => {
   const [requests, setRequests] = useState<RequestRow[]>([]);
   const [editing, setEditing] = useState<CompanyRow | null>(null);
   const [editingPlan, setEditingPlan] = useState<PlanRow | null>(null);
+  const [newPlan, setNewPlan] = useState<PlanRow | null>(null);
+  const [planToDelete, setPlanToDelete] = useState<PlanRow | null>(null);
   const [toDelete, setToDelete] = useState<CompanyRow | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -265,6 +268,63 @@ const SuperAdmin = () => {
     loadData();
   };
 
+  const emptyPlan = (): PlanRow => ({
+    id: '',
+    slug: '',
+    name: '',
+    description: '',
+    price_monthly: 0,
+    max_listings: 10,
+    max_advisors: 1,
+    is_active: true,
+    sort_order: (plans[plans.length - 1]?.sort_order ?? 0) + 1,
+  });
+
+  const createPlan = async () => {
+    if (!newPlan) return;
+    if (!newPlan.name.trim()) {
+      toast({ title: 'El plan necesita un nombre', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    const slug = newPlan.name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || `plan-${Date.now()}`;
+    const { error } = await supabase.from('plans').insert({
+      slug: `${slug}-${Date.now().toString(36)}`,
+      name: newPlan.name.trim(),
+      description: newPlan.description,
+      price_monthly: newPlan.price_monthly,
+      max_listings: newPlan.max_listings,
+      max_advisors: newPlan.max_advisors,
+      is_active: newPlan.is_active,
+      sort_order: newPlan.sort_order,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: 'No se pudo crear el plan', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Plan creado' });
+    setNewPlan(null);
+    loadData();
+  };
+
+  const deletePlan = async () => {
+    if (!planToDelete) return;
+    const { error } = await supabase.from('plans').delete().eq('id', planToDelete.id);
+    setPlanToDelete(null);
+    if (error) {
+      toast({ title: 'No se pudo eliminar el plan', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Plan eliminado' });
+    loadData();
+  };
+
   const deleteCompany = async () => {
     if (!toDelete) return;
     const { error } = await supabase.from('companies').delete().eq('id', toDelete.id);
@@ -395,23 +455,35 @@ const SuperAdmin = () => {
             ))}
           </TabsContent>
 
-          <TabsContent value="plans" className="mt-4 grid gap-3 md:grid-cols-3">
-            {plans.map((plan) => (
-              <Card key={plan.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{plan.name}</CardTitle>
-                    <Badge variant={plan.is_active ? 'default' : 'secondary'}>{plan.is_active ? 'Activo' : 'Oculto'}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-2xl font-bold">{plan.price_monthly} €<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  <p className="text-sm">{plan.max_listings} anuncios · {plan.max_advisors} asesores</p>
-                  <Button size="sm" variant="outline" onClick={() => setEditingPlan(plan)}>Editar plan</Button>
-                </CardContent>
-              </Card>
-            ))}
+          <TabsContent value="plans" className="mt-4 space-y-3">
+            <div className="flex justify-end">
+              <Button size="sm" onClick={() => setNewPlan(emptyPlan())}>
+                <Plus className="h-4 w-4 mr-1" /> Nuevo plan
+              </Button>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {plans.map((plan) => (
+                <Card key={plan.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">{plan.name}</CardTitle>
+                      <div className="flex items-center gap-1">
+                        <Badge variant={plan.is_active ? 'default' : 'secondary'}>{plan.is_active ? 'Activo' : 'Oculto'}</Badge>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => setPlanToDelete(plan)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-2xl font-bold">{plan.price_monthly} €<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm">{plan.max_listings} anuncios · {plan.max_advisors} asesores</p>
+                    <Button size="sm" variant="outline" onClick={() => setEditingPlan(plan)}>Editar plan</Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </main>
@@ -553,6 +625,63 @@ const SuperAdmin = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Nuevo plan */}
+      <Dialog open={!!newPlan} onOpenChange={(o) => !o && setNewPlan(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Nuevo plan</DialogTitle></DialogHeader>
+          {newPlan && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Nombre</Label>
+                <Input value={newPlan.name} onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })} placeholder="Ej. Plan Emprendedor" />
+              </div>
+              <div className="space-y-2">
+                <Label>Descripción</Label>
+                <Input value={newPlan.description} onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label>€/mes</Label>
+                  <Input type="number" value={newPlan.price_monthly} onChange={(e) => setNewPlan({ ...newPlan, price_monthly: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Anuncios</Label>
+                  <Input type="number" value={newPlan.max_listings} onChange={(e) => setNewPlan({ ...newPlan, max_listings: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Asesores</Label>
+                  <Input type="number" value={newPlan.max_advisors} onChange={(e) => setNewPlan({ ...newPlan, max_advisors: Number(e.target.value) })} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <span className="text-sm">Plan visible</span>
+                <Switch checked={newPlan.is_active} onCheckedChange={(v) => setNewPlan({ ...newPlan, is_active: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewPlan(null)}>Cancelar</Button>
+            <Button onClick={createPlan} disabled={saving}>Crear plan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Eliminar plan */}
+      <AlertDialog open={!!planToDelete} onOpenChange={(o) => !o && setPlanToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar el plan {planToDelete?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Las empresas que tengan este plan quedarán sin plan asignado. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={deletePlan}>Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
