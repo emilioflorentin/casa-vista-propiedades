@@ -455,23 +455,35 @@ const SuperAdmin = () => {
             ))}
           </TabsContent>
 
-          <TabsContent value="plans" className="mt-4 grid gap-3 md:grid-cols-3">
-            {plans.map((plan) => (
-              <Card key={plan.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{plan.name}</CardTitle>
-                    <Badge variant={plan.is_active ? 'default' : 'secondary'}>{plan.is_active ? 'Activo' : 'Oculto'}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-2xl font-bold">{plan.price_monthly} €<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  <p className="text-sm">{plan.max_listings} anuncios · {plan.max_advisors} asesores</p>
-                  <Button size="sm" variant="outline" onClick={() => setEditingPlan(plan)}>Editar plan</Button>
-                </CardContent>
-              </Card>
-            ))}
+          <TabsContent value="plans" className="mt-4 space-y-3">
+            <div className="flex justify-end">
+              <Button size="sm" onClick={() => setNewPlan(emptyPlan())}>
+                <Plus className="h-4 w-4 mr-1" /> Nuevo plan
+              </Button>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {plans.map((plan) => (
+                <Card key={plan.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">{plan.name}</CardTitle>
+                      <div className="flex items-center gap-1">
+                        <Badge variant={plan.is_active ? 'default' : 'secondary'}>{plan.is_active ? 'Activo' : 'Oculto'}</Badge>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => setPlanToDelete(plan)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-2xl font-bold">{plan.price_monthly} €<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm">{plan.max_listings} anuncios · {plan.max_advisors} asesores</p>
+                    <Button size="sm" variant="outline" onClick={() => setEditingPlan(plan)}>Editar plan</Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </main>
