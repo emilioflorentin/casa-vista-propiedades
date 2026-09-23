@@ -268,6 +268,63 @@ const SuperAdmin = () => {
     loadData();
   };
 
+  const emptyPlan = (): PlanRow => ({
+    id: '',
+    slug: '',
+    name: '',
+    description: '',
+    price_monthly: 0,
+    max_listings: 10,
+    max_advisors: 1,
+    is_active: true,
+    sort_order: (plans[plans.length - 1]?.sort_order ?? 0) + 1,
+  });
+
+  const createPlan = async () => {
+    if (!newPlan) return;
+    if (!newPlan.name.trim()) {
+      toast({ title: 'El plan necesita un nombre', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    const slug = newPlan.name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || `plan-${Date.now()}`;
+    const { error } = await supabase.from('plans').insert({
+      slug: `${slug}-${Date.now().toString(36)}`,
+      name: newPlan.name.trim(),
+      description: newPlan.description,
+      price_monthly: newPlan.price_monthly,
+      max_listings: newPlan.max_listings,
+      max_advisors: newPlan.max_advisors,
+      is_active: newPlan.is_active,
+      sort_order: newPlan.sort_order,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: 'No se pudo crear el plan', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Plan creado' });
+    setNewPlan(null);
+    loadData();
+  };
+
+  const deletePlan = async () => {
+    if (!planToDelete) return;
+    const { error } = await supabase.from('plans').delete().eq('id', planToDelete.id);
+    setPlanToDelete(null);
+    if (error) {
+      toast({ title: 'No se pudo eliminar el plan', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Plan eliminado' });
+    loadData();
+  };
+
   const deleteCompany = async () => {
     if (!toDelete) return;
     const { error } = await supabase.from('companies').delete().eq('id', toDelete.id);
