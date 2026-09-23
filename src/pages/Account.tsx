@@ -969,7 +969,7 @@ const Account = () => {
                           <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 flex gap-1">
+                      <div className="absolute top-2 left-2 right-12 flex flex-wrap gap-1">
                         <Badge className="bg-primary text-white">
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
@@ -1080,7 +1080,7 @@ const Account = () => {
                           <Home className="w-12 h-12 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 flex gap-1">
+                      <div className="absolute top-2 left-2 right-12 flex flex-wrap gap-1">
                         <Badge className="bg-green-600 text-white">
                           Alquilada
                         </Badge>
