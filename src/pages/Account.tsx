@@ -31,6 +31,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { geocodeSpanishAddress } from '@/utils/geocoding';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 
 // Property type for Supabase data
 interface PropertyData {
@@ -63,13 +64,17 @@ const Account = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin();
 
-  // Redirect multiservicios to their dedicated panel
+  // Redirect privileged accounts to their dedicated panels
   useEffect(() => {
-    if (user?.email === 'multiservicios@nazarihomes.com') {
+    if (superAdminLoading) return;
+    if (isSuperAdmin) {
+      navigate('/superadmin', { replace: true });
+    } else if (user?.email === 'multiservicios@nazarihomes.com') {
       navigate('/service-board', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, isSuperAdmin, superAdminLoading]);
   const [activeTab, setActiveTab] = useState('profile');
   const [showPropertyForm, setShowPropertyForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null);
