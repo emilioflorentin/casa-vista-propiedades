@@ -748,14 +748,14 @@ const Account = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-              <TabsList className="flex w-max min-w-full gap-1 sm:grid sm:w-full sm:grid-cols-5 md:grid-cols-6">
-                <TabsTrigger value="profile" className="whitespace-nowrap text-xs sm:text-sm px-3">Mi Perfil</TabsTrigger>
-                <TabsTrigger value="properties" className="whitespace-nowrap text-xs sm:text-sm px-3">Mis Propiedades</TabsTrigger>
-                <TabsTrigger value="rented" className="whitespace-nowrap text-xs sm:text-sm px-3">Alquiladas</TabsTrigger>
-                <TabsTrigger value="tenants" className="whitespace-nowrap text-xs sm:text-sm px-3">Inquilinos</TabsTrigger>
-                <TabsTrigger value="stats" className="whitespace-nowrap text-xs sm:text-sm px-3">Estadísticas</TabsTrigger>
+              <TabsList className="flex w-max min-w-full gap-1 sm:w-full">
+                <TabsTrigger value="profile" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Mi Perfil</TabsTrigger>
+                <TabsTrigger value="properties" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Mis Propiedades</TabsTrigger>
+                <TabsTrigger value="rented" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Alquiladas</TabsTrigger>
+                <TabsTrigger value="tenants" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Inquilinos</TabsTrigger>
+                <TabsTrigger value="stats" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">Estadísticas</TabsTrigger>
                 {user?.email?.toLowerCase().endsWith('@nazarihomes.com') && user?.email?.toLowerCase() !== 'multiservicios@nazarihomes.com' && (
-                  <TabsTrigger value="documents" className="whitespace-nowrap text-xs sm:text-sm px-3">
+                  <TabsTrigger value="documents" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:flex-1">
                     <FileSignature className="w-4 h-4 mr-1" />
                     Documentación
                   </TabsTrigger>
