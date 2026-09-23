@@ -50,6 +50,7 @@ import {
   Euro,
   Trash2,
   Settings2,
+  Plus,
 } from 'lucide-react';
 
 type PlanRow = {
@@ -127,6 +128,8 @@ const SuperAdmin = () => {
   const [requests, setRequests] = useState<RequestRow[]>([]);
   const [editing, setEditing] = useState<CompanyRow | null>(null);
   const [editingPlan, setEditingPlan] = useState<PlanRow | null>(null);
+  const [newPlan, setNewPlan] = useState<PlanRow | null>(null);
+  const [planToDelete, setPlanToDelete] = useState<PlanRow | null>(null);
   const [toDelete, setToDelete] = useState<CompanyRow | null>(null);
   const [saving, setSaving] = useState(false);
 
