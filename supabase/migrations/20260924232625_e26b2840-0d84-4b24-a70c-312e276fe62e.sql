@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.roomie_listing_owner_must_be_particular() FROM anon, authenticated, public;
