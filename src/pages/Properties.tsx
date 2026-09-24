@@ -63,6 +63,7 @@ const Properties = () => {
     .map((pair) => pair.split(",").map(Number) as [number, number])
     .filter(([la, ln]) => Number.isFinite(la) && Number.isFinite(ln));
   const hasPolygonSearch = searchPolygon.length >= 3;
+  const hasZoneSearch = searchQuery.trim().length > 0 || hasRadiusSearch || hasPolygonSearch;
   const isInsidePolygon = (lat: number, lng: number) => {
     let inside = false;
     for (let i = 0, j = searchPolygon.length - 1; i < searchPolygon.length; j = i++) {
@@ -207,7 +208,7 @@ const Properties = () => {
   // Combine only database and local properties (no static properties)
   const allCombinedProperties = [...convertedDbProperties, ...convertedLocalProperties];
 
-  const filteredProperties = allCombinedProperties.filter((property) => {
+  const filteredProperties = !hasZoneSearch ? [] : allCombinedProperties.filter((property) => {
     const q = searchQuery.toLowerCase().trim();
     const hasCoords = Number.isFinite(property.latitude) && Number.isFinite(property.longitude);
     const matchesSearch = hasPolygonSearch
