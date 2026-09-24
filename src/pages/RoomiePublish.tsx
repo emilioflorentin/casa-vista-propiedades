@@ -58,6 +58,16 @@ const RoomiePublish = () => {
     }
   }, [authLoading, user, navigate]);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setIsCompany(data?.user_type === 'empresa'));
+  }, [user]);
+
   const validateStep = () => {
     if (step === 0) {
       if (!f.title.trim() || !f.address.trim() || !f.municipality.trim() || !f.province.trim()) {
