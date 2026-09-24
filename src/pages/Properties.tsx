@@ -616,10 +616,12 @@ const Properties = () => {
             <div className="max-w-md mx-auto">
               <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {t('properties.no_results_title')}
+                {hasZoneSearch ? t('properties.no_results_title') : 'Escribe una ubicación donde buscar'}
               </h3>
               <p className="text-primary">
-                {t('properties.no_results_desc')}
+                {hasZoneSearch
+                  ? t('properties.no_results_desc')
+                  : 'Indica una ciudad, barrio o referencia para ver las viviendas de esa zona.'}
               </p>
             </div>
           </div>
