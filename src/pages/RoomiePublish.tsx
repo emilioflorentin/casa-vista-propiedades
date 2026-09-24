@@ -24,6 +24,7 @@ const RoomiePublish = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [isCompany, setIsCompany] = useState<boolean | null>(null);
   const [homeFiles, setHomeFiles] = useState<File[]>([]);
   const [roomFiles, setRoomFiles] = useState<File[]>([]);
 
@@ -56,6 +57,16 @@ const RoomiePublish = () => {
       navigate('/auth');
     }
   }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setIsCompany(data?.user_type === 'empresa'));
+  }, [user]);
 
   const validateStep = () => {
     if (step === 0) {
@@ -145,6 +156,23 @@ const RoomiePublish = () => {
       </Select>
     </div>
   );
+
+  if (isCompany) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <Header />
+        <main className="container mx-auto px-6 py-16 max-w-xl text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-3">Roomie Finder es solo para particulares</h1>
+          <p className="text-muted-foreground mb-6">
+            Las cuentas de empresa no pueden publicar habitaciones en Roomie Finder. Como empresa puedes publicar
+            pisos, casas, lofts y habitaciones desde la sección de propiedades de PisoGo.
+          </p>
+          <Button onClick={() => navigate('/account')}>Ir a mi cuenta</Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted">
