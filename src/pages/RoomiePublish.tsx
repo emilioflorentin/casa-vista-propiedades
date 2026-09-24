@@ -24,6 +24,7 @@ const RoomiePublish = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [isCompany, setIsCompany] = useState<boolean | null>(null);
   const [homeFiles, setHomeFiles] = useState<File[]>([]);
   const [roomFiles, setRoomFiles] = useState<File[]>([]);
 
