@@ -37,10 +37,7 @@ const Header = () => {
             <Link to="/inicio" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
                {t('nav.home')}
              </Link>
-             <Link to="/properties" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
-              {t('nav.properties')}
-            </Link>
-            <Link to="/roomie-finder" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
+             <Link to="/roomie-finder" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
               Roomie Finder
             </Link>
             <Link to="/services" className="text-primary-foreground/80 hover:text-accent font-medium transition-colors">
@@ -207,13 +204,6 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.home')}
-              </Link>
-              <Link 
-                to="/properties" 
-                className="text-primary-foreground text-lg font-medium hover:text-accent transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.properties')}
               </Link>
               <Link 
                 to="/roomie-finder" 
