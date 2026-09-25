@@ -136,6 +136,50 @@ export type Database = {
           },
         ]
       }
+      company_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_requests: {
         Row: {
           admin_notes: string
@@ -1117,6 +1161,16 @@ export type Database = {
       }
       generate_budget_number: { Args: never; Returns: string }
       generate_property_reference: { Args: never; Returns: string }
+      get_company_usage: {
+        Args: { p_company_id: string }
+        Returns: {
+          company_status: string
+          max_advisors: number
+          max_listings: number
+          used_advisors: number
+          used_listings: number
+        }[]
+      }
       get_complete_profile_info: {
         Args: { profile_user_id: string }
         Returns: {
@@ -1220,6 +1274,14 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_company_owner: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
+      owner_manages_user: {
+        Args: { _owner: string; _target: string }
         Returns: boolean
       }
       roomie_seeker_get: {
