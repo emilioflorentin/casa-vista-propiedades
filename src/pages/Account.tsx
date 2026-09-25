@@ -32,6 +32,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { geocodeSpanishAddress } from '@/utils/geocoding';
 import { useSuperAdmin } from '@/hooks/useSuperAdmin';
+import { useCompanyMembership } from '@/hooks/useCompanyMembership';
 
 // Property type for Supabase data
 interface PropertyData {
@@ -65,6 +66,7 @@ const Account = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin();
+  const { membership: companyMembership, usage: companyUsage, refresh: refreshCompany } = useCompanyMembership();
 
   // Redirect privileged accounts to their dedicated panels
   useEffect(() => {
@@ -343,10 +345,16 @@ const Account = () => {
   };
 
   const handleShowNewPropertyForm = () => {
-    // Verificar límite: usuarios sin dominio @nazarihomes.com tienen máximo 3 propiedades
-    const userEmail = user?.email || '';
-    const isNazariUser = userEmail.endsWith('@nazarihomes.com');
-    if (!isNazariUser && userProperties.length >= 3) {
+    if (companyMembership) {
+      if (limitReached) {
+        toast({
+          title: "Límite del plan alcanzado",
+          description: `Tu empresa ya usa ${companyUsage?.used_listings}/${companyUsage?.max_listings} anuncios de su plan.`,
+          variant: "destructive"
+        });
+        return;
+      }
+    } else if (limitReached) {
       toast({
         title: "Límite alcanzado",
         description: "Puedes publicar máximo 3 propiedades. Para publicaciones ilimitadas, contacta con Nazari Homes.",
@@ -899,7 +907,11 @@ const Account = () => {
                   <h2 className="text-2xl font-bold text-foreground">Mis Propiedades</h2>
                   <div className="flex items-center gap-2">
                     <p className="text-muted-foreground">Gestiona tus propiedades publicadas</p>
-                    {profileData.user_type === 'particular' && (
+                    {companyMembership && companyUsage ? (
+                      <Badge variant="outline" className="text-xs">
+                        Plan {companyMembership.company_name}: {companyUsage.used_listings}/{companyUsage.max_listings}
+                      </Badge>
+                    ) : profileData.user_type === 'particular' && (
                       <Badge variant="outline" className="text-xs">
                         {userProperties.length}/3 propiedades
                       </Badge>
@@ -910,12 +922,12 @@ const Account = () => {
                   <Button
                     onClick={handleShowNewPropertyForm}
                     className="bg-primary hover:bg-primary/90"
-                    disabled={!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3}
+                    disabled={limitReached}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Nueva Propiedad
                   </Button>
-                  {!(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3 && (
+                  {limitReached && (
                     <p className="text-xs text-muted-foreground mt-1">
                       Límite de propiedades alcanzado
                     </p>
