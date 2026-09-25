@@ -199,7 +199,24 @@ const SuperAdmin = () => {
       })
       .eq('id', req.id);
 
-    toast({ title: 'Empresa dada de alta', description: `${req.company_name} ya aparece en Empresas.` });
+    const { data: inv, error: invErr } = await supabase.functions.invoke('company-admin', {
+      body: {
+        action: 'invite_company',
+        companyId: data.id,
+        redirectTo: `${window.location.origin}/crear-contrasena`,
+      },
+    });
+    const invMsg = (inv as any)?.error || (invErr ? 'Error de conexión' : null);
+    if (invMsg) {
+      toast({ title: 'Empresa creada, pero no se envió la invitación', description: invMsg, variant: 'destructive' });
+    } else {
+      toast({
+        title: 'Empresa dada de alta',
+        description: (inv as any)?.invited
+          ? `Se ha enviado un email a ${req.email} para crear su contraseña.`
+          : `${req.email} ya tenía cuenta: se ha vinculado como responsable de la empresa.`,
+      });
+    }
     loadData();
   };
 
