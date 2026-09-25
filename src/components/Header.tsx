@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart, User, Phone, LogOut, Plus, Shield } from "lucide-react";
+import { Menu, X, Heart, User, Phone, LogOut, Plus, Shield, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BrandLogo from "@/components/BrandLogo";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { useCompanyMembership } from "@/hooks/useCompanyMembership";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +23,7 @@ const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const { user, signOut } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
+  const { isCompanyOwner } = useCompanyMembership();
 
   return (
     <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
@@ -86,6 +88,14 @@ const Header = () => {
                       Mi Perfil
                     </Link>
                   </DropdownMenuItem>
+                  {isCompanyOwner && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/empresa" className="w-full">
+                        <Building2 className="h-4 w-4 mr-2" />
+                        Panel de empresa
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   {isSuperAdmin && (
                     <DropdownMenuItem asChild>
                       <Link to="/superadmin" className="w-full">
@@ -303,6 +313,14 @@ const Header = () => {
                         Mi Perfil
                       </Button>
                     </Link>
+                    {isCompanyOwner && (
+                      <Link to="/empresa" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
+                          <Building2 className="h-4 w-4 mr-2" />
+                          Panel de empresa
+                        </Button>
+                      </Link>
+                    )}
                     {isSuperAdmin && (
                       <Link to="/superadmin" onClick={() => setIsMenuOpen(false)}>
                         <Button variant="ghost" size="sm" className="justify-start text-primary-foreground hover:text-accent hover:bg-primary-foreground/10 w-full">
