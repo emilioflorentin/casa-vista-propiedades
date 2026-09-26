@@ -28,10 +28,10 @@ const Header = () => {
   return (
     <header className="bg-header sticky top-0 z-50 border-b border-accent/40">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20 md:h-24">
+        <div className="flex items-center justify-between h-24 md:h-24">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <BrandLogo className="h-14 md:h-[4.5rem]" />
+              <BrandLogo className="h-[4.5rem] md:h-[4.5rem]" />
           </Link>
 
           {/* Desktop Navigation */}
