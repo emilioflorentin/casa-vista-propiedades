@@ -81,6 +81,10 @@ const Account = () => {
   const [showPropertyForm, setShowPropertyForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null);
   const [userProperties, setUserProperties] = useState<PropertyData[]>([]);
+  const limitReached = companyMembership
+    ? !!companyUsage && companyUsage.used_listings >= companyUsage.max_listings
+    : !(user?.email?.endsWith('@nazarihomes.com')) && userProperties.length >= 3;
+  useEffect(() => { refreshCompany(); }, [userProperties.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
