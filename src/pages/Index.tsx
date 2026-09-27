@@ -41,7 +41,6 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
-  const [propertyCount, setPropertyCount] = useState(0);
   const [showMore, setShowMore] = useState(false);
   const [geoPermission, setGeoPermission] = useState<'unknown' | 'granted' | 'prompt' | 'denied' | 'unsupported'>('unknown');
   const [featuredProperties, setFeaturedProperties] = useState<FeaturedProperty[]>([]);
