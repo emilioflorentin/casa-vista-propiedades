@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nazarihomes.com/</loc>
+    <loc>https://www.piso-go.com/inicio</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/properties</loc>
+    <loc>https://www.piso-go.com/properties</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/services</loc>
+    <loc>https://www.piso-go.com/roomie-finder</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.piso-go.com/services</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/about</loc>
+    <loc>https://www.piso-go.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/contact</loc>
+    <loc>https://www.piso-go.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/tenant-incidents</loc>
+    <loc>https://www.piso-go.com/tenant-incidents</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nazarihomes.com/privacy-policy</loc>
+    <loc>https://www.piso-go.com/privacy-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
