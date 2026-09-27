@@ -269,7 +269,7 @@ const Index = () => {
                 title: "Seleccionar zonas en el mapa",
                 desc: "Busca dibujando con el dedo las zonas que te interesan, o elige un radio alrededor de tu barrio favorito.",
                 cta: "Empezar a seleccionar zonas",
-                to: "/properties",
+                openSearch: true,
               },
               {
                 img: imgPublicar,
@@ -287,12 +287,9 @@ const Index = () => {
                 cta: "Buscar profesional",
                 to: "/services",
               },
-            ].map(({ img, alt, title, desc, cta, to }, i) => (
-              <Reveal key={title} delay={i * 120}>
-                <Link
-                  to={to}
-                  className="group flex h-full overflow-hidden bg-card border border-border rounded-lg shadow-sm transition-shadow hover:shadow-md"
-                >
+            ].map(({ img, alt, title, desc, cta, to, openSearch }, i) => {
+              const cardInner = (
+                <>
                   <img
                     src={img}
                     alt={alt}
@@ -309,9 +306,27 @@ const Index = () => {
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </div>
-                </Link>
-              </Reveal>
-            ))}
+                </>
+              );
+              const cardClass = "group flex h-full overflow-hidden bg-card border border-border rounded-lg shadow-sm transition-shadow hover:shadow-md text-left w-full";
+              return (
+                <Reveal key={title} delay={i * 120}>
+                  {openSearch ? (
+                    <button
+                      type="button"
+                      className={cardClass}
+                      onClick={() => { setLocationError(false); setLocationOpen(true); }}
+                    >
+                      {cardInner}
+                    </button>
+                  ) : (
+                    <Link to={to!} className={cardClass}>
+                      {cardInner}
+                    </Link>
+                  )}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -369,12 +384,10 @@ const Index = () => {
                   )}
                 </div>
                 <div className="text-center">
-                  <Link to="/properties">
-                    <Button variant="outline" size="lg">
-                      {t("properties.view_all")}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
+                  <Button variant="outline" size="lg" onClick={() => { setLocationError(false); setLocationOpen(true); }}>
+                    {t("properties.view_all")}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
                 </div>
               </>
             ) : null}

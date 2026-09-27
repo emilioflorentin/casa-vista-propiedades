@@ -336,7 +336,7 @@ const PropertyDetail = () => {
       <div className="min-h-screen bg-secondary flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">{t('property.not_found')}</h1>
-          <Link to="/properties">
+          <Link to="/inicio">
             <Button className="bg-primary hover:bg-primary">{t('property.back_to_properties')}</Button>
           </Link>
         </div>
