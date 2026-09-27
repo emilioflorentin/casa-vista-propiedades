@@ -41,7 +41,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
+                <Link to="/inicio" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('nav.properties')}
                 </Link>
               </li>
@@ -73,12 +73,12 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.services_section')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
+                <Link to="/inicio" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('footer.rental_properties')}
                 </Link>
               </li>
               <li>
-                <Link to="/properties" className="text-primary-foreground/80 hover:text-white transition-colors">
+                <Link to="/inicio" className="text-primary-foreground/80 hover:text-white transition-colors">
                   {t('footer.sale_properties')}
                 </Link>
               </li>
