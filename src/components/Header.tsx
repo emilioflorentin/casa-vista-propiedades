@@ -31,7 +31,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-24 md:h-24">
           {/* Logo */}
           <Link to="/inicio" className="flex items-center space-x-3">
-              <BrandLogo className="h-[4.5rem] md:h-[4.5rem]" />
+              <BrandLogo className="h-14 md:h-[4.5rem]" />
           </Link>
 
           {/* Desktop Navigation */}
