@@ -162,25 +162,6 @@ const Index = () => {
   }, [geoPermission]);
 
 
-  // Load property count for the stats section
-  useEffect(() => {
-    const loadPropertyCount = async () => {
-      try {
-        const { count } = await supabase
-          .from("properties")
-          .select("*", { count: "exact", head: true })
-          .or("is_rented.is.null,is_rented.eq.false"); // Only available properties
-
-        const localProperties = getLocalProperties().filter((prop) => !prop.is_rented);
-        setPropertyCount((count || 0) + localProperties.length);
-      } catch (error) {
-        console.error("Error loading property count:", error);
-      }
-    };
-
-    loadPropertyCount();
-  }, []);
-
   return (
     <div className="min-h-screen bg-secondary">
       <Header />
