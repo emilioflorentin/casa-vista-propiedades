@@ -11,7 +11,6 @@ import Reveal from "@/components/Reveal";
 import LocationSearchOverlay from "@/components/LocationSearchOverlay";
 import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/integrations/supabase/client";
-import { getLocalProperties } from "@/utils/localProperties";
 import { calculateDistance } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
 
