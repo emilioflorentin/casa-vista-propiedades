@@ -259,33 +259,60 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-10 md:py-16 bg-card">
+      {/* Highlights Section — cards estilo Idealista */}
+      <section className="py-8 md:py-14 bg-secondary">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8 text-center">
-            <Reveal className="p-4 md:p-6">
-              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <Home className="h-6 w-6 text-primary md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">
-                {propertyCount.toLocaleString("es-ES")}+
-              </h3>
-              <p className="text-muted-foreground">{t("stats.properties")}</p>
-            </Reveal>
-            <Reveal delay={120} className="p-4 md:p-6">
-              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <Key className="h-6 w-6 text-primary md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">190+</h3>
-              <p className="text-muted-foreground">{t("stats.clients")}</p>
-            </Reveal>
-            <Reveal delay={240} className="p-4 md:p-6">
-              <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 md:w-16 md:h-16 md:mb-4">
-                <Zap className="h-6 w-6 text-primary md:h-8 md:w-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2 md:text-3xl">98%</h3>
-              <p className="text-muted-foreground">{t("stats.success_rate")}</p>
-            </Reveal>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+            {[
+              {
+                img: imgZonasMapa,
+                alt: "Mapa con zonas seleccionadas",
+                title: "Seleccionar zonas en el mapa",
+                desc: "Busca dibujando con el dedo las zonas que te interesan, o elige un radio alrededor de tu barrio favorito.",
+                cta: "Empezar a seleccionar zonas",
+                to: "/properties",
+              },
+              {
+                img: imgPublicar,
+                alt: "Publicar tu inmueble desde el móvil",
+                title: "Publicar tu inmueble",
+                desc: "Pisos, casas, lofts y habitaciones. Publica tu anuncio en minutos y llega a miles de interesados.",
+                cta: "Poner tu anuncio",
+                to: "/account",
+              },
+              {
+                img: imgProfesional,
+                alt: "Profesional de mantenimiento para tu vivienda",
+                title: "Tu profesional adecuado",
+                desc: "Encuentra al experto que necesita tu vivienda: reformas, limpieza, reparaciones y mucho más.",
+                cta: "Buscar profesional",
+                to: "/services",
+              },
+            ].map(({ img, alt, title, desc, cta, to }, i) => (
+              <Reveal key={title} delay={i * 120}>
+                <Link
+                  to={to}
+                  className="group flex h-full overflow-hidden bg-card border border-border rounded-lg shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <img
+                    src={img}
+                    alt={alt}
+                    loading="lazy"
+                    width={512}
+                    height={512}
+                    className="w-28 shrink-0 object-cover md:w-36"
+                  />
+                  <div className="flex flex-col justify-center p-4 md:p-5">
+                    <h3 className="text-base md:text-lg font-bold text-foreground mb-1 leading-snug">{title}</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-2 leading-relaxed">{desc}</p>
+                    <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline underline-offset-4">
+                      {cta}
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
