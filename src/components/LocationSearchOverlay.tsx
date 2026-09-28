@@ -36,6 +36,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const [picked, setPicked] = useState<GeocodedLocation | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [polygon, setPolygon] = useState<[number, number][] | null>(null);
+  const [zonesOpen, setZonesOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
