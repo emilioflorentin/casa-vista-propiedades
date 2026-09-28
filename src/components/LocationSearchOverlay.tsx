@@ -61,6 +61,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
       setMapMode(false);
       setPicked(null);
       setSuggestions([]);
+      setZonesOpen(false);
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open, initialValue]);
