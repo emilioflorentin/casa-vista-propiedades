@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2, Pencil } from 'lucide-react';
+import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2, Pencil, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
+import { SEARCH_ZONES, SearchZone } from '@/utils/zones';
 
 export interface LocationSelection extends GeocodedLocation {
   radius: number;
@@ -35,6 +36,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const [picked, setPicked] = useState<GeocodedLocation | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [polygon, setPolygon] = useState<[number, number][] | null>(null);
+  const [zonesOpen, setZonesOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
@@ -59,6 +61,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
       setMapMode(false);
       setPicked(null);
       setSuggestions([]);
+      setZonesOpen(false);
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open, initialValue]);
@@ -250,6 +253,34 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
     setPicked(null);
   };
 
+  const selectZone = (zone: SearchZone) => {
+    const map = mapInstance.current;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
+    if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
+    if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+    setPolygon(null);
+    setDrawMode(false);
+    setRadius(String(zone.radius));
+    layerRefs.current.marker = L.marker([zone.lat, zone.lng]).addTo(map);
+    layerRefs.current.circle = L.circle([zone.lat, zone.lng], {
+      radius: zone.radius,
+      color: '#3F6B52',
+      fillColor: '#3F6B52',
+      fillOpacity: 0.15,
+    }).addTo(map);
+    map.flyTo([zone.lat, zone.lng], 14);
+    setPicked({
+      address: `${zone.name}, ${zone.city}`,
+      label: zone.name,
+      detail: zone.city,
+      lat: zone.lat,
+      lng: zone.lng,
+    });
+    setZonesOpen(false);
+  };
+
   useEffect(() => {
     if (layerRefs.current.circle) layerRefs.current.circle.setRadius(Number(radius));
   }, [radius]);
@@ -298,11 +329,49 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
               <Pencil className="h-4 w-4" />
               {drawMode ? 'Dibujando…' : 'Dibujar zona'}
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={zonesOpen ? 'default' : 'outline'}
+              onClick={() => setZonesOpen((v) => !v)}
+              className="gap-2"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              Zonas
+            </Button>
             {polygon && (
               <Button type="button" size="sm" variant="ghost" onClick={clearDrawing}>Borrar</Button>
             )}
           </div>
-          <div ref={mapRef} className="min-h-[280px] flex-1 overflow-hidden rounded-lg border" />
+          <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-lg border">
+            <div ref={mapRef} className="absolute inset-0" />
+            {zonesOpen && (
+              <div className="absolute bottom-0 left-0 top-24 z-[500] w-64 overflow-y-auto rounded-r-lg border-r bg-card shadow-lg">
+                <p className="border-b px-4 py-3 text-sm font-semibold text-foreground">Buscar por zonas</p>
+                {Object.entries(
+                  SEARCH_ZONES.reduce<Record<string, SearchZone[]>>((acc, z) => {
+                    (acc[z.city] ||= []).push(z);
+                    return acc;
+                  }, {})
+                ).map(([city, zones]) => (
+                  <div key={city}>
+                    <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{city}</p>
+                    {zones.map((z) => (
+                      <button
+                        key={`${z.city}-${z.name}`}
+                        type="button"
+                        onClick={() => selectZone(z)}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-secondary"
+                      >
+                        <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                        {z.name}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
               {drawMode
