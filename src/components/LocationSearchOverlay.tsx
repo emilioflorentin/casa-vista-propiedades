@@ -328,11 +328,49 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
               <Pencil className="h-4 w-4" />
               {drawMode ? 'Dibujando…' : 'Dibujar zona'}
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={zonesOpen ? 'default' : 'outline'}
+              onClick={() => setZonesOpen((v) => !v)}
+              className="gap-2"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              Zonas
+            </Button>
             {polygon && (
               <Button type="button" size="sm" variant="ghost" onClick={clearDrawing}>Borrar</Button>
             )}
           </div>
-          <div ref={mapRef} className="min-h-[280px] flex-1 overflow-hidden rounded-lg border" />
+          <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-lg border">
+            <div ref={mapRef} className="absolute inset-0" />
+            {zonesOpen && (
+              <div className="absolute inset-y-0 left-0 z-[500] w-64 overflow-y-auto border-r bg-card shadow-lg">
+                <p className="border-b px-4 py-3 text-sm font-semibold text-foreground">Buscar por zonas</p>
+                {Object.entries(
+                  SEARCH_ZONES.reduce<Record<string, SearchZone[]>>((acc, z) => {
+                    (acc[z.city] ||= []).push(z);
+                    return acc;
+                  }, {})
+                ).map(([city, zones]) => (
+                  <div key={city}>
+                    <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{city}</p>
+                    {zones.map((z) => (
+                      <button
+                        key={`${z.city}-${z.name}`}
+                        type="button"
+                        onClick={() => selectZone(z)}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-secondary"
+                      >
+                        <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                        {z.name}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
               {drawMode
