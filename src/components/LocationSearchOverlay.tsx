@@ -346,7 +346,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-lg border">
             <div ref={mapRef} className="absolute inset-0" />
             {zonesOpen && (
-              <div className="absolute inset-y-0 left-0 z-[500] w-64 overflow-y-auto border-r bg-card shadow-lg">
+              <div className="absolute bottom-0 left-0 top-24 z-[500] w-64 overflow-y-auto rounded-r-lg border-r bg-card shadow-lg">
                 <p className="border-b px-4 py-3 text-sm font-semibold text-foreground">Buscar por zonas</p>
                 {Object.entries(
                   SEARCH_ZONES.reduce<Record<string, SearchZone[]>>((acc, z) => {
