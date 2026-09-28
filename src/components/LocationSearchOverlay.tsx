@@ -252,6 +252,34 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
     setPicked(null);
   };
 
+  const selectZone = (zone: SearchZone) => {
+    const map = mapInstance.current;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
+    if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
+    if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
+    setPolygon(null);
+    setDrawMode(false);
+    setRadius(String(zone.radius));
+    layerRefs.current.marker = L.marker([zone.lat, zone.lng]).addTo(map);
+    layerRefs.current.circle = L.circle([zone.lat, zone.lng], {
+      radius: zone.radius,
+      color: '#3F6B52',
+      fillColor: '#3F6B52',
+      fillOpacity: 0.15,
+    }).addTo(map);
+    map.flyTo([zone.lat, zone.lng], 14);
+    setPicked({
+      address: `${zone.name}, ${zone.city}`,
+      label: zone.name,
+      detail: zone.city,
+      lat: zone.lat,
+      lng: zone.lng,
+    });
+    setZonesOpen(false);
+  };
+
   useEffect(() => {
     if (layerRefs.current.circle) layerRefs.current.circle.setRadius(Number(radius));
   }, [radius]);
