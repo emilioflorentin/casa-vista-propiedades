@@ -4,7 +4,7 @@ import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2, Pencil, Layout
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
-import { SEARCH_ZONES, SearchZone } from '@/utils/zones';
+import { SEARCH_ZONES, SPAIN_PROVINCES, SearchZone } from '@/utils/zones';
 
 export interface LocationSelection extends GeocodedLocation {
   radius: number;
@@ -348,6 +348,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             {zonesOpen && (
               <div className="absolute bottom-0 left-0 top-24 z-[500] w-64 overflow-y-auto rounded-r-lg border-r bg-card shadow-lg">
                 <p className="border-b px-4 py-3 text-sm font-semibold text-foreground">Buscar por zonas</p>
+                <p className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">Barrios y municipios</p>
                 {Object.entries(
                   SEARCH_ZONES.reduce<Record<string, SearchZone[]>>((acc, z) => {
                     (acc[z.city] ||= []).push(z);
@@ -357,6 +358,23 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
                   <div key={city}>
                     <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{city}</p>
                     {zones.map((z) => (
+                      <button
+                        key={`${z.city}-${z.name}`}
+                        type="button"
+                        onClick={() => selectZone(z)}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-secondary"
+                      >
+                        <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                        {z.name}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+                <p className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">Toda España</p>
+                {SPAIN_PROVINCES.map((group) => (
+                  <div key={group.community}>
+                    <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.community}</p>
+                    {group.zones.map((z) => (
                       <button
                         key={`${z.city}-${z.name}`}
                         type="button"
