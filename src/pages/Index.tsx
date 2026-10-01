@@ -248,7 +248,7 @@ const Index = () => {
                   params.set('lng', String(value.lng));
                   params.set('radius', String(value.radius));
                   if (value.polygon?.length) {
-                    params.set('poly', value.polygon.map(([la, ln]) => `${la.toFixed(5)},${ln.toFixed(5)}`).join(';'));
+                    params.set('poly', (value.polygons || [value.polygon]).map((ring) => ring.map(([la, ln]) => `${la.toFixed(4)},${ln.toFixed(4)}`).join(';')).join('|'));
                   }
                 }
                 navigate(`/properties?${params.toString()}`);

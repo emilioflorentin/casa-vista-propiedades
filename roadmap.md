@@ -8,3 +8,4 @@
 - [x] Roomie Finder: tarjeta Descubrir clicable entera + CTA prominente + tarjeta compacta en móvil (verificado con Playwright)
 - [x] Overlay "¿Dónde buscas?": cubre la cabecera en el preview (verificado); pendiente republicar para la web pública
 - [x] Búsqueda geográfica: conservar coordenadas y radio, filtrar resultados por distancia y geolocalizar viviendas nuevas y existentes
+- [x] Búsqueda por zonas directamente sobre el mapa: contornos provinciales y municipios al acercar, seleccionables en toda España.

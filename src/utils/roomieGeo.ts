@@ -29,8 +29,8 @@ export const isInsidePolygon = (point: Coords, polygon: [number, number][]): boo
     const [latI, lngI] = polygon[i];
     const [latJ, lngJ] = polygon[j];
     const intersects =
-      lngI > point.lng !== lngJ > point.lng &&
-      point.lat < ((latJ - latI) * (point.lng - lngI)) / (lngJ - lngI) + latI;
+      (latI > point.lat) !== (latJ > point.lat) &&
+      point.lng < ((lngJ - lngI) * (point.lat - latI)) / (latJ - latI) + lngI;
     if (intersects) inside = !inside;
   }
   return inside;

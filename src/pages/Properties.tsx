@@ -58,20 +58,23 @@ const Properties = () => {
   const searchLongitude = Number(searchParams.get("lng"));
   const searchRadius = Number(searchParams.get("radius"));
   const hasRadiusSearch = Number.isFinite(searchLatitude) && Number.isFinite(searchLongitude) && searchRadius > 0;
-  const searchPolygon = (searchParams.get("poly") || "")
+  const searchPolygons = (searchParams.get("poly") || "").split("|").map((ring) => ring
     .split(";")
     .map((pair) => pair.split(",").map(Number) as [number, number])
-    .filter(([la, ln]) => Number.isFinite(la) && Number.isFinite(ln));
-  const hasPolygonSearch = searchPolygon.length >= 3;
+    .filter(([la, ln]) => Number.isFinite(la) && Number.isFinite(ln))
+  ).filter((ring) => ring.length >= 3);
+  const hasPolygonSearch = searchPolygons.length > 0;
   const hasZoneSearch = searchQuery.trim().length > 0 || hasRadiusSearch || hasPolygonSearch;
   const isInsidePolygon = (lat: number, lng: number) => {
-    let inside = false;
-    for (let i = 0, j = searchPolygon.length - 1; i < searchPolygon.length; j = i++) {
-      const [yi, xi] = searchPolygon[i];
-      const [yj, xj] = searchPolygon[j];
-      if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
-    }
-    return inside;
+    return searchPolygons.some((searchPolygon) => {
+      let inside = false;
+      for (let i = 0, j = searchPolygon.length - 1; i < searchPolygon.length; j = i++) {
+        const [yi, xi] = searchPolygon[i];
+        const [yj, xj] = searchPolygon[j];
+        if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+      }
+      return inside;
+    });
   };
   const [propertyType, setPropertyType] = useState("all");
   const [operation, setOperation] = useState(() => {
