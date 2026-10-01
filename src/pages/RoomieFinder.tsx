@@ -25,6 +25,7 @@ interface RoomieArea {
   lng: number;
   radius: number;
   polygon?: [number, number][];
+  polygons?: [number, number][][];
 }
 
 
@@ -127,6 +128,7 @@ const RoomieFinder = () => {
       lng: selection.lng,
       radius: selection.radius,
       ...(selection.polygon ? { polygon: selection.polygon } : {}),
+      ...(selection.polygons ? { polygons: selection.polygons } : {}),
     };
     setArea(next);
     setZone(null);
@@ -168,7 +170,7 @@ const RoomieFinder = () => {
         const point = coords[l.id];
         if (!point) return false;
         if (area.polygon && area.polygon.length >= 3) {
-          if (!isInsidePolygon(point, area.polygon)) return false;
+          if (!(area.polygons || [area.polygon]).some((ring) => isInsidePolygon(point, ring))) return false;
         } else if (calculateDistance(area.lat, area.lng, point.lat, point.lng) > area.radius / 1000) {
           return false;
         }
