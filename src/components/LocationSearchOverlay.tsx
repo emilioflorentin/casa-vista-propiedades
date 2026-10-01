@@ -15,6 +15,24 @@ export interface LocationSelection extends GeocodedLocation {
 type ZoneFeature = GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon, { name: string }>;
 type ZoneCollection = GeoJSON.FeatureCollection<GeoJSON.Polygon | GeoJSON.MultiPolygon, { name: string }>;
 const zoneCache: Partial<Record<'provinces' | 'municipalities', ZoneCollection>> = {};
+const boundsCache = new WeakMap<ZoneFeature, [number, number, number, number]>();
+
+const zoneBounds = (zone: ZoneFeature): [number, number, number, number] => {
+  const cached = boundsCache.get(zone);
+  if (cached) return cached;
+  let south = Infinity, west = Infinity, north = -Infinity, east = -Infinity;
+  const visit = (coords: unknown): void => {
+    if (!Array.isArray(coords)) return;
+    if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+      west = Math.min(west, coords[0]); east = Math.max(east, coords[0]);
+      south = Math.min(south, coords[1]); north = Math.max(north, coords[1]);
+    } else coords.forEach(visit);
+  };
+  visit(zone.geometry.coordinates);
+  const bounds: [number, number, number, number] = [south, west, north, east];
+  boundsCache.set(zone, bounds);
+  return bounds;
+};
 
 const loadZones = async (level: 'provinces' | 'municipalities'): Promise<ZoneCollection> => {
   if (zoneCache[level]) return zoneCache[level];
@@ -28,7 +46,7 @@ const loadZones = async (level: 'provinces' | 'municipalities'): Promise<ZoneCol
 
 const simplifyRing = (ring: number[][]): [number, number][] => {
   // Keep URLs compact while retaining the outline at neighbourhood scale.
-  const step = Math.max(1, Math.ceil(ring.length / 120));
+  const step = Math.max(1, Math.ceil(ring.length / 65));
   return ring.filter((_, index) => index % step === 0).map(([lng, lat]) => [lat, lng]);
 };
 
@@ -279,8 +297,8 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         if (zoneLayerRef.current) map.removeLayer(zoneLayerRef.current);
         const bounds = map.getBounds().pad(0.15);
         const visible = collection.features.filter((zone) => {
-          const shape = L.geoJSON(zone);
-          return bounds.intersects(shape.getBounds());
+          const [south, west, north, east] = zoneBounds(zone);
+          return bounds.intersects(L.latLngBounds([south, west], [north, east]));
         });
         const layer = L.geoJSON(visible, {
           style: {
