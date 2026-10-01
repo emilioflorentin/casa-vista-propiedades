@@ -1,15 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X, MapPin, LocateFixed, Map as MapIcon, Loader2, Pencil, LayoutGrid } from 'lucide-react';
+import { feature } from 'topojson-client';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GeocodedLocation, reverseSpanishLocation, searchSpanishLocations } from '@/utils/geocoding';
-import { SEARCH_ZONES, SPAIN_PROVINCES, SearchZone } from '@/utils/zones';
 
 export interface LocationSelection extends GeocodedLocation {
   radius: number;
   polygon?: [number, number][];
+  polygons?: [number, number][][];
 }
+
+type ZoneFeature = GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon, { name: string }>;
+type ZoneCollection = GeoJSON.FeatureCollection<GeoJSON.Polygon | GeoJSON.MultiPolygon, { name: string }>;
+const zoneCache: Partial<Record<'provinces' | 'municipalities', ZoneCollection>> = {};
+
+const loadZones = async (level: 'provinces' | 'municipalities'): Promise<ZoneCollection> => {
+  if (zoneCache[level]) return zoneCache[level];
+  const response = await fetch(`/data/spain-${level}.json`);
+  if (!response.ok) throw new Error('No se pudieron cargar las zonas');
+  const topology = await response.json();
+  const collection = feature(topology, topology.objects[level]) as ZoneCollection;
+  zoneCache[level] = collection;
+  return collection;
+};
+
+const simplifyRing = (ring: number[][]): [number, number][] => {
+  // Keep URLs compact while retaining the outline at neighbourhood scale.
+  const step = Math.max(1, Math.ceil(ring.length / 120));
+  return ring.filter((_, index) => index % step === 0).map(([lng, lat]) => [lat, lng]);
+};
+
+const featureRings = (zone: ZoneFeature): [number, number][][] => {
+  const shapes = zone.geometry.type === 'Polygon' ? [zone.geometry.coordinates] : zone.geometry.coordinates;
+  return shapes.map((shape) => simplifyRing(shape[0])).filter((ring) => ring.length >= 3);
+};
 
 interface LocationSearchOverlayProps {
   open: boolean;
@@ -36,12 +62,16 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
   const [picked, setPicked] = useState<GeocodedLocation | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [polygon, setPolygon] = useState<[number, number][] | null>(null);
+  const [polygons, setPolygons] = useState<[number, number][][] | null>(null);
   const [zonesOpen, setZonesOpen] = useState(false);
+  const [zonesError, setZonesError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const leafletRef = useRef<any>(null);
   const drawModeRef = useRef(false);
+  const zonesOpenRef = useRef(false);
+  const zoneLayerRef = useRef<any>(null);
   const drawPointsRef = useRef<[number, number][]>([]);
   const layerRefs = useRef<{ marker: any; circle: any; shape: any }>({ marker: null, circle: null, shape: null });
 
@@ -62,6 +92,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
       setPicked(null);
       setSuggestions([]);
       setZonesOpen(false);
+      setZonesError(false);
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open, initialValue]);
@@ -125,12 +156,13 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         attribution: '© OpenStreetMap',
       }).addTo(map);
       map.on('click', async (event: any) => {
-        if (drawModeRef.current) return;
+        if (drawModeRef.current || zonesOpenRef.current) return;
         const { lat, lng } = event.latlng;
         if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
         if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
         if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
         setPolygon(null);
+        setPolygons(null);
         layerRefs.current.marker = L.marker([lat, lng]).addTo(map);
         layerRefs.current.circle = L.circle([lat, lng], {
           radius: parseInt(radius, 10),
@@ -186,6 +218,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         if (layerRefs.current.marker) { map.removeLayer(layerRefs.current.marker); layerRefs.current.marker = null; }
         if (layerRefs.current.circle) { map.removeLayer(layerRefs.current.circle); layerRefs.current.circle = null; }
         setPolygon(points);
+        setPolygons(null);
         const center = layerRefs.current.shape.getBounds().getCenter();
         try {
           setPicked(await reverseSpanishLocation(center.lat, center.lng));
@@ -215,6 +248,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
         mapInstance.current.remove();
         mapInstance.current = null;
         layerRefs.current = { marker: null, circle: null, shape: null };
+        zoneLayerRef.current = null;
       }
       drawPointsRef.current = [];
       setPolygon(null);
@@ -222,6 +256,75 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
       drawModeRef.current = false;
     };
   }, [mapMode]);
+
+  // A map overlay, not a side list: show provinces at country scale and municipalities when zoomed in.
+  useEffect(() => {
+    zonesOpenRef.current = zonesOpen;
+    const map = mapInstance.current;
+    const L = leafletRef.current;
+    if (!map || !L || !zonesOpen || drawMode) {
+      if (map && zoneLayerRef.current) map.removeLayer(zoneLayerRef.current);
+      zoneLayerRef.current = null;
+      return;
+    }
+    let cancelled = false;
+    let serial = 0;
+    const update = async () => {
+      const request = ++serial;
+      const level = map.getZoom() >= 10 ? 'municipalities' : 'provinces';
+      try {
+        const collection = await loadZones(level);
+        if (cancelled || request !== serial) return;
+        setZonesError(false);
+        if (zoneLayerRef.current) map.removeLayer(zoneLayerRef.current);
+        const bounds = map.getBounds().pad(0.15);
+        const visible = collection.features.filter((zone) => {
+          const shape = L.geoJSON(zone);
+          return bounds.intersects(shape.getBounds());
+        });
+        const layer = L.geoJSON(visible, {
+          style: {
+            color: 'hsl(var(--foreground))', weight: 1.5,
+            fillColor: 'hsl(var(--primary))', fillOpacity: 0.06,
+          },
+          onEachFeature: (zone: ZoneFeature, path: any) => {
+            path.bindTooltip(zone.properties.name, { sticky: true, direction: 'top' });
+            path.on('mouseover', () => path.setStyle({ fillOpacity: 0.28, weight: 2.5 }));
+            path.on('mouseout', () => path.setStyle({ fillOpacity: 0.06, weight: 1.5 }));
+            path.on('click', (event: any) => {
+              L.DomEvent.stopPropagation(event);
+              const rings = featureRings(zone);
+              if (!rings.length) return;
+              if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
+              if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
+              if (layerRefs.current.shape) map.removeLayer(layerRefs.current.shape);
+              layerRefs.current = { marker: null, circle: null, shape: L.geoJSON(zone, {
+                style: { color: 'hsl(var(--primary))', weight: 3, fillColor: 'hsl(var(--primary))', fillOpacity: 0.22 },
+                interactive: false,
+              }).addTo(map) };
+              setPolygon(rings[0]);
+              setPolygons(rings);
+              const center = path.getBounds().getCenter();
+              setPicked({ address: zone.properties.name, label: zone.properties.name, detail: '', lat: center.lat, lng: center.lng });
+              setZonesOpen(false);
+              map.fitBounds(path.getBounds(), { padding: [24, 24], maxZoom: level === 'provinces' ? 9 : 14 });
+            });
+          },
+        }).addTo(map);
+        zoneLayerRef.current = layer;
+      } catch {
+        if (!cancelled) setZonesError(true);
+      }
+    };
+    map.on('moveend', update);
+    update();
+    return () => {
+      cancelled = true;
+      map.off('moveend', update);
+      if (zoneLayerRef.current) map.removeLayer(zoneLayerRef.current);
+      zoneLayerRef.current = null;
+    };
+  }, [zonesOpen, drawMode, mapMode]);
 
   // Toggle map dragging while drawing
   useEffect(() => {
@@ -250,35 +353,8 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
       layerRefs.current.shape = null;
     }
     setPolygon(null);
+    setPolygons(null);
     setPicked(null);
-  };
-
-  const selectZone = (zone: SearchZone) => {
-    const map = mapInstance.current;
-    const L = leafletRef.current;
-    if (!map || !L) return;
-    if (layerRefs.current.marker) map.removeLayer(layerRefs.current.marker);
-    if (layerRefs.current.circle) map.removeLayer(layerRefs.current.circle);
-    if (layerRefs.current.shape) { map.removeLayer(layerRefs.current.shape); layerRefs.current.shape = null; }
-    setPolygon(null);
-    setDrawMode(false);
-    setRadius(String(zone.radius));
-    layerRefs.current.marker = L.marker([zone.lat, zone.lng]).addTo(map);
-    layerRefs.current.circle = L.circle([zone.lat, zone.lng], {
-      radius: zone.radius,
-      color: '#3F6B52',
-      fillColor: '#3F6B52',
-      fillOpacity: 0.15,
-    }).addTo(map);
-    map.flyTo([zone.lat, zone.lng], 14);
-    setPicked({
-      address: `${zone.name}, ${zone.city}`,
-      label: zone.name,
-      detail: zone.city,
-      lat: zone.lat,
-      lng: zone.lng,
-    });
-    setZonesOpen(false);
   };
 
   useEffect(() => {
@@ -335,6 +411,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
               variant={zonesOpen ? 'default' : 'outline'}
               onClick={() => setZonesOpen((v) => !v)}
               className="gap-2"
+              aria-pressed={zonesOpen}
             >
               <LayoutGrid className="h-4 w-4" />
               Zonas
@@ -346,47 +423,8 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
           <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-lg border">
             <div ref={mapRef} className="absolute inset-0" />
             {zonesOpen && (
-              <div className="absolute bottom-0 left-0 top-24 z-[500] w-64 overflow-y-auto rounded-r-lg border-r bg-card shadow-lg">
-                <p className="border-b px-4 py-3 text-sm font-semibold text-foreground">Buscar por zonas</p>
-                <p className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">Barrios y municipios</p>
-                {Object.entries(
-                  SEARCH_ZONES.reduce<Record<string, SearchZone[]>>((acc, z) => {
-                    (acc[z.city] ||= []).push(z);
-                    return acc;
-                  }, {})
-                ).map(([city, zones]) => (
-                  <div key={city}>
-                    <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{city}</p>
-                    {zones.map((z) => (
-                      <button
-                        key={`${z.city}-${z.name}`}
-                        type="button"
-                        onClick={() => selectZone(z)}
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-secondary"
-                      >
-                        <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                        {z.name}
-                      </button>
-                    ))}
-                  </div>
-                ))}
-                <p className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">Toda España</p>
-                {SPAIN_PROVINCES.map((group) => (
-                  <div key={group.community}>
-                    <p className="bg-secondary px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.community}</p>
-                    {group.zones.map((z) => (
-                      <button
-                        key={`${z.city}-${z.name}`}
-                        type="button"
-                        onClick={() => selectZone(z)}
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-secondary"
-                      >
-                        <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                        {z.name}
-                      </button>
-                    ))}
-                  </div>
-                ))}
+              <div className="pointer-events-none absolute bottom-3 left-3 z-[500] max-w-[calc(100%-1.5rem)] rounded bg-card/95 px-3 py-2 text-xs font-medium text-foreground shadow-md">
+                {zonesError ? 'No se pudieron cargar las zonas' : 'Toca una zona del mapa · Acércate para ver municipios'}
               </div>
             )}
           </div>
@@ -400,7 +438,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
             </p>
             <Button
               disabled={!picked}
-              onClick={() => picked && onSelect({ ...picked, radius: Number(radius), ...(polygon ? { polygon } : {}) })}
+              onClick={() => picked && onSelect({ ...picked, radius: Number(radius), ...(polygon ? { polygon } : {}), ...(polygons ? { polygons } : {}) })}
             >
               Aplicar zona
             </Button>
