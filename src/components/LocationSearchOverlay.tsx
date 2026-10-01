@@ -39,7 +39,7 @@ const loadZones = async (level: 'provinces' | 'municipalities'): Promise<ZoneCol
   const response = await fetch(`/data/spain-${level}.json`);
   if (!response.ok) throw new Error('No se pudieron cargar las zonas');
   const topology = await response.json();
-  const collection = feature(topology, topology.objects[level]) as ZoneCollection;
+  const collection = feature(topology, topology.objects[level]) as unknown as ZoneCollection;
   zoneCache[level] = collection;
   return collection;
 };
@@ -451,7 +451,7 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
               {drawMode
                 ? 'Dibuja con el dedo el contorno de la zona'
                 : picked
-                  ? polygon ? `Zona dibujada · ${picked.label}` : picked.label
+                  ? polygon ? picked.label : picked.label
                   : 'Toca el mapa o dibuja tu zona'}
             </p>
             <Button
