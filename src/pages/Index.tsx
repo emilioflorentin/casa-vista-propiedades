@@ -219,6 +219,23 @@ const Index = () => {
                 </Button>
               </div>
               <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:items-start md:gap-3 md:p-3">
+                <Select value={searchType} onValueChange={setSearchType}>
+                  <SelectTrigger
+                    aria-label="Tipo de inmueble"
+                    className="h-12 w-full text-base md:h-14 md:w-48 shrink-0 border-border"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Vivienda</SelectItem>
+                    <SelectItem value="apartment">Piso</SelectItem>
+                    <SelectItem value="house">Casa</SelectItem>
+                    <SelectItem value="loft">Loft</SelectItem>
+                    <SelectItem value="studio">Estudio</SelectItem>
+                    <SelectItem value="room">Habitación (compartir)</SelectItem>
+                    <SelectItem value="garage">Garaje</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="relative flex-1">
                   <MapPin className="absolute left-4 top-6 h-5 w-5 -translate-y-1/2 text-muted-foreground md:top-7" />
                   <button
@@ -237,7 +254,7 @@ const Index = () => {
                 </div>
                 <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14">
                   <Search className="h-5 w-5" />
-                  Buscar viviendas
+                  Buscar
                 </Button>
               </div>
             </form>
