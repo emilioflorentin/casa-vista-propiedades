@@ -266,6 +266,7 @@ const Index = () => {
                 setSearchQuery(value.address);
                 setLocationOpen(false);
                 const params = new URLSearchParams({ operation: searchOperation });
+                if (searchType !== 'all' && searchType !== 'room') params.set('type', searchType);
                 if (value.address.trim()) params.set('q', value.address.trim());
                 if ('lat' in value) {
                   params.set('lat', String(value.lat));
