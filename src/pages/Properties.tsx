@@ -305,6 +305,7 @@ const Properties = () => {
                   <SelectItem value="house">{t('properties.type_house')}</SelectItem>
                   <SelectItem value="loft">{t('properties.type_loft')}</SelectItem>
                   <SelectItem value="studio">{t('properties.type_studio')}</SelectItem>
+                  <SelectItem value="garage">Garaje</SelectItem>
                 </SelectContent>
               </Select>
 
