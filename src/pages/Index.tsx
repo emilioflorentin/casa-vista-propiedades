@@ -38,6 +38,7 @@ const Index = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
+  const [searchType, setSearchType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
