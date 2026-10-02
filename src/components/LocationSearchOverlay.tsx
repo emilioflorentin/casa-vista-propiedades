@@ -324,7 +324,9 @@ const LocationSearchOverlay = ({ open, initialValue = '', onClose, onSelect }: L
               setPolygons(rings);
               const center = path.getBounds().getCenter();
               setPicked({ address: zone.properties.name, label: zone.properties.name, detail: '', lat: center.lat, lng: center.lng });
-              setZonesOpen(false);
+              // Keep the zone layer active after choosing a province: zooming in
+              // then swaps its boundaries for clickable municipalities.
+              if (level === 'municipalities') setZonesOpen(false);
               map.fitBounds(path.getBounds(), { padding: [24, 24], maxZoom: level === 'provinces' ? 9 : 14 });
             });
           },
