@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import imgZonasMapa from "@/assets/home-zonas-mapa.jpg";
 import imgPublicar from "@/assets/home-publicar-inmueble.jpg";
 import imgProfesional from "@/assets/home-profesional.jpg";
@@ -37,6 +38,7 @@ const Index = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchOperation, setSearchOperation] = useState<'sale' | 'rent'>('sale');
+  const [searchType, setSearchType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationError, setLocationError] = useState(false);
@@ -184,6 +186,10 @@ const Index = () => {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
+                if (searchType === 'room') {
+                  navigate('/roomie-finder');
+                  return;
+                }
                 if (!searchQuery.trim()) {
                   setLocationError(true);
                   setLocationOpen(true);
@@ -191,6 +197,7 @@ const Index = () => {
                 }
                 setLocationError(false);
                 const params = new URLSearchParams({ operation: searchOperation });
+                if (searchType !== 'all') params.set('type', searchType);
                 params.set('q', searchQuery.trim());
                 navigate(`/properties?${params.toString()}`);
               }}
@@ -212,6 +219,23 @@ const Index = () => {
                 </Button>
               </div>
               <div className="flex flex-col gap-2 bg-card p-2 shadow-xl md:flex-row md:items-start md:gap-3 md:p-3">
+                <Select value={searchType} onValueChange={setSearchType}>
+                  <SelectTrigger
+                    aria-label="Tipo de inmueble"
+                    className="h-12 w-full text-base md:h-14 md:w-48 shrink-0 border-border"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Vivienda</SelectItem>
+                    <SelectItem value="apartment">Piso</SelectItem>
+                    <SelectItem value="house">Casa</SelectItem>
+                    <SelectItem value="loft">Loft</SelectItem>
+                    <SelectItem value="studio">Estudio</SelectItem>
+                    <SelectItem value="room">Habitación (compartir)</SelectItem>
+                    <SelectItem value="garage">Garaje</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="relative flex-1">
                   <MapPin className="absolute left-4 top-6 h-5 w-5 -translate-y-1/2 text-muted-foreground md:top-7" />
                   <button
@@ -230,7 +254,7 @@ const Index = () => {
                 </div>
                 <Button type="submit" size="lg" className="h-12 px-9 text-base md:h-14">
                   <Search className="h-5 w-5" />
-                  Buscar viviendas
+                  Buscar
                 </Button>
               </div>
             </form>
@@ -242,6 +266,7 @@ const Index = () => {
                 setSearchQuery(value.address);
                 setLocationOpen(false);
                 const params = new URLSearchParams({ operation: searchOperation });
+                if (searchType !== 'all' && searchType !== 'room') params.set('type', searchType);
                 if (value.address.trim()) params.set('q', value.address.trim());
                 if ('lat' in value) {
                   params.set('lat', String(value.lat));
