@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Shield, MessageCircle, Camera, ArrowRight, MapPin, AlertCircle, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import imgZonasMapa from "@/assets/home-zonas-mapa.jpg";
 import imgPublicar from "@/assets/home-publicar-inmueble.jpg";
 import imgProfesional from "@/assets/home-profesional.jpg";
