@@ -186,6 +186,10 @@ const Index = () => {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
+                if (searchType === 'room') {
+                  navigate('/roomie-finder');
+                  return;
+                }
                 if (!searchQuery.trim()) {
                   setLocationError(true);
                   setLocationOpen(true);
@@ -193,6 +197,7 @@ const Index = () => {
                 }
                 setLocationError(false);
                 const params = new URLSearchParams({ operation: searchOperation });
+                if (searchType !== 'all') params.set('type', searchType);
                 params.set('q', searchQuery.trim());
                 navigate(`/properties?${params.toString()}`);
               }}
