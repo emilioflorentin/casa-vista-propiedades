@@ -1,0 +1,2 @@
+ALTER TABLE public.properties DROP CONSTRAINT IF EXISTS properties_type_check;
+ALTER TABLE public.properties ADD CONSTRAINT properties_type_check CHECK (type IN ('apartment','house','loft','studio','room','vacation','garage','storage','office','commercial','transfer','land','building','new_development'));
