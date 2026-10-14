@@ -1102,9 +1102,7 @@ const Account = () => {
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
                          <Badge variant="secondary">
-                           {property.type === 'apartment' ? 'Apartamento' :
-                            property.type === 'house' ? 'Casa' :
-                            property.type === 'studio' ? 'Estudio' : 'Loft'}
+                           {getPropertyTypeLabel(property.type)}
                          </Badge>
                       </div>
                       <div className="absolute top-2 right-2">
