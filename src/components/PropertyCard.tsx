@@ -7,6 +7,7 @@ import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getPropertyTypeLabel } from "@/utils/propertyTypes";
 
 interface Property {
   id: number;
