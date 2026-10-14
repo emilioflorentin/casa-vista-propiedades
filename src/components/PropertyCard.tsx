@@ -7,6 +7,7 @@ import { Heart, MapPin, Bed, Bath, Square, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getPropertyTypeLabel } from "@/utils/propertyTypes";
 
 interface Property {
   id: number;
@@ -46,7 +47,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
       loft: t('properties.type_loft'),
       studio: t('properties.type_studio')
     };
-    return types[type] || type;
+    return types[type] || getPropertyTypeLabel(type);
   };
 
   const getManagementLabel = (managedBy: string) => {

@@ -227,13 +227,17 @@ const Index = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Vivienda</SelectItem>
-                    <SelectItem value="apartment">Piso</SelectItem>
-                    <SelectItem value="house">Casa</SelectItem>
-                    <SelectItem value="loft">Loft</SelectItem>
-                    <SelectItem value="studio">Estudio</SelectItem>
-                    <SelectItem value="room">Habitación (compartir)</SelectItem>
-                    <SelectItem value="garage">Garaje</SelectItem>
+                    <SelectItem value="all">Viviendas</SelectItem>
+                    <SelectItem value="new_development">Obra nueva</SelectItem>
+                    <SelectItem value="room">Habitación</SelectItem>
+                    <SelectItem value="vacation">Vacacional</SelectItem>
+                    <SelectItem value="garage">Garajes</SelectItem>
+                    <SelectItem value="storage">Trasteros</SelectItem>
+                    <SelectItem value="office">Oficinas</SelectItem>
+                    <SelectItem value="commercial">Locales o naves</SelectItem>
+                    <SelectItem value="transfer">Traspasos</SelectItem>
+                    <SelectItem value="land">Terrenos</SelectItem>
+                    <SelectItem value="building">Edificios</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="relative flex-1">
