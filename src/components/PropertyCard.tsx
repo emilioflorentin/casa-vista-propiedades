@@ -46,7 +46,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
       loft: t('properties.type_loft'),
       studio: t('properties.type_studio')
     };
-    return types[type] || type;
+    return types[type] || getPropertyTypeLabel(type);
   };
 
   const getManagementLabel = (managedBy: string) => {
