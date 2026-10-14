@@ -222,12 +222,12 @@ const Index = () => {
                 <Select value={searchType} onValueChange={setSearchType}>
                   <SelectTrigger
                     aria-label="Tipo de inmueble"
-                    className="h-12 w-full text-base md:h-14 md:w-48 shrink-0 border-border"
+                    className="h-12 w-full text-base text-foreground md:h-14 md:w-48 shrink-0 border-border"
                   >
-                    <SelectValue />
+                    <SelectValue placeholder="Vivienda" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Viviendas</SelectItem>
+                    <SelectItem value="all">Vivienda</SelectItem>
                     <SelectItem value="new_development">Obra nueva</SelectItem>
                     <SelectItem value="room">Habitación</SelectItem>
                     <SelectItem value="vacation">Vacacional</SelectItem>
