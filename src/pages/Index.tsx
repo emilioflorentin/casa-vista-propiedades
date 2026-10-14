@@ -14,6 +14,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateDistance } from "@/utils/distanceCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getPropertyTypeLabel } from "@/utils/propertyTypes";
 
 interface FeaturedProperty {
   id: number;
@@ -224,7 +225,9 @@ const Index = () => {
                     aria-label="Tipo de inmueble"
                     className="h-12 w-full text-base text-foreground md:h-14 md:w-48 shrink-0 border-border"
                   >
-                    <SelectValue placeholder="Vivienda" />
+                    <SelectValue placeholder="Vivienda">
+                      {searchType === 'all' ? 'Vivienda' : getPropertyTypeLabel(searchType)}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Vivienda</SelectItem>
