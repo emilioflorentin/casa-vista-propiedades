@@ -5,7 +5,7 @@ export interface LocalProperty {
   userId?: string; // Add userId for direct profile lookup
   reference: string;
   title: string;
-  type: "apartment" | "house" | "loft" | "studio";
+  type: string;
   price: number;
   currency: string;
   operation: "rent" | "sale";
