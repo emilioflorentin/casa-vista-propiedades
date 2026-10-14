@@ -304,6 +304,15 @@ const Properties = () => {
                   <SelectItem value="house">{t('properties.type_house')}</SelectItem>
                   <SelectItem value="loft">{t('properties.type_loft')}</SelectItem>
                   <SelectItem value="studio">{t('properties.type_studio')}</SelectItem>
+                  <SelectItem value="new_development">Obra nueva</SelectItem>
+                  <SelectItem value="vacation">Vacacional</SelectItem>
+                  <SelectItem value="garage">Garaje</SelectItem>
+                  <SelectItem value="storage">Trastero</SelectItem>
+                  <SelectItem value="office">Oficina</SelectItem>
+                  <SelectItem value="commercial">Local o nave</SelectItem>
+                  <SelectItem value="transfer">Traspaso</SelectItem>
+                  <SelectItem value="land">Terreno</SelectItem>
+                  <SelectItem value="building">Edificio</SelectItem>
                   <SelectItem value="garage">Garaje</SelectItem>
                 </SelectContent>
               </Select>

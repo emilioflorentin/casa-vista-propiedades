@@ -15,7 +15,7 @@ interface EditableProperty {
   id: string;
   reference: string;
   title: string;
-  type: "apartment" | "house" | "loft" | "studio";
+  type: string;
   price: number;
   currency: string;
   operation: "rent" | "sale";
@@ -34,7 +34,7 @@ const energyRatings = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 interface PropertyFormProps {
   propertyForm: {
     title: string;
-    type: "apartment" | "house" | "loft" | "studio";
+    type: string;
     price: string;
     currency: string;
     operation: "rent" | "sale";
@@ -189,10 +189,19 @@ export function PropertyForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="apartment">Apartamento</SelectItem>
+                  <SelectItem value="apartment">Piso</SelectItem>
                   <SelectItem value="house">Casa</SelectItem>
                   <SelectItem value="loft">Loft</SelectItem>
                   <SelectItem value="studio">Estudio</SelectItem>
+                  <SelectItem value="new_development">Obra nueva</SelectItem>
+                  <SelectItem value="vacation">Vacacional</SelectItem>
+                  <SelectItem value="garage">Garaje</SelectItem>
+                  <SelectItem value="storage">Trastero</SelectItem>
+                  <SelectItem value="office">Oficina</SelectItem>
+                  <SelectItem value="commercial">Local o nave</SelectItem>
+                  <SelectItem value="transfer">Traspaso</SelectItem>
+                  <SelectItem value="land">Terreno</SelectItem>
+                  <SelectItem value="building">Edificio</SelectItem>
                 </SelectContent>
               </Select>
             </div>
