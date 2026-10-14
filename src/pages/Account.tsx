@@ -115,7 +115,7 @@ const Account = () => {
 
   const [propertyForm, setPropertyForm] = useState({
     title: '',
-    type: 'apartment' as "apartment" | "house" | "loft" | "studio",
+    type: 'apartment' as string,
     price: '',
     currency: 'EUR',
     operation: 'rent' as "rent" | "sale",
@@ -155,7 +155,7 @@ const Account = () => {
           id: p.id,
           reference: p.reference,
           title: p.title,
-          type: p.type as "apartment" | "house" | "loft" | "studio",
+          type: p.type as string,
           price: Number(p.price),
           currency: p.currency,
           operation: p.operation as "rent" | "sale",
@@ -990,9 +990,7 @@ const Account = () => {
                           {property.operation === 'rent' ? 'Alquiler' : 'Venta'}
                         </Badge>
                          <Badge variant="secondary">
-                           {property.type === 'apartment' ? 'Apartamento' :
-                            property.type === 'house' ? 'Casa' :
-                            property.type === 'studio' ? 'Estudio' : 'Loft'}
+                           {getPropertyTypeLabel(property.type)}
                          </Badge>
                       </div>
                        <div className="absolute top-2 right-2 flex gap-1">
