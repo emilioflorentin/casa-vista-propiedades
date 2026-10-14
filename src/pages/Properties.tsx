@@ -313,7 +313,6 @@ const Properties = () => {
                   <SelectItem value="transfer">Traspaso</SelectItem>
                   <SelectItem value="land">Terreno</SelectItem>
                   <SelectItem value="building">Edificio</SelectItem>
-                  <SelectItem value="garage">Garaje</SelectItem>
                 </SelectContent>
               </Select>
 
