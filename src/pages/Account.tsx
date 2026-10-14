@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { PropertyForm } from '../components/PropertyForm';
+import { getPropertyTypeLabel } from '@/utils/propertyTypes';
 import DocumentGenerator from '../components/DocumentGenerator';
 import { 
   User, 
