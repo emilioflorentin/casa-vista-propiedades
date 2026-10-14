@@ -23,7 +23,7 @@ interface DBProperty {
   id: string;
   reference: string;
   title: string;
-  type: "apartment" | "house" | "loft" | "studio";
+  type: string;
   price: number;
   currency: string;
   operation: "rent" | "sale";
@@ -222,9 +222,8 @@ const Properties = () => {
       : property.title.toLowerCase().includes(q) ||
         property.location.toLowerCase().includes(q) ||
         (property.reference?.toLowerCase().includes(q) ?? false);
-    const matchesType = propertyType === "all" || (propertyType === "garage"
-      ? property.features?.some(feature => feature.toLowerCase().includes('garaje')) ?? false
-      : property.type === propertyType);
+    const matchesType = propertyType === "all" || property.type === propertyType ||
+      (propertyType === "garage" && (property.features?.some(feature => feature.toLowerCase().includes('garaje')) ?? false));
     const matchesOperation = operation === "all" || property.operation === operation;
     const matchesManagement = managedBy === "all" || property.managedBy === managedBy;
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
