@@ -42,6 +42,9 @@ const RoomieHeader = () => {
           >
              <ArrowLeft className="w-3.5 h-3.5" /> Volver a PisoGo
           </Link>
+          <Link to="/roomie-finder/registro" className="text-sm font-semibold text-roomie-ink/60 hover:text-roomie-green transition-colors">
+            Crear cuenta
+          </Link>
           <Link to="/roomie-finder/publicar">
             <Button className="rounded-full bg-roomie-green text-white hover:bg-roomie-ink px-5">
               Publicar habitación
@@ -64,8 +67,8 @@ const RoomieHeader = () => {
           <Link to="/roomie-finder/publicar" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-roomie-green">
             Publicar habitación
           </Link>
-          <Link to="/roomie-finder/acceso" onClick={() => setOpen(false)} className="py-2 text-sm text-muted-foreground">
-            Acceso anunciantes
+          <Link to="/roomie-finder/registro" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-roomie-green">
+            Crear cuenta / Entrar
           </Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm text-muted-foreground">
              ← Volver a PisoGo
