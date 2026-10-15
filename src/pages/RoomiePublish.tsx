@@ -48,13 +48,13 @@ const RoomiePublish = () => {
   const set = (k: string, v: string | boolean) => setF((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
-    document.title = 'Publicar habitación | Roomie Finder — Nazarí Homes';
+    document.title = 'Publicar habitación | Roomie Finder by PisoGo';
   }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
-      toast.info('Inicia sesión para publicar una habitación');
-      navigate('/auth');
+      toast.info('Inicia sesión o crea tu cuenta de Roomie Finder para publicar');
+      navigate('/roomie-finder/registro');
     }
   }, [authLoading, user, navigate]);
 
