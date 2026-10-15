@@ -1,3 +1,5 @@
+// ============= Roomie Finder account page =============
+
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '@/components/roomie/RoomieHeader';
@@ -8,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveSeeker } from '@/utils/roomieSeeker';
@@ -20,7 +21,7 @@ const RoomieRegister = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { signUp, signIn, user } = useAuth();
-  const [tab, setTab] = useState(params.get('mode') === 'login' ? 'login' : 'register');
+  const [mode, setMode] = useState<'login' | 'register'>(params.get('mode') === 'register' ? 'register' : 'login');
   const [saving, setSaving] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -32,7 +33,11 @@ const RoomieRegister = () => {
   });
   const set = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
 
-  useEffect(() => { document.title = 'Crear cuenta | Roomie Finder by PisoGo'; }, []);
+  useEffect(() => {
+    document.title = mode === 'register'
+      ? 'Crear cuenta | Roomie Finder by PisoGo'
+      : 'Entrar | Roomie Finder by PisoGo';
+  }, [mode]);
 
   useEffect(() => {
     if (user) navigate('/roomie-finder', { replace: true });
@@ -73,7 +78,7 @@ const RoomieRegister = () => {
         console.error('No se pudo guardar la ficha de búsqueda', e);
       }
       toast.success('Cuenta de Roomie Finder creada. Revisa tu email para confirmarla.');
-      setTab('login');
+      setMode('login');
     } finally { setSaving(false); }
   };
 
@@ -93,18 +98,43 @@ const RoomieRegister = () => {
       <main className="container mx-auto px-6 py-10 max-w-xl">
         <h1 className="text-3xl font-bold text-foreground mb-2">Tu cuenta de Roomie Finder</h1>
         <p className="text-muted-foreground mb-6">
-          Registro independiente de PisoGo: sirve tanto si buscas habitación como si publicas una.
+          Acceso independiente de PisoGo: sirve tanto si buscas habitación como si publicas una.
         </p>
 
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="register">Crear cuenta</TabsTrigger>
-            <TabsTrigger value="login">Entrar</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="register">
+        {mode === 'login' ? (
+          <>
             <Card>
-              <CardHeader><CardTitle>Registro completo</CardTitle></CardHeader>
+              <CardHeader><CardTitle>Entrar a Roomie Finder</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="le">Email</Label>
+                  <Input id="le" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lp">Contraseña</Label>
+                  <Input id="lp" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                </div>
+                <Button className="w-full bg-roomie-green text-white hover:bg-roomie-ink" onClick={login} disabled={saving}>
+                  {saving ? 'Entrando...' : 'Entrar'}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <p className="mt-5 text-center text-sm text-muted-foreground">
+              ¿Aún no tienes cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => setMode('register')}
+                className="font-bold text-roomie-green underline underline-offset-4 hover:text-roomie-ink"
+              >
+                Crear cuenta de Roomie Finder
+              </button>
+            </p>
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardHeader><CardTitle>Crear cuenta de Roomie Finder</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -181,27 +211,19 @@ const RoomieRegister = () => {
                 </p>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="login">
-            <Card>
-              <CardHeader><CardTitle>Entrar a Roomie Finder</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="le">Email</Label>
-                  <Input id="le" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="lp">Contraseña</Label>
-                  <Input id="lp" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-                </div>
-                <Button className="w-full bg-roomie-green text-white hover:bg-roomie-ink" onClick={login} disabled={saving}>
-                  {saving ? 'Entrando...' : 'Entrar'}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            <p className="mt-5 text-center text-sm text-muted-foreground">
+              ¿Ya tienes cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => setMode('login')}
+                className="font-bold text-roomie-green underline underline-offset-4 hover:text-roomie-ink"
+              >
+                Entrar
+              </button>
+            </p>
+          </>
+        )}
       </main>
       <Footer />
     </div>
