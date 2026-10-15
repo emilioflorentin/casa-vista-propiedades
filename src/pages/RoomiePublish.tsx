@@ -54,7 +54,7 @@ const RoomiePublish = () => {
   useEffect(() => {
     if (!authLoading && !user) {
       toast.info('Inicia sesión o crea tu cuenta de Roomie Finder para publicar');
-      navigate('/roomie-finder/registro');
+      navigate('/roomie-finder/registro?mode=register');
     }
   }, [authLoading, user, navigate]);
 
